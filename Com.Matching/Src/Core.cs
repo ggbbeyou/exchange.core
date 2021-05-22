@@ -129,7 +129,20 @@ namespace Com.Matching
             {
                 return;
             }
-            
+
+        }
+
+        /// <summary>
+        /// 从MQ获取到撤消订单
+        /// </summary>
+        /// <param name="order">挂单订单</param>
+        public void RemoveOrder(Order order)
+        {
+            if (order.name != this.name)
+            {
+                return;
+            }
+
         }
 
         /// <summary>

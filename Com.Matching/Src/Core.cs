@@ -23,9 +23,28 @@
  *  
  */
 
-using System;
 
-namespace Com.Model
+/*
+撮合价格
+
+买入价:A,卖出价:B,前一价:C,最新价:D
+
+前提:A>=B
+
+规则:
+A<=C    D=A
+B>=C    D=B
+B<C<A   D=C
+
+*/
+
+using System;
+using System.Collections.Generic;
+using Com.Model.Base;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+
+namespace Com.Matching
 {
     /// <summary>
     /// 撮合算法核心类
@@ -33,9 +52,90 @@ namespace Com.Model
     public class Core
     {
         /// <summary>
+        /// 是否运行
+        /// </summary>
+        public bool run;
+        /// <summary>
+        /// 交易对名称
+        /// </summary>
+        /// <value></value>
+        public string name { get; set; }
+        /// <summary>
         /// 上一次成交价
         /// </summary>
         public decimal price;
+        /// <summary>
+        /// 市价买单
+        /// </summary>
+        /// <typeparam name="Order">订单</typeparam>
+        /// <returns></returns>
+        public List<Order> market_bid = new List<Order>();
+        /// <summary>
+        /// 市价卖单
+        /// </summary>
+        /// <typeparam name="Order">订单</typeparam>
+        /// <returns></returns>
+        public List<Order> market_ask = new List<Order>();
+        /// <summary>
+        /// 限价买单
+        /// </summary>
+        /// <typeparam name="Order">订单</typeparam>
+        /// <returns></returns>
+        public List<Order> fixed_bid = new List<Order>();
+        /// <summary>
+        /// 限价卖单
+        /// </summary>
+        /// <typeparam name="Order">订单</typeparam>
+        /// <returns></returns>
+        public List<Order> fixed_ask = new List<Order>();
+        /// <summary>
+        /// 配置接口
+        /// </summary>
+        public IConfiguration configuration;
+        /// <summary>
+        /// 日志接口
+        /// </summary>
+        public ILogger logger;
+
+        public Core(string name, IConfiguration configuration, ILogger logger)
+        {
+            this.name = name;
+            this.logger = logger;
+            this.configuration = configuration;
+        }
+
+        /// <summary>
+        /// 开启
+        /// </summary>
+        /// <param name="last">最后价格</param>
+        public void Start(decimal last)
+        {
+
+        }
+
+        public void Stop()
+        {
+
+        }
+
+        /// <summary>
+        /// 添加新的订单
+        /// </summary>
+        /// <param name="order">挂单订单</param>
+        public void AddOrder(Order order)
+        {
+
+        }
+
+        /// <summary>
+        /// 成交了一个订单
+        /// </summary>
+        /// <param name="deal">成交订单</param>
+        public void AddDeal(Deal deal)
+        {
+
+        }
+
 
 
     }

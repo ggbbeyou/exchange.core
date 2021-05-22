@@ -43,6 +43,11 @@ namespace Com.Model.Base
         /// <value></value>
         public DateTimeOffset time { get; set; }
         /// <summary>
+        /// 成交状态
+        /// </summary>
+        /// <value></value>
+        public E_DealState state { get; set; }
+        /// <summary>
         /// 买订单
         /// </summary>
         /// <value></value>

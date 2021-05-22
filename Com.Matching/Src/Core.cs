@@ -54,7 +54,7 @@ namespace Com.Matching
         /// <summary>
         /// 是否运行
         /// </summary>
-        public bool run;
+        public volatile bool run;
         /// <summary>
         /// 交易对名称
         /// </summary>
@@ -63,7 +63,7 @@ namespace Com.Matching
         /// <summary>
         /// 上一次成交价
         /// </summary>
-        public decimal price;
+        public decimal price_last;
         /// <summary>
         /// 市价买单
         /// </summary>
@@ -107,15 +107,16 @@ namespace Com.Matching
         /// <summary>
         /// 开启
         /// </summary>
-        /// <param name="last">最后价格</param>
-        public void Start(decimal last)
+        /// <param name="price_last">最后价格</param>
+        public void Start(decimal price_last)
         {
-
+            this.price_last = price_last;
+            this.run = true;
         }
 
         public void Stop()
         {
-
+            this.run = false;
         }
 
         /// <summary>

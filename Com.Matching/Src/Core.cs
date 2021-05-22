@@ -54,7 +54,7 @@ namespace Com.Matching
         /// <summary>
         /// 是否运行
         /// </summary>
-        public volatile bool run;
+        public bool run;
         /// <summary>
         /// 交易对名称
         /// </summary>
@@ -120,16 +120,20 @@ namespace Com.Matching
         }
 
         /// <summary>
-        /// 添加新的订单
+        /// 从MQ获取到新的订单
         /// </summary>
         /// <param name="order">挂单订单</param>
         public void AddOrder(Order order)
         {
-
+            if (order.name != this.name)
+            {
+                return;
+            }
+            
         }
 
         /// <summary>
-        /// 成交了一个订单
+        /// 成交订单发送到MQ
         /// </summary>
         /// <param name="deal">成交订单</param>
         public void AddDeal(Deal deal)

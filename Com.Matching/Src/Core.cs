@@ -237,7 +237,6 @@ namespace Com.Matching
                 amount = ask.amount_unsold,
                 total = new_price * bid.amount,
                 time = now,
-
                 bid = bid,
                 ask = ask,
             };

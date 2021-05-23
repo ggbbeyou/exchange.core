@@ -121,7 +121,7 @@ namespace Com.Matching
         }
 
         /// <summary>
-        /// 从MQ获取到新的订单
+        /// 撮合算法
         /// </summary>
         /// <param name="order">挂单订单(手续费问题在推送到撮合之前扣除)</param>
         public List<Deal> AddOrder(Order order)
@@ -137,56 +137,20 @@ namespace Com.Matching
             {
                 if (order.type == E_OrderType.price_market)
                 {
+                    //市价买单与市价卖市撮合
                     foreach (var item in market_ask)
                     {
                         if (item.amount_unsold >= order.amount)
                         {
-                            item.amount_unsold -= order.amount;
-                            item.amount_done += order.amount;
-                            item.deal_last_time = now;
-                            order.amount_unsold = 0;
-                            order.amount_done = order.amount;
-                            order.deal_last_time = now;
-                            Deal deal = new Deal()
-                            {
-                                id = Util.worker.NextId().ToString(),
-                                name = this.name,
-                                uid_bid = order.uid,
-                                uid_ask = item.uid,
-                                price = this.price_last,
-                                amount = order.amount,
-                                total = this.price_last * order.amount,
-                                time = now,
-                                state = E_DealState.completed,
-                                bid = order,
-                                ask = item,
-                            };
+                            Deal deal = NewMethod(order, now, item);
                             deals.Add(deal);
                             break;
                         }
                         else
                         {
-                            item.amount_unsold = 0;
-                            item.amount_done += item.amount_unsold;
-                            item.deal_last_time = now;
-                            order.amount_unsold -= item.amount_unsold;
-                            order.amount_done += item.amount_unsold;
-                            order.deal_last_time = now;
-                            Deal deal = new Deal()
-                            {
-                                id = Util.worker.NextId().ToString(),
-                                name = this.name,
-                                uid_bid = order.uid,
-                                uid_ask = item.uid,
-                                price = this.price_last,
-                                amount = item.amount_unsold,
-                                total = this.price_last * order.amount,
-                                time = now,
-                                state = E_DealState.partial,
-                                bid = order,
-                                ask = item,
-                            };
+                            Deal deal = NewMethod1(order, now, item);
                             deals.Add(deal);
+                            //市价卖单完成,从市价卖单移除
                             market_ask.Remove(item);
                             if (order.amount_unsold <= 0)
                             {
@@ -194,14 +158,17 @@ namespace Com.Matching
                             }
                         }
                     }
+                    //市价买单与限价卖单撮合
                     if (order.amount_unsold > 0 && fixed_ask.Count() > 0)
                     {
                         foreach (var item in fixed_ask)
                         {
+                            //买单价>=卖单价原则
                             if (order.price < item.price)
                             {
                                 break;
                             }
+                            //使用撮合价规则
                             decimal new_price = Util.GetNewPrice(order.price, item.price, this.price_last);
                             if (new_price <= 0)
                             {
@@ -234,6 +201,7 @@ namespace Com.Matching
                             this.price_last = new_price;
                         }
                     }
+                    //市价买单没成交部分添加到市价买单最后,(时间优先原则)
                     if (order.amount_unsold > 0)
                     {
                         market_bid.Append(order);
@@ -250,6 +218,72 @@ namespace Com.Matching
             }
 
             return deals;
+        }
+
+        /// <summary>
+        /// 卖单量< 买单量
+        /// </summary>
+        /// <param name="bid"></param>
+        /// <param name="ask"></param>
+        /// <param name="new_price"></param>
+        /// <param name="now"></param>
+        /// <returns></returns>
+        private Deal NewMethod1(Order bid, Order ask, decimal new_price, DateTimeOffset now)
+        {
+            ask.amount_unsold = 0;
+            ask.amount_done += ask.amount_unsold;
+            ask.deal_last_time = now;
+            bid.amount_unsold -= ask.amount_unsold;
+            bid.amount_done += ask.amount_unsold;
+            bid.deal_last_time = now;
+            Deal deal = new Deal()
+            {
+                id = Util.worker.NextId().ToString(),
+                name = this.name,
+                uid_bid = bid.uid,
+                uid_ask = ask.uid,
+                price = new_price,
+                amount = ask.amount_unsold,
+                total = new_price * bid.amount,
+                time = now,
+                state = E_DealState.partial,
+                bid = bid,
+                ask = ask,
+            };
+            return deal;
+        }
+
+        /// <summary>
+        /// 卖单量>=买单量
+        /// </summary>
+        /// <param name="bid"></param>
+        /// <param name="ask"></param>
+        /// <param name="new_price"></param>
+        /// <param name="now"></param>
+        /// <returns></returns>
+        private Deal NewMethod(Order bid, Order ask, decimal new_price, DateTimeOffset now)
+        {
+            ask.amount_unsold -= bid.amount;
+            ask.amount_done += bid.amount;
+            ask.deal_last_time = now;
+            bid.amount_unsold = 0;
+            bid.amount_done = bid.amount;
+            bid.deal_last_time = now;
+            Deal deal = new Deal()
+            {
+                id = Util.worker.NextId().ToString(),
+                name = this.name,
+                uid_bid = bid.uid,
+                uid_ask = ask.uid,
+                price = new_price,
+                amount = bid.amount,
+                total = new_price * bid.amount,
+                time = now,
+                state = E_DealState.completed,
+                bid = bid,
+                ask = ask,
+            };
+            return deal;
         }
 
         /// <summary>

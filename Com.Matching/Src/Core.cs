@@ -69,7 +69,7 @@ namespace Com.Matching
         /// </summary>
         /// <typeparam name="Order">订单</typeparam>
         /// <returns></returns>
-        public List<Order> market_bid =new List<Order>();
+        public List<Order> market_bid = new List<Order>();
         /// <summary>
         /// 市价卖单
         /// </summary>
@@ -125,11 +125,68 @@ namespace Com.Matching
         /// <param name="order">挂单订单</param>
         public void AddOrder(Order order)
         {
-            if (order.name != this.name)
+            if (order.name != this.name || order.amount_unsold <= 0)
             {
                 return;
             }
+            Deal deal = new Deal()
+            {
+                id = Util.worker.NextId().ToString(),
+                name = this.name,
+            };
 
+            if (order.direction == E_Direction.bid)
+            {
+                if (market_ask.Count > 0)
+                {
+
+                }
+                if (order.type == E_OrderType.price_market)
+                {
+
+                }
+                else if (order.type == E_OrderType.price_fixed)
+                {
+
+                }
+            }
+            else if (order.direction == E_Direction.ask)
+            {
+                if (order.type == E_OrderType.price_market)
+                {
+
+                }
+                else if (order.type == E_OrderType.price_fixed)
+                {
+
+                }
+            }
+
+            ///
+            /// ///////////////
+            /// 
+            if (order.type == E_OrderType.price_market)
+            {
+                if (order.direction == E_Direction.bid)
+                {
+
+                }
+                else if (order.direction == E_Direction.ask)
+                {
+
+                }
+            }
+            else if (order.type == E_OrderType.price_fixed)
+            {
+                if (order.direction == E_Direction.bid)
+                {
+
+                }
+                else if (order.direction == E_Direction.ask)
+                {
+
+                }
+            }
         }
 
         /// <summary>

@@ -10,7 +10,7 @@ namespace Com.Model.Base
         /// <summary>
         /// 市价
         /// </summary>
-        price_market_ = 1,
+        price_market = 1,
         /// <summary>
         /// 限价
         /// </summary>

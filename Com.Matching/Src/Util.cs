@@ -1,4 +1,5 @@
 using System;
+using Snowflake;
 
 namespace Com.Matching
 {
@@ -7,6 +8,8 @@ namespace Com.Matching
     /// </summary>
     public static class Util
     {
+        public static IdWorker worker = new IdWorker(1, 1);
+
         /// <summary>
         /// 获取最新成交价
         /// </summary>
@@ -33,6 +36,12 @@ namespace Com.Matching
                 return last;
             }
             return 0;
+        }
+
+        public static long a()
+        {
+
+            return worker.NextId();
         }
     }
 }

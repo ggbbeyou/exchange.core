@@ -18,10 +18,15 @@ namespace Com.Model.Base
         /// <value></value>
         public string name { get; set; }
         /// <summary>
-        /// 用户ID
+        /// 买单用户ID
         /// </summary>
         /// <value></value>
-        public string uid { get; set; }
+        public string uid_bid { get; set; }
+        /// <summary>
+        /// 卖单用户ID
+        /// </summary>
+        /// <value></value>
+        public string uid_ask { get; set; }
         /// <summary>
         /// 成交价
         /// </summary>

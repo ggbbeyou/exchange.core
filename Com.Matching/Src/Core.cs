@@ -201,7 +201,7 @@ namespace Com.Matching
                     //市价买单没成交部分添加到市价买单最后,(时间优先原则)
                     if (order.amount_unsold > 0)
                     {
-                        market_bid.Append(order);
+                        market_bid.Add(order);
                     }
                 }
                 else if (order.type == E_OrderType.price_fixed)

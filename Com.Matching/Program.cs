@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using Com.Model.Base;
 
 namespace Com.Matching
 {
@@ -9,9 +11,12 @@ namespace Com.Matching
             Console.WriteLine("Hello World!");
             DateTimeOffset now = DateTimeOffset.UtcNow;
             Test test = new Test();
-            Console.WriteLine(test.AddOrder().Count);
+            List<Deal> deals = test.AddOrder();
 
-            Console.WriteLine("End ~~ " + (DateTimeOffset.UtcNow - now).TotalSeconds);
+            int count = deals.Count;
+            double time = (DateTimeOffset.UtcNow - now).TotalSeconds;
+
+            Console.WriteLine($"End ~~  count:{count},time:{time}秒,avg:{time / count}");
             Console.Read();
         }
     }

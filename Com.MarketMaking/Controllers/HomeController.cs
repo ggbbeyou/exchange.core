@@ -21,7 +21,6 @@ namespace Com.MarketMaking.Controllers
 
         public IActionResult Index()
         {
-            Span<byte> market_bid = new Span<byte>();
             return View();
         }
 

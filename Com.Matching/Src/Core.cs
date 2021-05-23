@@ -480,12 +480,13 @@ namespace Com.Matching
         /// <returns></returns>
         private Deal AmountBidAsk(Order bid, Order ask, decimal price, DateTimeOffset now)
         {
+            decimal ask_amount = ask.amount_unsold;
             ask.amount_unsold = 0;
-            ask.amount_done += ask.amount_unsold;
+            ask.amount_done += ask_amount;
             ask.deal_last_time = now;
             ask.state = E_DealState.completed;
-            bid.amount_unsold -= ask.amount_unsold;
-            bid.amount_done += ask.amount_unsold;
+            bid.amount_unsold -= ask_amount;
+            bid.amount_done += ask_amount;
             bid.deal_last_time = now;
             if (bid.amount_unsold <= 0)
             {
@@ -502,8 +503,8 @@ namespace Com.Matching
                 uid_bid = bid.uid,
                 uid_ask = ask.uid,
                 price = price,
-                amount = ask.amount_unsold,
-                total = price * bid.amount_unsold,
+                amount = ask_amount,
+                total = price * ask_amount,
                 time = now,
                 bid = bid,
                 ask = ask,
@@ -521,8 +522,9 @@ namespace Com.Matching
         /// <returns></returns>
         private Deal AmountAskBid(Order bid, Order ask, decimal price, DateTimeOffset now)
         {
-            ask.amount_unsold -= bid.amount_unsold;
-            ask.amount_done += bid.amount_unsold;
+            decimal bid_amount = bid.amount_unsold;
+            ask.amount_unsold -= bid_amount;
+            ask.amount_done += bid_amount;
             ask.deal_last_time = now;
             if (ask.amount_unsold <= 0)
             {
@@ -533,7 +535,7 @@ namespace Com.Matching
                 ask.state = E_DealState.partial;
             }
             bid.amount_unsold = 0;
-            bid.amount_done = bid.amount_unsold;
+            bid.amount_done = bid_amount;
             bid.deal_last_time = now;
             bid.state = E_DealState.completed;
             Deal deal = new Deal()
@@ -543,8 +545,8 @@ namespace Com.Matching
                 uid_bid = bid.uid,
                 uid_ask = ask.uid,
                 price = price,
-                amount = bid.amount_unsold,
-                total = price * bid.amount_unsold,
+                amount = bid_amount,
+                total = price * bid_amount,
                 time = now,
                 bid = bid,
                 ask = ask,

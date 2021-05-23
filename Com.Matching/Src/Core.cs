@@ -152,17 +152,17 @@ namespace Com.Matching
                     //市价买单与市价卖市撮合
                     for (int i = 0; i < market_ask.Count; i++)
                     {
-                        if (market_ask[i].amount_unsold >= order.amount)
+                        if (market_ask[i].amount_unsold >= order.amount_unsold)
                         {
                             Deal deal = AmountAskBid(order, market_ask[i], this.price_last, now);
                             deals.Add(deal);
-                            if (market_ask[i].amount_unsold == order.amount)
+                            if (market_ask[i].amount_unsold == order.amount_unsold)
                             {
                                 market_ask.Remove(market_ask[i]);
                             }
                             break;
                         }
-                        else if (market_ask[i].amount_unsold < order.amount)
+                        else if (market_ask[i].amount_unsold < order.amount_unsold)
                         {
                             Deal deal = AmountBidAsk(order, market_ask[i], this.price_last, now);
                             deals.Add(deal);
@@ -186,17 +186,17 @@ namespace Com.Matching
                             {
                                 break;
                             }
-                            if (fixed_ask[i].amount_unsold >= order.amount)
+                            if (fixed_ask[i].amount_unsold >= order.amount_unsold)
                             {
                                 Deal deal = AmountAskBid(order, fixed_ask[i], this.price_last, now);
                                 deals.Add(deal);
-                                if (fixed_ask[i].amount_unsold == order.amount)
+                                if (fixed_ask[i].amount_unsold == order.amount_unsold)
                                 {
                                     fixed_ask.Remove(fixed_ask[i]);
                                 }
                                 break;
                             }
-                            else if (fixed_ask[i].amount_unsold < order.amount)
+                            else if (fixed_ask[i].amount_unsold < order.amount_unsold)
                             {
                                 Deal deal = AmountBidAsk(order, fixed_ask[i], this.price_last, now);
                                 deals.Add(deal);
@@ -223,17 +223,17 @@ namespace Com.Matching
                     //限价买单与市价卖单撮合
                     for (int i = 0; i < market_ask.Count; i++)
                     {
-                        if (market_ask[i].amount_unsold >= order.amount)
+                        if (market_ask[i].amount_unsold >= order.amount_unsold)
                         {
                             Deal deal = AmountAskBid(order, market_ask[i], order.price, now);
                             deals.Add(deal);
-                            if (market_ask[i].amount_unsold == order.amount)
+                            if (market_ask[i].amount_unsold == order.amount_unsold)
                             {
                                 market_ask.Remove(market_ask[i]);
                             }
                             break;
                         }
-                        else if (market_ask[i].amount_unsold < order.amount)
+                        else if (market_ask[i].amount_unsold < order.amount_unsold)
                         {
                             Deal deal = AmountBidAsk(order, market_ask[i], order.price, now);
                             deals.Add(deal);
@@ -257,17 +257,17 @@ namespace Com.Matching
                             {
                                 break;
                             }
-                            if (fixed_ask[i].amount_unsold >= order.amount)
+                            if (fixed_ask[i].amount_unsold >= order.amount_unsold)
                             {
                                 Deal deal = AmountAskBid(order, fixed_ask[i], new_price, now);
                                 deals.Add(deal);
-                                if (fixed_ask[i].amount_unsold == order.amount)
+                                if (fixed_ask[i].amount_unsold == order.amount_unsold)
                                 {
                                     fixed_ask.Remove(fixed_ask[i]);
                                 }
                                 break;
                             }
-                            else if (fixed_ask[i].amount_unsold < order.amount)
+                            else if (fixed_ask[i].amount_unsold < order.amount_unsold)
                             {
                                 Deal deal = AmountBidAsk(order, fixed_ask[i], new_price, now);
                                 deals.Add(deal);
@@ -304,7 +304,7 @@ namespace Com.Matching
                     //市价卖单与市价买单撮合
                     for (int i = 0; i < market_bid.Count; i++)
                     {
-                        if (market_bid[i].amount_unsold >= order.amount)
+                        if (market_bid[i].amount_unsold >= order.amount_unsold)
                         {
                             Deal deal = AmountBidAsk(market_bid[i], order, this.price_last, now);
                             deals.Add(deal);
@@ -314,7 +314,7 @@ namespace Com.Matching
                             }
                             break;
                         }
-                        else if (market_bid[i].amount_unsold < order.amount)
+                        else if (market_bid[i].amount_unsold < order.amount_unsold)
                         {
                             Deal deal = AmountAskBid(market_bid[i], order, this.price_last, now);
                             deals.Add(deal);
@@ -338,17 +338,17 @@ namespace Com.Matching
                             {
                                 break;
                             }
-                            if (fixed_bid[i].amount_unsold >= order.amount)
+                            if (fixed_bid[i].amount_unsold >= order.amount_unsold)
                             {
                                 Deal deal = AmountBidAsk(fixed_bid[i], order, new_price, now);
                                 deals.Add(deal);
-                                if (fixed_bid[i].amount_unsold == order.amount)
+                                if (fixed_bid[i].amount_unsold == order.amount_unsold)
                                 {
                                     fixed_bid.Remove(fixed_bid[i]);
                                 }
                                 break;
                             }
-                            else if (fixed_bid[i].amount_unsold < order.amount)
+                            else if (fixed_bid[i].amount_unsold < order.amount_unsold)
                             {
                                 Deal deal = AmountAskBid(fixed_bid[i], order, new_price, now);
                                 deals.Add(deal);
@@ -374,7 +374,7 @@ namespace Com.Matching
                     //限价卖单与市价买市撮合
                     for (int i = 0; i < market_bid.Count; i++)
                     {
-                        if (market_bid[i].amount_unsold >= order.amount)
+                        if (market_bid[i].amount_unsold >= order.amount_unsold)
                         {
                             Deal deal = AmountBidAsk(order, market_bid[i], order.price, now);
                             deals.Add(deal);
@@ -384,7 +384,7 @@ namespace Com.Matching
                             }
                             break;
                         }
-                        else if (market_bid[i].amount_unsold < order.amount)
+                        else if (market_bid[i].amount_unsold < order.amount_unsold)
                         {
                             Deal deal = AmountAskBid(market_bid[i], order, order.price, now);
                             deals.Add(deal);
@@ -408,7 +408,7 @@ namespace Com.Matching
                             {
                                 break;
                             }
-                            if (fixed_bid[i].amount_unsold >= order.amount)
+                            if (fixed_bid[i].amount_unsold >= order.amount_unsold)
                             {
                                 Deal deal = AmountBidAsk(fixed_bid[i], order, new_price, now);
                                 deals.Add(deal);
@@ -418,7 +418,7 @@ namespace Com.Matching
                                 }
                                 break;
                             }
-                            else if (fixed_bid[i].amount_unsold < order.amount)
+                            else if (fixed_bid[i].amount_unsold < order.amount_unsold)
                             {
                                 Deal deal = AmountAskBid(fixed_bid[i], order, new_price, now);
                                 deals.Add(deal);

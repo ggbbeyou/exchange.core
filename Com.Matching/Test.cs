@@ -41,7 +41,7 @@ namespace Com.Matching
             for (int i = 0; i < 10000; i++)
             {
                 decimal price = random.Next(1, 50) + (decimal)random.NextDouble();
-                decimal amount = random.Next(5000, 5010) + (decimal)random.NextDouble();
+                decimal amount = random.Next(1, 10) + (decimal)random.NextDouble();
                 E_Direction direction = random.Next() % 2 == 0 ? E_Direction.bid : E_Direction.ask;
                 E_OrderType type = random.Next() % 2 == 0 ? E_OrderType.price_fixed : E_OrderType.price_market;
                 if (type == E_OrderType.price_market)

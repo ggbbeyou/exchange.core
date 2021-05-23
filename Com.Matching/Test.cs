@@ -24,9 +24,9 @@ namespace Com.Matching
         {
             List<Deal> deals = new List<Deal>();
             List<Order> orders = GetOrder();
-            foreach (var item in orders)
+            for (int i = 0; i < orders.Count; i++)
             {
-                deals.AddRange(core.Match(item));
+                deals.AddRange(core.Match(orders[i]));
             }
             return deals;
         }
@@ -40,11 +40,10 @@ namespace Com.Matching
             List<Order> orders = new List<Order>();
             for (int i = 0; i < 1000000; i++)
             {
-                E_Direction direction = random.Next() % 2 == 0 ? E_Direction.bid : E_Direction.ask;
-                E_OrderType type = random.Next() % 2 == 0 ? E_OrderType.price_fixed : E_OrderType.price_market;
+                E_Direction direction = random.Next(1, 3) == 1 ? E_Direction.bid : E_Direction.ask;
+                E_OrderType type = random.Next(1, 3) == 1 ? E_OrderType.price_fixed : E_OrderType.price_market;
                 decimal price = 0;
                 decimal amount = random.Next(1, 10);
-
                 if (type == E_OrderType.price_fixed)
                 {
                     if (direction == E_Direction.bid)
@@ -53,7 +52,7 @@ namespace Com.Matching
                     }
                     else
                     {
-                        price = random.Next(20, 60);
+                        price = random.Next(40, 50);
                     }
                 }
                 Order order = new Order()

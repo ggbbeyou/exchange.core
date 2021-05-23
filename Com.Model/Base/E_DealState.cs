@@ -18,6 +18,10 @@ namespace Com.Model.Base
         /// <summary>
         /// 完全成交
         /// </summary>
-        completed=2
+        completed = 2,
+        /// <summary>
+        /// 撤单
+        /// </summary>
+        cancel = 3
     }
 }

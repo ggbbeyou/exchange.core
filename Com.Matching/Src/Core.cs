@@ -150,24 +150,24 @@ namespace Com.Matching
                 if (order.type == E_OrderType.price_market)
                 {
                     //市价买单与市价卖市撮合
-                    foreach (var item in market_ask)
+                    for (int i = 0; i <= market_ask.Count; i++)
                     {
-                        if (item.amount_unsold >= order.amount)
+                        if (market_ask[i].amount_unsold >= order.amount)
                         {
-                            Deal deal = AmountAskBid(order, item, this.price_last, now);
+                            Deal deal = AmountAskBid(order, market_ask[i], this.price_last, now);
                             deals.Add(deal);
-                            if (item.amount_unsold == order.amount)
+                            if (market_ask[i].amount_unsold == order.amount)
                             {
-                                market_ask.Remove(item);
+                                market_ask.Remove(market_ask[i]);
                             }
                             break;
                         }
-                        else if (item.amount_unsold < order.amount)
+                        else if (market_ask[i].amount_unsold < order.amount)
                         {
-                            Deal deal = AmountBidAsk(order, item, this.price_last, now);
+                            Deal deal = AmountBidAsk(order, market_ask[i], this.price_last, now);
                             deals.Add(deal);
                             //市价卖单完成,从市价卖单移除
-                            market_ask.Remove(item);
+                            market_ask.Remove(market_ask[i]);
                         }
                         //量全部处理完了
                         if (order.amount_unsold <= 0)
@@ -178,30 +178,30 @@ namespace Com.Matching
                     //市价买单与限价卖单撮合
                     if (order.amount_unsold > 0 && fixed_ask.Count() > 0)
                     {
-                        foreach (var item in fixed_ask)
+                        for (int i = 0; i <= fixed_ask.Count; i++)
                         {
                             //使用撮合价规则
-                            decimal new_price = Util.GetNewPrice(order.price, item.price, this.price_last);
+                            decimal new_price = Util.GetNewPrice(order.price, fixed_ask[i].price, this.price_last);
                             if (new_price <= 0)
                             {
                                 break;
                             }
-                            if (item.amount_unsold >= order.amount)
+                            if (fixed_ask[i].amount_unsold >= order.amount)
                             {
-                                Deal deal = AmountAskBid(order, item, this.price_last, now);
+                                Deal deal = AmountAskBid(order, fixed_ask[i], this.price_last, now);
                                 deals.Add(deal);
-                                if (item.amount_unsold == order.amount)
+                                if (fixed_ask[i].amount_unsold == order.amount)
                                 {
-                                    fixed_ask.Remove(item);
+                                    fixed_ask.Remove(fixed_ask[i]);
                                 }
                                 break;
                             }
-                            else if (item.amount_unsold < order.amount)
+                            else if (fixed_ask[i].amount_unsold < order.amount)
                             {
-                                Deal deal = AmountBidAsk(order, item, this.price_last, now);
+                                Deal deal = AmountBidAsk(order, fixed_ask[i], this.price_last, now);
                                 deals.Add(deal);
                                 //市价卖单完成,从市价卖单移除
-                                fixed_ask.Remove(item);
+                                fixed_ask.Remove(fixed_ask[i]);
                             }
                             this.price_last = new_price;
                             //量全部处理完了
@@ -220,24 +220,24 @@ namespace Com.Matching
                 else if (order.type == E_OrderType.price_fixed)
                 {
                     //限价买单与市价卖单撮合
-                    foreach (var item in market_ask)
+                    for (int i = 0; i <= market_ask.Count; i++)
                     {
-                        if (item.amount_unsold >= order.amount)
+                        if (market_ask[i].amount_unsold >= order.amount)
                         {
-                            Deal deal = AmountAskBid(order, item, order.price, now);
+                            Deal deal = AmountAskBid(order, market_ask[i], order.price, now);
                             deals.Add(deal);
-                            if (item.amount_unsold == order.amount)
+                            if (market_ask[i].amount_unsold == order.amount)
                             {
-                                market_ask.Remove(item);
+                                market_ask.Remove(market_ask[i]);
                             }
                             break;
                         }
-                        else if (item.amount_unsold < order.amount)
+                        else if (market_ask[i].amount_unsold < order.amount)
                         {
-                            Deal deal = AmountBidAsk(order, item, order.price, now);
+                            Deal deal = AmountBidAsk(order, market_ask[i], order.price, now);
                             deals.Add(deal);
                             //市价卖单完成,从市价卖单移除
-                            market_ask.Remove(item);
+                            market_ask.Remove(market_ask[i]);
                         }
                         //量全部处理完了
                         if (order.amount_unsold <= 0)
@@ -248,30 +248,30 @@ namespace Com.Matching
                     //限价买单与限价卖单撮合
                     if (order.amount_unsold > 0 && fixed_ask.Count() > 0)
                     {
-                        foreach (var item in fixed_ask)
+                        for (int i = 0; i <= fixed_ask.Count; i++)
                         {
                             //使用撮合价规则
-                            decimal new_price = Util.GetNewPrice(order.price, item.price, this.price_last);
+                            decimal new_price = Util.GetNewPrice(order.price, fixed_ask[i].price, this.price_last);
                             if (new_price <= 0)
                             {
                                 break;
                             }
-                            if (item.amount_unsold >= order.amount)
+                            if (fixed_ask[i].amount_unsold >= order.amount)
                             {
-                                Deal deal = AmountAskBid(order, item, new_price, now);
+                                Deal deal = AmountAskBid(order, fixed_ask[i], new_price, now);
                                 deals.Add(deal);
-                                if (item.amount_unsold == order.amount)
+                                if (fixed_ask[i].amount_unsold == order.amount)
                                 {
-                                    fixed_ask.Remove(item);
+                                    fixed_ask.Remove(fixed_ask[i]);
                                 }
                                 break;
                             }
-                            else if (item.amount_unsold < order.amount)
+                            else if (fixed_ask[i].amount_unsold < order.amount)
                             {
-                                Deal deal = AmountBidAsk(order, item, new_price, now);
+                                Deal deal = AmountBidAsk(order, fixed_ask[i], new_price, now);
                                 deals.Add(deal);
                                 //市价卖单完成,从市价卖单移除
-                                fixed_ask.Remove(item);
+                                fixed_ask.Remove(fixed_ask[i]);
                             }
                             this.price_last = new_price;
                             //量全部处理完了
@@ -301,24 +301,24 @@ namespace Com.Matching
                 if (order.type == E_OrderType.price_market)
                 {
                     //市价卖单与市价买单撮合
-                    foreach (var item in market_bid)
+                    for (int i = 0; i <= market_bid.Count; i++)
                     {
-                        if (item.amount_unsold >= order.amount)
+                        if (market_bid[i].amount_unsold >= order.amount)
                         {
-                            Deal deal = AmountAskBid(item, order, this.price_last, now);
+                            Deal deal = AmountAskBid(market_bid[i], order, this.price_last, now);
                             deals.Add(deal);
-                            if (item.amount_unsold == order.amount)
+                            if (market_bid[i].amount_unsold == order.amount)
                             {
-                                market_bid.Remove(item);
+                                market_bid.Remove(market_bid[i]);
                             }
                             break;
                         }
-                        else if (item.amount_unsold < order.amount)
+                        else if (market_bid[i].amount_unsold < order.amount)
                         {
-                            Deal deal = AmountBidAsk(item, order, this.price_last, now);
+                            Deal deal = AmountBidAsk(market_bid[i], order, this.price_last, now);
                             deals.Add(deal);
                             //市价买单完成,从市价买单移除
-                            market_bid.Remove(item);
+                            market_bid.Remove(market_bid[i]);
                         }
                         //量全部处理完了
                         if (order.amount_unsold <= 0)
@@ -329,30 +329,30 @@ namespace Com.Matching
                     //市价卖单与限价买单撮合
                     if (order.amount_unsold > 0 && fixed_bid.Count() > 0)
                     {
-                        foreach (var item in fixed_bid)
+                        for (int i = 0; i < fixed_bid.Count; i++)
                         {
                             //使用撮合价规则
-                            decimal new_price = Util.GetNewPrice(item.price, order.price, this.price_last);
+                            decimal new_price = Util.GetNewPrice(fixed_bid[i].price, order.price, this.price_last);
                             if (new_price <= 0)
                             {
                                 break;
                             }
-                            if (item.amount_unsold >= order.amount)
+                            if (fixed_bid[i].amount_unsold >= order.amount)
                             {
-                                Deal deal = AmountAskBid(order, item, this.price_last, now);
+                                Deal deal = AmountAskBid(order, fixed_bid[i], this.price_last, now);
                                 deals.Add(deal);
-                                if (item.amount_unsold == order.amount)
+                                if (fixed_bid[i].amount_unsold == order.amount)
                                 {
-                                    fixed_bid.Remove(item);
+                                    fixed_bid.Remove(fixed_bid[i]);
                                 }
                                 break;
                             }
-                            else if (item.amount_unsold < order.amount)
+                            else if (fixed_bid[i].amount_unsold < order.amount)
                             {
-                                Deal deal = AmountBidAsk(item, order, this.price_last, now);
+                                Deal deal = AmountBidAsk(fixed_bid[i], order, this.price_last, now);
                                 deals.Add(deal);
                                 //市价买单完成,从市价买单移除
-                                fixed_bid.Remove(item);
+                                fixed_bid.Remove(fixed_bid[i]);
                             }
                             this.price_last = new_price;
                             //量全部处理完了
@@ -371,24 +371,24 @@ namespace Com.Matching
                 else if (order.type == E_OrderType.price_fixed)
                 {
                     //限价卖单与市价买市撮合
-                    foreach (var item in market_bid)
+                    for (int i = 0; i <= market_bid.Count; i++)
                     {
-                        if (item.amount_unsold >= order.amount)
+                        if (market_bid[i].amount_unsold >= order.amount)
                         {
-                            Deal deal = AmountAskBid(order, item, order.price, now);
+                            Deal deal = AmountAskBid(order, market_bid[i], order.price, now);
                             deals.Add(deal);
-                            if (item.amount_unsold == order.amount)
+                            if (market_bid[i].amount_unsold == order.amount)
                             {
-                                market_bid.Remove(item);
+                                market_bid.Remove(market_bid[i]);
                             }
                             break;
                         }
-                        else if (item.amount_unsold < order.amount)
+                        else if (market_bid[i].amount_unsold < order.amount)
                         {
-                            Deal deal = AmountBidAsk(item, order, order.price, now);
+                            Deal deal = AmountBidAsk(market_bid[i], order, order.price, now);
                             deals.Add(deal);
                             //市价买单完成,从市价买单移除
-                            market_bid.Remove(item);
+                            market_bid.Remove(market_bid[i]);
                         }
                         //量全部处理完了
                         if (order.amount_unsold <= 0)
@@ -399,30 +399,30 @@ namespace Com.Matching
                     //限价卖单与限价买单撮合
                     if (order.amount_unsold > 0 && fixed_bid.Count() > 0)
                     {
-                        foreach (var item in fixed_bid)
+                        for (int i = 0; i <= fixed_bid.Count; i++)
                         {
                             //使用撮合价规则
-                            decimal new_price = Util.GetNewPrice(item.price, order.price, this.price_last);
+                            decimal new_price = Util.GetNewPrice(fixed_bid[i].price, order.price, this.price_last);
                             if (new_price <= 0)
                             {
                                 break;
                             }
-                            if (item.amount_unsold >= order.amount)
+                            if (fixed_bid[i].amount_unsold >= order.amount)
                             {
-                                Deal deal = AmountAskBid(order, item, new_price, now);
+                                Deal deal = AmountAskBid(order, fixed_bid[i], new_price, now);
                                 deals.Add(deal);
-                                if (item.amount_unsold == order.amount)
+                                if (fixed_bid[i].amount_unsold == order.amount)
                                 {
-                                    fixed_bid.Remove(item);
+                                    fixed_bid.Remove(fixed_bid[i]);
                                 }
                                 break;
                             }
-                            else if (item.amount_unsold < order.amount)
+                            else if (fixed_bid[i].amount_unsold < order.amount)
                             {
-                                Deal deal = AmountBidAsk(item, order, new_price, now);
+                                Deal deal = AmountBidAsk(fixed_bid[i], order, new_price, now);
                                 deals.Add(deal);
                                 //市价买单完成,从市价买单移除
-                                fixed_bid.Remove(item);
+                                fixed_bid.Remove(fixed_bid[i]);
                             }
                             this.price_last = new_price;
                             //量全部处理完了
@@ -437,7 +437,7 @@ namespace Com.Matching
                     {
                         for (int i = 0; i < fixed_bid.Count; i++)
                         {
-                            if (order.price >= fixed_bid[i].price && order.time < fixed_bid[i].time)
+                            if (order.price <= fixed_bid[i].price && order.time < fixed_bid[i].time)
                             {
                                 fixed_bid.Insert(i, order);
                                 break;

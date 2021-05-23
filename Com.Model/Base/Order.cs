@@ -56,7 +56,7 @@ namespace Com.Model.Base
         /// 最后成交时间
         /// </summary>
         /// <value></value>
-        public DateTimeOffset deal_last_time { get; set; }
+        public DateTimeOffset? deal_last_time { get; set; }
         /// <summary>
         /// 交易方向
         /// </summary>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Com.Model.Base;
+using Newtonsoft.Json;
 
 namespace Com.Matching
 {
@@ -9,21 +10,25 @@ namespace Com.Matching
         string name = "btc/usdt";
         Core core = new Core("btc/usdt", null, null);
 
+        Random random = new Random();
+
         public Test()
         {
-
+            core.Start(10);
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public void AddOrder()
+        public List<Deal> AddOrder()
         {
+            List<Deal> deals = new List<Deal>();
             List<Order> orders = GetOrder();
             foreach (var item in orders)
             {
-                List<Deal> deals = core.AddOrder(item);
+                deals.AddRange(core.AddOrder(item));
             }
+            return deals;
         }
 
         /// <summary>
@@ -35,41 +40,25 @@ namespace Com.Matching
             List<Order> orders = new List<Order>();
             for (int i = 0; i < 10; i++)
             {
+                decimal price = random.Next(1, 50) + (decimal)random.NextDouble();
+                decimal amount = random.Next(1, 5000) + (decimal)random.NextDouble();
+                E_Direction direction = random.Next() % 2 == 0 ? E_Direction.bid : E_Direction.ask;
+                E_OrderType type = random.Next() % 2 == 0 ? E_OrderType.price_fixed : E_OrderType.price_market;
                 Order order = new Order()
                 {
                     id = Util.worker.NextId().ToString(),
                     name = this.name,
                     uid = i.ToString(),
-                    price = 10 + i,
-                    amount = 100,
-                    total = (10 + i) * 100,
+                    price = price,
+                    amount = amount,
+                    total = price * amount,
                     time = DateTimeOffset.UtcNow,
-                    amount_unsold = 100,
+                    amount_unsold = amount,
                     amount_done = 0,
-                    direction = i % 2 == 0 ? E_Direction.bid : E_Direction.ask,
+                    direction = direction,
                     state = E_DealState.unsold,
-                    type = E_OrderType.price_market,
-                    data = "什么玩意",
-                };
-                orders.Add(order);
-            }
-            for (int i = 0; i < 10; i++)
-            {
-                Order order = new Order()
-                {
-                    id = Util.worker.NextId().ToString(),
-                    name = this.name,
-                    uid = i.ToString(),
-                    price = 10 + i,
-                    amount = 100,
-                    total = (10 + i) * 100,
-                    time = DateTimeOffset.UtcNow,
-                    amount_unsold = 100,
-                    amount_done = 0,
-                    direction = i % 2 == 0 ? E_Direction.bid : E_Direction.ask,
-                    state = E_DealState.unsold,
-                    type = E_OrderType.price_fixed,
-                    data = "什么玩意",
+                    type = type,
+                    data = "",
                 };
                 orders.Add(order);
             }

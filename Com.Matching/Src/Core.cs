@@ -291,14 +291,14 @@ namespace Com.Matching
                         }
                         else
                         {
-                            int index = fixed_bid.FindIndex(0, fixed_bid.Count, P => P.price <= order.price);
+                            int index = fixed_bid.FindIndex(P => P.price <= order.price && P.time < order.time);
                             if (index == -1)
                             {
                                 fixed_bid.Add(order);
                             }
                             else
                             {
-                                fixed_bid.Insert(index + 1, order);
+                                fixed_bid.Insert(index, order);
                             }
                         }
                     }
@@ -450,14 +450,14 @@ namespace Com.Matching
                         }
                         else
                         {
-                            int index = fixed_ask.FindIndex(0, fixed_ask.Count, P => P.price > order.price && P.time < order.time);
+                            int index = fixed_ask.FindIndex(P => P.price > order.price && P.time < order.time);
                             if (index == -1)
                             {
                                 fixed_ask.Add(order);
                             }
                             else
                             {
-                                fixed_ask.Insert(index + 1, order);
+                                fixed_ask.Insert(index, order);
                             }
                         }
                     }

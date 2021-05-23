@@ -285,12 +285,19 @@ namespace Com.Matching
                     //限价买单没成交部分添加到限价买单相应的位置,(价格优先,时间优先原则)
                     if (order.amount_unsold > 0)
                     {
-                        for (int i = 0; i < fixed_bid.Count; i++)
+                        if (fixed_bid.Count == 0)
                         {
-                            if (order.price >= fixed_bid[i].price && order.time < fixed_bid[i].time)
+                            fixed_bid.Add(order);
+                        }
+                        else
+                        {
+                            for (int i = 0; i < fixed_bid.Count; i++)
                             {
-                                fixed_bid.Insert(i, order);
-                                break;
+                                if (order.price >= fixed_bid[i].price && order.time < fixed_bid[i].time)
+                                {
+                                    fixed_bid.Insert(i, order);
+                                    break;
+                                }
                             }
                         }
                     }
@@ -436,12 +443,22 @@ namespace Com.Matching
                     //限价卖单没成交部分添加到限价卖单相应的位置,(价格优先,时间优先原则)
                     if (order.amount_unsold > 0)
                     {
-                        for (int i = 0; i < fixed_ask.Count; i++)
+                        if (fixed_ask.Count == 0)
                         {
-                            if (order.price <= fixed_ask[i].price && order.time < fixed_ask[i].time)
+                            fixed_ask.Add(order);
+                        }
+                        else
+                        {
+                            for (int i = 0; i < fixed_ask.Count; i++)
                             {
-                                fixed_ask.Insert(i, order);
-                                break;
+                                if (order.price <= fixed_ask[i].price || order.time < fixed_ask[i].time)
+                                {
+                                    break;
+                                }
+                                else
+                                {
+                                    fixed_ask.Insert(i, order);
+                                }
                             }
                         }
                     }

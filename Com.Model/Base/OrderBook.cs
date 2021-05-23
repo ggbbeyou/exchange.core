@@ -28,7 +28,7 @@ namespace Com.Model.Base
         /// <value></value>
         public decimal amount { get; set; }
         /// <summary>
-        /// 挂单总额
+        /// 挂单总金额
         /// </summary>
         /// <value></value>
         public decimal total

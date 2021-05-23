@@ -66,6 +66,18 @@ namespace Com.Matching
         /// </summary>
         public decimal price_last;
         /// <summary>
+        /// 买盘
+        /// </summary>
+        /// <typeparam name="OrderBook">买盘</typeparam>
+        /// <returns></returns>
+        public List<OrderBook> bid = new List<OrderBook>();
+        /// <summary>
+        /// 卖盘
+        /// </summary>
+        /// <typeparam name="OrderBook">卖盘</typeparam>
+        /// <returns></returns>
+        public List<OrderBook> ask = new List<OrderBook>();
+        /// <summary>
         /// 市价买单
         /// </summary>
         /// <typeparam name="Order">订单</typeparam>
@@ -134,6 +146,7 @@ namespace Com.Matching
             DateTimeOffset now = DateTimeOffset.UtcNow;
             if (order.direction == E_Direction.bid)
             {
+                //先市价成交,再限价成交
                 if (order.type == E_OrderType.price_market)
                 {
                     //市价买单与市价卖市撮合
@@ -206,7 +219,73 @@ namespace Com.Matching
                 }
                 else if (order.type == E_OrderType.price_fixed)
                 {
-
+                    //限价买单与市价卖市撮合
+                    foreach (var item in market_ask)
+                    {
+                        if (item.amount_unsold >= order.amount)
+                        {
+                            Deal deal = AmountAskBid(order, item, order.price, now);
+                            deals.Add(deal);
+                            if (item.amount_unsold == order.amount)
+                            {
+                                market_ask.Remove(item);
+                            }
+                            break;
+                        }
+                        else if (item.amount_unsold < order.amount)
+                        {
+                            Deal deal = AmountBidAsk(order, item, order.price, now);
+                            deals.Add(deal);
+                            //市价卖单完成,从市价卖单移除
+                            market_ask.Remove(item);
+                        }
+                        //量全部处理完了
+                        if (order.amount_unsold <= 0)
+                        {
+                            break;
+                        }
+                    }
+                    //限价买单与限价卖单撮合
+                    if (order.amount_unsold > 0 && fixed_ask.Count() > 0)
+                    {
+                        foreach (var item in fixed_ask)
+                        {
+                            //使用撮合价规则
+                            decimal new_price = Util.GetNewPrice(order.price, item.price, this.price_last);
+                            if (new_price <= 0)
+                            {
+                                break;
+                            }
+                            if (item.amount_unsold >= order.amount)
+                            {
+                                Deal deal = AmountAskBid(order, item, new_price, now);
+                                deals.Add(deal);
+                                if (item.amount_unsold == order.amount)
+                                {
+                                    fixed_ask.Remove(item);
+                                }
+                                break;
+                            }
+                            else if (item.amount_unsold < order.amount)
+                            {
+                                Deal deal = AmountBidAsk(order, item, new_price, now);
+                                deals.Add(deal);
+                                //市价卖单完成,从市价卖单移除
+                                fixed_ask.Remove(item);
+                            }
+                            this.price_last = new_price;
+                            //量全部处理完了
+                            if (order.amount_unsold <= 0)
+                            {
+                                break;
+                            }
+                        }
+                    }
+                    //市价买单没成交部分添加到市价买单最后,(时间优先原则)
+                    if (order.amount_unsold > 0)
+                    {
+                        market_bid.Add(order);
+                    }
                 }
             }
             else if (order.direction == E_Direction.ask)

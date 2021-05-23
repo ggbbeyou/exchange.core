@@ -40,17 +40,25 @@ namespace Com.Matching
             List<Order> orders = new List<Order>();
             for (int i = 0; i < 10000; i++)
             {
-                decimal price = random.Next(1, 50) + (decimal)random.NextDouble();
-                decimal amount = random.Next(1, 10) + (decimal)random.NextDouble();
                 E_Direction direction = random.Next() % 2 == 0 ? E_Direction.bid : E_Direction.ask;
                 E_OrderType type = random.Next() % 2 == 0 ? E_OrderType.price_fixed : E_OrderType.price_market;
-                if (type == E_OrderType.price_market)
+                decimal price = 0;
+                decimal amount = random.Next(1, 10);
+
+                if (type == E_OrderType.price_fixed)
                 {
-                    price = 0;
+                    if (direction == E_Direction.bid)
+                    {
+                        price = random.Next(40, 50);
+                    }
+                    else
+                    {
+                        price = random.Next(20, 60);
+                    }
                 }
                 Order order = new Order()
                 {
-                    id = Util.worker.NextId().ToString(),
+                    id = i.ToString(),
                     name = this.name,
                     uid = i.ToString(),
                     price = price,

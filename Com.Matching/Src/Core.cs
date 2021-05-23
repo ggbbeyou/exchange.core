@@ -293,10 +293,13 @@ namespace Com.Matching
                         {
                             for (int i = 0; i < fixed_bid.Count; i++)
                             {
-                                if (order.price >= fixed_bid[i].price && order.time < fixed_bid[i].time)
+                                if (order.price >= fixed_bid[i].price || order.time < fixed_bid[i].time)
                                 {
-                                    fixed_bid.Insert(i, order);
                                     break;
+                                }
+                                else
+                                {
+                                    fixed_bid.Insert(i + 1, order);
                                 }
                             }
                         }

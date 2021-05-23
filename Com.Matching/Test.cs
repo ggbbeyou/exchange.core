@@ -14,7 +14,7 @@ namespace Com.Matching
 
         public Test()
         {
-            core.Start(10);
+            core.Start(45);
         }
 
         /// <summary>
@@ -48,11 +48,11 @@ namespace Com.Matching
                 {
                     if (direction == E_Direction.bid)
                     {
-                        price = random.Next(40, 50);
+                        price = random.Next(40, 51);
                     }
                     else
                     {
-                        price = random.Next(40, 50);
+                        price = random.Next(40, 51);
                     }
                 }
                 Order order = new Order()

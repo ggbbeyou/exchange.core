@@ -66,13 +66,13 @@ namespace Com.Matching
         /// </summary>
         public decimal price_last;
         /// <summary>
-        /// 买盘
+        /// 买盘 高->低
         /// </summary>
         /// <typeparam name="OrderBook">买盘</typeparam>
         /// <returns></returns>
         public List<OrderBook> bid = new List<OrderBook>();
         /// <summary>
-        /// 卖盘
+        /// 卖盘 低->高
         /// </summary>
         /// <typeparam name="OrderBook">卖盘</typeparam>
         /// <returns></returns>
@@ -90,13 +90,13 @@ namespace Com.Matching
         /// <returns></returns>
         public List<Order> market_ask = new List<Order>();
         /// <summary>
-        /// 限价买单
+        /// 限价买单 高->低
         /// </summary>
         /// <typeparam name="Order">订单</typeparam>
         /// <returns></returns>
         public List<Order> fixed_bid = new List<Order>();
         /// <summary>
-        /// 限价卖单
+        /// 限价卖单 低->高
         /// </summary>
         /// <typeparam name="Order">订单</typeparam>
         /// <returns></returns>

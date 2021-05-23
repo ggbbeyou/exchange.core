@@ -43,6 +43,16 @@ namespace Com.Model.Base
         /// <value></value>
         public DateTimeOffset time { get; set; }
         /// <summary>
+        /// 未成交挂单量
+        /// </summary>
+        /// <value></value>
+        public decimal amount_unsold { get; set; }
+        /// <summary>
+        /// 已成交挂单量
+        /// </summary>
+        /// <value></value>
+        public decimal amount_done { get; set; }
+        /// <summary>
         /// 交易方向
         /// </summary>
         /// <value></value>

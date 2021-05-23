@@ -11,6 +11,7 @@ namespace Com.MarketMaking.Controllers
 {
     public class HomeController : Controller
     {
+        //Span<byte> market_bid = new Span<byte>();
         private readonly ILogger<HomeController> _logger;
 
         public HomeController(ILogger<HomeController> logger)
@@ -20,6 +21,7 @@ namespace Com.MarketMaking.Controllers
 
         public IActionResult Index()
         {
+            Span<byte> market_bid = new Span<byte>();
             return View();
         }
 

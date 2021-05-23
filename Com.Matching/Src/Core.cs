@@ -69,7 +69,7 @@ namespace Com.Matching
         /// </summary>
         /// <typeparam name="Order">订单</typeparam>
         /// <returns></returns>
-        public List<Order> market_bid = new List<Order>();
+        public List<Order> market_bid =new List<Order>();
         /// <summary>
         /// 市价卖单
         /// </summary>

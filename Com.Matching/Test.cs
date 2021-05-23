@@ -26,7 +26,7 @@ namespace Com.Matching
             List<Order> orders = GetOrder();
             foreach (var item in orders)
             {
-                deals.AddRange(core.AddOrder(item));
+                deals.AddRange(core.Match(item));
             }
             return deals;
         }

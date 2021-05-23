@@ -136,7 +136,7 @@ namespace Com.Matching
         /// 撮合算法(不考虑手续费问题)
         /// </summary>
         /// <param name="order">挂单订单(手续费问题在推送到撮合之前扣除)</param>
-        public List<Deal> AddOrder(Order order)
+        public List<Deal> Match(Order order)
         {
             List<Deal> deals = new List<Deal>();
             if (order.name != this.name || order.amount_unsold <= 0)

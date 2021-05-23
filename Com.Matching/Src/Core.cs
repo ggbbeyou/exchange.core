@@ -308,7 +308,7 @@ namespace Com.Matching
                         {
                             Deal deal = AmountBidAsk(market_bid[i], order, this.price_last, now);
                             deals.Add(deal);
-                            if (market_bid[i].amount_unsold == order.amount)
+                            if (deal.bid.state == E_DealState.completed)
                             {
                                 market_bid.Remove(market_bid[i]);
                             }
@@ -333,14 +333,14 @@ namespace Com.Matching
                         for (int i = 0; i < fixed_bid.Count; i++)
                         {
                             //使用撮合价规则
-                            decimal new_price = Util.GetNewPrice(fixed_bid[i].price, order.price, this.price_last);
+                            decimal new_price = Util.GetNewPrice(fixed_bid[i].price, fixed_bid[i].price, this.price_last);
                             if (new_price <= 0)
                             {
                                 break;
                             }
                             if (fixed_bid[i].amount_unsold >= order.amount)
                             {
-                                Deal deal = AmountBidAsk(order, fixed_bid[i], this.price_last, now);
+                                Deal deal = AmountBidAsk(fixed_bid[i], order, new_price, now);
                                 deals.Add(deal);
                                 if (fixed_bid[i].amount_unsold == order.amount)
                                 {
@@ -350,7 +350,7 @@ namespace Com.Matching
                             }
                             else if (fixed_bid[i].amount_unsold < order.amount)
                             {
-                                Deal deal = AmountAskBid(fixed_bid[i], order, this.price_last, now);
+                                Deal deal = AmountAskBid(fixed_bid[i], order, new_price, now);
                                 deals.Add(deal);
                                 //市价买单完成,从市价买单移除
                                 fixed_bid.Remove(fixed_bid[i]);
@@ -378,7 +378,7 @@ namespace Com.Matching
                         {
                             Deal deal = AmountBidAsk(order, market_bid[i], order.price, now);
                             deals.Add(deal);
-                            if (market_bid[i].amount_unsold == order.amount)
+                            if (deal.bid.state == E_DealState.completed)
                             {
                                 market_bid.Remove(market_bid[i]);
                             }
@@ -410,9 +410,9 @@ namespace Com.Matching
                             }
                             if (fixed_bid[i].amount_unsold >= order.amount)
                             {
-                                Deal deal = AmountBidAsk(order, fixed_bid[i], new_price, now);
+                                Deal deal = AmountBidAsk(fixed_bid[i], order, new_price, now);
                                 deals.Add(deal);
-                                if (fixed_bid[i].amount_unsold == order.amount)
+                                if (deal.bid.state == E_DealState.completed)
                                 {
                                     fixed_bid.Remove(fixed_bid[i]);
                                 }
@@ -463,10 +463,18 @@ namespace Com.Matching
             ask.amount_unsold = 0;
             ask.amount_done += ask.amount_unsold;
             ask.deal_last_time = now;
+            ask.state = E_DealState.completed;
             bid.amount_unsold -= ask.amount_unsold;
             bid.amount_done += ask.amount_unsold;
             bid.deal_last_time = now;
-            bid.state = E_DealState.partial;
+            if (bid.amount_unsold == 0)
+            {
+                bid.state = E_DealState.completed;
+            }
+            else
+            {
+                bid.state = E_DealState.partial;
+            }
             Deal deal = new Deal()
             {
                 id = Util.worker.NextId().ToString(),
@@ -496,6 +504,14 @@ namespace Com.Matching
             ask.amount_unsold -= bid.amount;
             ask.amount_done += bid.amount;
             ask.deal_last_time = now;
+            if (ask.amount_unsold == 0)
+            {
+                ask.state = E_DealState.completed;
+            }
+            else
+            {
+                ask.state = E_DealState.partial;
+            }
             bid.amount_unsold = 0;
             bid.amount_done = bid.amount;
             bid.deal_last_time = now;

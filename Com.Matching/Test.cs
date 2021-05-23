@@ -44,6 +44,10 @@ namespace Com.Matching
                 decimal amount = random.Next(1, 5000) + (decimal)random.NextDouble();
                 E_Direction direction = random.Next() % 2 == 0 ? E_Direction.bid : E_Direction.ask;
                 E_OrderType type = random.Next() % 2 == 0 ? E_OrderType.price_fixed : E_OrderType.price_market;
+                if (type == E_OrderType.price_market)
+                {
+                    price = 0;
+                }
                 Order order = new Order()
                 {
                     id = Util.worker.NextId().ToString(),

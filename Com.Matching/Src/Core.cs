@@ -133,7 +133,7 @@ namespace Com.Matching
         }
 
         /// <summary>
-        /// 撮合算法
+        /// 撮合算法(不考虑手续费问题)
         /// </summary>
         /// <param name="order">挂单订单(手续费问题在推送到撮合之前扣除)</param>
         public List<Deal> AddOrder(Order order)
@@ -306,7 +306,7 @@ namespace Com.Matching
                     {
                         if (market_bid[i].amount_unsold >= order.amount)
                         {
-                            Deal deal = AmountAskBid(market_bid[i], order, this.price_last, now);
+                            Deal deal = AmountBidAsk(market_bid[i], order, this.price_last, now);
                             deals.Add(deal);
                             if (market_bid[i].amount_unsold == order.amount)
                             {
@@ -316,7 +316,7 @@ namespace Com.Matching
                         }
                         else if (market_bid[i].amount_unsold < order.amount)
                         {
-                            Deal deal = AmountBidAsk(market_bid[i], order, this.price_last, now);
+                            Deal deal = AmountAskBid(market_bid[i], order, this.price_last, now);
                             deals.Add(deal);
                             //市价买单完成,从市价买单移除
                             market_bid.Remove(market_bid[i]);
@@ -340,7 +340,7 @@ namespace Com.Matching
                             }
                             if (fixed_bid[i].amount_unsold >= order.amount)
                             {
-                                Deal deal = AmountAskBid(order, fixed_bid[i], this.price_last, now);
+                                Deal deal = AmountBidAsk(order, fixed_bid[i], this.price_last, now);
                                 deals.Add(deal);
                                 if (fixed_bid[i].amount_unsold == order.amount)
                                 {
@@ -350,7 +350,7 @@ namespace Com.Matching
                             }
                             else if (fixed_bid[i].amount_unsold < order.amount)
                             {
-                                Deal deal = AmountBidAsk(fixed_bid[i], order, this.price_last, now);
+                                Deal deal = AmountAskBid(fixed_bid[i], order, this.price_last, now);
                                 deals.Add(deal);
                                 //市价买单完成,从市价买单移除
                                 fixed_bid.Remove(fixed_bid[i]);
@@ -363,10 +363,10 @@ namespace Com.Matching
                             }
                         }
                     }
-                    //市价买单没成交部分添加到市价买单最后,(时间优先原则)
+                    //市价卖单没成交部分添加到市价卖单最后,(时间优先原则)
                     if (order.amount_unsold > 0)
                     {
-                        market_bid.Add(order);
+                        market_ask.Add(order);
                     }
                 }
                 else if (order.type == E_OrderType.price_fixed)
@@ -376,7 +376,7 @@ namespace Com.Matching
                     {
                         if (market_bid[i].amount_unsold >= order.amount)
                         {
-                            Deal deal = AmountAskBid(order, market_bid[i], order.price, now);
+                            Deal deal = AmountBidAsk(order, market_bid[i], order.price, now);
                             deals.Add(deal);
                             if (market_bid[i].amount_unsold == order.amount)
                             {
@@ -386,7 +386,7 @@ namespace Com.Matching
                         }
                         else if (market_bid[i].amount_unsold < order.amount)
                         {
-                            Deal deal = AmountBidAsk(market_bid[i], order, order.price, now);
+                            Deal deal = AmountAskBid(market_bid[i], order, order.price, now);
                             deals.Add(deal);
                             //市价买单完成,从市价买单移除
                             market_bid.Remove(market_bid[i]);
@@ -410,7 +410,7 @@ namespace Com.Matching
                             }
                             if (fixed_bid[i].amount_unsold >= order.amount)
                             {
-                                Deal deal = AmountAskBid(order, fixed_bid[i], new_price, now);
+                                Deal deal = AmountBidAsk(order, fixed_bid[i], new_price, now);
                                 deals.Add(deal);
                                 if (fixed_bid[i].amount_unsold == order.amount)
                                 {
@@ -420,7 +420,7 @@ namespace Com.Matching
                             }
                             else if (fixed_bid[i].amount_unsold < order.amount)
                             {
-                                Deal deal = AmountBidAsk(fixed_bid[i], order, new_price, now);
+                                Deal deal = AmountAskBid(fixed_bid[i], order, new_price, now);
                                 deals.Add(deal);
                                 //市价买单完成,从市价买单移除
                                 fixed_bid.Remove(fixed_bid[i]);
@@ -436,11 +436,11 @@ namespace Com.Matching
                     //限价卖单没成交部分添加到限价卖单相应的位置,(价格优先,时间优先原则)
                     if (order.amount_unsold > 0)
                     {
-                        for (int i = 0; i < fixed_bid.Count; i++)
+                        for (int i = 0; i < fixed_ask.Count; i++)
                         {
-                            if (order.price <= fixed_bid[i].price && order.time < fixed_bid[i].time)
+                            if (order.price <= fixed_ask[i].price && order.time < fixed_ask[i].time)
                             {
-                                fixed_bid.Insert(i, order);
+                                fixed_ask.Insert(i, order);
                                 break;
                             }
                         }

@@ -50,19 +50,19 @@ namespace Com.Matching
                 }
                 Order order = new Order()
                 {
-                    id = Util.worker.NextId().ToString(),
-                    name = this.name,
-                    uid = i.ToString(),
-                    price = price,
-                    amount = amount,
-                    total = price * amount,
-                    time = DateTimeOffset.UtcNow,
-                    amount_unsold = amount,
-                    amount_done = 0,
-                    direction = direction,
-                    state = E_DealState.unsold,
-                    type = type,
-                    data = "",
+                    // id = Util.worker.NextId().ToString(),
+                    // name = this.name,
+                    // uid = i.ToString(),
+                    // price = price,
+                    // amount = amount,
+                    // total = price * amount,
+                    // time = DateTimeOffset.UtcNow,
+                    // amount_unsold = amount,
+                    // amount_done = 0,
+                    // direction = direction,
+                    // state = E_DealState.unsold,
+                    // type = type,
+                    // data = "",
                 };
                 orders.Add(order);
             }

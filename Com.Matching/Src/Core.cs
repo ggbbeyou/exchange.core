@@ -467,7 +467,7 @@ namespace Com.Matching
             bid.amount_unsold -= ask.amount_unsold;
             bid.amount_done += ask.amount_unsold;
             bid.deal_last_time = now;
-            if (bid.amount_unsold == 0)
+            if (bid.amount_unsold <= 0)
             {
                 bid.state = E_DealState.completed;
             }
@@ -483,7 +483,7 @@ namespace Com.Matching
                 uid_ask = ask.uid,
                 price = new_price,
                 amount = ask.amount_unsold,
-                total = new_price * bid.amount,
+                total = new_price * bid.amount_unsold,
                 time = now,
                 bid = bid,
                 ask = ask,
@@ -501,10 +501,10 @@ namespace Com.Matching
         /// <returns></returns>
         private Deal AmountAskBid(Order bid, Order ask, decimal new_price, DateTimeOffset now)
         {
-            ask.amount_unsold -= bid.amount;
-            ask.amount_done += bid.amount;
+            ask.amount_unsold -= bid.amount_unsold;
+            ask.amount_done += bid.amount_unsold;
             ask.deal_last_time = now;
-            if (ask.amount_unsold == 0)
+            if (ask.amount_unsold <= 0)
             {
                 ask.state = E_DealState.completed;
             }
@@ -513,7 +513,7 @@ namespace Com.Matching
                 ask.state = E_DealState.partial;
             }
             bid.amount_unsold = 0;
-            bid.amount_done = bid.amount;
+            bid.amount_done = bid.amount_unsold;
             bid.deal_last_time = now;
             bid.state = E_DealState.completed;
             Deal deal = new Deal()
@@ -523,8 +523,8 @@ namespace Com.Matching
                 uid_bid = bid.uid,
                 uid_ask = ask.uid,
                 price = new_price,
-                amount = bid.amount,
-                total = new_price * bid.amount,
+                amount = bid.amount_unsold,
+                total = new_price * bid.amount_unsold,
                 time = now,
                 bid = bid,
                 ask = ask,

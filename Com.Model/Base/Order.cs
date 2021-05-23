@@ -5,7 +5,7 @@ namespace Com.Model.Base
     /// <summary>
     /// 订单表
     /// </summary>
-    public struct Order
+    public class Order
     {
         /// <summary>
         /// 订单id
@@ -52,6 +52,11 @@ namespace Com.Model.Base
         /// </summary>
         /// <value></value>
         public decimal amount_done { get; set; }
+        /// <summary>
+        /// 最后成交时间
+        /// </summary>
+        /// <value></value>
+        public DateTimeOffset deal_last_time { get; set; }
         /// <summary>
         /// 交易方向
         /// </summary>

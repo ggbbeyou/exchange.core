@@ -40,6 +40,7 @@ B<C<A   D=C
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Com.Model.Base;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -122,28 +123,121 @@ namespace Com.Matching
         /// <summary>
         /// 从MQ获取到新的订单
         /// </summary>
-        /// <param name="order">挂单订单</param>
-        public void AddOrder(Order order)
+        /// <param name="order">挂单订单(手续费问题在推送到撮合之前扣除)</param>
+        public List<Deal> AddOrder(Order order)
         {
-            if (order.name != this.name || order.amount_unsold <= 0)
+            List<Deal> deals = new List<Deal>();
+            if (order == null || order.name != this.name || order.amount_unsold <= 0)
             {
-                return;
+                return deals;
             }
-            Deal deal = new Deal()
-            {
-                id = Util.worker.NextId().ToString(),
-                name = this.name,
-            };
-
+            order.amount_unsold = order.amount;
+            DateTimeOffset now = DateTimeOffset.UtcNow;
             if (order.direction == E_Direction.bid)
             {
-                if (market_ask.Count > 0)
-                {
-
-                }
                 if (order.type == E_OrderType.price_market)
                 {
-
+                    foreach (var item in market_ask)
+                    {
+                        if (item.amount_unsold >= order.amount)
+                        {
+                            item.amount_unsold -= order.amount;
+                            item.amount_done += order.amount;
+                            item.deal_last_time = now;
+                            order.amount_unsold = 0;
+                            order.amount_done = order.amount;
+                            order.deal_last_time = now;
+                            Deal deal = new Deal()
+                            {
+                                id = Util.worker.NextId().ToString(),
+                                name = this.name,
+                                uid_bid = order.uid,
+                                uid_ask = item.uid,
+                                price = this.price_last,
+                                amount = order.amount,
+                                total = this.price_last * order.amount,
+                                time = now,
+                                state = E_DealState.completed,
+                                bid = order,
+                                ask = item,
+                            };
+                            deals.Add(deal);
+                            break;
+                        }
+                        else
+                        {
+                            item.amount_unsold = 0;
+                            item.amount_done += item.amount_unsold;
+                            item.deal_last_time = now;
+                            order.amount_unsold -= item.amount_unsold;
+                            order.amount_done += item.amount_unsold;
+                            order.deal_last_time = now;
+                            Deal deal = new Deal()
+                            {
+                                id = Util.worker.NextId().ToString(),
+                                name = this.name,
+                                uid_bid = order.uid,
+                                uid_ask = item.uid,
+                                price = this.price_last,
+                                amount = item.amount_unsold,
+                                total = this.price_last * order.amount,
+                                time = now,
+                                state = E_DealState.partial,
+                                bid = order,
+                                ask = item,
+                            };
+                            deals.Add(deal);
+                            market_ask.Remove(item);
+                            if (order.amount_unsold <= 0)
+                            {
+                                break;
+                            }
+                        }
+                    }
+                    if (order.amount_unsold > 0 && fixed_ask.Count() > 0)
+                    {
+                        foreach (var item in fixed_ask)
+                        {
+                            if (order.price < item.price)
+                            {
+                                break;
+                            }
+                            decimal new_price = Util.GetNewPrice(order.price, item.price, this.price_last);
+                            if (new_price <= 0)
+                            {
+                                break;
+                            }
+                            if (item.amount_unsold >= order.amount)
+                            {
+                                item.amount_unsold -= order.amount;
+                                order.amount_done = order.amount;
+                                Deal deal = new Deal()
+                                {
+                                    id = Util.worker.NextId().ToString(),
+                                    name = this.name,
+                                    state = E_DealState.completed,
+                                };
+                                deals.Add(deal);
+                            }
+                            else if (item.amount_unsold < order.amount)
+                            {
+                                item.amount_unsold = 0;
+                                order.amount_done -= item.amount_unsold;
+                                Deal deal = new Deal()
+                                {
+                                    id = Util.worker.NextId().ToString(),
+                                    name = this.name,
+                                    state = E_DealState.partial,
+                                };
+                                deals.Add(deal);
+                            }
+                            this.price_last = new_price;
+                        }
+                    }
+                    if (order.amount_unsold > 0)
+                    {
+                        market_bid.Append(order);
+                    }
                 }
                 else if (order.type == E_OrderType.price_fixed)
                 {
@@ -152,41 +246,10 @@ namespace Com.Matching
             }
             else if (order.direction == E_Direction.ask)
             {
-                if (order.type == E_OrderType.price_market)
-                {
 
-                }
-                else if (order.type == E_OrderType.price_fixed)
-                {
-
-                }
             }
 
-            ///
-            /// ///////////////
-            /// 
-            if (order.type == E_OrderType.price_market)
-            {
-                if (order.direction == E_Direction.bid)
-                {
-
-                }
-                else if (order.direction == E_Direction.ask)
-                {
-
-                }
-            }
-            else if (order.type == E_OrderType.price_fixed)
-            {
-                if (order.direction == E_Direction.bid)
-                {
-
-                }
-                else if (order.direction == E_Direction.ask)
-                {
-
-                }
-            }
+            return deals;
         }
 
         /// <summary>

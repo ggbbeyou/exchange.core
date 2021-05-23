@@ -150,7 +150,7 @@ namespace Com.Matching
                 if (order.type == E_OrderType.price_market)
                 {
                     //市价买单与市价卖市撮合
-                    for (int i = 0; i <= market_ask.Count; i++)
+                    for (int i = 0; i < market_ask.Count; i++)
                     {
                         if (market_ask[i].amount_unsold >= order.amount)
                         {
@@ -178,7 +178,7 @@ namespace Com.Matching
                     //市价买单与限价卖单撮合
                     if (order.amount_unsold > 0 && fixed_ask.Count() > 0)
                     {
-                        for (int i = 0; i <= fixed_ask.Count; i++)
+                        for (int i = 0; i < fixed_ask.Count; i++)
                         {
                             //使用撮合价规则
                             decimal new_price = Util.GetNewPrice(order.price, fixed_ask[i].price, this.price_last);
@@ -219,8 +219,9 @@ namespace Com.Matching
                 }
                 else if (order.type == E_OrderType.price_fixed)
                 {
+
                     //限价买单与市价卖单撮合
-                    for (int i = 0; i <= market_ask.Count; i++)
+                    for (int i = 0; i < market_ask.Count; i++)
                     {
                         if (market_ask[i].amount_unsold >= order.amount)
                         {
@@ -248,7 +249,7 @@ namespace Com.Matching
                     //限价买单与限价卖单撮合
                     if (order.amount_unsold > 0 && fixed_ask.Count() > 0)
                     {
-                        for (int i = 0; i <= fixed_ask.Count; i++)
+                        for (int i = 0; i < fixed_ask.Count; i++)
                         {
                             //使用撮合价规则
                             decimal new_price = Util.GetNewPrice(order.price, fixed_ask[i].price, this.price_last);
@@ -301,7 +302,7 @@ namespace Com.Matching
                 if (order.type == E_OrderType.price_market)
                 {
                     //市价卖单与市价买单撮合
-                    for (int i = 0; i <= market_bid.Count; i++)
+                    for (int i = 0; i < market_bid.Count; i++)
                     {
                         if (market_bid[i].amount_unsold >= order.amount)
                         {
@@ -371,7 +372,7 @@ namespace Com.Matching
                 else if (order.type == E_OrderType.price_fixed)
                 {
                     //限价卖单与市价买市撮合
-                    for (int i = 0; i <= market_bid.Count; i++)
+                    for (int i = 0; i < market_bid.Count; i++)
                     {
                         if (market_bid[i].amount_unsold >= order.amount)
                         {
@@ -399,7 +400,7 @@ namespace Com.Matching
                     //限价卖单与限价买单撮合
                     if (order.amount_unsold > 0 && fixed_bid.Count() > 0)
                     {
-                        for (int i = 0; i <= fixed_bid.Count; i++)
+                        for (int i = 0; i < fixed_bid.Count; i++)
                         {
                             //使用撮合价规则
                             decimal new_price = Util.GetNewPrice(fixed_bid[i].price, order.price, this.price_last);

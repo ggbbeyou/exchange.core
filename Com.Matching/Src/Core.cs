@@ -127,11 +127,10 @@ namespace Com.Matching
         public List<Deal> AddOrder(Order order)
         {
             List<Deal> deals = new List<Deal>();
-            if (order == null || order.name != this.name || order.amount_unsold <= 0)
+            if (order.name != this.name || order.amount_unsold <= 0)
             {
                 return deals;
             }
-            order.amount_unsold = order.amount;
             DateTimeOffset now = DateTimeOffset.UtcNow;
             if (order.direction == E_Direction.bid)
             {
@@ -144,6 +143,10 @@ namespace Com.Matching
                         {
                             Deal deal = AmountAskBid(order, item, this.price_last, now);
                             deals.Add(deal);
+                            if (item.amount_unsold == order.amount)
+                            {
+                                market_ask.Remove(item);
+                            }
                             break;
                         }
                         else if (item.amount_unsold < order.amount)
@@ -174,6 +177,10 @@ namespace Com.Matching
                             {
                                 Deal deal = AmountAskBid(order, item, this.price_last, now);
                                 deals.Add(deal);
+                                if (item.amount_unsold == order.amount)
+                                {
+                                    fixed_ask.Remove(item);
+                                }
                                 break;
                             }
                             else if (item.amount_unsold < order.amount)

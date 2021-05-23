@@ -219,7 +219,7 @@ namespace Com.Matching
                 }
                 else if (order.type == E_OrderType.price_fixed)
                 {
-                    //限价买单与市价卖市撮合
+                    //限价买单与市价卖单撮合
                     foreach (var item in market_ask)
                     {
                         if (item.amount_unsold >= order.amount)
@@ -281,18 +281,171 @@ namespace Com.Matching
                             }
                         }
                     }
+                    //限价买单没成交部分添加到限价买单相应的位置,(价格优先,时间优先原则)
+                    if (order.amount_unsold > 0)
+                    {
+                        for (int i = 0; i < fixed_bid.Count; i++)
+                        {
+                            if (order.price >= fixed_bid[i].price && order.time < fixed_bid[i].time)
+                            {
+                                fixed_bid.Insert(i, order);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            else if (order.direction == E_Direction.ask)
+            {
+                //先市价成交,再限价成交
+                if (order.type == E_OrderType.price_market)
+                {
+                    //市价卖单与市价买单撮合
+                    foreach (var item in market_bid)
+                    {
+                        if (item.amount_unsold >= order.amount)
+                        {
+                            Deal deal = AmountAskBid(item, order, this.price_last, now);
+                            deals.Add(deal);
+                            if (item.amount_unsold == order.amount)
+                            {
+                                market_bid.Remove(item);
+                            }
+                            break;
+                        }
+                        else if (item.amount_unsold < order.amount)
+                        {
+                            Deal deal = AmountBidAsk(item, order, this.price_last, now);
+                            deals.Add(deal);
+                            //市价卖单完成,从市价卖单移除
+                            market_bid.Remove(item);
+                        }
+                        //量全部处理完了
+                        if (order.amount_unsold <= 0)
+                        {
+                            break;
+                        }
+                    }
+                    //市价卖单与限价买单撮合
+                    if (order.amount_unsold > 0 && fixed_bid.Count() > 0)
+                    {
+                        foreach (var item in fixed_bid)
+                        {
+                            //使用撮合价规则
+                            decimal new_price = Util.GetNewPrice(item.price, order.price, this.price_last);
+                            if (new_price <= 0)
+                            {
+                                break;
+                            }
+                            if (item.amount_unsold >= order.amount)
+                            {
+                                Deal deal = AmountAskBid(order, item, this.price_last, now);
+                                deals.Add(deal);
+                                if (item.amount_unsold == order.amount)
+                                {
+                                    fixed_bid.Remove(item);
+                                }
+                                break;
+                            }
+                            else if (item.amount_unsold < order.amount)
+                            {
+                                Deal deal = AmountBidAsk(item, order, this.price_last, now);
+                                deals.Add(deal);
+                                //市价卖单完成,从市价卖单移除
+                                fixed_bid.Remove(item);
+                            }
+                            this.price_last = new_price;
+                            //量全部处理完了
+                            if (order.amount_unsold <= 0)
+                            {
+                                break;
+                            }
+                        }
+                    }
                     //市价买单没成交部分添加到市价买单最后,(时间优先原则)
                     if (order.amount_unsold > 0)
                     {
                         market_bid.Add(order);
                     }
                 }
+                else if (order.type == E_OrderType.price_fixed)
+                {
+                    //限价买单与市价卖市撮合
+                    foreach (var item in market_bid)
+                    {
+                        if (item.amount_unsold >= order.amount)
+                        {
+                            Deal deal = AmountAskBid(order, item, order.price, now);
+                            deals.Add(deal);
+                            if (item.amount_unsold == order.amount)
+                            {
+                                market_bid.Remove(item);
+                            }
+                            break;
+                        }
+                        else if (item.amount_unsold < order.amount)
+                        {
+                            Deal deal = AmountBidAsk(item, order, order.price, now);
+                            deals.Add(deal);
+                            //市价卖单完成,从市价卖单移除
+                            market_bid.Remove(item);
+                        }
+                        //量全部处理完了
+                        if (order.amount_unsold <= 0)
+                        {
+                            break;
+                        }
+                    }
+                    //限价买单与限价卖单撮合
+                    if (order.amount_unsold > 0 && fixed_bid.Count() > 0)
+                    {
+                        foreach (var item in fixed_bid)
+                        {
+                            //使用撮合价规则
+                            decimal new_price = Util.GetNewPrice(item.price, order.price, this.price_last);
+                            if (new_price <= 0)
+                            {
+                                break;
+                            }
+                            if (item.amount_unsold >= order.amount)
+                            {
+                                Deal deal = AmountAskBid(order, item, new_price, now);
+                                deals.Add(deal);
+                                if (item.amount_unsold == order.amount)
+                                {
+                                    fixed_bid.Remove(item);
+                                }
+                                break;
+                            }
+                            else if (item.amount_unsold < order.amount)
+                            {
+                                Deal deal = AmountBidAsk(item, order, new_price, now);
+                                deals.Add(deal);
+                                //市价卖单完成,从市价卖单移除
+                                fixed_bid.Remove(item);
+                            }
+                            this.price_last = new_price;
+                            //量全部处理完了
+                            if (order.amount_unsold <= 0)
+                            {
+                                break;
+                            }
+                        }
+                    }
+                    //限价买单没成交部分添加到限价买单相应的位置,(价格优先,时间优先原则)
+                    if (order.amount_unsold > 0)
+                    {
+                        for (int i = 0; i < fixed_bid.Count; i++)
+                        {
+                            if (order.price >= fixed_bid[i].price && order.time < fixed_bid[i].time)
+                            {
+                                fixed_bid.Insert(i, order);
+                                break;
+                            }
+                        }
+                    }
+                }
             }
-            else if (order.direction == E_Direction.ask)
-            {
-
-            }
-
             return deals;
         }
 

@@ -56,11 +56,11 @@ namespace Com.Model.Base
         /// 买订单
         /// </summary>
         /// <value></value>
-        public Order Bid { get; set; }
+        public Order bid { get; set; }
         /// <summary>
         /// 卖订单
         /// </summary>
         /// <value></value>
-        public Order Ask { get; set; }
+        public Order ask { get; set; }
     }
 }

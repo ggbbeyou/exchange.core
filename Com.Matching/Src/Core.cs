@@ -291,16 +291,14 @@ namespace Com.Matching
                         }
                         else
                         {
-                            for (int i = 0; i < fixed_bid.Count; i++)
+                            int index = fixed_bid.FindIndex(0, fixed_bid.Count, P => P.price <= order.price);
+                            if (index == -1)
                             {
-                                if (order.price >= fixed_bid[i].price || order.time < fixed_bid[i].time)
-                                {
-                                    break;
-                                }
-                                else
-                                {
-                                    fixed_bid.Insert(i + 1, order);
-                                }
+                                fixed_bid.Add(order);
+                            }
+                            else
+                            {
+                                fixed_bid.Insert(index + 1, order);
                             }
                         }
                     }
@@ -452,16 +450,14 @@ namespace Com.Matching
                         }
                         else
                         {
-                            for (int i = 0; i < fixed_ask.Count; i++)
+                            int index = fixed_ask.FindIndex(0, fixed_ask.Count, P => P.price > order.price && P.time < order.time);
+                            if (index == -1)
                             {
-                                if (order.price <= fixed_ask[i].price || order.time < fixed_ask[i].time)
-                                {
-                                    break;
-                                }
-                                else
-                                {
-                                    fixed_ask.Insert(i, order);
-                                }
+                                fixed_ask.Add(order);
+                            }
+                            else
+                            {
+                                fixed_ask.Insert(index + 1, order);
                             }
                         }
                     }

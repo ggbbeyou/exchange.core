@@ -142,20 +142,21 @@ namespace Com.Matching
                     {
                         if (item.amount_unsold >= order.amount)
                         {
-                            Deal deal = NewMethod(order, now, item);
+                            Deal deal = AmountAskBid(order, item, this.price_last, now);
                             deals.Add(deal);
                             break;
                         }
-                        else
+                        else if (item.amount_unsold < order.amount)
                         {
-                            Deal deal = NewMethod1(order, now, item);
+                            Deal deal = AmountBidAsk(order, item, this.price_last, now);
                             deals.Add(deal);
                             //市价卖单完成,从市价卖单移除
                             market_ask.Remove(item);
-                            if (order.amount_unsold <= 0)
-                            {
-                                break;
-                            }
+                        }
+                        //量全部处理完了
+                        if (order.amount_unsold <= 0)
+                        {
+                            break;
                         }
                     }
                     //市价买单与限价卖单撮合
@@ -163,11 +164,6 @@ namespace Com.Matching
                     {
                         foreach (var item in fixed_ask)
                         {
-                            //买单价>=卖单价原则
-                            if (order.price < item.price)
-                            {
-                                break;
-                            }
                             //使用撮合价规则
                             decimal new_price = Util.GetNewPrice(order.price, item.price, this.price_last);
                             if (new_price <= 0)
@@ -176,29 +172,23 @@ namespace Com.Matching
                             }
                             if (item.amount_unsold >= order.amount)
                             {
-                                item.amount_unsold -= order.amount;
-                                order.amount_done = order.amount;
-                                Deal deal = new Deal()
-                                {
-                                    id = Util.worker.NextId().ToString(),
-                                    name = this.name,
-                                    state = E_DealState.completed,
-                                };
+                                Deal deal = AmountAskBid(order, item, this.price_last, now);
                                 deals.Add(deal);
+                                break;
                             }
                             else if (item.amount_unsold < order.amount)
                             {
-                                item.amount_unsold = 0;
-                                order.amount_done -= item.amount_unsold;
-                                Deal deal = new Deal()
-                                {
-                                    id = Util.worker.NextId().ToString(),
-                                    name = this.name,
-                                    state = E_DealState.partial,
-                                };
+                                Deal deal = AmountBidAsk(order, item, this.price_last, now);
                                 deals.Add(deal);
+                                //市价卖单完成,从市价卖单移除
+                                fixed_ask.Remove(item);
                             }
                             this.price_last = new_price;
+                            //量全部处理完了
+                            if (order.amount_unsold <= 0)
+                            {
+                                break;
+                            }
                         }
                     }
                     //市价买单没成交部分添加到市价买单最后,(时间优先原则)
@@ -221,14 +211,14 @@ namespace Com.Matching
         }
 
         /// <summary>
-        /// 卖单量< 买单量
+        /// 买单量>卖单量
         /// </summary>
         /// <param name="bid"></param>
         /// <param name="ask"></param>
         /// <param name="new_price"></param>
         /// <param name="now"></param>
         /// <returns></returns>
-        private Deal NewMethod1(Order bid, Order ask, decimal new_price, DateTimeOffset now)
+        private Deal AmountBidAsk(Order bid, Order ask, decimal new_price, DateTimeOffset now)
         {
             ask.amount_unsold = 0;
             ask.amount_done += ask.amount_unsold;
@@ -236,6 +226,7 @@ namespace Com.Matching
             bid.amount_unsold -= ask.amount_unsold;
             bid.amount_done += ask.amount_unsold;
             bid.deal_last_time = now;
+            bid.state = E_DealState.partial;
             Deal deal = new Deal()
             {
                 id = Util.worker.NextId().ToString(),
@@ -246,7 +237,7 @@ namespace Com.Matching
                 amount = ask.amount_unsold,
                 total = new_price * bid.amount,
                 time = now,
-                state = E_DealState.partial,
+
                 bid = bid,
                 ask = ask,
             };
@@ -261,7 +252,7 @@ namespace Com.Matching
         /// <param name="new_price"></param>
         /// <param name="now"></param>
         /// <returns></returns>
-        private Deal NewMethod(Order bid, Order ask, decimal new_price, DateTimeOffset now)
+        private Deal AmountAskBid(Order bid, Order ask, decimal new_price, DateTimeOffset now)
         {
             ask.amount_unsold -= bid.amount;
             ask.amount_done += bid.amount;
@@ -269,6 +260,7 @@ namespace Com.Matching
             bid.amount_unsold = 0;
             bid.amount_done = bid.amount;
             bid.deal_last_time = now;
+            bid.state = E_DealState.completed;
             Deal deal = new Deal()
             {
                 id = Util.worker.NextId().ToString(),
@@ -279,7 +271,6 @@ namespace Com.Matching
                 amount = bid.amount,
                 total = new_price * bid.amount,
                 time = now,
-                state = E_DealState.completed,
                 bid = bid,
                 ask = ask,
             };

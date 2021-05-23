@@ -63,6 +63,11 @@ namespace Com.Model.Base
         /// <value></value>
         public E_Direction direction { get; set; }
         /// <summary>
+        /// 成交状态
+        /// </summary>
+        /// <value></value>
+        public E_DealState state { get; set; }
+        /// <summary>
         /// 订单类型
         /// </summary>
         /// <value></value>

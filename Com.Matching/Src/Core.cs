@@ -453,12 +453,12 @@ namespace Com.Matching
         /// <summary>
         /// 买单量>卖单量
         /// </summary>
-        /// <param name="bid"></param>
-        /// <param name="ask"></param>
-        /// <param name="new_price"></param>
-        /// <param name="now"></param>
+        /// <param name="bid">买单</param>
+        /// <param name="ask">卖单</param>
+        /// <param name="price">成交价</param>
+        /// <param name="now">成交时间</param>
         /// <returns></returns>
-        private Deal AmountBidAsk(Order bid, Order ask, decimal new_price, DateTimeOffset now)
+        private Deal AmountBidAsk(Order bid, Order ask, decimal price, DateTimeOffset now)
         {
             ask.amount_unsold = 0;
             ask.amount_done += ask.amount_unsold;
@@ -481,9 +481,9 @@ namespace Com.Matching
                 name = this.name,
                 uid_bid = bid.uid,
                 uid_ask = ask.uid,
-                price = new_price,
+                price = price,
                 amount = ask.amount_unsold,
-                total = new_price * bid.amount_unsold,
+                total = price * bid.amount_unsold,
                 time = now,
                 bid = bid,
                 ask = ask,
@@ -494,12 +494,12 @@ namespace Com.Matching
         /// <summary>
         /// 卖单量>=买单量
         /// </summary>
-        /// <param name="bid"></param>
-        /// <param name="ask"></param>
-        /// <param name="new_price"></param>
-        /// <param name="now"></param>
+        /// <param name="bid">买单</param>
+        /// <param name="ask">卖单</param>
+        /// <param name="price">成交价</param>
+        /// <param name="now">成交时间</param>
         /// <returns></returns>
-        private Deal AmountAskBid(Order bid, Order ask, decimal new_price, DateTimeOffset now)
+        private Deal AmountAskBid(Order bid, Order ask, decimal price, DateTimeOffset now)
         {
             ask.amount_unsold -= bid.amount_unsold;
             ask.amount_done += bid.amount_unsold;
@@ -522,9 +522,9 @@ namespace Com.Matching
                 name = this.name,
                 uid_bid = bid.uid,
                 uid_ask = ask.uid,
-                price = new_price,
+                price = price,
                 amount = bid.amount_unsold,
-                total = new_price * bid.amount_unsold,
+                total = price * bid.amount_unsold,
                 time = now,
                 bid = bid,
                 ask = ask,

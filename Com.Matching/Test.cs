@@ -21,7 +21,7 @@ namespace Com.Matching
 
         public void TestOrder()
         {
-            Console.WriteLine("Hello World!");          
+            Console.WriteLine("Hello World!");
             List<Order> orders = GetOrder();
             DateTimeOffset now = DateTimeOffset.UtcNow;
             List<Deal> deals = AddOrder(orders);
@@ -39,8 +39,11 @@ namespace Com.Matching
             List<Deal> deals = new List<Deal>();
             for (int i = 0; i < orders.Count; i++)
             {
-                deals.AddRange(core.Match(orders[i]));
+                //deals.AddRange(core.Match(orders[i]));
+                core.Process(orders[i]);
+                //deals.AddRange(core.Process(orders[i]));
             }
+
             return deals;
         }
 

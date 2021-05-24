@@ -151,7 +151,7 @@ namespace Com.Matching
 
             //ShutdownEventArgs args = new ShutdownEventArgs();
             consumer.HandleModelShutdown(this.channel, null);
-            Process();
+            //Process();
         }
 
         /// <summary>
@@ -173,8 +173,57 @@ namespace Com.Matching
         /// <summary>
         /// 主要流程
         /// </summary>
-        public void Process()
+        public void Process(Order order)
         {
+            // OrderBook orderbook;
+            // if (order.type == E_OrderType.price_fixed)
+            // {
+            //     if (order.direction == E_Direction.bid)
+            //     {
+            //         orderbook = bid.FirstOrDefault(P => P.price == order.price);
+            //         if (orderbook == null)
+            //         {
+            //             orderbook = new OrderBook();
+            //             orderbook.name = this.name;
+            //             orderbook.price = order.price;
+            //             orderbook.amount = 0;
+            //             orderbook.count = 0;
+            //             orderbook.last_time = DateTimeOffset.UtcNow;
+            //             orderbook.direction = E_Direction.bid;
+            //         }
+            //         orderbook.amount += order.amount;
+            //         orderbook.count += 1;
+            //     }
+            //     else if (order.direction == E_Direction.ask)
+            //     {
+            //         orderbook = bid.FirstOrDefault(P => P.price == order.price);
+            //         if (orderbook == null)
+            //         {
+            //             orderbook = new OrderBook();
+            //             orderbook.name = this.name;
+            //             orderbook.price = order.price;
+            //             orderbook.amount = 0;
+            //             orderbook.count = 0;
+            //             orderbook.last_time = DateTimeOffset.UtcNow;
+            //             orderbook.direction = E_Direction.ask;
+            //         }
+            //         orderbook.amount += order.amount;
+            //         orderbook.count += 1;
+            //     }
+            // }
+            List<Deal> deals = Match(order);
+
+            foreach (var item in deals)
+            {
+                // deal发送到MQ
+                if (item.bid.type == E_OrderType.price_fixed)
+                {
+
+                }
+                OrderBook orderBook_bid = bid.FirstOrDefault(P => P.price == order.price);
+
+            }
+
 
         }
 

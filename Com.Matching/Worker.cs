@@ -48,6 +48,7 @@ namespace Com.Matching
             {
                 Test test=new Test();
                 test.TestOrder();
+                
                 await Task.Delay(0);
                 this.logger.LogInformation("启动后台服务成功");
             }

@@ -5,13 +5,8 @@ namespace Com.Model.Base
     /// <summary>
     /// 盘口
     /// </summary>
-    public struct OrderBook
+    public class OrderBook
     {
-        /// <summary>
-        /// 序列,从1档口开始
-        /// </summary>
-        /// <value></value>
-        public int no { get; set; }
         /// <summary>
         /// 交易对
         /// </summary>

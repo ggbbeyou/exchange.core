@@ -16,15 +16,19 @@ namespace Com.Matching
         {
             core.Start(45);
 
-            // Console.WriteLine("Hello World!");
-            // Test test = new Test();
-            // List<Order> orders = test.GetOrder();
-            // DateTimeOffset now = DateTimeOffset.UtcNow;
-            // List<Deal> deals = test.AddOrder(orders);
-            // double time = (DateTimeOffset.UtcNow - now).TotalSeconds;
-            // int count = deals.Count;
-            // Console.WriteLine($"End ~~  count:{count},time:{time}秒,avg:{time / count}");
-            // Console.Read();
+
+        }
+
+        public void TestOrder()
+        {
+            Console.WriteLine("Hello World!");          
+            List<Order> orders = GetOrder();
+            DateTimeOffset now = DateTimeOffset.UtcNow;
+            List<Deal> deals = AddOrder(orders);
+            double time = (DateTimeOffset.UtcNow - now).TotalSeconds;
+            int count = deals.Count;
+            Console.WriteLine($"End ~~  count:{count},time:{time}秒,avg:{time / count}");
+            Console.Read();
         }
 
         /// <summary>
@@ -52,8 +56,8 @@ namespace Com.Matching
                 E_Direction direction = random.Next(1, 3) == 1 ? E_Direction.bid : E_Direction.ask;
                 E_OrderType type = random.Next(1, 3) == 1 ? E_OrderType.price_fixed : E_OrderType.price_market;
                 type = E_OrderType.price_fixed;
-                decimal price = random.Next(1, 1000);
-                decimal amount = random.Next(1, 1000);
+                decimal price = random.Next(50, 100);
+                decimal amount = random.Next(50, 100);
                 if (type == E_OrderType.price_market)
                 {
                     price = 0;

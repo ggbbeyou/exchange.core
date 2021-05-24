@@ -31,12 +31,7 @@ namespace Com.Matching
         /// <param name="configuration">配置接口</param>
         /// <param name="logger">日志接口</param>
         public Worker(IConfiguration configuration, ILogger<Worker> logger)
-        {
-            string redisConnection = configuration.GetValue<string>("key");
-            var a = configuration["key"];
-            var aa = configuration.GetConnectionString("key");
-
-
+        { 
             this.configuration = configuration;
             this.logger = logger ?? NullLogger<Worker>.Instance;
         }
@@ -51,9 +46,8 @@ namespace Com.Matching
             this.logger.LogInformation("准备启动后台服务");
             try
             {
-                string redisConnection = this.configuration.GetValue<string>("key");
-                var a = this.configuration["key"];
-                var aa = this.configuration.GetConnectionString("key");
+                Test test=new Test();
+                test.TestOrder();
                 await Task.Delay(0);
                 this.logger.LogInformation("启动后台服务成功");
             }

@@ -41,9 +41,12 @@ B<C<A   D=C
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Com.Model.Base;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using RabbitMQ.Client;
+using RabbitMQ.Client.Events;
 
 namespace Com.Matching
 {
@@ -65,6 +68,12 @@ namespace Com.Matching
         /// 上一次成交价
         /// </summary>
         public decimal price_last;
+        /// <summary>
+        /// 收到到的订单
+        /// </summary>
+        /// <typeparam name="Order">订单</typeparam>
+        /// <returns></returns>
+        public Queue<Order> queue = new Queue<Order>();
         /// <summary>
         /// 买盘 高->低
         /// </summary>
@@ -102,6 +111,10 @@ namespace Com.Matching
         /// <returns></returns>
         public List<Order> fixed_ask = new List<Order>();
         /// <summary>
+        /// RabbitMQ模型接口
+        /// </summary>
+        public readonly IModel channel;
+        /// <summary>
         /// 配置接口
         /// </summary>
         public IConfiguration configuration;
@@ -115,6 +128,30 @@ namespace Com.Matching
             this.name = name;
             this.logger = logger;
             this.configuration = configuration;
+            ConnectionFactory factory = new ConnectionFactory() { HostName = "192.168.1.3", Port = 5672, UserName = "guest", Password = "guest" };
+            IConnection connection = factory.CreateConnection();
+            this.channel = connection.CreateModel();
+
+            channel.ExchangeDeclare(exchange: "PendingOrder", type: "topic");
+            string queueName = channel.QueueDeclare().QueueName;
+            channel.QueueBind(queue: queueName, exchange: "PendingOrder", routingKey: this.name);
+            EventingBasicConsumer consumer = new EventingBasicConsumer(channel);
+
+            consumer.Received += (model, ea) =>
+                                {
+                                    var body = ea.Body.ToArray();
+                                    var message = Encoding.UTF8.GetString(body);
+                                    var routingKey = ea.RoutingKey;
+                                    Console.WriteLine(" [x] Received '{0}':'{1}'", routingKey, message);
+                                };
+            channel.BasicConsume(queue: queueName, autoAck: true, consumer: consumer);
+            // channel.Close();
+            // connection.Close();
+
+
+            //ShutdownEventArgs args = new ShutdownEventArgs();
+            consumer.HandleModelShutdown(this.channel, null);
+            Process();
         }
 
         /// <summary>
@@ -125,11 +162,20 @@ namespace Com.Matching
         {
             this.price_last = price_last;
             this.run = true;
+
         }
 
         public void Stop()
         {
             this.run = false;
+        }
+
+        /// <summary>
+        /// 主要流程
+        /// </summary>
+        public void Process()
+        {
+
         }
 
         /// <summary>
@@ -139,21 +185,21 @@ namespace Com.Matching
         /// <returns></returns>
         public bool RemoveOrder(string order_id)
         {
-            if(this.market_bid.Exists(P=>P.id==order_id))
+            if (this.market_bid.Exists(P => P.id == order_id))
             {
-                return this.market_bid.RemoveAll(P=>P.id==order_id)>0;
+                return this.market_bid.RemoveAll(P => P.id == order_id) > 0;
             }
-            else if(this.market_ask.Exists(P=>P.id==order_id))
+            else if (this.market_ask.Exists(P => P.id == order_id))
             {
-                return this.market_ask.RemoveAll(P=>P.id==order_id)>0;
+                return this.market_ask.RemoveAll(P => P.id == order_id) > 0;
             }
-            else if(this.fixed_bid.Exists(P=>P.id==order_id))
+            else if (this.fixed_bid.Exists(P => P.id == order_id))
             {
-                return this.fixed_bid.RemoveAll(P=>P.id==order_id)>0;
+                return this.fixed_bid.RemoveAll(P => P.id == order_id) > 0;
             }
-            else if(this.fixed_ask.Exists(P=>P.id==order_id))
+            else if (this.fixed_ask.Exists(P => P.id == order_id))
             {
-                return this.fixed_ask.RemoveAll(P=>P.id==order_id)>0;
+                return this.fixed_ask.RemoveAll(P => P.id == order_id) > 0;
             }
             return false;
         }

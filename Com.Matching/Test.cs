@@ -58,9 +58,9 @@ namespace Com.Matching
 
                 price = i + 1;
                 amount = i + 1;
-                // direction = i % 2 == 0 ? E_Direction.bid : E_Direction.ask;
-                // type = i % 2 == 0 ? E_OrderType.price_fixed : E_OrderType.price_market;
-                type = E_OrderType.price_fixed;
+                direction = i % 2 == 0 ? E_Direction.bid : E_Direction.ask;
+                type = i % 2 == 0 ? E_OrderType.price_fixed : E_OrderType.price_market;
+                //type = E_OrderType.price_fixed;
 
                 Order order = new Order()
                 {
@@ -73,7 +73,7 @@ namespace Com.Matching
                     time = DateTimeOffset.UtcNow,
                     amount_unsold = amount,
                     amount_done = 0,
-                    direction = E_Direction.bid,
+                    direction = direction,
                     state = E_DealState.unsold,
                     type = type,
                     data = "",
@@ -91,7 +91,7 @@ namespace Com.Matching
                     time = DateTimeOffset.UtcNow,
                     amount_unsold = amount,
                     amount_done = 0,
-                    direction = E_Direction.ask,
+                    direction = direction,
                     state = E_DealState.unsold,
                     type = type,
                     data = "",

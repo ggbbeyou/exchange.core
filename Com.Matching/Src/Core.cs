@@ -133,6 +133,27 @@ namespace Com.Matching
         }
 
         /// <summary>
+        /// 从MQ获取到撤消订单
+        /// </summary>
+        /// <param name="order">挂单订单</param>
+        public void RemoveOrder(Order order)
+        {
+            if (order.name != this.name)
+            {
+                return;
+            }
+        }
+
+        /// <summary>
+        /// 成交订单发送到MQ
+        /// </summary>
+        /// <param name="deal">成交订单</param>
+        public void AddDeal(Deal deal)
+        {
+
+        }
+
+        /// <summary>
         /// 撮合算法(不考虑手续费问题)
         /// </summary>
         /// <param name="order">挂单订单(手续费问题在推送到撮合之前扣除)</param>
@@ -467,28 +488,6 @@ namespace Com.Matching
         }
 
 
-
-        /// <summary>
-        /// 从MQ获取到撤消订单
-        /// </summary>
-        /// <param name="order">挂单订单</param>
-        public void RemoveOrder(Order order)
-        {
-            if (order.name != this.name)
-            {
-                return;
-            }
-
-        }
-
-        /// <summary>
-        /// 成交订单发送到MQ
-        /// </summary>
-        /// <param name="deal">成交订单</param>
-        public void AddDeal(Deal deal)
-        {
-
-        }
 
 
 

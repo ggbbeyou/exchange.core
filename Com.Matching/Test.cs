@@ -38,12 +38,12 @@ namespace Com.Matching
         public List<Order> GetOrder()
         {
             List<Order> orders = new List<Order>();
-            for (int i = 0; i < 1000000; i++)
+            for (int i = 0; i < 10000000; i++)
             {
                 E_Direction direction = random.Next(1, 3) == 1 ? E_Direction.bid : E_Direction.ask;
                 E_OrderType type = random.Next(1, 3) == 1 ? E_OrderType.price_fixed : E_OrderType.price_market;
-                decimal price = random.Next(1, 1000);
-                decimal amount = random.Next(1, 1000);
+                decimal price = random.Next(1, 1000)+(decimal)random.Next();
+                decimal amount = random.Next(1, 1000)+(decimal)random.Next();
                 if (type == E_OrderType.price_market)
                 {
                     price=0;

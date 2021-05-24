@@ -42,24 +42,17 @@ namespace Com.Matching
             {
                 E_Direction direction = random.Next(1, 3) == 1 ? E_Direction.bid : E_Direction.ask;
                 E_OrderType type = random.Next(1, 3) == 1 ? E_OrderType.price_fixed : E_OrderType.price_market;
-                decimal price = 0;
-                decimal amount = random.Next(1, 10);
-                if (type == E_OrderType.price_fixed)
+                decimal price = random.Next(1, 1000);
+                decimal amount = random.Next(1, 1000);
+                if (type == E_OrderType.price_market)
                 {
-                    if (direction == E_Direction.bid)
-                    {
-                        price = random.Next(40, 51);
-                    }
-                    else
-                    {
-                        price = random.Next(40, 51);
-                    }
+                    price=0;
                 }
 
-                price = i + 1;
-                amount = i + 1;
-                direction = i % 2 == 0 ? E_Direction.bid : E_Direction.ask;
-                type = i % 2 == 0 ? E_OrderType.price_fixed : E_OrderType.price_market;
+                // price = i + 1;
+                // amount = i + 1;
+                // direction = i % 2 == 0 ? E_Direction.bid : E_Direction.ask;
+                // type = i % 2 == 0 ? E_OrderType.price_fixed : E_OrderType.price_market;
                 //type = E_OrderType.price_fixed;
 
                 Order order = new Order()
@@ -80,23 +73,23 @@ namespace Com.Matching
                 };
 
                 orders.Add(order);
-                Order order1 = new Order()
-                {
-                    id = i.ToString(),
-                    name = this.name,
-                    uid = i.ToString(),
-                    price = price,
-                    amount = amount,
-                    total = price * amount,
-                    time = DateTimeOffset.UtcNow,
-                    amount_unsold = amount,
-                    amount_done = 0,
-                    direction = direction,
-                    state = E_DealState.unsold,
-                    type = type,
-                    data = "",
-                };
-                orders.Add(order1);
+                // Order order1 = new Order()
+                // {
+                //     id = i.ToString(),
+                //     name = this.name,
+                //     uid = i.ToString(),
+                //     price = price,
+                //     amount = amount,
+                //     total = price * amount,
+                //     time = DateTimeOffset.UtcNow,
+                //     amount_unsold = amount,
+                //     amount_done = 0,
+                //     direction = direction,
+                //     state = E_DealState.unsold,
+                //     type = type,
+                //     data = "",
+                // };
+                // orders.Add(order1);
             }
             return orders;
         }

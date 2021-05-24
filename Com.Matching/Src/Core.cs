@@ -181,7 +181,7 @@ namespace Com.Matching
                         for (int i = 0; i < fixed_ask.Count; i++)
                         {
                             //使用撮合价规则
-                            decimal new_price = Util.GetNewPrice(order.price, fixed_ask[i].price, this.price_last);
+                            decimal new_price = Util.GetNewPrice(fixed_ask[i].price, fixed_ask[i].price, this.price_last);
                             if (new_price <= 0)
                             {
                                 break;

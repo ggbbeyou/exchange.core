@@ -5,7 +5,7 @@ namespace Com.Model.Base
     /// <summary>
     /// 订单表
     /// </summary>
-    public struct Order
+    public class Order
     {
         /// <summary>
         /// 订单id

@@ -19,6 +19,10 @@ namespace Com.Matching
         /// <returns>最新价</returns>
         public static decimal GetNewPrice(decimal bid, decimal ask, decimal last)
         {
+            if(bid==0||ask==0||last==0)
+            {
+                return 0;
+            }
             if (bid < ask)
             {
                 return 0;

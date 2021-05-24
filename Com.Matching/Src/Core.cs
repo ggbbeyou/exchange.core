@@ -216,9 +216,29 @@ namespace Com.Matching
             foreach (var item in deals)
             {
                 // deal发送到MQ
+
+
+                decimal amount_bid = 0;
+                decimal amount_ask = 0;
+                if (order.type == E_OrderType.price_fixed)
+                {
+                    if (order.direction == E_Direction.bid)
+                    {
+                        amount_bid = order.amount;
+
+                    }
+                    else if (order.direction == E_Direction.ask)
+                    {
+                        amount_ask = order.amount;
+                    }
+                }
+                decimal diff = amount_bid - item.amount;
                 if (item.bid.type == E_OrderType.price_fixed)
                 {
-
+                    if (diff > 0)
+                    {
+                        //表示未全部成交
+                    }
                 }
                 OrderBook orderBook_bid = bid.FirstOrDefault(P => P.price == order.price);
 

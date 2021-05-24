@@ -1,22 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Com.Model.Base;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace Com.Matching
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task<int> Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
-            Test test = new Test();
-            List<Order> orders = test.GetOrder();
-            DateTimeOffset now = DateTimeOffset.UtcNow;
-            List<Deal> deals = test.AddOrder(orders);
-            double time = (DateTimeOffset.UtcNow - now).TotalSeconds;
-            int count = deals.Count;
-            Console.WriteLine($"End ~~  count:{count},time:{time}秒,avg:{time / count}");
-            Console.Read();
+            var host = CreateHostBuilder();
+            await host.RunConsoleAsync();
+            return Environment.ExitCode;          
+        }
+
+        private static IHostBuilder CreateHostBuilder()
+        {
+            return Host.CreateDefaultBuilder().ConfigureServices(services =>
+            {
+                services.AddHostedService<Worker>();
+            });
         }
     }
 }

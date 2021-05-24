@@ -133,22 +133,36 @@ namespace Com.Matching
         }
 
         /// <summary>
-        /// 从MQ获取到撤消订单
+        /// 撤消订单
         /// </summary>
-        /// <param name="order">挂单订单</param>
-        public void RemoveOrder(Order order)
+        /// <param name="order_id">订单ID</param>
+        /// <returns></returns>
+        public bool RemoveOrder(string order_id)
         {
-            if (order.name != this.name)
+            if(this.market_bid.Exists(P=>P.id==order_id))
             {
-                return;
+                return this.market_bid.RemoveAll(P=>P.id==order_id)>0;
             }
+            else if(this.market_ask.Exists(P=>P.id==order_id))
+            {
+                return this.market_ask.RemoveAll(P=>P.id==order_id)>0;
+            }
+            else if(this.fixed_bid.Exists(P=>P.id==order_id))
+            {
+                return this.fixed_bid.RemoveAll(P=>P.id==order_id)>0;
+            }
+            else if(this.fixed_ask.Exists(P=>P.id==order_id))
+            {
+                return this.fixed_ask.RemoveAll(P=>P.id==order_id)>0;
+            }
+            return false;
         }
 
         /// <summary>
         /// 成交订单发送到MQ
         /// </summary>
         /// <param name="deal">成交订单</param>
-        public void AddDeal(Deal deal)
+        public void PushDeal(List<Deal> deals)
         {
 
         }
@@ -486,10 +500,6 @@ namespace Com.Matching
             }
             return deals;
         }
-
-
-
-
 
     }
 }

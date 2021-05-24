@@ -20,10 +20,9 @@ namespace Com.Matching
         /// <summary>
         /// 
         /// </summary>
-        public List<Deal> AddOrder()
+        public List<Deal> AddOrder(List<Order> orders)
         {
             List<Deal> deals = new List<Deal>();
-            List<Order> orders = GetOrder();
             for (int i = 0; i < orders.Count; i++)
             {
                 deals.AddRange(core.Match(orders[i]));
@@ -42,19 +41,12 @@ namespace Com.Matching
             {
                 E_Direction direction = random.Next(1, 3) == 1 ? E_Direction.bid : E_Direction.ask;
                 E_OrderType type = random.Next(1, 3) == 1 ? E_OrderType.price_fixed : E_OrderType.price_market;
-                decimal price = random.Next(1, 1000)+(decimal)random.Next();
-                decimal amount = random.Next(1, 1000)+(decimal)random.Next();
+                decimal price = random.Next(1, 1000);
+                decimal amount = random.Next(1, 1000);
                 if (type == E_OrderType.price_market)
                 {
-                    price=0;
-                }
-
-                // price = i + 1;
-                // amount = i + 1;
-                // direction = i % 2 == 0 ? E_Direction.bid : E_Direction.ask;
-                // type = i % 2 == 0 ? E_OrderType.price_fixed : E_OrderType.price_market;
-                //type = E_OrderType.price_fixed;
-
+                    price = 0;
+                }               
                 Order order = new Order()
                 {
                     id = i.ToString(),
@@ -71,25 +63,7 @@ namespace Com.Matching
                     type = type,
                     data = "",
                 };
-
                 orders.Add(order);
-                // Order order1 = new Order()
-                // {
-                //     id = i.ToString(),
-                //     name = this.name,
-                //     uid = i.ToString(),
-                //     price = price,
-                //     amount = amount,
-                //     total = price * amount,
-                //     time = DateTimeOffset.UtcNow,
-                //     amount_unsold = amount,
-                //     amount_done = 0,
-                //     direction = direction,
-                //     state = E_DealState.unsold,
-                //     type = type,
-                //     data = "",
-                // };
-                // orders.Add(order1);
             }
             return orders;
         }

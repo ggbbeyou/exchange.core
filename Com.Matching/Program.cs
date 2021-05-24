@@ -9,13 +9,12 @@ namespace Com.Matching
         static void Main(string[] args)
         {
             Console.WriteLine("Hello World!");
-            DateTimeOffset now = DateTimeOffset.UtcNow;
             Test test = new Test();
-            List<Deal> deals = test.AddOrder();
-
-            int count = deals.Count;
+            List<Order> orders = test.GetOrder();
+            DateTimeOffset now = DateTimeOffset.UtcNow;
+            List<Deal> deals = test.AddOrder(orders);
             double time = (DateTimeOffset.UtcNow - now).TotalSeconds;
-
+            int count = deals.Count;
             Console.WriteLine($"End ~~  count:{count},time:{time}秒,avg:{time / count}");
             Console.Read();
         }

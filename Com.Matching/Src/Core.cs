@@ -154,7 +154,7 @@ namespace Com.Matching
                     {
                         if (market_ask[i].amount_unsold >= order.amount_unsold)
                         {
-                            Deal deal = AmountAskBid(order, market_ask[i], this.price_last, now);
+                            Deal deal = Util.AmountAskBid(this.name, order, market_ask[i], this.price_last, now);
                             deals.Add(deal);
                             if (market_ask[i].amount_unsold == order.amount_unsold)
                             {
@@ -164,7 +164,7 @@ namespace Com.Matching
                         }
                         else if (market_ask[i].amount_unsold < order.amount_unsold)
                         {
-                            Deal deal = AmountBidAsk(order, market_ask[i], this.price_last, now);
+                            Deal deal = Util.AmountBidAsk(this.name, order, market_ask[i], this.price_last, now);
                             deals.Add(deal);
                             //市价卖单完成,从市价卖单移除
                             market_ask.Remove(market_ask[i]);
@@ -188,7 +188,7 @@ namespace Com.Matching
                             }
                             if (fixed_ask[i].amount_unsold >= order.amount_unsold)
                             {
-                                Deal deal = AmountAskBid(order, fixed_ask[i], this.price_last, now);
+                                Deal deal = Util.AmountAskBid(this.name, order, fixed_ask[i], this.price_last, now);
                                 deals.Add(deal);
                                 if (fixed_ask[i].amount_unsold == order.amount_unsold)
                                 {
@@ -198,7 +198,7 @@ namespace Com.Matching
                             }
                             else if (fixed_ask[i].amount_unsold < order.amount_unsold)
                             {
-                                Deal deal = AmountBidAsk(order, fixed_ask[i], this.price_last, now);
+                                Deal deal = Util.AmountBidAsk(this.name, order, fixed_ask[i], this.price_last, now);
                                 deals.Add(deal);
                                 //市价卖单完成,从市价卖单移除
                                 fixed_ask.Remove(fixed_ask[i]);
@@ -225,7 +225,7 @@ namespace Com.Matching
                     {
                         if (market_ask[i].amount_unsold >= order.amount_unsold)
                         {
-                            Deal deal = AmountAskBid(order, market_ask[i], order.price, now);
+                            Deal deal = Util.AmountAskBid(this.name, order, market_ask[i], order.price, now);
                             deals.Add(deal);
                             if (market_ask[i].amount_unsold == order.amount_unsold)
                             {
@@ -235,7 +235,7 @@ namespace Com.Matching
                         }
                         else if (market_ask[i].amount_unsold < order.amount_unsold)
                         {
-                            Deal deal = AmountBidAsk(order, market_ask[i], order.price, now);
+                            Deal deal = Util.AmountBidAsk(this.name, order, market_ask[i], order.price, now);
                             deals.Add(deal);
                             //市价卖单完成,从市价卖单移除
                             market_ask.Remove(market_ask[i]);
@@ -259,7 +259,7 @@ namespace Com.Matching
                             }
                             if (fixed_ask[i].amount_unsold >= order.amount_unsold)
                             {
-                                Deal deal = AmountAskBid(order, fixed_ask[i], new_price, now);
+                                Deal deal = Util.AmountAskBid(this.name, order, fixed_ask[i], new_price, now);
                                 deals.Add(deal);
                                 if (fixed_ask[i].amount_unsold == order.amount_unsold)
                                 {
@@ -269,7 +269,7 @@ namespace Com.Matching
                             }
                             else if (fixed_ask[i].amount_unsold < order.amount_unsold)
                             {
-                                Deal deal = AmountBidAsk(order, fixed_ask[i], new_price, now);
+                                Deal deal = Util.AmountBidAsk(this.name, order, fixed_ask[i], new_price, now);
                                 deals.Add(deal);
                                 //市价卖单完成,从市价卖单移除
                                 fixed_ask.Remove(fixed_ask[i]);
@@ -314,7 +314,7 @@ namespace Com.Matching
                     {
                         if (market_bid[i].amount_unsold >= order.amount_unsold)
                         {
-                            Deal deal = AmountBidAsk(market_bid[i], order, this.price_last, now);
+                            Deal deal = Util.AmountBidAsk(this.name, market_bid[i], order, this.price_last, now);
                             deals.Add(deal);
                             if (deal.bid.state == E_DealState.completed)
                             {
@@ -324,7 +324,7 @@ namespace Com.Matching
                         }
                         else if (market_bid[i].amount_unsold < order.amount_unsold)
                         {
-                            Deal deal = AmountAskBid(market_bid[i], order, this.price_last, now);
+                            Deal deal = Util.AmountAskBid(this.name, market_bid[i], order, this.price_last, now);
                             deals.Add(deal);
                             //市价买单完成,从市价买单移除
                             market_bid.Remove(market_bid[i]);
@@ -348,7 +348,7 @@ namespace Com.Matching
                             }
                             if (fixed_bid[i].amount_unsold >= order.amount_unsold)
                             {
-                                Deal deal = AmountBidAsk(fixed_bid[i], order, new_price, now);
+                                Deal deal = Util.AmountBidAsk(this.name, fixed_bid[i], order, new_price, now);
                                 deals.Add(deal);
                                 if (fixed_bid[i].amount_unsold == order.amount_unsold)
                                 {
@@ -358,7 +358,7 @@ namespace Com.Matching
                             }
                             else if (fixed_bid[i].amount_unsold < order.amount_unsold)
                             {
-                                Deal deal = AmountAskBid(fixed_bid[i], order, new_price, now);
+                                Deal deal = Util.AmountAskBid(this.name, fixed_bid[i], order, new_price, now);
                                 deals.Add(deal);
                                 //市价买单完成,从市价买单移除
                                 fixed_bid.Remove(fixed_bid[i]);
@@ -384,7 +384,7 @@ namespace Com.Matching
                     {
                         if (market_bid[i].amount_unsold >= order.amount_unsold)
                         {
-                            Deal deal = AmountBidAsk(order, market_bid[i], order.price, now);
+                            Deal deal = Util.AmountBidAsk(this.name, order, market_bid[i], order.price, now);
                             deals.Add(deal);
                             if (deal.bid.state == E_DealState.completed)
                             {
@@ -394,7 +394,7 @@ namespace Com.Matching
                         }
                         else if (market_bid[i].amount_unsold < order.amount_unsold)
                         {
-                            Deal deal = AmountAskBid(market_bid[i], order, order.price, now);
+                            Deal deal = Util.AmountAskBid(this.name, market_bid[i], order, order.price, now);
                             deals.Add(deal);
                             //市价买单完成,从市价买单移除
                             market_bid.Remove(market_bid[i]);
@@ -418,7 +418,7 @@ namespace Com.Matching
                             }
                             if (fixed_bid[i].amount_unsold >= order.amount_unsold)
                             {
-                                Deal deal = AmountBidAsk(fixed_bid[i], order, new_price, now);
+                                Deal deal = Util.AmountBidAsk(this.name, fixed_bid[i], order, new_price, now);
                                 deals.Add(deal);
                                 if (deal.bid.state == E_DealState.completed)
                                 {
@@ -428,7 +428,7 @@ namespace Com.Matching
                             }
                             else if (fixed_bid[i].amount_unsold < order.amount_unsold)
                             {
-                                Deal deal = AmountAskBid(fixed_bid[i], order, new_price, now);
+                                Deal deal = Util.AmountAskBid(this.name, fixed_bid[i], order, new_price, now);
                                 deals.Add(deal);
                                 //市价买单完成,从市价买单移除
                                 fixed_bid.Remove(fixed_bid[i]);
@@ -466,89 +466,7 @@ namespace Com.Matching
             return deals;
         }
 
-        /// <summary>
-        /// 买单量>卖单量
-        /// </summary>
-        /// <param name="bid">买单</param>
-        /// <param name="ask">卖单</param>
-        /// <param name="price">成交价</param>
-        /// <param name="now">成交时间</param>
-        /// <returns></returns>
-        private Deal AmountBidAsk(Order bid, Order ask, decimal price, DateTimeOffset now)
-        {
-            decimal ask_amount = ask.amount_unsold;
-            ask.amount_unsold = 0;
-            ask.amount_done += ask_amount;
-            ask.deal_last_time = now;
-            ask.state = E_DealState.completed;
-            bid.amount_unsold -= ask_amount;
-            bid.amount_done += ask_amount;
-            bid.deal_last_time = now;
-            if (bid.amount_unsold <= 0)
-            {
-                bid.state = E_DealState.completed;
-            }
-            else
-            {
-                bid.state = E_DealState.partial;
-            }
-            Deal deal = new Deal()
-            {
-                id = Util.worker.NextId().ToString(),
-                name = this.name,
-                uid_bid = bid.uid,
-                uid_ask = ask.uid,
-                price = price,
-                amount = ask_amount,
-                total = price * ask_amount,
-                time = now,
-                bid = bid,
-                ask = ask,
-            };
-            return deal;
-        }
 
-        /// <summary>
-        /// 卖单量>=买单量
-        /// </summary>
-        /// <param name="bid">买单</param>
-        /// <param name="ask">卖单</param>
-        /// <param name="price">成交价</param>
-        /// <param name="now">成交时间</param>
-        /// <returns></returns>
-        private Deal AmountAskBid(Order bid, Order ask, decimal price, DateTimeOffset now)
-        {
-            decimal bid_amount = bid.amount_unsold;
-            ask.amount_unsold -= bid_amount;
-            ask.amount_done += bid_amount;
-            ask.deal_last_time = now;
-            if (ask.amount_unsold <= 0)
-            {
-                ask.state = E_DealState.completed;
-            }
-            else
-            {
-                ask.state = E_DealState.partial;
-            }
-            bid.amount_unsold = 0;
-            bid.amount_done = bid_amount;
-            bid.deal_last_time = now;
-            bid.state = E_DealState.completed;
-            Deal deal = new Deal()
-            {
-                id = Util.worker.NextId().ToString(),
-                name = this.name,
-                uid_bid = bid.uid,
-                uid_ask = ask.uid,
-                price = price,
-                amount = bid_amount,
-                total = price * bid_amount,
-                time = now,
-                bid = bid,
-                ask = ask,
-            };
-            return deal;
-        }
 
         /// <summary>
         /// 从MQ获取到撤消订单

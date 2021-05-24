@@ -12,20 +12,20 @@ namespace Com.Matching
     {
         static async Task Main(string[] args)
         {
-            IHostBuilder host = Host.CreateDefaultBuilder();
-            host = host.ConfigureHostConfiguration(config =>
+            IHostBuilder hosts = Host.CreateDefaultBuilder();
+            hosts = hosts.ConfigureHostConfiguration(config =>
             {
                 config.Sources.Clear();
                 config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
                 config.AddEnvironmentVariables();
                 config.Build();
             });
-            host = host.ConfigureServices(build =>
+            hosts = hosts.ConfigureServices(config =>
             {
-                build.AddHostedService<Worker>();
+                config.AddHostedService<Worker>();
             });
-            IHost ihost = host.Build();
-            await ihost.RunAsync();
+            IHost host = hosts.Build();
+            await host.RunAsync();
         }
 
     }

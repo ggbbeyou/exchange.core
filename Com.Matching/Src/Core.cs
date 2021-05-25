@@ -206,7 +206,7 @@ namespace Com.Matching
         }
 
         /// <summary>
-        /// 获取更新的orderbook
+        /// 获取有变量的orderbook(增量)
         /// </summary>
         /// <param name="order">订单</param>
         /// <param name="deals">成交记录</param>

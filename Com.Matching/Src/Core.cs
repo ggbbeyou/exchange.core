@@ -105,6 +105,11 @@ namespace Com.Matching
         /// <returns></returns>
         public List<Order> fixed_ask = new List<Order>();
         /// <summary>
+        /// 一分钟K线
+        /// </summary>
+        /// <returns></returns>
+        public Kline kline_minute = new Kline();
+        /// <summary>
         /// RabbitMQ模型接口
         /// </summary>
         public readonly IModel channel;
@@ -231,6 +236,34 @@ namespace Com.Matching
                 }
             }
             return orderBook;
+        }
+
+        /// <summary>
+        /// 设置分钟K线
+        /// </summary>
+        /// <param name="deals"></param>
+        public Kline SetKlink(List<Deal> deals)
+        {
+            foreach (var item in deals)
+            {
+                DateTimeOffset now = DateTimeOffset.UtcNow;
+                if (now.Minute == kline_minute.minute)
+                {
+                    kline_minute.name = this.name;
+                    kline_minute.amount = 0;
+                    kline_minute.count = 0;
+                    kline_minute.total = 0;
+                    kline_minute.open = 0;
+                    kline_minute.close = 0;
+                    kline_minute.low = 0;
+                    kline_minute.high = 0;
+                    kline_minute.time_start = now;
+                    kline_minute.minute = now.Minute;
+                }
+
+            }
+
+            return kline_minute;
         }
 
         /// <summary>

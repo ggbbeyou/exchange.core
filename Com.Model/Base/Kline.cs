@@ -48,9 +48,19 @@ namespace Com.Model.Base
         /// <value></value>
         public decimal high { get; set; }
         /// <summary>
-        /// 变更时间
+        /// 变更开始时间
         /// </summary>
         /// <value></value>
-        public DateTimeOffset last_time { get; set; }
+        public DateTimeOffset time_start { get; set; }
+        /// <summary>
+        /// 变更结束时间
+        /// </summary>
+        /// <value></value>
+        public DateTimeOffset time_end { get; set; }
+        /// <summary>
+        /// 当天第几分钟
+        /// </summary>
+        /// <value></value>
+        public int minute{get;set;}
     }
 }

@@ -176,7 +176,7 @@ namespace Com.Matching
         /// 撤消订单
         /// </summary>
         /// <param name="order_id">订单ID</param>
-        /// <returns></returns>
+        /// <returns>orderbook变更</returns>
         public OrderBook RemoveOrder(string order_id)
         {
             OrderBook orderBook = new OrderBook();

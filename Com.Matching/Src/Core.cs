@@ -51,7 +51,7 @@ using RabbitMQ.Client.Events;
 namespace Com.Matching
 {
     /// <summary>
-    /// 撮合算法核心类 ,注:撮合引擎不保存数据，所以K线需要外部系统处理
+    /// 撮合算法核心类 ,注:撮合引擎不保存数据，所以K线只提供实时分钟K线
     /// </summary>
     public class Core
     {

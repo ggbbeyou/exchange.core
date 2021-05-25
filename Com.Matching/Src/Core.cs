@@ -175,6 +175,7 @@ namespace Com.Matching
         {
             List<Deal> deals = Match(order);
             List<OrderBook> orderBooks = GetOrderBooks(order, deals);
+            Kline kline = SetKlink(deals);
         }
 
         /// <summary>
@@ -239,30 +240,40 @@ namespace Com.Matching
         }
 
         /// <summary>
-        /// 设置分钟K线
+        /// 设置当前分钟K线
         /// </summary>
-        /// <param name="deals"></param>
+        /// <param name="deals">成交记录</param>
+        /// <returns>当前一分钟K线</returns>
         public Kline SetKlink(List<Deal> deals)
         {
             foreach (var item in deals)
             {
-                DateTimeOffset now = DateTimeOffset.UtcNow;
-                if (now.Minute == kline_minute.minute)
+                int minute = (int)(item.time - DateTimeOffset.UtcNow.Date).TotalMinutes;
+                if (kline_minute.minute != minute)
                 {
                     kline_minute.name = this.name;
-                    kline_minute.amount = 0;
-                    kline_minute.count = 0;
-                    kline_minute.total = 0;
-                    kline_minute.open = 0;
-                    kline_minute.close = 0;
-                    kline_minute.low = 0;
-                    kline_minute.high = 0;
-                    kline_minute.time_start = now;
-                    kline_minute.minute = now.Minute;
+                    kline_minute.amount = item.amount;
+                    kline_minute.count = 1;
+                    kline_minute.total = item.price * item.amount;
+                    kline_minute.open = item.price;
+                    kline_minute.close = item.price;
+                    kline_minute.low = item.price;
+                    kline_minute.high = item.price;
+                    kline_minute.time_start = item.time;
+                    kline_minute.time_end = item.time;
+                    kline_minute.minute = minute;
                 }
-
+                else
+                {
+                    kline_minute.amount += item.amount;
+                    kline_minute.count += 1;
+                    kline_minute.total += item.price * item.amount;
+                    kline_minute.close = item.price;
+                    kline_minute.low = item.price < kline_minute.low ? item.price : kline_minute.low;
+                    kline_minute.high = item.price > kline_minute.high ? item.price : kline_minute.high;
+                    kline_minute.time_end = item.time;
+                }
             }
-
             return kline_minute;
         }
 

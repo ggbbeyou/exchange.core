@@ -67,13 +67,7 @@ namespace Com.Matching
         /// <summary>
         /// 上一次成交价
         /// </summary>
-        public decimal price_last;
-        /// <summary>
-        /// 收到到的订单
-        /// </summary>
-        /// <typeparam name="Order">订单</typeparam>
-        /// <returns></returns>
-        public Queue<Order> queue = new Queue<Order>();
+        public decimal price_last;     
         /// <summary>
         /// 买盘 高->低
         /// </summary>

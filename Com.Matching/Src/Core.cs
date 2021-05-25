@@ -45,8 +45,6 @@ using System.Text;
 using Com.Model.Base;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using RabbitMQ.Client;
-using RabbitMQ.Client.Events;
 
 namespace Com.Matching
 {
@@ -108,11 +106,7 @@ namespace Com.Matching
         /// 一分钟K线
         /// </summary>
         /// <returns></returns>
-        public Kline kline_minute = new Kline();
-        /// <summary>
-        /// RabbitMQ模型接口
-        /// </summary>
-        public readonly IModel channel;
+        public Kline kline_minute = null;
         /// <summary>
         /// 配置接口
         /// </summary>
@@ -121,6 +115,9 @@ namespace Com.Matching
         /// 日志接口
         /// </summary>
         public ILogger logger;
+        /// <summary>
+        /// 消息队列
+        /// </summary>
         private MQ mq = null;
 
         public Core(string name, IConfiguration configuration, ILogger logger)
@@ -129,8 +126,6 @@ namespace Com.Matching
             this.logger = logger;
             this.configuration = configuration;
             this.mq = new MQ(this);
-
-            
         }
 
         /// <summary>
@@ -141,6 +136,7 @@ namespace Com.Matching
         {
             this.price_last = price_last;
             this.run = true;
+
         }
 
         public void Stop()
@@ -154,8 +150,11 @@ namespace Com.Matching
         public void Process(Order order)
         {
             List<Deal> deals = Match(order);
+            this.mq.SendDeal(deals);
             List<OrderBook> orderBooks = GetOrderBooks(order, deals);
+            this.mq.SendOrderBook(orderBooks);
             Kline kline = SetKlink(deals);
+            this.mq.SendKline(kline);
         }
 
         /// <summary>
@@ -163,7 +162,7 @@ namespace Com.Matching
         /// </summary>
         /// <param name="order_id">订单ID</param>
         /// <returns>orderbook变更</returns>
-        public OrderBook RemoveOrder(string order_id)
+        public OrderBook CancelOrder(string order_id)
         {
             OrderBook orderBook = new OrderBook();
             if (this.market_bid.Exists(P => P.id == order_id))
@@ -226,6 +225,10 @@ namespace Com.Matching
         /// <returns>当前一分钟K线</returns>
         public Kline SetKlink(List<Deal> deals)
         {
+            if (kline_minute == null && deals != null && deals.Count > 0)
+            {
+                kline_minute = new Kline();
+            }
             foreach (var item in deals)
             {
                 int minute = (int)(item.time - DateTimeOffset.UtcNow.Date).TotalMinutes;

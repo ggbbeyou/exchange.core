@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Com.Model.Base;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 
 namespace Com.Matching
@@ -8,15 +9,14 @@ namespace Com.Matching
     public class Test
     {
         string name = "btc/usdt";
-        Core core = new Core("btc/usdt", null, null);
+        Core core = null;
 
         Random random = new Random();
 
-        public Test()
+        public Test(IConfiguration configuration)
         {
+            core = new Core("btc/usdt", configuration, null);
             core.Start(45);
-
-
         }
 
         public void TestOrder()

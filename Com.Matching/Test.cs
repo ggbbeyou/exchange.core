@@ -27,7 +27,7 @@ namespace Com.Matching
             List<Deal> deals = AddOrder(orders);
             double time = (DateTimeOffset.UtcNow - now).TotalSeconds;
             int count = deals.Count;
-            Console.WriteLine($"End ~~  count:{count},time:{time}秒,avg:{time / count}");
+            Console.WriteLine($"End ~~  count:{count},time:{time}秒,avg:{(time / count)}");
             Console.Read();
         }
 
@@ -54,7 +54,7 @@ namespace Com.Matching
         public List<Order> GetOrder()
         {
             List<Order> orders = new List<Order>();
-            for (int i = 0; i < 1000000; i++)
+            for (int i = 0; i < 100000; i++)
             {
                 E_Direction direction = random.Next(1, 3) == 1 ? E_Direction.bid : E_Direction.ask;
                 E_OrderType type = random.Next(1, 3) == 1 ? E_OrderType.price_fixed : E_OrderType.price_market;

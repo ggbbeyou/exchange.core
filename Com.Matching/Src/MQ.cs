@@ -87,12 +87,15 @@ namespace Com.Matching
             EventingBasicConsumer consumer_send_order = new EventingBasicConsumer(channel_send_order);
             consumer_send_order.Received += (model, ea) =>
             {
-                byte[] body = ea.Body.ToArray();
-                string json = Encoding.UTF8.GetString(body);
-                Order order = JsonConvert.DeserializeObject<Order>(json);
-                if (order != null)
+                if (this.core.run)
                 {
-                    this.core.Process(order);
+                    byte[] body = ea.Body.ToArray();
+                    string json = Encoding.UTF8.GetString(body);
+                    Order order = JsonConvert.DeserializeObject<Order>(json);
+                    if (order != null)
+                    {
+                        this.core.Process(order);
+                    }
                 }
             };
             channel_send_order.BasicConsume(queue: this.key_order_send, autoAck: true, consumer: consumer_send_order);

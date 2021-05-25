@@ -121,12 +121,15 @@ namespace Com.Matching
         /// 日志接口
         /// </summary>
         public ILogger logger;
+        private MQ mq = null;
 
         public Core(string name, IConfiguration configuration, ILogger logger)
         {
             this.name = name;
             this.logger = logger;
             this.configuration = configuration;
+            this.mq = new MQ(this);
+
             // ConnectionFactory factory = new ConnectionFactory() { HostName = "192.168.1.3", Port = 5672, UserName = "guest", Password = "guest" };
             // IConnection connection = factory.CreateConnection();
             // this.channel = connection.CreateModel();

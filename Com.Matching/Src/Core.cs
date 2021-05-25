@@ -175,76 +175,8 @@ namespace Com.Matching
         /// </summary>
         public void Process(Order order)
         {
-            // OrderBook orderbook;
-            // if (order.type == E_OrderType.price_fixed)
-            // {
-            //     if (order.direction == E_Direction.bid)
-            //     {
-            //         orderbook = bid.FirstOrDefault(P => P.price == order.price);
-            //         if (orderbook == null)
-            //         {
-            //             orderbook = new OrderBook();
-            //             orderbook.name = this.name;
-            //             orderbook.price = order.price;
-            //             orderbook.amount = 0;
-            //             orderbook.count = 0;
-            //             orderbook.last_time = DateTimeOffset.UtcNow;
-            //             orderbook.direction = E_Direction.bid;
-            //         }
-            //         orderbook.amount += order.amount;
-            //         orderbook.count += 1;
-            //     }
-            //     else if (order.direction == E_Direction.ask)
-            //     {
-            //         orderbook = bid.FirstOrDefault(P => P.price == order.price);
-            //         if (orderbook == null)
-            //         {
-            //             orderbook = new OrderBook();
-            //             orderbook.name = this.name;
-            //             orderbook.price = order.price;
-            //             orderbook.amount = 0;
-            //             orderbook.count = 0;
-            //             orderbook.last_time = DateTimeOffset.UtcNow;
-            //             orderbook.direction = E_Direction.ask;
-            //         }
-            //         orderbook.amount += order.amount;
-            //         orderbook.count += 1;
-            //     }
-            // }
             List<Deal> deals = Match(order);
-
-            foreach (var item in deals)
-            {
-                // deal发送到MQ
-
-
-                decimal amount_bid = 0;
-                decimal amount_ask = 0;
-                if (order.type == E_OrderType.price_fixed)
-                {
-                    if (order.direction == E_Direction.bid)
-                    {
-                        amount_bid = order.amount;
-
-                    }
-                    else if (order.direction == E_Direction.ask)
-                    {
-                        amount_ask = order.amount;
-                    }
-                }
-                decimal diff = amount_bid - item.amount;
-                if (item.bid.type == E_OrderType.price_fixed)
-                {
-                    if (diff > 0)
-                    {
-                        //表示未全部成交
-                    }
-                }
-                OrderBook orderBook_bid = bid.FirstOrDefault(P => P.price == order.price);
-
-            }
-
-
+            List<OrderBook> orderBooks = GetOrderBooks(order, deals);
         }
 
         /// <summary>
@@ -274,12 +206,68 @@ namespace Com.Matching
         }
 
         /// <summary>
-        /// 成交订单发送到MQ
+        /// 获取更新的orderbook
         /// </summary>
-        /// <param name="deal">成交订单</param>
-        public void PushDeal(List<Deal> deals)
+        /// <param name="order">订单</param>
+        /// <param name="deals">成交记录</param>
+        /// <returns></returns>
+        public List<OrderBook> GetOrderBooks(Order order, List<Deal> deals)
         {
-
+            List<OrderBook> orderBooks = new List<OrderBook>();
+            decimal amount_deal = deals.Sum(P => P.amount);
+            OrderBook orderBook = null;
+            if (order.amount > amount_deal)
+            {
+                //未完全成交
+                if (order.type == E_OrderType.price_fixed && order.direction == E_Direction.bid)
+                {
+                    orderBook = bid.FirstOrDefault(P => P.price == order.price);
+                    if (orderBook == null)
+                    {
+                        orderBook = new OrderBook()
+                        {
+                            name = this.name,
+                            price = order.price,
+                            amount = 0,
+                            count = 0,
+                            last_time = DateTimeOffset.UtcNow,
+                            direction = E_Direction.bid,
+                        };
+                        bid.Add(orderBook);
+                    }
+                    orderBook.amount += (order.amount - amount_deal);
+                    orderBook.count += 1;
+                    orderBook.last_time = DateTimeOffset.UtcNow;
+                    orderBooks.Add(orderBook);
+                }
+            }
+            // List<KeyValuePair<decimal, decimal>> market_bid = deals.Where(P => P.bid.type == E_OrderType.price_market).GroupBy(P => P.price).Select(P => new KeyValuePair<decimal, decimal>(P.Key, P.Sum(T => T.amount))).ToList();
+            // List<KeyValuePair<decimal, decimal>> market_ask = deals.Where(P => P.ask.type == E_OrderType.price_market).GroupBy(P => P.price).Select(P => new KeyValuePair<decimal, decimal>(P.Key, P.Sum(T => T.amount))).ToList();
+            var fixed_bid = deals.Where(P => P.bid.type == E_OrderType.price_fixed).GroupBy(P => P.price).Select(P => new { price = P.Key, amount = P.Sum(T => T.amount), complet_count = P.Count(T => T.bid.state == E_DealState.completed) }).ToList();
+            foreach (var item in fixed_bid)
+            {
+                OrderBook orderBook_bid = bid.FirstOrDefault(P => P.price == item.price);
+                if (orderBook_bid != null)
+                {
+                    orderBook_bid.amount -= item.amount;
+                    orderBook_bid.count -= item.complet_count;
+                    orderBook_bid.last_time = DateTimeOffset.UtcNow;
+                    orderBooks.Add(orderBook_bid);
+                }
+            }
+            var fixed_ask = deals.Where(P => P.ask.type == E_OrderType.price_fixed).GroupBy(P => P.price).Select(P => new { price = P.Key, amount = P.Sum(T => T.amount), complet_count = P.Count(T => T.ask.state == E_DealState.completed) }).ToList();
+            foreach (var item in fixed_ask)
+            {
+                OrderBook orderBook_ask = ask.FirstOrDefault(P => P.price == item.price);
+                if (orderBook_ask != null)
+                {
+                    orderBook_ask.amount -= item.amount;
+                    orderBook_ask.count -= item.complet_count;
+                    orderBook_ask.last_time = DateTimeOffset.UtcNow;
+                    orderBooks.Add(orderBook_ask);
+                }
+            }
+            return orderBooks;
         }
 
         /// <summary>

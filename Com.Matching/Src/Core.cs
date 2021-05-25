@@ -156,7 +156,6 @@ namespace Com.Matching
         {
             this.price_last = price_last;
             this.run = true;
-
         }
 
         public void Stop()

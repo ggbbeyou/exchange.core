@@ -67,7 +67,7 @@ namespace Com.Matching
         /// <summary>
         /// 上一次成交价
         /// </summary>
-        public decimal price_last;     
+        public decimal price_last;
         /// <summary>
         /// 买盘 高->低
         /// </summary>
@@ -178,25 +178,60 @@ namespace Com.Matching
         /// </summary>
         /// <param name="order_id">订单ID</param>
         /// <returns></returns>
-        public bool RemoveOrder(string order_id)
+        public OrderBook RemoveOrder(string order_id)
         {
+            OrderBook orderBook = new OrderBook();
             if (this.market_bid.Exists(P => P.id == order_id))
             {
-                return this.market_bid.RemoveAll(P => P.id == order_id) > 0;
+                this.market_bid.RemoveAll(P => P.id == order_id);
             }
             else if (this.market_ask.Exists(P => P.id == order_id))
             {
-                return this.market_ask.RemoveAll(P => P.id == order_id) > 0;
+                this.market_ask.RemoveAll(P => P.id == order_id);
             }
             else if (this.fixed_bid.Exists(P => P.id == order_id))
             {
-                return this.fixed_bid.RemoveAll(P => P.id == order_id) > 0;
+                Order order = this.fixed_bid.FirstOrDefault();
+                this.fixed_bid.RemoveAll(P => P.id == order_id);
+                if (order != null)
+                {
+                    OrderBook orderBook_bid = bid.FirstOrDefault(P => P.price == order.price);
+                    if (orderBook_bid != null)
+                    {
+                        orderBook_bid.amount -= order.amount_unsold;
+                        orderBook_bid.count -= 1;
+                        orderBook_bid.last_time = DateTimeOffset.UtcNow;
+                        orderBook.name = order.name;
+                        orderBook.price = order.price;
+                        orderBook.amount = orderBook_bid.amount;
+                        orderBook.count = orderBook_bid.count;
+                        orderBook.last_time = orderBook_bid.last_time;
+                        orderBook.direction = orderBook_bid.direction;
+                    }
+                }
             }
             else if (this.fixed_ask.Exists(P => P.id == order_id))
             {
-                return this.fixed_ask.RemoveAll(P => P.id == order_id) > 0;
+                Order order = this.fixed_ask.FirstOrDefault();
+                this.fixed_ask.RemoveAll(P => P.id == order_id);
+                if (order != null)
+                {
+                    OrderBook orderBook_ask = ask.FirstOrDefault(P => P.price == order.price);
+                    if (orderBook_ask != null)
+                    {
+                        orderBook_ask.amount -= order.amount_unsold;
+                        orderBook_ask.count -= 1;
+                        orderBook_ask.last_time = DateTimeOffset.UtcNow;
+                        orderBook.name = order.name;
+                        orderBook.price = order.price;
+                        orderBook.amount = orderBook_ask.amount;
+                        orderBook.count = orderBook_ask.count;
+                        orderBook.last_time = orderBook_ask.last_time;
+                        orderBook.direction = orderBook_ask.direction;
+                    }
+                }
             }
-            return false;
+            return orderBook;
         }
 
         /// <summary>

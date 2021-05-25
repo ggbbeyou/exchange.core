@@ -218,7 +218,7 @@ namespace Com.Matching
             OrderBook orderBook = null;
             if (order.amount > amount_deal)
             {
-                //未完全成交
+                //未完全成交,增加orderBook
                 if (order.type == E_OrderType.price_fixed && order.direction == E_Direction.bid)
                 {
                     orderBook = bid.FirstOrDefault(P => P.price == order.price);
@@ -240,9 +240,29 @@ namespace Com.Matching
                     orderBook.last_time = DateTimeOffset.UtcNow;
                     orderBooks.Add(orderBook);
                 }
+                else if (order.type == E_OrderType.price_fixed && order.direction == E_Direction.ask)
+                {
+                    orderBook = ask.FirstOrDefault(P => P.price == order.price);
+                    if (orderBook == null)
+                    {
+                        orderBook = new OrderBook()
+                        {
+                            name = this.name,
+                            price = order.price,
+                            amount = 0,
+                            count = 0,
+                            last_time = DateTimeOffset.UtcNow,
+                            direction = E_Direction.ask,
+                        };
+                        ask.Add(orderBook);
+                    }
+                    orderBook.amount += (order.amount - amount_deal);
+                    orderBook.count += 1;
+                    orderBook.last_time = DateTimeOffset.UtcNow;
+                    orderBooks.Add(orderBook);
+                }
             }
-            // List<KeyValuePair<decimal, decimal>> market_bid = deals.Where(P => P.bid.type == E_OrderType.price_market).GroupBy(P => P.price).Select(P => new KeyValuePair<decimal, decimal>(P.Key, P.Sum(T => T.amount))).ToList();
-            // List<KeyValuePair<decimal, decimal>> market_ask = deals.Where(P => P.ask.type == E_OrderType.price_market).GroupBy(P => P.price).Select(P => new KeyValuePair<decimal, decimal>(P.Key, P.Sum(T => T.amount))).ToList();
+            //已成交，则减少orderBook
             var fixed_bid = deals.Where(P => P.bid.type == E_OrderType.price_fixed).GroupBy(P => P.price).Select(P => new { price = P.Key, amount = P.Sum(T => T.amount), complet_count = P.Count(T => T.bid.state == E_DealState.completed) }).ToList();
             foreach (var item in fixed_bid)
             {

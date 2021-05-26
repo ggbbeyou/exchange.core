@@ -78,7 +78,8 @@ namespace Com.Matching
                 HostName = this.core.configuration.GetValue<string>("RabbitMQ:HostName"),
                 Port = this.core.configuration.GetValue<int>("RabbitMQ:Port"),
                 UserName = this.core.configuration.GetValue<string>("RabbitMQ:UserName"),
-                Password = this.core.configuration.GetValue<string>("RabbitMQ:Password")
+                Password = this.core.configuration.GetValue<string>("RabbitMQ:Password"),
+                VirtualHost=this.core.configuration.GetValue<string>("RabbitMQ:VirtualHost"),
             };
             //接收到新订单
             IConnection connection_send_order = factory.CreateConnection();

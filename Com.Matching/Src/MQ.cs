@@ -139,7 +139,7 @@ namespace Com.Matching
             }
             string json = JsonConvert.SerializeObject(deals);
             byte[] body = Encoding.UTF8.GetBytes(json);
-            this.channel_deal.ExchangeDeclare(exchange: this.key_exchange_deal, type: "topic");
+            this.channel_deal.ExchangeDeclare(exchange: this.key_exchange_deal,type:ExchangeType.Topic);
             this.channel_deal.BasicPublish(exchange: this.key_exchange_deal, routingKey: this.core.name, basicProperties: null, body: body);
         }
 
@@ -155,7 +155,7 @@ namespace Com.Matching
             }
             string json = JsonConvert.SerializeObject(orderBooks);
             byte[] body = Encoding.UTF8.GetBytes(json);
-            this.channel_deal.ExchangeDeclare(exchange: this.key_exchange_orderbook, type: "topic");
+            this.channel_deal.ExchangeDeclare(exchange: this.key_exchange_orderbook,type:ExchangeType.Topic);
             this.channel_deal.BasicPublish(exchange: this.key_exchange_orderbook, routingKey: this.core.name, basicProperties: null, body: body);
         }
 
@@ -171,7 +171,7 @@ namespace Com.Matching
             }
             string json = JsonConvert.SerializeObject(kline);
             byte[] body = Encoding.UTF8.GetBytes(json);
-            this.channel_deal.ExchangeDeclare(exchange: this.key_exchange_kline, type: "topic");
+            this.channel_deal.ExchangeDeclare(exchange: this.key_exchange_kline, type:ExchangeType.Topic);
             this.channel_deal.BasicPublish(exchange: this.key_exchange_kline, routingKey: this.core.name, basicProperties: null, body: body);
         }
 

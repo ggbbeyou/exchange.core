@@ -73,14 +73,7 @@ namespace Com.Matching
             this.key_exchange_deal = string.Format(this.key_exchange_deal, core.name);
             this.key_exchange_orderbook = string.Format(this.key_exchange_orderbook, core.name);
             this.key_exchange_kline = string.Format(this.key_exchange_kline, core.name);
-            this.factory = new ConnectionFactory()
-            {
-                HostName = this.core.configuration.GetValue<string>("RabbitMQ:HostName"),
-                Port = this.core.configuration.GetValue<int>("RabbitMQ:Port"),
-                UserName = this.core.configuration.GetValue<string>("RabbitMQ:UserName"),
-                Password = this.core.configuration.GetValue<string>("RabbitMQ:Password"),
-                VirtualHost=this.core.configuration.GetValue<string>("RabbitMQ:VirtualHost"),
-            };
+            this.factory=this.core.configuration.GetSection("RabbitMQ").Get<ConnectionFactory>();
             //接收到新订单
             IConnection connection_send_order = factory.CreateConnection();
             IModel channel_send_order = connection_send_order.CreateModel();

@@ -14,7 +14,7 @@ namespace Com.Matching
     /// <summary>
     /// 工作进程
     /// </summary>
-    public class Worker : BackgroundService
+    public class MainService : BackgroundService
     {
         /// <summary>
         /// 配置接口
@@ -23,17 +23,17 @@ namespace Com.Matching
         /// <summary>
         /// 日志接口
         /// </summary>
-        private readonly ILogger<Worker> logger;
+        private readonly ILogger<MainService> logger;
 
         /// <summary>
         /// 初始化
         /// </summary>
         /// <param name="configuration">配置接口</param>
         /// <param name="logger">日志接口</param>
-        public Worker(IConfiguration configuration, ILogger<Worker> logger)
+        public MainService(IConfiguration configuration, ILogger<MainService> logger)
         {
             this.configuration = configuration;
-            this.logger = logger ?? NullLogger<Worker>.Instance;
+            this.logger = logger ?? NullLogger<MainService>.Instance;
         }
 
         /// <summary>
@@ -46,8 +46,10 @@ namespace Com.Matching
             this.logger.LogInformation("准备启动后台服务");
             try
             {
-                Test test = new Test(this.configuration);
-                test.TestOrder();
+                // Test test = new Test(this.configuration);
+                // test.TestOrder();
+                FactoryMatching.instance.Info(this.configuration, this.logger);
+                FactoryMatching.instance.Start();
 
                 await Task.Delay(0);
                 this.logger.LogInformation("启动后台服务成功");

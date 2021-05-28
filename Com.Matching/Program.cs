@@ -22,7 +22,7 @@ namespace Com.Matching
             });
             hosts = hosts.ConfigureServices(config =>
             {
-                config.AddHostedService<Worker>();
+                config.AddHostedService<MainService>();
             });
             IHost host = hosts.Build();
             await host.RunAsync();

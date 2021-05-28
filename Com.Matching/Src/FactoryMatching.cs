@@ -61,8 +61,7 @@ namespace Com.Matching
             this.logger = logger;
             this.configuration = configuration;
             this.server_name = configuration.GetValue<string>("server_name");
-            this.factory = configuration.GetSection("RabbitMQ").Get<ConnectionFactory>();
-            this.factory.AutomaticRecoveryEnabled = true;
+            this.factory = configuration.GetSection("RabbitMQ").Get<ConnectionFactory>();            
         }
 
         /// <summary>
@@ -88,7 +87,7 @@ namespace Com.Matching
                         try
                         {
                             var message = Encoding.UTF8.GetString(body); //请求参数                      
-                            response ="";//调用方法返回值
+                            response ="bbbbbbbbbb";//调用方法返回值
                         }
                         catch (Exception e)
                         {

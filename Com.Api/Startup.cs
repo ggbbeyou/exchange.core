@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using StackExchange.Redis.Extensions.Core.Configuration;
+using StackExchange.Redis.Extensions.Newtonsoft;
 
 namespace Com.Api
 {
@@ -23,7 +25,10 @@ namespace Com.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            RedisConfiguration redisConfiguration = Configuration.GetSection("Redis").Get<RedisConfiguration>();
+            services.AddStackExchangeRedisExtensions<NewtonsoftSerializer>(redisConfiguration);
             services.AddControllersWithViews();
+            services.AddHostedService<MainService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

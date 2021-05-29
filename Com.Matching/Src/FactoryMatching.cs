@@ -61,7 +61,52 @@ namespace Com.Matching
             this.logger = logger;
             this.configuration = configuration;
             this.server_name = configuration.GetValue<string>("server_name");
-            this.factory = configuration.GetSection("RabbitMQ").Get<ConnectionFactory>();            
+            //RabbitMQ
+            this.factory = configuration.GetSection("RabbitMQ").Get<ConnectionFactory>();
+            string queue_name = "rpc_queue";
+            // var factory = new ConnectionFactory() { HostName = "192.168.1.3", UserName = "mquser", Password = "Abcd1234", VirtualHost = "Matching" };
+            using (var connection = factory.CreateConnection())
+            using (var channel = connection.CreateModel())
+            {
+                channel.QueueDeclare(queue: "rpc_queue", durable: false, exclusive: false, autoDelete: false, arguments: null);
+                channel.BasicQos(0, 1, false);
+                var consumer = new EventingBasicConsumer(channel);
+                channel.BasicConsume(queue: "rpc_queue", autoAck: false, consumer: consumer);
+                //Console.WriteLine(" [x] Awaiting RPC requests");
+
+                consumer.Received += (model, ea) =>
+                {
+                    string response = null;
+
+                    var body = ea.Body.ToArray();
+                    var props = ea.BasicProperties;
+                    var replyProps = channel.CreateBasicProperties();
+                    replyProps.CorrelationId = props.CorrelationId;
+
+                    try
+                    {
+                        var message = Encoding.UTF8.GetString(body);
+                        int n = int.Parse(message);
+                        Console.WriteLine(" [.] fib({0})", message);
+                        //response = fib(n).ToString();
+                        response = CallPRC(message); ;
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(" [.] " + e.Message);
+                        response = "";
+                    }
+                    finally
+                    {
+                        var responseBytes = Encoding.UTF8.GetBytes(response);
+                        channel.BasicPublish(exchange: "", routingKey: props.ReplyTo, basicProperties: replyProps, body: responseBytes);
+                        channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
+                    }
+                };
+
+                //Console.WriteLine(" Press [enter] to exit.");
+                Console.ReadLine();
+            }
         }
 
         /// <summary>
@@ -69,47 +114,26 @@ namespace Com.Matching
         /// </summary>
         public void Start()
         {
-            using (var connection = factory.CreateConnection())
-            {
-                using (var channel = connection.CreateModel())
-                {
-                    channel.QueueDeclare(queue: "rpc_queue", durable: false, exclusive: false, autoDelete: false, arguments: null);
-                    channel.BasicQos(0, 1, false);
-                    var consumer = new EventingBasicConsumer(channel);
-                    channel.BasicConsume(queue: "rpc_queue", autoAck: false, consumer: consumer);                 
-                    consumer.Received += (model, ea) =>
-                    {
-                        string response = null;
-                        var body = ea.Body.ToArray();
-                        var props = ea.BasicProperties;
-                        var replyProps = channel.CreateBasicProperties();
-                        replyProps.CorrelationId = props.CorrelationId;
-                        try
-                        {
-                            var message = Encoding.UTF8.GetString(body); //请求参数                      
-                            response ="bbbbbbbbbb";//调用方法返回值
-                        }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine(" [.] " + e.Message);
-                            response = "";
-                        }
-                        finally
-                        {
-                            var responseBytes = Encoding.UTF8.GetBytes(response);
-                            channel.BasicPublish(exchange: "", routingKey: props.ReplyTo,basicProperties: replyProps, body: responseBytes);
-                            channel.BasicAck(deliveryTag: ea.DeliveryTag,multiple: false);
-                        }
-                    };
-                }
-            }
+
         }
 
 
 
 
+        private string CallPRC(string message)
+        {
+            return message + "aaaaaaaaaaaaaaaa";
+        }
 
+        private int fib(int n)
+        {
+            if (n == 0 || n == 1)
+            {
+                return n;
+            }
 
+            return fib(n - 1) + fib(n - 2);
+        }
 
 
 

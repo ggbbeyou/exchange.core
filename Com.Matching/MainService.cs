@@ -49,10 +49,11 @@ namespace Com.Matching
                 // Test test = new Test(this.configuration);
                 // test.TestOrder();
                 FactoryMatching.instance.Info(this.configuration, this.logger);
-                FactoryMatching.instance.Start();
 
-                await Task.Delay(0);
-                this.logger.LogInformation("启动后台服务成功");
+
+
+
+                //this.logger.LogInformation("启动后台服务成功");
             }
             catch (Exception ex)
             {

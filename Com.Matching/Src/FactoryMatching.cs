@@ -72,7 +72,7 @@ namespace Com.Matching
             this.configuration = configuration;
             this.server_name = configuration.GetValue<string>("server_name");
             this.factory = configuration.GetSection("RabbitMQ").Get<ConnectionFactory>();
-            Status();
+            ServiceStatus();
         }
 
         /// <summary>
@@ -80,7 +80,7 @@ namespace Com.Matching
         /// open:servername:name:price
         /// close:servername:name
         /// </summary>
-        public void Status()
+        public void ServiceStatus()
         {
             string queue_name = $"MatchingService";
             var connection = factory.CreateConnection();
@@ -93,40 +93,40 @@ namespace Com.Matching
                 if (!string.IsNullOrWhiteSpace(message))
                 {
                     string[] status = message.Split(':', StringSplitOptions.RemoveEmptyEntries);
-                    switch (status[0])
+                    if (this.server_name == status[1])
                     {
-                        case "open":
-                            if (this.server_name == status[1])
-                            {
-                                if (!this.cores.ContainsKey(status[2].ToLower()))
+                        string name = status[2].ToLower();
+                        switch (status[0])
+                        {
+                            case "open":
+                                decimal price = decimal.Parse(status[3]);
+                                if (!this.cores.ContainsKey(name))
                                 {
-                                    Core core = new Core(status[2].ToLower(), this.configuration, this.logger);
-                                    core.Start(decimal.Parse(status[3]));
-                                    this.cores.Add(status[2].ToLower(), core);
+                                    Core core = new Core(name, this.configuration, this.logger);
+                                    core.Start(price);
+                                    this.cores.Add(name, core);
                                 }
                                 else
                                 {
-                                    Core core = this.cores[status[2].ToLower()];
-                                    core.Start(decimal.Parse(status[3]));
+                                    Core core = this.cores[name];
+                                    core.Start(price);
                                 }
-                            }
-                            break;
-                        case "close":
-                            if (this.cores.ContainsKey(status[2].ToLower()))
-                            {
-                                Core core = this.cores[status[2].ToLower()];
-                                core.Stop();
-                            }
-                            break;
-                        default:
-                            break;
+                                break;
+                            case "close":
+                                if (this.cores.ContainsKey(name))
+                                {
+                                    Core core = this.cores[name];
+                                    core.Stop();
+                                }
+                                break;
+                            default:
+                                break;
+                        }
                     }
                 }
                 channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
             };
             channel.BasicConsume(queue: queue_name, autoAck: false, consumer: consumer);
-            // Console.Read();
-
         }
 
     }

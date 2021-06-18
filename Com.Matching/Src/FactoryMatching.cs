@@ -72,8 +72,9 @@ namespace Com.Matching
             this.configuration = configuration;
             this.server_name = configuration.GetValue<string>("server_name");
             this.factory = configuration.GetSection("RabbitMQ").Get<ConnectionFactory>();
-            OrderReceive();
-            OrderCancel();
+            // OrderReceive();
+            // OrderCancel();
+            Status();
         }
 
         /// <summary>

@@ -72,8 +72,6 @@ namespace Com.Matching
             this.configuration = configuration;
             this.server_name = configuration.GetValue<string>("server_name");
             this.factory = configuration.GetSection("RabbitMQ").Get<ConnectionFactory>();
-            // OrderReceive();
-            // OrderCancel();
             Status();
         }
 
@@ -130,64 +128,6 @@ namespace Com.Matching
                 channel.BasicConsume(queue: queue_name, autoAck: false, consumer: consumer);
             }
         }
-
-        /// <summary>
-        /// 接收订单列队
-        /// </summary>
-        public void OrderReceive()
-        {
-            string queue_name = $"{this.server_name}.OrderReceive";
-            using (var connection = factory.CreateConnection())
-            using (var channel = connection.CreateModel())
-            {
-                channel.QueueDeclare(queue: queue_name, durable: true, exclusive: false, autoDelete: false, arguments: null);
-                var consumer = new EventingBasicConsumer(channel);
-                consumer.Received += (model, ea) =>
-                {
-                    var message = Encoding.UTF8.GetString(ea.Body.ToArray());
-                    Order order = JsonConvert.DeserializeObject<Order>(message);
-                    if (order != null)
-                    {
-                        if (this.cores.ContainsKey(order.name))
-                        {
-                            this.cores[order.name].Process(order);
-                        }
-                    }
-                    channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
-                };
-                channel.BasicConsume(queue: queue_name, autoAck: false, consumer: consumer);
-            }
-        }
-
-        /// <summary>
-        /// 取消订单列队
-        /// </summary>
-        public void OrderCancel()
-        {
-            string queue_name = $"{this.server_name}.OrderCancel";
-            using (var connection = factory.CreateConnection())
-            using (var channel = connection.CreateModel())
-            {
-                channel.QueueDeclare(queue: queue_name, durable: true, exclusive: false, autoDelete: false, arguments: null);
-                var consumer = new EventingBasicConsumer(channel);
-                consumer.Received += (model, ea) =>
-                {
-                    var message = Encoding.UTF8.GetString(ea.Body.ToArray());
-
-                    // if (this.core.ContainsKey(order.name))
-                    // {
-                    //     this.core[order.name].CancelOrder(message);
-                    // }                    
-                    channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
-                };
-                channel.BasicConsume(queue: queue_name, autoAck: true, consumer: consumer);
-            }
-        }
-
-
-
-
-
 
     }
 }

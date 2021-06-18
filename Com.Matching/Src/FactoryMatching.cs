@@ -127,6 +127,7 @@ namespace Com.Matching
                 };
                 channel.BasicConsume(queue: queue_name, autoAck: false, consumer: consumer);
             }
+            Console.Read();
         }
 
     }

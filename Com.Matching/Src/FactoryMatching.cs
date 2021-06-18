@@ -83,51 +83,50 @@ namespace Com.Matching
         public void Status()
         {
             string queue_name = $"MatchingService";
-            using (var connection = factory.CreateConnection())
-            using (var channel = connection.CreateModel())
+            var connection = factory.CreateConnection();
+            var channel = connection.CreateModel();
+            channel.QueueDeclare(queue: queue_name, durable: true, exclusive: false, autoDelete: false, arguments: null);
+            var consumer = new EventingBasicConsumer(channel);
+            consumer.Received += (model, ea) =>
             {
-                channel.QueueDeclare(queue: queue_name, durable: true, exclusive: false, autoDelete: false, arguments: null);
-                var consumer = new EventingBasicConsumer(channel);
-                consumer.Received += (model, ea) =>
+                var message = Encoding.UTF8.GetString(ea.Body.ToArray());
+                if (!string.IsNullOrWhiteSpace(message))
                 {
-                    var message = Encoding.UTF8.GetString(ea.Body.ToArray());
-                    if (!string.IsNullOrWhiteSpace(message))
+                    string[] status = message.Split(':', StringSplitOptions.RemoveEmptyEntries);
+                    switch (status[0])
                     {
-                        string[] status = message.Split(':', StringSplitOptions.RemoveEmptyEntries);
-                        switch (status[0])
-                        {
-                            case "open":
-                                if (this.server_name == status[1])
+                        case "open":
+                            if (this.server_name == status[1])
+                            {
+                                if (!this.cores.ContainsKey(status[2].ToLower()))
                                 {
-                                    if (!this.cores.ContainsKey(status[2].ToLower()))
-                                    {
-                                        Core core = new Core(status[2].ToLower(), this.configuration, this.logger);
-                                        core.Start(decimal.Parse(status[3]));
-                                        this.cores.Add(status[2].ToLower(), core);
-                                    }
-                                    else
-                                    {
-                                        Core core = this.cores[status[2].ToLower()];
-                                        core.Start(decimal.Parse(status[3]));
-                                    }
+                                    Core core = new Core(status[2].ToLower(), this.configuration, this.logger);
+                                    core.Start(decimal.Parse(status[3]));
+                                    this.cores.Add(status[2].ToLower(), core);
                                 }
-                                break;
-                            case "close":
-                                if (this.cores.ContainsKey(status[2].ToLower()))
+                                else
                                 {
                                     Core core = this.cores[status[2].ToLower()];
-                                    core.Stop();
+                                    core.Start(decimal.Parse(status[3]));
                                 }
-                                break;
-                            default:
-                                break;
-                        }
+                            }
+                            break;
+                        case "close":
+                            if (this.cores.ContainsKey(status[2].ToLower()))
+                            {
+                                Core core = this.cores[status[2].ToLower()];
+                                core.Stop();
+                            }
+                            break;
+                        default:
+                            break;
                     }
-                    channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
-                };
-                channel.BasicConsume(queue: queue_name, autoAck: false, consumer: consumer);
-            }
-            Console.Read();
+                }
+                channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
+            };
+            channel.BasicConsume(queue: queue_name, autoAck: false, consumer: consumer);
+            // Console.Read();
+
         }
 
     }

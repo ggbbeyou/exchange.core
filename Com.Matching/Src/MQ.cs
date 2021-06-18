@@ -18,11 +18,14 @@ namespace Com.Matching
         /// <summary>
         /// 撮合核心
         /// </summary>
-        private Core core;    
+        private Core core;
         /// <summary>
         /// 发送历史成交
         /// </summary>
-        public IModel channel = null;    
+        public IConnection connection = null;
+        public IModel channel_Deal = null;
+        public IModel channel_OrderBook = null;
+        public IModel channel_Kline = null;
         /// <summary>
         /// (Base)发送订单队列名称
         /// </summary>
@@ -37,17 +40,17 @@ namespace Com.Matching
         /// (Topics)发送历史成交记录,交易机名称
         /// </summary>
         /// <value></value>
-        public string key_exchange_deal = "deal.{0}";        
+        public string key_exchange_deal = "deal.{0}";
         /// <summary>
         /// (Topics)发送orderbook记录,交易机名称
         /// </summary>
         /// <value></value>
-        public string key_exchange_orderbook = "orderbook.{0}"; 
+        public string key_exchange_orderbook = "orderbook.{0}";
         /// <summary>
         /// (Topics)发送K线记录,交易机名称
         /// </summary>
         /// <value></value>
-        public string key_exchange_kline = "kline.{0}";       
+        public string key_exchange_kline = "kline.{0}";
 
         /// <summary>
         /// 初始化
@@ -62,8 +65,10 @@ namespace Com.Matching
             this.key_exchange_orderbook = string.Format(this.key_exchange_orderbook, core.name);
             this.key_exchange_kline = string.Format(this.key_exchange_kline, core.name);
             ConnectionFactory factory = this.core.configuration.GetSection("RabbitMQ").Get<ConnectionFactory>();
-            IConnection connection = factory.CreateConnection();
-            this.channel = connection.CreateModel();     
+            this.connection = factory.CreateConnection();
+            this.channel_Deal = this.connection.CreateModel();
+            this.channel_OrderBook = this.connection.CreateModel();
+            this.channel_Kline = this.connection.CreateModel();
             OrderReceive();
             OrderCancel();
         }
@@ -72,7 +77,8 @@ namespace Com.Matching
         /// 接收订单列队
         /// </summary>
         public void OrderReceive()
-        {            
+        {
+            IModel channel = this.connection.CreateModel();
             channel.QueueDeclare(queue: this.key_order_send, durable: true, exclusive: false, autoDelete: false, arguments: null);
             EventingBasicConsumer consumer = new EventingBasicConsumer(channel);
             consumer.Received += (model, ea) =>
@@ -96,7 +102,8 @@ namespace Com.Matching
         /// 取消订单列队
         /// </summary>
         public void OrderCancel()
-        {          
+        {
+            IModel channel = this.connection.CreateModel();
             channel.QueueDeclare(queue: this.key_order_cancel, durable: true, exclusive: false, autoDelete: false, arguments: null);
             EventingBasicConsumer consumer = new EventingBasicConsumer(channel);
             consumer.Received += (model, ea) =>
@@ -124,8 +131,8 @@ namespace Com.Matching
             }
             string json = JsonConvert.SerializeObject(deals);
             byte[] body = Encoding.UTF8.GetBytes(json);
-            this.channel.ExchangeDeclare(exchange: this.key_exchange_deal, type: ExchangeType.Topic);
-            this.channel.BasicPublish(exchange: this.key_exchange_deal, routingKey: this.core.name, basicProperties: null, body: body);
+            this.channel_Deal.ExchangeDeclare(exchange: this.key_exchange_deal, type: ExchangeType.Topic);
+            this.channel_Deal.BasicPublish(exchange: this.key_exchange_deal, routingKey: this.core.name, basicProperties: null, body: body);
         }
 
         /// <summary>
@@ -140,8 +147,8 @@ namespace Com.Matching
             }
             string json = JsonConvert.SerializeObject(orderBooks);
             byte[] body = Encoding.UTF8.GetBytes(json);
-            this.channel.ExchangeDeclare(exchange: this.key_exchange_orderbook, type: ExchangeType.Topic);
-            this.channel.BasicPublish(exchange: this.key_exchange_orderbook, routingKey: this.core.name, basicProperties: null, body: body);
+            this.channel_OrderBook.ExchangeDeclare(exchange: this.key_exchange_orderbook, type: ExchangeType.Topic);
+            this.channel_OrderBook.BasicPublish(exchange: this.key_exchange_orderbook, routingKey: this.core.name, basicProperties: null, body: body);
         }
 
         /// <summary>
@@ -156,8 +163,8 @@ namespace Com.Matching
             }
             string json = JsonConvert.SerializeObject(kline);
             byte[] body = Encoding.UTF8.GetBytes(json);
-            this.channel.ExchangeDeclare(exchange: this.key_exchange_kline, type: ExchangeType.Topic);
-            this.channel.BasicPublish(exchange: this.key_exchange_kline, routingKey: this.core.name, basicProperties: null, body: body);
+            this.channel_Kline.ExchangeDeclare(exchange: this.key_exchange_kline, type: ExchangeType.Topic);
+            this.channel_Kline.BasicPublish(exchange: this.key_exchange_kline, routingKey: this.core.name, basicProperties: null, body: body);
         }
 
     }

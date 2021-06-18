@@ -97,7 +97,6 @@ namespace Com.Matching
             channel.BasicConsume(queue: this.key_order_send, autoAck: false, consumer: consumer);
         }
 
-
         /// <summary>
         /// 取消订单列队
         /// </summary>

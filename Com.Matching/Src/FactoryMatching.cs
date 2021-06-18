@@ -4,6 +4,7 @@ using System.Text;
 using Com.Model.Base;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using Snowflake;
@@ -42,13 +43,22 @@ namespace Com.Matching
         /// <typeparam name="string">名称</typeparam>
         /// <typeparam name="MQ">撮合器</typeparam>
         /// <returns></returns>
-        public Dictionary<string, MQ> cores = new Dictionary<string, MQ>();
+       // public Dictionary<string, MQ> cores = new Dictionary<string, MQ>();
+
+        /// <summary>
+        /// 撮合集合
+        /// </summary>
+        /// <typeparam name="string">交易对</typeparam>
+        /// <typeparam name="Core">撮合器</typeparam>
+        /// <returns></returns>
+        public Dictionary<string, Core> cores = new Dictionary<string, Core>();
 
         /// <summary>
         /// 私有构造方法
         /// </summary>
         private FactoryMatching()
         {
+
         }
 
         /// <summary>
@@ -61,79 +71,120 @@ namespace Com.Matching
             this.logger = logger;
             this.configuration = configuration;
             this.server_name = configuration.GetValue<string>("server_name");
-            //RabbitMQ
             this.factory = configuration.GetSection("RabbitMQ").Get<ConnectionFactory>();
-            string queue_name = "rpc_queue";
-            // var factory = new ConnectionFactory() { HostName = "192.168.1.3", UserName = "mquser", Password = "Abcd1234", VirtualHost = "Matching" };
+            OrderReceive();
+            OrderCancel();
+        }
+
+        /// <summary>
+        /// 撮合引擎状态监测 
+        /// open:servername:name:price
+        /// close:servername:name
+        /// </summary>
+        public void Status()
+        {
+            string queue_name = $"MatchingService";
             using (var connection = factory.CreateConnection())
             using (var channel = connection.CreateModel())
             {
-                channel.QueueDeclare(queue: "rpc_queue", durable: false, exclusive: false, autoDelete: false, arguments: null);
-                channel.BasicQos(0, 1, false);
+                channel.QueueDeclare(queue: queue_name, durable: true, exclusive: false, autoDelete: false, arguments: null);
                 var consumer = new EventingBasicConsumer(channel);
-                channel.BasicConsume(queue: "rpc_queue", autoAck: false, consumer: consumer);
-                //Console.WriteLine(" [x] Awaiting RPC requests");
-
                 consumer.Received += (model, ea) =>
                 {
-                    string response = null;
-
-                    var body = ea.Body.ToArray();
-                    var props = ea.BasicProperties;
-                    var replyProps = channel.CreateBasicProperties();
-                    replyProps.CorrelationId = props.CorrelationId;
-
-                    try
+                    var message = Encoding.UTF8.GetString(ea.Body.ToArray());
+                    if (!string.IsNullOrWhiteSpace(message))
                     {
-                        var message = Encoding.UTF8.GetString(body);
-                        int n = int.Parse(message);
-                        Console.WriteLine(" [.] fib({0})", message);
-                        //response = fib(n).ToString();
-                        response = CallPRC(message); ;
+                        string[] status = message.Split(':', StringSplitOptions.RemoveEmptyEntries);
+                        switch (status[0])
+                        {
+                            case "open":
+                                if (this.server_name == status[1])
+                                {
+                                    if (!this.cores.ContainsKey(status[2].ToLower()))
+                                    {
+                                        Core core = new Core(status[2].ToLower(), this.configuration, this.logger);
+                                        core.Start(decimal.Parse(status[3]));
+                                        this.cores.Add(status[2].ToLower(), core);
+                                    }
+                                    else
+                                    {
+                                        Core core = this.cores[status[2].ToLower()];
+                                        core.Start(decimal.Parse(status[3]));
+                                    }
+                                }
+                                break;
+                            case "close":
+                                if (this.cores.ContainsKey(status[2].ToLower()))
+                                {
+                                    Core core = this.cores[status[2].ToLower()];
+                                    core.Stop();
+                                }
+                                break;
+                            default:
+                                break;
+                        }
                     }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(" [.] " + e.Message);
-                        response = "";
-                    }
-                    finally
-                    {
-                        var responseBytes = Encoding.UTF8.GetBytes(response);
-                        channel.BasicPublish(exchange: "", routingKey: props.ReplyTo, basicProperties: replyProps, body: responseBytes);
-                        channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
-                    }
+                    channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
                 };
-
-                //Console.WriteLine(" Press [enter] to exit.");
-                Console.ReadLine();
+                channel.BasicConsume(queue: queue_name, autoAck: false, consumer: consumer);
             }
         }
 
         /// <summary>
-        /// 启动撮合引擎
+        /// 接收订单列队
         /// </summary>
-        public void Start()
+        public void OrderReceive()
         {
-
-        }
-
-
-
-
-        private string CallPRC(string message)
-        {
-            return message + "aaaaaaaaaaaaaaaa";
-        }
-
-        private int fib(int n)
-        {
-            if (n == 0 || n == 1)
+            string queue_name = $"{this.server_name}.OrderReceive";
+            using (var connection = factory.CreateConnection())
+            using (var channel = connection.CreateModel())
             {
-                return n;
+                channel.QueueDeclare(queue: queue_name, durable: true, exclusive: false, autoDelete: false, arguments: null);
+                var consumer = new EventingBasicConsumer(channel);
+                consumer.Received += (model, ea) =>
+                {
+                    var message = Encoding.UTF8.GetString(ea.Body.ToArray());
+                    Order order = JsonConvert.DeserializeObject<Order>(message);
+                    if (order != null)
+                    {
+                        if (this.cores.ContainsKey(order.name))
+                        {
+                            this.cores[order.name].Process(order);
+                        }
+                    }
+                    channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
+                };
+                channel.BasicConsume(queue: queue_name, autoAck: false, consumer: consumer);
             }
-
-            return fib(n - 1) + fib(n - 2);
         }
+
+        /// <summary>
+        /// 取消订单列队
+        /// </summary>
+        public void OrderCancel()
+        {
+            string queue_name = $"{this.server_name}.OrderCancel";
+            using (var connection = factory.CreateConnection())
+            using (var channel = connection.CreateModel())
+            {
+                channel.QueueDeclare(queue: queue_name, durable: true, exclusive: false, autoDelete: false, arguments: null);
+                var consumer = new EventingBasicConsumer(channel);
+                consumer.Received += (model, ea) =>
+                {
+                    var message = Encoding.UTF8.GetString(ea.Body.ToArray());
+
+                    // if (this.core.ContainsKey(order.name))
+                    // {
+                    //     this.core[order.name].CancelOrder(message);
+                    // }                    
+                    channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
+                };
+                channel.BasicConsume(queue: queue_name, autoAck: true, consumer: consumer);
+            }
+        }
+
+
+
 
 
 

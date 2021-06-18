@@ -46,14 +46,8 @@ namespace Com.Matching
             this.logger.LogInformation("准备启动后台服务");
             try
             {
-                // Test test = new Test(this.configuration);
-                // test.TestOrder();
                 FactoryMatching.instance.Info(this.configuration, this.logger);
-
-
-
-
-                //this.logger.LogInformation("启动后台服务成功");
+                this.logger.LogInformation("启动后台服务成功");
             }
             catch (Exception ex)
             {

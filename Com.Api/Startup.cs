@@ -28,7 +28,7 @@ namespace Com.Api
             RedisConfiguration redisConfiguration = Configuration.GetSection("Redis").Get<RedisConfiguration>();
             services.AddStackExchangeRedisExtensions<NewtonsoftSerializer>(redisConfiguration);
             services.AddControllersWithViews();
-            services.AddHostedService<MainService>();
+            // services.AddHostedService<MainService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -28,6 +28,7 @@ namespace Com.Api
             RedisConfiguration redisConfiguration = Configuration.GetSection("Redis").Get<RedisConfiguration>();
             services.AddStackExchangeRedisExtensions<NewtonsoftSerializer>(redisConfiguration);
             services.AddControllersWithViews();
+            
             // services.AddHostedService<MainService>();
         }
 
@@ -47,7 +48,7 @@ namespace Com.Api
             app.UseRouting();
 
             app.UseAuthorization();
-
+    
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(

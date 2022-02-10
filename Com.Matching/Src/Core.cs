@@ -431,7 +431,6 @@ public class Core
             }
             else if (order.type == E_OrderType.price_fixed)
             {
-
                 //限价买单与市价卖单撮合
                 for (int i = 0; i < market_ask.Count; i++)
                 {

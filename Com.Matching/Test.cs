@@ -9,7 +9,7 @@ namespace Com.Matching
     public class Test
     {
         string name = "btc/usdt";
-        Core core = null;
+        Core? core = null;
 
         Random random = new Random();
 

@@ -22,10 +22,10 @@ namespace Com.Matching
         /// <summary>
         /// 发送历史成交
         /// </summary>
-        public IConnection connection = null;
-        public IModel channel_Deal = null;
-        public IModel channel_OrderBook = null;
-        public IModel channel_Kline = null;
+        public IConnection connection = null!;
+        public IModel channel_Deal = null!;
+        public IModel channel_OrderBook = null!;
+        public IModel channel_Kline = null!;
         /// <summary>
         /// (Base)发送订单队列名称
         /// </summary>
@@ -86,7 +86,7 @@ namespace Com.Matching
                 if (this.core.run)
                 {
                     string json = Encoding.UTF8.GetString(ea.Body.ToArray());
-                    Order order = JsonConvert.DeserializeObject<Order>(json);
+                    Order? order = JsonConvert.DeserializeObject<Order>(json);
                     if (order != null)
                     {
                         this.core.Process(order);
@@ -108,7 +108,7 @@ namespace Com.Matching
             consumer.Received += (model, ea) =>
             {
                 string json = Encoding.UTF8.GetString(ea.Body.ToArray());
-                Order order = JsonConvert.DeserializeObject<Order>(json);
+                Order? order = JsonConvert.DeserializeObject<Order>(json);
                 if (order != null)
                 {
                     this.core.Process(order);

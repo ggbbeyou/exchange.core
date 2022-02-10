@@ -114,13 +114,13 @@ namespace Com.Matching
         /// <summary>
         /// 日志接口
         /// </summary>
-        public ILogger logger;
+        public ILogger? logger;
         /// <summary>
         /// 消息队列
         /// </summary>
         private MQ mq;
 
-        public Core(string name, IConfiguration configuration, ILogger logger)
+        public Core(string name, IConfiguration configuration, ILogger? logger)
         {
             this.name = name;
             this.logger = logger;

@@ -24,19 +24,19 @@ namespace Com.Matching
         /// <summary>
         /// 配置接口
         /// </summary>
-        public IConfiguration configuration;
+        public IConfiguration configuration = null!;
         /// <summary>
         /// 日志接口
         /// </summary>
-        public ILogger logger;
+        public ILogger logger = null!;
         /// <summary>
         /// 服务器名称
         /// </summary>
-        public string server_name;
+        public string server_name = null!;
         /// <summary>
         /// MQ工厂
         /// </summary>
-        private ConnectionFactory factory;
+        private ConnectionFactory factory = null!;
         /// <summary>
         /// 撮合集合
         /// </summary>

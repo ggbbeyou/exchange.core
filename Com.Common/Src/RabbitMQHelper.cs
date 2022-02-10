@@ -30,7 +30,7 @@ namespace Com.Common
         // 注意的是，我将Model存到了ConcurrentDictionary里面，因为声明与绑定是非常耗时的，
         // 其次，往重复的队列发送消息是不需要重新初始化的。
 
-        #region Publish（发布）的封装'
+        #region Publish(发布)的封装'
 
         /// <summary>
         /// 交换器声明
@@ -50,7 +50,7 @@ namespace Com.Common
         /// <param name="durable">持久化</param>
         /// <param name="autoDelete">自动删除</param>
         /// <param name="arguments">参数</param>
-        private void ExchangeDeclare(IModel iModel, string exchange, string type = ExchangeType.Direct, bool durable = true, bool autoDelete = false, IDictionary<string, object> arguments = null)
+        private void ExchangeDeclare(IModel iModel, string exchange, string type = ExchangeType.Direct, bool durable = true, bool autoDelete = false, IDictionary<string, object>? arguments = null)
         {
             exchange = string.IsNullOrWhiteSpace(exchange) ? "" : exchange.Trim();
             iModel.ExchangeDeclare(exchange, type, durable, autoDelete, arguments);
@@ -69,7 +69,7 @@ namespace Com.Common
         /// 客户端退出，该排他队列都会被自动删除的。这种队列适用于只限于一个客户端发送读取消息的应用场景。</param>
         /// <param name="autoDelete">自动删除</param>
         /// <param name="arguments">参数</param>
-        private void QueueDeclare(IModel channel, string queue, bool durable = true, bool exclusive = false, bool autoDelete = false, IDictionary<string, object> arguments = null)
+        private void QueueDeclare(IModel channel, string queue, bool durable = true, bool exclusive = false, bool autoDelete = false, IDictionary<string, object>? arguments = null)
         {
             queue = string.IsNullOrWhiteSpace(queue) ? "UndefinedQueueName" : queue.Trim();
             channel.QueueDeclare(queue, durable, exclusive, autoDelete, arguments);
@@ -114,13 +114,13 @@ namespace Com.Common
             }
             catch (Exception ex)
             {
-
+                Console.WriteLine(ex.Message);
             }
         }
 
         #endregion
 
-        #region Subscribe（订阅）的封装
+        #region Subscribe(订阅)的封装
 
         /// <summary>
         /// 获取Model
@@ -149,7 +149,7 @@ namespace Com.Common
         /// <param name="isProperties"></param>
         /// <param name="handler">消费处理</param>
         /// <param name="isDeadLetter"></param>
-        public void Subscribe<T>(string queue, bool isProperties, Action<T> handler, bool isDeadLetter) where T : class
+        public void Subscribe<T>(string queue, bool isProperties, Action<T?> handler, bool isDeadLetter) where T : class
         {
             //队列声明
             var channel = GetModel(queue, isProperties);
@@ -165,6 +165,7 @@ namespace Com.Common
                 }
                 catch (Exception ex)
                 {
+                    Console.WriteLine(ex.Message);
                     // ex.GetInnestException().WriteToFile("队列接收消息", "RabbitMq");
                     // if (!isDeadLetter)
                     //     PublishToDead<DeadLetterQueue>(queue, msgStr, ex);
@@ -179,7 +180,7 @@ namespace Com.Common
 
         #endregion
 
-        #region  Pull（拉）的封装
+        #region  Pull(拉)的封装
 
         /// <summary>
         /// 获取消息
@@ -189,7 +190,7 @@ namespace Com.Common
         /// <param name="queue"></param>
         /// <param name="routingKey"></param>
         /// <param name="handler">消费处理</param>
-        private void Poll<T>(string exchange, string queue, string routingKey, Action<T> handler) where T : class
+        private void Poll<T>(string exchange, string queue, string routingKey, Action<T?> handler) where T : class
         {
             var channel = GetModel(exchange, queue, routingKey);
             var result = channel.BasicGet(queue, false);
@@ -204,7 +205,7 @@ namespace Com.Common
             }
             catch (Exception ex)
             {
-
+                Console.WriteLine(ex.Message);
             }
             finally
             {
@@ -214,7 +215,7 @@ namespace Com.Common
 
         #endregion
 
-        #region Rpc（远程调用）的封装
+        #region Rpc(远程调用)的封装
 
         /// <summary>
         /// RPC客户端
@@ -234,7 +235,7 @@ namespace Com.Common
             var consumer = new EventingBasicConsumer(channel);
             consumer.Received += (model, ea) =>
             {
-                if (!callbackMapper.TryRemove(ea.BasicProperties.CorrelationId, out TaskCompletionSource<string> tcs))
+                if (!callbackMapper.TryRemove(ea.BasicProperties.CorrelationId, out TaskCompletionSource<string>? tcs))
                     return;
                 var body = ea.Body.ToArray();
                 var response = Encoding.UTF8.GetString(body);
@@ -271,7 +272,7 @@ namespace Com.Common
         /// <param name="isProperties"></param>
         /// <param name="handler"></param>
         /// <param name="isDeadLetter"></param>
-        public void RpcService<T>(string exchange, string queue, bool isProperties, Func<T, T> handler, bool isDeadLetter)
+        public void RpcService<T>(string exchange, string queue, bool isProperties, Func<T?, T> handler, bool isDeadLetter)
         {
             //队列声明
             var channel = GetModel(queue, isProperties);
@@ -290,7 +291,7 @@ namespace Com.Common
                 }
                 catch (Exception ex)
                 {
-
+                    Console.WriteLine(ex.Message);
                 }
                 finally
                 {

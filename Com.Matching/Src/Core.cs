@@ -106,7 +106,7 @@ namespace Com.Matching
         /// 一分钟K线
         /// </summary>
         /// <returns></returns>
-        public Kline kline_minute = null;
+        public Kline? kline_minute;
         /// <summary>
         /// 配置接口
         /// </summary>
@@ -118,7 +118,7 @@ namespace Com.Matching
         /// <summary>
         /// 消息队列
         /// </summary>
-        private MQ mq = null;
+        private MQ mq;
 
         public Core(string name, IConfiguration configuration, ILogger logger)
         {
@@ -174,11 +174,11 @@ namespace Com.Matching
             }
             else if (this.fixed_bid.Exists(P => P.id == order_id))
             {
-                Order order = this.fixed_bid.FirstOrDefault();
+                Order? order = this.fixed_bid.FirstOrDefault();
                 this.fixed_bid.RemoveAll(P => P.id == order_id);
                 if (order != null)
                 {
-                    OrderBook orderBook_bid = bid.FirstOrDefault(P => P.price == order.price);
+                    OrderBook? orderBook_bid = bid.FirstOrDefault(P => P.price == order.price);
                     if (orderBook_bid != null)
                     {
                         orderBook_bid.amount -= order.amount_unsold;
@@ -195,11 +195,11 @@ namespace Com.Matching
             }
             else if (this.fixed_ask.Exists(P => P.id == order_id))
             {
-                Order order = this.fixed_ask.FirstOrDefault();
+                Order? order = this.fixed_ask.FirstOrDefault();
                 this.fixed_ask.RemoveAll(P => P.id == order_id);
                 if (order != null)
                 {
-                    OrderBook orderBook_ask = ask.FirstOrDefault(P => P.price == order.price);
+                    OrderBook? orderBook_ask = ask.FirstOrDefault(P => P.price == order.price);
                     if (orderBook_ask != null)
                     {
                         orderBook_ask.amount -= order.amount_unsold;
@@ -224,7 +224,7 @@ namespace Com.Matching
         /// <returns>当前一分钟K线</returns>
         public Kline SetKlink(List<Deal> deals)
         {
-            if (kline_minute == null && deals != null && deals.Count > 0)
+            if (kline_minute == null)
             {
                 kline_minute = new Kline();
             }
@@ -269,7 +269,7 @@ namespace Com.Matching
         {
             List<OrderBook> orderBooks = new List<OrderBook>();
             decimal amount_deal = deals.Sum(P => P.amount);
-            OrderBook orderBook = null;
+            OrderBook? orderBook;
             if (order.amount > amount_deal)
             {
                 //未完全成交,增加orderBook
@@ -320,7 +320,7 @@ namespace Com.Matching
             var fixed_bid = deals.Where(P => P.bid.type == E_OrderType.price_fixed).GroupBy(P => P.price).Select(P => new { price = P.Key, amount = P.Sum(T => T.amount), complet_count = P.Count(T => T.bid.state == E_DealState.completed) }).ToList();
             foreach (var item in fixed_bid)
             {
-                OrderBook orderBook_bid = bid.FirstOrDefault(P => P.price == item.price);
+                OrderBook? orderBook_bid = bid.FirstOrDefault(P => P.price == item.price);
                 if (orderBook_bid != null)
                 {
                     orderBook_bid.amount -= item.amount;
@@ -332,7 +332,7 @@ namespace Com.Matching
             var fixed_ask = deals.Where(P => P.ask.type == E_OrderType.price_fixed).GroupBy(P => P.price).Select(P => new { price = P.Key, amount = P.Sum(T => T.amount), complet_count = P.Count(T => T.ask.state == E_DealState.completed) }).ToList();
             foreach (var item in fixed_ask)
             {
-                OrderBook orderBook_ask = ask.FirstOrDefault(P => P.price == item.price);
+                OrderBook? orderBook_ask = ask.FirstOrDefault(P => P.price == item.price);
                 if (orderBook_ask != null)
                 {
                     orderBook_ask.amount -= item.amount;

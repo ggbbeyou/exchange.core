@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using Com.Model.Base;
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -30,6 +30,6 @@ namespace Com.Matching
             IHost host = hosts.Build();
             await host.RunAsync();
         }
-        
+
     }
 }

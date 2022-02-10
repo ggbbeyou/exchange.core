@@ -1,5 +1,6 @@
 using System;
-using Com.Model.Base;
+using Com.Model;
+using Com.Model.Enum;
 using Snowflake;
 
 namespace Com.Matching;
@@ -58,17 +59,17 @@ public static class Util
         ask.amount_unsold = 0;
         ask.amount_done += ask_amount;
         ask.deal_last_time = now;
-        ask.state = E_DealState.completed;
+        ask.state = E_OrderState.completed;
         bid.amount_unsold -= ask_amount;
         bid.amount_done += ask_amount;
         bid.deal_last_time = now;
         if (bid.amount_unsold <= 0)
         {
-            bid.state = E_DealState.completed;
+            bid.state = E_OrderState.completed;
         }
         else
         {
-            bid.state = E_DealState.partial;
+            bid.state = E_OrderState.partial;
         }
         Deal deal = new Deal()
         {
@@ -103,16 +104,16 @@ public static class Util
         ask.deal_last_time = now;
         if (ask.amount_unsold <= 0)
         {
-            ask.state = E_DealState.completed;
+            ask.state = E_OrderState.completed;
         }
         else
         {
-            ask.state = E_DealState.partial;
+            ask.state = E_OrderState.partial;
         }
         bid.amount_unsold = 0;
         bid.amount_done = bid_amount;
         bid.deal_last_time = now;
-        bid.state = E_DealState.completed;
+        bid.state = E_OrderState.completed;
         Deal deal = new Deal()
         {
             id = Util.worker.NextId().ToString(),

@@ -1,11 +1,11 @@
 using System;
 
-namespace Com.Model.Base;
+namespace Com.Model.Enum;
 
 /// <summary>
-/// 买卖方向
+/// 订单买卖方向
 /// </summary>
-public enum E_Direction
+public enum E_OrderSide
 {
     /// <summary>
     /// 买入

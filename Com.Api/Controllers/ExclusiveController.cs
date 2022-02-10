@@ -6,12 +6,14 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Com.Api.Models;
-using Com.Model.Base;
+
 using Snowflake;
 using Newtonsoft.Json;
 using System.Text;
 using RabbitMQ.Client;
 using Microsoft.Extensions.Configuration;
+using Com.Model.Enum;
+using Com.Model;
 
 namespace Com.Api.Controllers
 {
@@ -41,7 +43,7 @@ namespace Com.Api.Controllers
         /// <param name="price">挂单价格</param>
         /// <param name="amount">挂单量</param>
         /// <returns></returns>
-        public IActionResult OrderPlace(string name, E_OrderType type, E_Direction direction, decimal? price, decimal amount)
+        public IActionResult OrderPlace(string name, E_OrderType type, E_OrderSide direction, decimal? price, decimal amount)
         {
             Order order = new Order()
             {
@@ -53,7 +55,7 @@ namespace Com.Api.Controllers
                 total = price ?? 0 * amount,
                 time = DateTimeOffset.UtcNow,
                 direction = direction,
-                state = E_DealState.unsold,
+                state = E_OrderState.unsold,
                 type = type,
             };
             string queue_name = $"order_send.{name}";

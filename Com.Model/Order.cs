@@ -1,6 +1,7 @@
 using System;
+using Com.Model.Enum;
 
-namespace Com.Model.Base;
+namespace Com.Model;
 
 /// <summary>
 /// 订单表
@@ -61,12 +62,12 @@ public class Order
     /// 交易方向
     /// </summary>
     /// <value></value>
-    public E_Direction direction { get; set; }
+    public E_OrderSide direction { get; set; }
     /// <summary>
     /// 成交状态
     /// </summary>
     /// <value></value>
-    public E_DealState state { get; set; }
+    public E_OrderState state { get; set; }
     /// <summary>
     /// 订单类型
     /// </summary>

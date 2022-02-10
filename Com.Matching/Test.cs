@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using Com.Model.Base;
+using Com.Model;
+using Com.Model.Enum;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 
@@ -56,7 +57,7 @@ namespace Com.Matching
             List<Order> orders = new List<Order>();
             for (int i = 0; i < 100000; i++)
             {
-                E_Direction direction = random.Next(1, 3) == 1 ? E_Direction.buy : E_Direction.sell;
+                E_OrderSide direction = random.Next(1, 3) == 1 ? E_OrderSide.buy : E_OrderSide.sell;
                 E_OrderType type = random.Next(1, 3) == 1 ? E_OrderType.price_fixed : E_OrderType.price_market;
                 type = E_OrderType.price_fixed;
                 decimal price = random.Next(50, 100);
@@ -77,7 +78,7 @@ namespace Com.Matching
                     amount_unsold = amount,
                     amount_done = 0,
                     direction = direction,
-                    state = E_DealState.unsold,
+                    state = E_OrderState.unsold,
                     type = type,
                     data = "",
                 };

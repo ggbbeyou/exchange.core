@@ -42,7 +42,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Com.Model.Base;
+using Com.Model;
+
+using Com.Model.Enum;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -273,7 +275,7 @@ public class Core
         if (order.amount > amount_deal)
         {
             //未完全成交,增加orderBook
-            if (order.type == E_OrderType.price_fixed && order.direction == E_Direction.buy)
+            if (order.type == E_OrderType.price_fixed && order.direction == E_OrderSide.buy)
             {
                 orderBook = bid.FirstOrDefault(P => P.price == order.price);
                 if (orderBook == null)
@@ -285,7 +287,7 @@ public class Core
                         amount = 0,
                         count = 0,
                         last_time = DateTimeOffset.UtcNow,
-                        direction = E_Direction.buy,
+                        direction = E_OrderSide.buy,
                     };
                     bid.Add(orderBook);
                 }
@@ -294,7 +296,7 @@ public class Core
                 orderBook.last_time = DateTimeOffset.UtcNow;
                 orderBooks.Add(orderBook);
             }
-            if (order.type == E_OrderType.price_fixed && order.direction == E_Direction.sell)
+            if (order.type == E_OrderType.price_fixed && order.direction == E_OrderSide.sell)
             {
                 orderBook = ask.FirstOrDefault(P => P.price == order.price);
                 if (orderBook == null)
@@ -306,7 +308,7 @@ public class Core
                         amount = 0,
                         count = 0,
                         last_time = DateTimeOffset.UtcNow,
-                        direction = E_Direction.sell,
+                        direction = E_OrderSide.sell,
                     };
                     ask.Add(orderBook);
                 }
@@ -317,7 +319,7 @@ public class Core
             }
         }
         //已成交，则减少orderBook
-        var fixed_bid = deals.Where(P => P.bid.type == E_OrderType.price_fixed).GroupBy(P => P.price).Select(P => new { price = P.Key, amount = P.Sum(T => T.amount), complet_count = P.Count(T => T.bid.state == E_DealState.completed) }).ToList();
+        var fixed_bid = deals.Where(P => P.bid.type == E_OrderType.price_fixed).GroupBy(P => P.price).Select(P => new { price = P.Key, amount = P.Sum(T => T.amount), complet_count = P.Count(T => T.bid.state == E_OrderState.completed) }).ToList();
         foreach (var item in fixed_bid)
         {
             OrderBook? orderBook_bid = bid.FirstOrDefault(P => P.price == item.price);
@@ -329,7 +331,7 @@ public class Core
                 orderBooks.Add(orderBook_bid);
             }
         }
-        var fixed_ask = deals.Where(P => P.ask.type == E_OrderType.price_fixed).GroupBy(P => P.price).Select(P => new { price = P.Key, amount = P.Sum(T => T.amount), complet_count = P.Count(T => T.ask.state == E_DealState.completed) }).ToList();
+        var fixed_ask = deals.Where(P => P.ask.type == E_OrderType.price_fixed).GroupBy(P => P.price).Select(P => new { price = P.Key, amount = P.Sum(T => T.amount), complet_count = P.Count(T => T.ask.state == E_OrderState.completed) }).ToList();
         foreach (var item in fixed_ask)
         {
             OrderBook? orderBook_ask = ask.FirstOrDefault(P => P.price == item.price);
@@ -356,7 +358,7 @@ public class Core
             return deals;
         }
         DateTimeOffset now = DateTimeOffset.UtcNow;
-        if (order.direction == E_Direction.buy)
+        if (order.direction == E_OrderSide.buy)
         {
             //先市价成交,再限价成交
             if (order.type == E_OrderType.price_market)
@@ -515,7 +517,7 @@ public class Core
                 }
             }
         }
-        else if (order.direction == E_Direction.sell)
+        else if (order.direction == E_OrderSide.sell)
         {
             //先市价成交,再限价成交
             if (order.type == E_OrderType.price_market)
@@ -527,7 +529,7 @@ public class Core
                     {
                         Deal deal = Util.AmountBidAsk(this.name, market_bid[i], order, this.price_last, now);
                         deals.Add(deal);
-                        if (deal.bid.state == E_DealState.completed)
+                        if (deal.bid.state == E_OrderState.completed)
                         {
                             market_bid.Remove(market_bid[i]);
                         }
@@ -597,7 +599,7 @@ public class Core
                     {
                         Deal deal = Util.AmountBidAsk(this.name, order, market_bid[i], order.price, now);
                         deals.Add(deal);
-                        if (deal.bid.state == E_DealState.completed)
+                        if (deal.bid.state == E_OrderState.completed)
                         {
                             market_bid.Remove(market_bid[i]);
                         }
@@ -631,7 +633,7 @@ public class Core
                         {
                             Deal deal = Util.AmountBidAsk(this.name, fixed_bid[i], order, new_price, now);
                             deals.Add(deal);
-                            if (deal.bid.state == E_DealState.completed)
+                            if (deal.bid.state == E_OrderState.completed)
                             {
                                 fixed_bid.Remove(fixed_bid[i]);
                             }

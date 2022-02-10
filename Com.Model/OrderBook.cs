@@ -1,6 +1,7 @@
 using System;
+using Com.Model.Enum;
 
-namespace Com.Model.Base;
+namespace Com.Model;
 
 /// <summary>
 /// 盘口
@@ -47,5 +48,5 @@ public class OrderBook
     /// 交易方向
     /// </summary>
     /// <value></value>
-    public E_Direction direction { get; set; }
+    public E_OrderSide direction { get; set; }
 }

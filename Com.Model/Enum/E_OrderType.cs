@@ -1,6 +1,6 @@
 using System;
 
-namespace Com.Model.Base;
+namespace Com.Model.Enum;
 
 /// <summary>
 /// 订单类型

@@ -1,52 +1,51 @@
 using System;
 
-namespace Com.Model.Base
+namespace Com.Model.Base;
+
+/// <summary>
+/// 盘口
+/// </summary>
+public class OrderBook
 {
     /// <summary>
-    /// 盘口
+    /// 交易对
     /// </summary>
-    public class OrderBook
+    /// <value></value>
+    public string name { get; set; } = null!;
+    /// <summary>
+    /// 挂单价
+    /// </summary>
+    /// <value></value>
+    public decimal price { get; set; }
+    /// <summary>
+    /// 挂单总量
+    /// </summary>
+    /// <value></value>
+    public decimal amount { get; set; }
+    /// <summary>
+    /// 挂单总金额
+    /// </summary>
+    /// <value></value>
+    public decimal total
     {
-        /// <summary>
-        /// 交易对
-        /// </summary>
-        /// <value></value>
-        public string name { get; set; }=null!;
-        /// <summary>
-        /// 挂单价
-        /// </summary>
-        /// <value></value>
-        public decimal price { get; set; }
-        /// <summary>
-        /// 挂单总量
-        /// </summary>
-        /// <value></value>
-        public decimal amount { get; set; }
-        /// <summary>
-        /// 挂单总金额
-        /// </summary>
-        /// <value></value>
-        public decimal total
+        get
         {
-            get
-            {
-                return price * amount;
-            }
+            return price * amount;
         }
-        /// <summary>
-        /// 挂单笔数量
-        /// </summary>
-        /// <value></value>
-        public decimal count { get; set; }
-        /// <summary>
-        /// 变更时间
-        /// </summary>
-        /// <value></value>
-        public DateTimeOffset last_time { get; set; }
-        /// <summary>
-        /// 交易方向
-        /// </summary>
-        /// <value></value>
-        public E_Direction direction { get; set; }
     }
+    /// <summary>
+    /// 挂单笔数量
+    /// </summary>
+    /// <value></value>
+    public decimal count { get; set; }
+    /// <summary>
+    /// 变更时间
+    /// </summary>
+    /// <value></value>
+    public DateTimeOffset last_time { get; set; }
+    /// <summary>
+    /// 交易方向
+    /// </summary>
+    /// <value></value>
+    public E_Direction direction { get; set; }
 }

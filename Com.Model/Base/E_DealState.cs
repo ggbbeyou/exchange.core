@@ -1,7 +1,7 @@
 using System;
 
-namespace Com.Model.Base
-{
+namespace Com.Model.Base;
+
     /// <summary>
     /// 成交状态
     /// </summary>
@@ -24,4 +24,3 @@ namespace Com.Model.Base
         /// </summary>
         cancel = 3
     }
-}

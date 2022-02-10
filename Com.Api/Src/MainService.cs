@@ -39,7 +39,7 @@ namespace Com.Api
         /// <param name="redisCacheClient">redis接口</param>
         /// <param name="environment">环境接口</param>
         /// <param name="logger">日志接口</param>
-        public MainService(IConfiguration configuration, IRedisCacheClient redisCacheClient, IHostEnvironment environment, ILogger<MainService> logger = null)
+        public MainService(IConfiguration configuration, IRedisCacheClient redisCacheClient, IHostEnvironment environment, ILogger<MainService>? logger = null)
         {
             this._configuration = configuration;
             this._redisCacheClient = redisCacheClient;

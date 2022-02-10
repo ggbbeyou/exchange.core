@@ -28,22 +28,22 @@ namespace Com.Api
         /// <summary>
         /// 配置接口
         /// </summary>
-        public IConfiguration configuration;
+        public IConfiguration configuration = null!;
         /// <summary>
         /// 日志接口
         /// </summary>
-        public ILogger logger;       
+        public ILogger? logger;
         /// <summary>
         /// MQ工厂
         /// </summary>
-        private ConnectionFactory factory;
+        private ConnectionFactory factory = null!;
 
         private const string QUEUE_NAME = "rpc_queue";
 
-        private IConnection connection;
-        private IModel channel;
-        private string replyQueueName;
-        private EventingBasicConsumer consumer;
+        private IConnection connection = null!;
+        private IModel channel = null!;
+        private string replyQueueName = null!;
+        private EventingBasicConsumer consumer = null!;
         private ConcurrentDictionary<string, TaskCompletionSource<string>> callbackMapper = new ConcurrentDictionary<string, TaskCompletionSource<string>>();
 
         /// <summary>
@@ -58,7 +58,7 @@ namespace Com.Api
         /// </summary>
         /// <param name="configuration">配置接口</param>
         /// <param name="logger">日志接口</param>
-        public void Init(IConfiguration configuration, IRedisCacheClient redisCacheClient, IHostEnvironment environment, ILogger logger = null)
+        public void Init(IConfiguration configuration, IRedisCacheClient redisCacheClient, IHostEnvironment environment, ILogger? logger = null)
         {
             this.logger = logger;
             this.configuration = configuration;
@@ -70,7 +70,7 @@ namespace Com.Api
             consumer = new EventingBasicConsumer(channel);
             consumer.Received += (model, ea) =>
             {
-                if (!callbackMapper.TryRemove(ea.BasicProperties.CorrelationId, out TaskCompletionSource<string> tcs))
+                if (!callbackMapper.TryRemove(ea.BasicProperties.CorrelationId, out TaskCompletionSource<string>? tcs))
                 {
                     return;
                 }
@@ -92,7 +92,7 @@ namespace Com.Api
                     channel.BasicConsume(queue: "rpc_queue", autoAck: false, consumer: consumer);
                     consumer.Received += (model, ea) =>
                     {
-                        string response = null;
+                        string? response = null;
                         var body = ea.Body.ToArray();
                         var props = ea.BasicProperties;
                         var replyProps = channel.CreateBasicProperties();
@@ -109,7 +109,7 @@ namespace Com.Api
                         }
                         finally
                         {
-                            var responseBytes = Encoding.UTF8.GetBytes(response);
+                            var responseBytes = Encoding.UTF8.GetBytes(response!);
                             channel.BasicPublish(exchange: "", routingKey: props.ReplyTo, basicProperties: replyProps, body: responseBytes);
                             channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
                         }
@@ -137,9 +137,9 @@ namespace Com.Api
             var tcs = new TaskCompletionSource<string>();
             callbackMapper.TryAdd(correlationId, tcs);
 
-            channel.BasicPublish(exchange: "",routingKey: QUEUE_NAME,basicProperties: props,body: messageBytes);
+            channel.BasicPublish(exchange: "", routingKey: QUEUE_NAME, basicProperties: props, body: messageBytes);
 
-            channel.BasicConsume(consumer: consumer,queue: replyQueueName,autoAck: true);
+            channel.BasicConsume(consumer: consumer, queue: replyQueueName, autoAck: true);
 
             cancellationToken.Register(() => callbackMapper.TryRemove(correlationId, out var tmp));
             return tcs.Task;

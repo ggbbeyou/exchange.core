@@ -40,7 +40,7 @@ namespace Com.Matching
             for (int i = 0; i < orders.Count; i++)
             {
                 //deals.AddRange(core.Match(orders[i]));
-                core.Process(orders[i]);
+                core!.Process(orders[i]);
                 //deals.AddRange(core.Process(orders[i]));
             }
 

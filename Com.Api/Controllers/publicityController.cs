@@ -14,11 +14,11 @@ namespace Com.Api.Controllers
     /// </summary>
     public class publicityController : Controller
     {
-        private readonly ILogger<publicityController> _logger;
+        private readonly ILogger<publicityController> logger;
 
         public publicityController(ILogger<publicityController> logger)
         {
-            _logger = logger;
+            this.logger = logger;
         }
 
         public IActionResult Index()

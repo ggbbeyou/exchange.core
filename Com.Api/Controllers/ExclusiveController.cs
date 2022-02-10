@@ -22,7 +22,7 @@ namespace Com.Api.Controllers
     /// </summary>
     public class ExclusiveController : Controller
     {
-        private readonly ILogger<ExclusiveController> _logger;
+        private readonly ILogger<ExclusiveController> logger;
         /// <summary>
         /// 配置接口
         /// </summary>
@@ -30,7 +30,7 @@ namespace Com.Api.Controllers
         public IdWorker worker = new IdWorker(1, 1);
         public ExclusiveController(IConfiguration configuration, ILogger<ExclusiveController> logger)
         {
-            _logger = logger;
+            this.logger = logger;
             this.configuration = configuration;
         }
 

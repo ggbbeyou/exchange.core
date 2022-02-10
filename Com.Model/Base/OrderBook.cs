@@ -11,7 +11,7 @@ namespace Com.Model.Base
         /// 交易对
         /// </summary>
         /// <value></value>
-        public string name { get; set; }
+        public string name { get; set; }=null!;
         /// <summary>
         /// 挂单价
         /// </summary>

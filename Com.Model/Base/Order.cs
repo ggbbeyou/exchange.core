@@ -11,17 +11,17 @@ namespace Com.Model.Base
         /// 订单id
         /// </summary>
         /// <value></value>
-        public string id { get; set; }
+        public string id { get; set; } = null!;
         /// <summary>
         /// 交易对
         /// </summary>
         /// <value></value>
-        public string name { get; set; }
+        public string name { get; set; } = null!;
         /// <summary>
         /// 用户ID
         /// </summary>
         /// <value></value>
-        public string uid { get; set; }
+        public string uid { get; set; } = null!;
         /// <summary>
         /// 挂单价
         /// </summary>
@@ -76,7 +76,7 @@ namespace Com.Model.Base
         /// 附加数据
         /// </summary>
         /// <value></value>
-        public string data { get; set; }
+        public string data { get; set; } = null!;
 
     }
 }

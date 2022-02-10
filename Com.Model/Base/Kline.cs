@@ -11,7 +11,7 @@ namespace Com.Model.Base
         /// 交易对
         /// </summary>
         /// <value></value>
-        public string name { get; set; }
+        public string name { get; set; } = null!;
         /// <summary>
         /// 成交量
         /// </summary>
@@ -61,6 +61,6 @@ namespace Com.Model.Base
         /// 当天第几分钟
         /// </summary>
         /// <value></value>
-        public int minute{get;set;}
+        public int minute { get; set; }
     }
 }

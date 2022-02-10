@@ -56,7 +56,7 @@ namespace Com.Matching
             List<Order> orders = new List<Order>();
             for (int i = 0; i < 100000; i++)
             {
-                E_Direction direction = random.Next(1, 3) == 1 ? E_Direction.bid : E_Direction.ask;
+                E_Direction direction = random.Next(1, 3) == 1 ? E_Direction.buy : E_Direction.sell;
                 E_OrderType type = random.Next(1, 3) == 1 ? E_OrderType.price_fixed : E_OrderType.price_market;
                 type = E_OrderType.price_fixed;
                 decimal price = random.Next(50, 100);

@@ -273,7 +273,7 @@ namespace Com.Matching
             if (order.amount > amount_deal)
             {
                 //未完全成交,增加orderBook
-                if (order.type == E_OrderType.price_fixed && order.direction == E_Direction.bid)
+                if (order.type == E_OrderType.price_fixed && order.direction == E_Direction.buy)
                 {
                     orderBook = bid.FirstOrDefault(P => P.price == order.price);
                     if (orderBook == null)
@@ -285,7 +285,7 @@ namespace Com.Matching
                             amount = 0,
                             count = 0,
                             last_time = DateTimeOffset.UtcNow,
-                            direction = E_Direction.bid,
+                            direction = E_Direction.buy,
                         };
                         bid.Add(orderBook);
                     }
@@ -294,7 +294,7 @@ namespace Com.Matching
                     orderBook.last_time = DateTimeOffset.UtcNow;
                     orderBooks.Add(orderBook);
                 }
-                if (order.type == E_OrderType.price_fixed && order.direction == E_Direction.ask)
+                if (order.type == E_OrderType.price_fixed && order.direction == E_Direction.sell)
                 {
                     orderBook = ask.FirstOrDefault(P => P.price == order.price);
                     if (orderBook == null)
@@ -306,7 +306,7 @@ namespace Com.Matching
                             amount = 0,
                             count = 0,
                             last_time = DateTimeOffset.UtcNow,
-                            direction = E_Direction.ask,
+                            direction = E_Direction.sell,
                         };
                         ask.Add(orderBook);
                     }
@@ -356,7 +356,7 @@ namespace Com.Matching
                 return deals;
             }
             DateTimeOffset now = DateTimeOffset.UtcNow;
-            if (order.direction == E_Direction.bid)
+            if (order.direction == E_Direction.buy)
             {
                 //先市价成交,再限价成交
                 if (order.type == E_OrderType.price_market)
@@ -516,7 +516,7 @@ namespace Com.Matching
                     }
                 }
             }
-            else if (order.direction == E_Direction.ask)
+            else if (order.direction == E_Direction.sell)
             {
                 //先市价成交,再限价成交
                 if (order.type == E_OrderType.price_market)

@@ -10,10 +10,10 @@ namespace Com.Model.Base
         /// <summary>
         /// 买入
         /// </summary>
-        bid = 1,
+        buy = 1,
         /// <summary>
         /// 卖出
         /// </summary>
-        ask = 2,
+        sell = 2,
     }
 }

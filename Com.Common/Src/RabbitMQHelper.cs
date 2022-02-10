@@ -14,7 +14,7 @@ namespace Com.Common;
 public class RabbitMQHelper
 {
     private readonly ConnectionFactory connectionFactory;
-    private readonly IConnection _conn;
+    private readonly IConnection conn;
 
 
     private ConcurrentDictionary<string, IModel> ModelDic = new ConcurrentDictionary<string, IModel>();
@@ -22,7 +22,7 @@ public class RabbitMQHelper
     public RabbitMQHelper(ConnectionFactory connectionFactory)
     {
         this.connectionFactory = connectionFactory;
-        _conn = connectionFactory.CreateConnection();
+        conn = connectionFactory.CreateConnection();
     }
 
 
@@ -87,7 +87,7 @@ public class RabbitMQHelper
     {
         return ModelDic.GetOrAdd(queue, key =>
         {
-            var model = _conn.CreateModel();
+            var model = conn.CreateModel();
             ExchangeDeclare(model, exchange, ExchangeType.Fanout, isProperties);
             QueueDeclare(model, queue, isProperties);
             model.QueueBind(queue, exchange, routingKey);
@@ -132,7 +132,7 @@ public class RabbitMQHelper
     {
         return ModelDic.GetOrAdd(queue, value =>
          {
-             var model = _conn.CreateModel();
+             var model = conn.CreateModel();
              QueueDeclare(model, queue, isProperties);
                  //每次消费的消息数
                  model.BasicQos(0, 1, false);

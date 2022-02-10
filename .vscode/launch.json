@@ -10,7 +10,7 @@
             "request": "launch",
             "preLaunchTask": "build-Api",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/Com.Api/bin/Debug/net5.0/Com.Api.dll",
+            "program": "${workspaceFolder}/Com.Api/bin/Debug/net6.0/Com.Api.dll",
             "args": [],
             "cwd": "${workspaceFolder}/Com.Api",
             "stopAtEntry": false,
@@ -35,7 +35,7 @@
             "request": "launch",
             "preLaunchTask": "build-MarketMaking",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/Com.MarketMaking/bin/Debug/net5.0/Com.MarketMaking.dll",
+            "program": "${workspaceFolder}/Com.MarketMaking/bin/Debug/net6.0/Com.MarketMaking.dll",
             "args": [],
             "cwd": "${workspaceFolder}/Com.MarketMaking",
             "stopAtEntry": false,
@@ -60,7 +60,7 @@
             "request": "launch",
             "preLaunchTask": "build-Web",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/Com.Web/bin/Debug/net5.0/Com.Web.dll",
+            "program": "${workspaceFolder}/Com.Web/bin/Debug/net6.0/Com.Web.dll",
             "args": [],
             "cwd": "${workspaceFolder}/Com.Web",
             "stopAtEntry": false,
@@ -85,7 +85,7 @@
             "request": "launch",
             "preLaunchTask": "build-Matching",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/Com.Matching/bin/Debug/net5.0/Com.Matching.dll",
+            "program": "${workspaceFolder}/Com.Matching/bin/Debug/net6.0/Com.Matching.dll",
             "args": [],
             "cwd": "${workspaceFolder}",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console

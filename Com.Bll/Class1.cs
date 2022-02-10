@@ -1,8 +1,5 @@
-﻿using System;
-
-namespace Com.Bll
+﻿namespace Com.Bll;
+public class Class1
 {
-    public class Class1
-    {
-    }
+
 }

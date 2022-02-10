@@ -20,6 +20,7 @@ namespace Com.Matching
             {
                 config.Sources.Clear();
                 config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+                config.AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true);
                 config.AddEnvironmentVariables();
                 config.Build();
             });

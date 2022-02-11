@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Com.Model;
 using Com.Model.Enum;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace Com.Matching
@@ -14,10 +15,11 @@ namespace Com.Matching
 
         Random random = new Random();
 
-        public Test(IConfiguration configuration)
+        public Test(IConfiguration configuration, ILogger logger)
         {
-            core = new Core("btc/usdt", configuration, null);
-            core.Start(45);
+            core = new Core("btc/usdt", configuration, logger);
+            core.Start(43250);
+            TestOrder();
         }
 
         public void TestOrder()
@@ -60,8 +62,8 @@ namespace Com.Matching
                 E_OrderSide direction = random.Next(1, 3) == 1 ? E_OrderSide.buy : E_OrderSide.sell;
                 E_OrderType type = random.Next(1, 3) == 1 ? E_OrderType.price_fixed : E_OrderType.price_market;
                 type = E_OrderType.price_fixed;
-                decimal price = random.Next(50, 100);
-                decimal amount = random.Next(50, 100);
+                decimal price = random.Next(43000, 45000);
+                decimal amount = (decimal)random.NextDouble();
                 if (type == E_OrderType.price_market)
                 {
                     price = 0;

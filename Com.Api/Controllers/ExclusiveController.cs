@@ -54,7 +54,7 @@ namespace Com.Api.Controllers
                 amount = amount,
                 total = price ?? 0 * amount,
                 time = DateTimeOffset.UtcNow,
-                direction = direction,
+                side = direction,
                 state = E_OrderState.unsold,
                 type = type,
             };

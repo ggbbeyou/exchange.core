@@ -147,7 +147,7 @@ public class Core
     /// <summary>
     /// 主要流程
     /// </summary>
-    public void Process(Order order)
+    public void SendOrder(Order order)
     {
         List<Deal> deals = Match(order);
         this.mq.SendDeal(deals);
@@ -274,7 +274,7 @@ public class Core
         if (order.amount > amount_deal)
         {
             //未完全成交,增加orderBook
-            if (order.type == E_OrderType.price_fixed && order.direction == E_OrderSide.buy)
+            if (order.type == E_OrderType.price_fixed && order.side == E_OrderSide.buy)
             {
                 orderBook = bid.FirstOrDefault(P => P.price == order.price);
                 if (orderBook == null)
@@ -295,7 +295,7 @@ public class Core
                 orderBook.last_time = DateTimeOffset.UtcNow;
                 orderBooks.Add(orderBook);
             }
-            if (order.type == E_OrderType.price_fixed && order.direction == E_OrderSide.sell)
+            if (order.type == E_OrderType.price_fixed && order.side == E_OrderSide.sell)
             {
                 orderBook = ask.FirstOrDefault(P => P.price == order.price);
                 if (orderBook == null)
@@ -346,9 +346,10 @@ public class Core
     }
 
     /// <summary>
-    /// 撮合算法(不考虑手续费问题)
+    ///  撮合算法(不考虑手续费问题)
     /// </summary>
     /// <param name="order">挂单订单(手续费问题在推送到撮合之前扣除)</param>
+    /// <returns>成交情况</returns>
     public List<Deal> Match(Order order)
     {
         List<Deal> deals = new List<Deal>();
@@ -357,7 +358,7 @@ public class Core
             return deals;
         }
         DateTimeOffset now = DateTimeOffset.UtcNow;
-        if (order.direction == E_OrderSide.buy)
+        if (order.side == E_OrderSide.buy)
         {
             //先市价成交,再限价成交
             if (order.type == E_OrderType.price_market)
@@ -516,7 +517,7 @@ public class Core
                 }
             }
         }
-        else if (order.direction == E_OrderSide.sell)
+        else if (order.side == E_OrderSide.sell)
         {
             //先市价成交,再限价成交
             if (order.type == E_OrderType.price_market)

@@ -41,7 +41,7 @@ namespace Com.Matching
             for (int i = 0; i < orders.Count; i++)
             {
                 //deals.AddRange(core.Match(orders[i]));
-                core!.Process(orders[i]);
+                core!.SendOrder(orders[i]);
                 //deals.AddRange(core.Process(orders[i]));
             }
 
@@ -77,7 +77,7 @@ namespace Com.Matching
                     time = DateTimeOffset.UtcNow,
                     amount_unsold = amount,
                     amount_done = 0,
-                    direction = direction,
+                    side = direction,
                     state = E_OrderState.unsold,
                     type = type,
                     data = "",

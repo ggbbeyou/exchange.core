@@ -62,7 +62,7 @@ public class Order
     /// 交易方向
     /// </summary>
     /// <value></value>
-    public E_OrderSide direction { get; set; }
+    public E_OrderSide side { get; set; }
     /// <summary>
     /// 成交状态
     /// </summary>

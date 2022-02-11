@@ -89,7 +89,7 @@ public class MQ
                 Order? order = JsonConvert.DeserializeObject<Order>(json);
                 if (order != null)
                 {
-                    this.core.Process(order);
+                    this.core.SendOrder(order);
                     channel.BasicAck(ea.DeliveryTag, false);
                 }
             }
@@ -111,7 +111,7 @@ public class MQ
             Order? order = JsonConvert.DeserializeObject<Order>(json);
             if (order != null)
             {
-                this.core.Process(order);
+                this.core.SendOrder(order);
                 channel.BasicAck(ea.DeliveryTag, false);
             }
         };

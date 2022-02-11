@@ -86,10 +86,13 @@ public class MQ
             if (this.core.run)
             {
                 string json = Encoding.UTF8.GetString(ea.Body.ToArray());
-                Order? order = JsonConvert.DeserializeObject<Order>(json);
+                List<Order>? order = JsonConvert.DeserializeObject<List<Order>>(json);
                 if (order != null)
                 {
-                    this.core.SendOrder(order);
+                    foreach (var item in order)
+                    {
+                        this.core.SendOrder(item);
+                    }
                     channel.BasicAck(ea.DeliveryTag, false);
                 }
             }
@@ -108,10 +111,13 @@ public class MQ
         consumer.Received += (model, ea) =>
         {
             string json = Encoding.UTF8.GetString(ea.Body.ToArray());
-            Order? order = JsonConvert.DeserializeObject<Order>(json);
+            List<string>? order = JsonConvert.DeserializeObject<List<string>>(json);
             if (order != null)
             {
-                this.core.SendOrder(order);
+                foreach (var item in order)
+                {
+                    this.core.CancelOrder(item);
+                }
                 channel.BasicAck(ea.DeliveryTag, false);
             }
         };

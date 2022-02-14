@@ -153,7 +153,7 @@ public class Core
         this.mq.SendDeal(deals);
         List<OrderBook> orderBooks = GetOrderBooks(order, deals);
         this.mq.SendOrderBook(orderBooks);
-        Kline kline = SetKlink(deals);
+        Kline? kline = SetKlink(deals);
         this.mq.SendKline(kline);
     }
 
@@ -223,8 +223,12 @@ public class Core
     /// </summary>
     /// <param name="deals">成交记录</param>
     /// <returns>当前一分钟K线</returns>
-    public Kline SetKlink(List<Deal> deals)
+    public Kline? SetKlink(List<Deal> deals)
     {
+        if (deals == null || deals.Count == 0)
+        {
+            return null;
+        }
         if (kline_minute == null)
         {
             kline_minute = new Kline();

@@ -160,7 +160,7 @@ public class MQ
     /// 发送K线
     /// </summary>
     /// <param name="kline">K线</param>
-    public void SendKline(Kline kline)
+    public void SendKline(Kline? kline)
     {
         if (kline == null)
         {

@@ -110,8 +110,7 @@ public class MQ
         EventingBasicConsumer consumer = new EventingBasicConsumer(channel);
         consumer.Received += (model, ea) =>
         {
-            string json = Encoding.UTF8.GetString(ea.Body.ToArray());
-            List<string>? order = JsonConvert.DeserializeObject<List<string>>(json);
+            List<string>? order = JsonConvert.DeserializeObject<List<string>>(Encoding.UTF8.GetString(ea.Body.ToArray()));
             if (order != null)
             {
                 foreach (var item in order)
@@ -134,10 +133,8 @@ public class MQ
         {
             return;
         }
-        string json = JsonConvert.SerializeObject(deals);
-        byte[] body = Encoding.UTF8.GetBytes(json);
         this.channel_Deal.ExchangeDeclare(exchange: this.key_exchange_deal, type: ExchangeType.Topic);
-        this.channel_Deal.BasicPublish(exchange: this.key_exchange_deal, routingKey: this.core.name, basicProperties: null, body: body);
+        this.channel_Deal.BasicPublish(exchange: this.key_exchange_deal, routingKey: this.core.name, basicProperties: null, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(deals)));
     }
 
     /// <summary>

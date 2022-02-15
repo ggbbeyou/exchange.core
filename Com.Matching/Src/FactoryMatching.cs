@@ -50,7 +50,7 @@ public class FactoryMatching
     public void Info(FactoryConstant constant)
     {
         this.constant = constant;
-        ServiceStatus();
+        this.ServiceStatus();
     }
 
     /// <summary>

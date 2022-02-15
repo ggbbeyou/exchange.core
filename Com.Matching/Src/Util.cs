@@ -10,8 +10,6 @@ namespace Com.Matching;
 /// </summary>
 public static class Util
 {
-    public static IdWorker worker = new IdWorker(1, 1);
-
     /// <summary>
     /// 获取最新成交价
     /// </summary>
@@ -73,7 +71,7 @@ public static class Util
         }
         Deal deal = new Deal()
         {
-            id = Util.worker.NextId().ToString(),
+            id = FactoryMatching.instance.constant.worker.NextId().ToString(),
             name = name,
             uid_bid = bid.uid,
             uid_ask = ask.uid,
@@ -116,7 +114,7 @@ public static class Util
         bid.state = E_OrderState.completed;
         Deal deal = new Deal()
         {
-            id = Util.worker.NextId().ToString(),
+            id = FactoryMatching.instance.constant.worker.NextId().ToString(),
             name = name,
             uid_bid = bid.uid,
             uid_ask = ask.uid,

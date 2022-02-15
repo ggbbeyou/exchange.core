@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
+using Snowflake;
 using StackExchange.Redis;
 
 namespace Com.Common;
@@ -26,6 +27,11 @@ public class FactoryConstant
     /// 配置接口
     /// </summary>
     public readonly IConfiguration config;
+    /// <summary>
+    /// 雪花算法
+    /// </summary>
+    /// <returns></returns>
+    public readonly IdWorker worker = new IdWorker(1, 1);
     /// <summary>
     /// redis数据库
     /// </summary>

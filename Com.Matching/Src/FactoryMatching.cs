@@ -13,7 +13,7 @@ using Snowflake;
 namespace Com.Matching;
 
 /// <summary>
-/// 工厂
+/// 撮合工厂
 /// </summary>
 public class FactoryMatching
 {

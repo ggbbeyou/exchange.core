@@ -16,6 +16,11 @@ namespace Com.Matching
         static async Task Main(string[] args)
         {
             IHostBuilder hosts = Host.CreateDefaultBuilder();
+            hosts.ConfigureLogging(logging =>
+            {
+                // logging.ClearProviders();
+                // logging.AddConsole();
+            });
             hosts = hosts.ConfigureHostConfiguration(config =>
             {
                 config.Sources.Clear();

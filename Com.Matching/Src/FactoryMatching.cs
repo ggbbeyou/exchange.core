@@ -61,7 +61,7 @@ public class FactoryMatching
     public void ServiceStatus()
     {
         string match_name = this.constant.config.GetValue<string>("match_name");
-        this.constant.i_model.QueueDeclare(queue: match_name, durable: true, exclusive: false, autoDelete: false, arguments: null);
+        this.constant.i_model.QueueDeclare(queue: match_name, durable: false, exclusive: false, autoDelete: true, arguments: null);
         var consumer = new EventingBasicConsumer(this.constant.i_model);
         consumer.Received += (model, ea) =>
         {

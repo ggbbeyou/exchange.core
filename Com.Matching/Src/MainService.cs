@@ -29,7 +29,7 @@ public class MainService : BackgroundService
     /// <param name="logger">日志接口</param>
     public MainService(IConfiguration configuration, IHostEnvironment environment, ILogger<MainService> logger)
     {
-        FactoryConstant factory = new FactoryConstant(configuration, environment, logger ?? NullLogger<MainService>.Instance);
+        this.constant = new FactoryConstant(configuration, environment, logger ?? NullLogger<MainService>.Instance);
     }
 
     /// <summary>

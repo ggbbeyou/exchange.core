@@ -30,12 +30,12 @@ public class MQ
     /// (Base)发送订单队列名称
     /// </summary>
     /// <value></value>
-    public string key_order_send = "order_send.{0}";
+    public string key_order_send = "order_send";
     /// <summary>
     /// (Base)取消订单队列名称
     /// </summary>
     /// <value></value>
-    public string key_order_cancel = "order_cancel.{0}";
+    public string key_order_cancel = "order_cancel";
     /// <summary>
     /// (Topics)发送历史成交记录,交易机名称
     /// </summary>
@@ -59,12 +59,9 @@ public class MQ
     public MQ(Core core)
     {
         this.core = core;
-        this.key_order_send = string.Format(this.key_order_send, core.name);
-        this.key_order_cancel = string.Format(this.key_order_cancel, core.name);
         this.key_exchange_deal = string.Format(this.key_exchange_deal, core.name);
         this.key_exchange_orderbook = string.Format(this.key_exchange_orderbook, core.name);
         this.key_exchange_kline = string.Format(this.key_exchange_kline, core.name);
-
         OrderReceive();
         OrderCancel();
     }
@@ -74,14 +71,15 @@ public class MQ
     /// </summary>
     public void OrderReceive()
     {
-        IModel channel = this.connection.CreateModel();
-        channel.QueueDeclare(queue: this.key_order_send, durable: true, exclusive: false, autoDelete: false, arguments: null);
-        EventingBasicConsumer consumer = new EventingBasicConsumer(channel);
+        FactoryMatching.instance.constant.i_model.ExchangeDeclare(exchange: this.key_order_send, type: ExchangeType.Direct, durable: true, autoDelete: false, arguments: null);
+        string queueName = FactoryMatching.instance.constant.i_model.QueueDeclare().QueueName;
+        FactoryMatching.instance.constant.i_model.QueueBind(queue: queueName, exchange: this.key_order_send, routingKey: this.core.name);
+        EventingBasicConsumer consumer = new EventingBasicConsumer(FactoryMatching.instance.constant.i_model);
         consumer.Received += (model, ea) =>
         {
             if (!this.core.run)
             {
-                channel.BasicNack(deliveryTag: ea.DeliveryTag, multiple: true, requeue: true);
+                FactoryMatching.instance.constant.i_model.BasicNack(deliveryTag: ea.DeliveryTag, multiple: true, requeue: true);
             }
             else
             {
@@ -93,11 +91,11 @@ public class MQ
                     {
                         this.core.SendOrder(item);
                     }
-                    channel.BasicAck(ea.DeliveryTag, false);
+                    FactoryMatching.instance.constant.i_model.BasicAck(ea.DeliveryTag, true);
                 }
             }
         };
-        channel.BasicConsume(queue: this.key_order_send, autoAck: false, consumer: consumer);
+        FactoryMatching.instance.constant.i_model.BasicConsume(queue: queueName, autoAck: false, consumer: consumer);
     }
 
     /// <summary>
@@ -105,14 +103,15 @@ public class MQ
     /// </summary>
     public void OrderCancel()
     {
-        IModel channel = this.connection.CreateModel();
-        channel.QueueDeclare(queue: this.key_order_cancel, durable: true, exclusive: false, autoDelete: false, arguments: null);
-        EventingBasicConsumer consumer = new EventingBasicConsumer(channel);
+        FactoryMatching.instance.constant.i_model.ExchangeDeclare(exchange: this.key_order_cancel, type: ExchangeType.Direct, durable: true, autoDelete: false, arguments: null);
+        string queueName = FactoryMatching.instance.constant.i_model.QueueDeclare().QueueName;
+        FactoryMatching.instance.constant.i_model.QueueBind(queue: queueName, exchange: this.key_order_cancel, routingKey: this.core.name);
+        EventingBasicConsumer consumer = new EventingBasicConsumer(FactoryMatching.instance.constant.i_model);
         consumer.Received += (model, ea) =>
         {
             if (!this.core.run)
             {
-                channel.BasicNack(deliveryTag: ea.DeliveryTag, multiple: true, requeue: true);
+                FactoryMatching.instance.constant.i_model.BasicNack(deliveryTag: ea.DeliveryTag, multiple: true, requeue: true);
             }
             else
             {
@@ -123,11 +122,11 @@ public class MQ
                     {
                         this.core.CancelOrder(item);
                     }
-                    channel.BasicAck(ea.DeliveryTag, false);
+                    FactoryMatching.instance.constant.i_model.BasicAck(ea.DeliveryTag, false);
                 }
             }
         };
-        channel.BasicConsume(queue: this.key_order_cancel, autoAck: false, consumer: consumer);
+        FactoryMatching.instance.constant.i_model.BasicConsume(queue: queueName, autoAck: false, consumer: consumer);
     }
 
     /// <summary>

@@ -83,7 +83,11 @@ public class MQ
         EventingBasicConsumer consumer = new EventingBasicConsumer(channel);
         consumer.Received += (model, ea) =>
         {
-            if (this.core.run)
+            if (!this.core.run)
+            {
+                channel.BasicNack(deliveryTag: ea.DeliveryTag, multiple: true, requeue: true);
+            }
+            else
             {
                 string json = Encoding.UTF8.GetString(ea.Body.ToArray());
                 List<Order>? order = JsonConvert.DeserializeObject<List<Order>>(json);
@@ -110,14 +114,21 @@ public class MQ
         EventingBasicConsumer consumer = new EventingBasicConsumer(channel);
         consumer.Received += (model, ea) =>
         {
-            List<string>? order = JsonConvert.DeserializeObject<List<string>>(Encoding.UTF8.GetString(ea.Body.ToArray()));
-            if (order != null)
+            if (!this.core.run)
             {
-                foreach (var item in order)
+                channel.BasicNack(deliveryTag: ea.DeliveryTag, multiple: true, requeue: true);
+            }
+            else
+            {
+                List<string>? order = JsonConvert.DeserializeObject<List<string>>(Encoding.UTF8.GetString(ea.Body.ToArray()));
+                if (order != null)
                 {
-                    this.core.CancelOrder(item);
+                    foreach (var item in order)
+                    {
+                        this.core.CancelOrder(item);
+                    }
+                    channel.BasicAck(ea.DeliveryTag, false);
                 }
-                channel.BasicAck(ea.DeliveryTag, false);
             }
         };
         channel.BasicConsume(queue: this.key_order_cancel, autoAck: false, consumer: consumer);

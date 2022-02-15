@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection.Metadata;
 using System.Text;
+using Com.Common;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -21,28 +23,13 @@ public class FactoryMatching
     /// <returns></returns>
     public static readonly FactoryMatching instance = new FactoryMatching();
     /// <summary>
-    /// 配置接口
+    /// 常用接口
     /// </summary>
-    public IConfiguration configuration = null!;
-    /// <summary>
-    /// 日志接口
-    /// </summary>
-    public ILogger logger = null!;
+    public FactoryConstant constant = null!;
     /// <summary>
     /// 服务器名称
     /// </summary>
     public string server_name = null!;
-    /// <summary>
-    /// MQ工厂
-    /// </summary>
-    private ConnectionFactory factory = null!;
-    /// <summary>
-    /// 撮合集合
-    /// </summary>
-    /// <typeparam name="string">名称</typeparam>
-    /// <typeparam name="MQ">撮合器</typeparam>
-    /// <returns></returns>
-    // public Dictionary<string, MQ> cores = new Dictionary<string, MQ>();
 
     /// <summary>
     /// 撮合集合
@@ -65,12 +52,10 @@ public class FactoryMatching
     /// </summary>
     /// <param name="configuration">配置接口</param>
     /// <param name="logger">日志接口</param>
-    public void Info(IConfiguration configuration, ILogger logger)
+    public void Info(FactoryConstant constant)
     {
-        this.logger = logger;
-        this.configuration = configuration;
-        this.server_name = configuration.GetValue<string>("server_name");
-        this.factory = configuration.GetSection("RabbitMQ").Get<ConnectionFactory>();
+        this.constant = constant;
+        this.server_name = this.constant.config.GetValue<string>("server_name");
         ServiceStatus();
     }
 
@@ -82,10 +67,8 @@ public class FactoryMatching
     public void ServiceStatus()
     {
         string queue_name = $"MatchingService";
-        var connection = factory.CreateConnection();
-        var channel = connection.CreateModel();
-        channel.QueueDeclare(queue: queue_name, durable: true, exclusive: false, autoDelete: false, arguments: null);
-        var consumer = new EventingBasicConsumer(channel);
+        this.constant.i_model.QueueDeclare(queue: queue_name, durable: true, exclusive: false, autoDelete: false, arguments: null);
+        var consumer = new EventingBasicConsumer(this.constant.i_model);
         consumer.Received += (model, ea) =>
         {
             var message = Encoding.UTF8.GetString(ea.Body.ToArray());
@@ -101,7 +84,7 @@ public class FactoryMatching
                             decimal price = decimal.Parse(status[3]);
                             if (!this.cores.ContainsKey(name))
                             {
-                                Core core = new Core(name, this.configuration, this.logger);
+                                Core core = new Core(name, this.constant);
                                 core.Start(price);
                                 this.cores.Add(name, core);
                             }
@@ -123,9 +106,9 @@ public class FactoryMatching
                     }
                 }
             }
-            channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
+            this.constant.i_model.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
         };
-        channel.BasicConsume(queue: queue_name, autoAck: false, consumer: consumer);
+        this.constant.i_model.BasicConsume(queue: queue_name, autoAck: false, consumer: consumer);
     }
 
 }

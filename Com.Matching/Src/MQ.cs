@@ -64,11 +64,7 @@ public class MQ
         this.key_exchange_deal = string.Format(this.key_exchange_deal, core.name);
         this.key_exchange_orderbook = string.Format(this.key_exchange_orderbook, core.name);
         this.key_exchange_kline = string.Format(this.key_exchange_kline, core.name);
-        ConnectionFactory factory = this.core.configuration.GetSection("RabbitMQ").Get<ConnectionFactory>();
-        this.connection = factory.CreateConnection();
-        this.channel_Deal = this.connection.CreateModel();
-        this.channel_OrderBook = this.connection.CreateModel();
-        this.channel_Kline = this.connection.CreateModel();
+
         OrderReceive();
         OrderCancel();
     }

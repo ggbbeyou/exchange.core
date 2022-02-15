@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Com.Common;
 using Com.Model;
 using Com.Model.Enum;
 using Microsoft.Extensions.Configuration;
@@ -15,9 +16,9 @@ namespace Com.Matching
 
         Random random = new Random();
 
-        public Test(IConfiguration configuration, ILogger logger)
+        public Test(FactoryConstant constant)
         {
-            core = new Core("btc/usdt", configuration, logger);
+            core = new Core("btc/usdt", constant);
             core.Start(43250);
             TestOrder();
         }

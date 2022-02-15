@@ -42,6 +42,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Com.Common;
 using Com.Model;
 using Com.Model.Enum;
 using Microsoft.Extensions.Configuration;
@@ -54,6 +55,10 @@ namespace Com.Matching;
 /// </summary>
 public class Core
 {
+    /// <summary>
+    /// 常用接口
+    /// </summary>
+    public FactoryConstant constant = null!;
     /// <summary>
     /// 是否运行
     /// </summary>
@@ -109,28 +114,24 @@ public class Core
     /// <returns></returns>
     public Kline? kline_minute;
     /// <summary>
-    /// 配置接口
-    /// </summary>
-    public IConfiguration configuration;
-    /// <summary>
-    /// 日志接口
-    /// </summary>
-    public ILogger? logger;
-    /// <summary>
     /// 消息队列
     /// </summary>
     private MQ mq;
 
-    public Core(string name, IConfiguration configuration, ILogger? logger)
+    /// <summary>
+    /// 初始化
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="constant"></param>
+    public Core(string name, FactoryConstant constant)
     {
         this.name = name;
-        this.logger = logger;
-        this.configuration = configuration;
+        this.constant = constant;
         this.mq = new MQ(this);
     }
 
     /// <summary>
-    /// 开启
+    /// 开启撮合服务
     /// </summary>
     /// <param name="price_last">最后价格</param>
     public void Start(decimal price_last)
@@ -139,6 +140,9 @@ public class Core
         this.run = true;
     }
 
+    /// <summary>
+    /// 关闭撮合服务
+    /// </summary>
     public void Stop()
     {
         this.run = false;

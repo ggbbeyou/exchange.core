@@ -46,8 +46,7 @@ public class FactoryMatching
     /// <summary>
     /// 初始化方法
     /// </summary>
-    /// <param name="configuration">配置接口</param>
-    /// <param name="logger">日志接口</param>
+    /// <param name="constant">常用接口</param>
     public void Info(FactoryConstant constant)
     {
         this.constant = constant;
@@ -61,8 +60,8 @@ public class FactoryMatching
     /// </summary>
     public void ServiceStatus()
     {
-        string queue_name = $"MatchingService";
-        this.constant.i_model.QueueDeclare(queue: queue_name, durable: true, exclusive: false, autoDelete: false, arguments: null);
+        string match_name = this.constant.config.GetValue<string>("match_name");
+        this.constant.i_model.QueueDeclare(queue: match_name, durable: true, exclusive: false, autoDelete: false, arguments: null);
         var consumer = new EventingBasicConsumer(this.constant.i_model);
         consumer.Received += (model, ea) =>
         {
@@ -100,7 +99,7 @@ public class FactoryMatching
             }
             this.constant.i_model.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
         };
-        this.constant.i_model.BasicConsume(queue: queue_name, autoAck: false, consumer: consumer);
+        this.constant.i_model.BasicConsume(queue: match_name, autoAck: false, consumer: consumer);
     }
 
 }

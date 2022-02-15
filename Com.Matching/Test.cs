@@ -18,7 +18,7 @@ namespace Com.Matching
 
         public Test(FactoryConstant constant)
         {
-            core = new Core("btc/usdt", constant);
+            core = new Core("btc/usdt");
             core.Start(43250);
             TestOrder();
         }

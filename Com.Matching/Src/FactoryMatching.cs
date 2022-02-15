@@ -26,10 +26,6 @@ public class FactoryMatching
     /// 常用接口
     /// </summary>
     public FactoryConstant constant = null!;
-    /// <summary>
-    /// 服务器名称
-    /// </summary>
-    public string server_name = null!;
 
     /// <summary>
     /// 撮合集合
@@ -55,14 +51,13 @@ public class FactoryMatching
     public void Info(FactoryConstant constant)
     {
         this.constant = constant;
-        this.server_name = this.constant.config.GetValue<string>("server_name");
         ServiceStatus();
     }
 
     /// <summary>
     /// 撮合引擎状态监测 
-    /// open:servername:name:price
-    /// close:servername:name
+    /// open:name:price
+    /// close:name
     /// </summary>
     public void ServiceStatus()
     {
@@ -75,35 +70,32 @@ public class FactoryMatching
             if (!string.IsNullOrWhiteSpace(message))
             {
                 string[] status = message.Split(':', StringSplitOptions.RemoveEmptyEntries);
-                if (this.server_name == status[1])
+                string name = status[1].ToLower();
+                switch (status[0])
                 {
-                    string name = status[2].ToLower();
-                    switch (status[0])
-                    {
-                        case "open":
-                            decimal price = decimal.Parse(status[3]);
-                            if (!this.cores.ContainsKey(name))
-                            {
-                                Core core = new Core(name, this.constant);
-                                core.Start(price);
-                                this.cores.Add(name, core);
-                            }
-                            else
-                            {
-                                Core core = this.cores[name];
-                                core.Start(price);
-                            }
-                            break;
-                        case "close":
-                            if (this.cores.ContainsKey(name))
-                            {
-                                Core core = this.cores[name];
-                                core.Stop();
-                            }
-                            break;
-                        default:
-                            break;
-                    }
+                    case "open":
+                        decimal price = decimal.Parse(status[2]);
+                        if (!this.cores.ContainsKey(name))
+                        {
+                            Core core = new Core(name);
+                            core.Start(price);
+                            this.cores.Add(name, core);
+                        }
+                        else
+                        {
+                            Core core = this.cores[name];
+                            core.Start(price);
+                        }
+                        break;
+                    case "close":
+                        if (this.cores.ContainsKey(name))
+                        {
+                            Core core = this.cores[name];
+                            core.Stop();
+                        }
+                        break;
+                    default:
+                        break;
                 }
             }
             this.constant.i_model.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);

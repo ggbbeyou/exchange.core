@@ -54,11 +54,7 @@ namespace Com.Matching;
 /// 撮合算法核心类 ,注:撮合引擎不保存数据，所以K线只提供实时分钟K线
 /// </summary>
 public class Core
-{
-    /// <summary>
-    /// 常用接口
-    /// </summary>
-    public FactoryConstant constant = null!;
+{   
     /// <summary>
     /// 是否运行
     /// </summary>
@@ -123,10 +119,9 @@ public class Core
     /// </summary>
     /// <param name="name"></param>
     /// <param name="constant"></param>
-    public Core(string name, FactoryConstant constant)
+    public Core(string name)
     {
         this.name = name;
-        this.constant = constant;
         this.mq = new MQ(this);
     }
 

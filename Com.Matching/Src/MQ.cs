@@ -27,12 +27,12 @@ public class MQ
     public IModel channel_OrderBook = null!;
     public IModel channel_Kline = null!;
     /// <summary>
-    /// (Base)发送订单队列名称
+    /// (Direct)发送订单队列名称
     /// </summary>
     /// <value></value>
     public string key_order_send = "order_send";
     /// <summary>
-    /// (Base)取消订单队列名称
+    /// (Direct)取消订单队列名称
     /// </summary>
     /// <value></value>
     public string key_order_cancel = "order_cancel";

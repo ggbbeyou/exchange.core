@@ -20,6 +20,7 @@ namespace Com.Api.Controllers
     /// <summary>
     /// 专有接口(需要登录的公开接口)
     /// </summary>
+    [Route("api/private")]
     public class ExclusiveController : Controller
     {
         private readonly ILogger<ExclusiveController> logger;

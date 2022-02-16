@@ -12,6 +12,7 @@ namespace Com.Api.Controllers
     /// <summary>
     /// 公开的接口(不需要登录的公开接口)
     /// </summary>
+    [Route("api/public")]
     public class publicityController : Controller
     {
         private readonly ILogger<publicityController> logger;

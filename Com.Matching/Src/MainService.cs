@@ -42,8 +42,8 @@ public class MainService : BackgroundService
         this.constant.logger.LogInformation("准备启动撮合后台服务");
         try
         {
-            // Test test = new Test(this.configuration, this.logger);
             FactoryMatching.instance.Info(constant);
+            Test test = new Test(constant);
             this.constant.logger.LogInformation("启动撮合后台服务成功");
         }
         catch (Exception ex)

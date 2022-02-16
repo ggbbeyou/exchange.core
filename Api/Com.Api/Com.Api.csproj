@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Com.Bll\Com.Bll.csproj" />
+    <ProjectReference Include="..\..\Com.Bll\Com.Bll.csproj" />
     <ProjectReference Include="..\..\Com.Model\Com.Model.csproj" />
     <ProjectReference Include="..\Com.Api.Model\Com.Api.Model.csproj" />
     <ProjectReference Include="..\Com.Api.Sdk\Com.Api.Sdk.csproj" />

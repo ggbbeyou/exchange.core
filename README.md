@@ -1,15 +1,22 @@
 # exchange.core
 一个使用纯.net 5开发的开源交易所,有兴趣参与的伙伴请联系我。
 
-
-1:Matching          撮合引擎    RabbitMQ
-2:PushService       推送服务    RabbitMQ Websocket Redis
-3:OrderGateway      订单网关    Websocket RabbitMQ
-4:SerializeDb       存入数据库
-5:Business          业务系统
-6:Api               api接口
-7:UI                UI
-8:MarketMaking      作市机器人
+项目说明:
+Com.Api                 api接口
+Com.Api.Model           api模型
+Com.Api.Sdk             api接口SDK
+Com.Bll                 业务逻辑
+Com.Common              帮助通用类
+Com.MarketMaking        作市机器人
+Com.Matching            撮合引擎    RabbitMQ
+Com.Model               基本模型
+Com.UI                  UI
+Com.Web                 后台管理网站
+doc                     帮助文档
+Com.PushService         推送服务    RabbitMQ Websocket Redis
+Com.OrderGateway        订单网关    Websocket RabbitMQ
+Com.SerializeDb         存入数据库
+Com.Business            业务系统
 
 
 基本流程

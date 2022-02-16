@@ -12,6 +12,7 @@ Com.Matching            console     撮合引擎    RabbitMQ
 Com.Model               dll         基本模型
 Com.UI                  UI          前端网站
 Com.Web                 web         后台管理网站
+Com.Db.Model            dll         数据库模型
 doc                     doc         帮助文档
 
 

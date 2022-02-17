@@ -85,7 +85,7 @@
             "request": "launch",
             "preLaunchTask": "build-Matching",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/Com.Matching/bin/Debug/net6.0/Com.Matching.dll",
+            "program": "${workspaceFolder}/Server/Com.Matching/bin/Debug/net6.0/Com.Matching.dll",
             "args": [],
             "cwd": "${workspaceFolder}",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console

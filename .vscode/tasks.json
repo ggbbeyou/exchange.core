@@ -69,7 +69,7 @@
             "args": [
                 "watch",
                 "run",
-                "${workspaceFolder}/Com.MarketMaking/Com.MarketMaking.csproj",
+                "${workspaceFolder}/Server/Com.MarketMaking/Com.MarketMaking.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -81,7 +81,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/Com.Matching/Com.Matching.csproj",
+                "${workspaceFolder}/Server/Com.Matching/Com.Matching.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -93,7 +93,7 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/Com.Matching/Com.Matching.csproj",
+                "${workspaceFolder}/Server/Com.Matching/Com.Matching.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -106,7 +106,7 @@
             "args": [
                 "watch",
                 "run",
-                "${workspaceFolder}/Com.Matching/Com.Matching.csproj",
+                "${workspaceFolder}/Server/Com.Matching/Com.Matching.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],

@@ -45,8 +45,7 @@ namespace Com.Matching
             List<Deal> deals = new List<Deal>();
             for (int i = 0; i < orders.Count; i++)
             {
-                //deals.AddRange(core.Match(orders[i]));
-                core.SendOrder(orders[i]);
+                deals.AddRange(core.Match(orders[i]));
             }
             return deals;
         }

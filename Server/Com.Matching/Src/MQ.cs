@@ -49,6 +49,11 @@ public class MQ
     /// </summary>
     /// <returns></returns>
     private IBasicProperties props = FactoryMatching.instance.constant.i_model.CreateBasicProperties();
+    /// <summary>
+    /// 互斥锁
+    /// </summary>
+    /// <returns></returns>
+    private Mutex mutex = new Mutex(false);
 
     /// <summary>
     /// 初始化
@@ -88,7 +93,13 @@ public class MQ
                 {
                     foreach (var item in order)
                     {
-                        this.core.SendOrder(item);
+                        this.mutex.WaitOne();
+                        List<Deal> deals = this.core.Match(item);
+                        if (deals != null && deals.Count > 0)
+                        {
+                            FactoryMatching.instance.constant.i_model.BasicPublish(exchange: this.key_exchange_deal, routingKey: this.core.name, basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(deals)));
+                        }
+                        this.mutex.ReleaseMutex();
                     }
                     FactoryMatching.instance.constant.i_model.BasicAck(ea.DeliveryTag, true);
                 }
@@ -117,16 +128,21 @@ public class MQ
                 List<string>? order = JsonConvert.DeserializeObject<List<string>>(Encoding.UTF8.GetString(ea.Body.ToArray()));
                 if (order != null)
                 {
-                    foreach (var item in order)
+                    this.mutex.WaitOne();
+                    List<Order> cancel = this.core.CancelOrder(order);
+                    if (cancel != null && cancel.Count > 0)
                     {
-                        this.core.CancelOrder(item);
+                        FactoryMatching.instance.constant.i_model.BasicPublish(exchange: this.key_exchange_deal, routingKey: this.core.name, basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(cancel)));
                     }
+                    this.mutex.ReleaseMutex();
                     FactoryMatching.instance.constant.i_model.BasicAck(ea.DeliveryTag, false);
                 }
             }
         };
         FactoryMatching.instance.constant.i_model.BasicConsume(queue: queueName, autoAck: false, consumer: consumer);
     }
+
+    /*
 
     /// <summary>
     /// 发送历史成交记录
@@ -166,5 +182,6 @@ public class MQ
         }
         FactoryMatching.instance.constant.i_model.BasicPublish(exchange: this.key_exchange_kline, routingKey: this.core.name, basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(kline)));
     }
+    */
 
 }

@@ -12,9 +12,9 @@ using Microsoft.Extensions.Logging.Abstractions;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
-using StackExchange.Redis.Extensions.Core.Abstractions;
+// using StackExchange.Redis.Extensions.Core.Abstractions;
 
-namespace Com.Api
+namespace Com.Server
 {
     /// <summary>
     /// 工厂
@@ -30,7 +30,7 @@ namespace Com.Api
         /// 常用接口
         /// </summary>
         public FactoryConstant constant = null!;
-       
+
         /// <summary>
         /// 私有构造方法
         /// </summary>

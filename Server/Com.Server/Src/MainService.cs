@@ -42,7 +42,7 @@ public class MainService : BackgroundService
         this.constant.logger.LogInformation("准备启动业务后台服务");
         try
         {
-
+            FactoryMatching.instance.Init(this.constant);
             this.constant.logger.LogInformation("启动业务后台服务成功");
         }
         catch (Exception ex)

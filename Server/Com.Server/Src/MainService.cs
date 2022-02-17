@@ -39,15 +39,15 @@ public class MainService : BackgroundService
     /// <returns></returns>
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        this.constant.logger.LogInformation("准备启动撮合后台服务");
+        this.constant.logger.LogInformation("准备启动业务后台服务");
         try
         {
 
-            this.constant.logger.LogInformation("启动撮合后台服务成功");
+            this.constant.logger.LogInformation("启动业务后台服务成功");
         }
         catch (Exception ex)
         {
-            this.constant.logger.LogError(ex, "启动撮合后台服务异常");
+            this.constant.logger.LogError(ex, "启动业务后台服务异常");
         }
         await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
     }

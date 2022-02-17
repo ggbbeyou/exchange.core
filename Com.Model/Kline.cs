@@ -58,7 +58,7 @@ public class Kline
     /// <value></value>
     public DateTimeOffset time_end { get; set; }
     /// <summary>
-    /// 当天第几分钟
+    /// 几分钟K线
     /// </summary>
     /// <value></value>
     public int minute { get; set; }

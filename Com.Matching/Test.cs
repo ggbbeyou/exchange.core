@@ -47,8 +47,6 @@ namespace Com.Matching
             {
                 //deals.AddRange(core.Match(orders[i]));
                 core.SendOrder(orders[i]);
-                // deals.AddRange(core.Match(orders[i]));
-                //deals.AddRange(core.Process(orders[i]));
             }
             return deals;
         }
@@ -60,12 +58,12 @@ namespace Com.Matching
         public List<Order> GetOrder()
         {
             List<Order> orders = new List<Order>();
-            for (int i = 0; i < 2_000; i++)
+            for (int i = 0; i < 500_000; i++)
             {
                 E_OrderSide direction = random.Next(1, 3) == 1 ? E_OrderSide.buy : E_OrderSide.sell;
                 E_OrderType type = random.Next(1, 3) == 1 ? E_OrderType.price_fixed : E_OrderType.price_market;
                 // type = E_OrderType.price_fixed;
-                decimal price = random.Next(43000, 45000);
+                decimal price = random.Next(45000, 45000 + 1);
                 decimal amount = (decimal)random.NextDouble();
                 if (type == E_OrderType.price_market)
                 {

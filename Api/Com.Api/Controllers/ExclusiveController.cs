@@ -14,6 +14,8 @@ using RabbitMQ.Client;
 using Microsoft.Extensions.Configuration;
 using Com.Model.Enum;
 using Com.Model;
+using Com.Common;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Com.Api.Controllers
 {
@@ -23,17 +25,22 @@ namespace Com.Api.Controllers
     [Route("api/private")]
     public class ExclusiveController : Controller
     {
-        private readonly ILogger<ExclusiveController> logger;
         /// <summary>
-        /// 配置接口
+        /// 常用接口
         /// </summary>
-        public readonly IConfiguration configuration;
-        public IdWorker worker = new IdWorker(1, 1);
-        public ExclusiveController(IConfiguration configuration, ILogger<ExclusiveController> logger)
+        public FactoryConstant constant = null!;
+
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        /// <param name="configuration">配置接口</param>
+        /// <param name="environment">环境接口</param>
+        /// <param name="logger">日志接口</param>
+        public ExclusiveController(IConfiguration configuration, IHostEnvironment environment, ILogger<publicityController> logger)
         {
-            this.logger = logger;
-            this.configuration = configuration;
+            this.constant = new FactoryConstant(configuration, environment, logger ?? NullLogger<publicityController>.Instance);
         }
+
 
         /// <summary>
         /// 下单
@@ -44,46 +51,12 @@ namespace Com.Api.Controllers
         /// <param name="price">挂单价格</param>
         /// <param name="amount">挂单量</param>
         /// <returns></returns>
-        public IActionResult OrderPlace(string name, E_OrderType type, E_OrderSide direction, decimal? price, decimal amount)
+        public IActionResult OrderPlace()
         {
-            Order order = new Order()
-            {
-                id = worker.WorkerId.ToString(),
-                name = name,
-                uid = "0",
-                price = price ?? 0,
-                amount = amount,
-                total = price ?? 0 * amount,
-                time = DateTimeOffset.UtcNow,
-                side = direction,
-                state = E_OrderState.unsold,
-                type = type,
-            };
-            string queue_name = $"order_send.{name}";
-            string comman = JsonConvert.SerializeObject(order);
-            byte[] body = Encoding.UTF8.GetBytes(comman);
-            try
-            {
-                ConnectionFactory factory = this.configuration.GetSection("RabbitMQ").Get<ConnectionFactory>();
-                IConnection connection = factory.CreateConnection();
-                IModel channel = connection.CreateModel();
-                channel.QueueDeclare(queue: queue_name, durable: true, exclusive: false, autoDelete: false, arguments: null);
-                IBasicProperties basicProperties = channel.CreateBasicProperties();
-                basicProperties.Persistent = true;
-                channel.BasicPublish(exchange: "", routingKey: queue_name, basicProperties: basicProperties, body: body);
-                channel.Close();
-            }
-            catch (System.Exception)
-            {
-                return Json(false);
-            }
-            return Json(order.id);
+            return Json(null);
         }
 
-        public IActionResult Index()
-        {
-            return View();
-        }
+
 
     }
 }

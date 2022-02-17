@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
 using StackExchange.Redis.Extensions.Core.Abstractions;
+using Com.Common;
 
 namespace Com.Api
 {
@@ -16,35 +17,19 @@ namespace Com.Api
     public class MainService : BackgroundService
     {
         /// <summary>
-        /// 配置文件接口
+        /// 常用接口
         /// </summary>
-        private readonly IConfiguration _configuration;
-        /// <summary>
-        /// redis接口
-        /// </summary>
-        private readonly IRedisCacheClient _redisCacheClient;
-        /// <summary>
-        /// 环境接口
-        /// </summary>
-        private readonly IHostEnvironment _environment;
-        /// <summary>
-        /// 日志
-        /// </summary>
-        private readonly ILogger _logger;
+        public FactoryConstant constant = null!;
 
         /// <summary>
         /// 初始化
         /// </summary>
         /// <param name="configuration">配置接口</param>
-        /// <param name="redisCacheClient">redis接口</param>
         /// <param name="environment">环境接口</param>
         /// <param name="logger">日志接口</param>
-        public MainService(IConfiguration configuration, IRedisCacheClient redisCacheClient, IHostEnvironment environment, ILogger<MainService>? logger = null)
+        public MainService(IConfiguration configuration, IHostEnvironment environment, ILogger<MainService> logger)
         {
-            this._configuration = configuration;
-            this._redisCacheClient = redisCacheClient;
-            this._environment = environment;
-            this._logger = logger ?? NullLogger<MainService>.Instance;
+            this.constant = new FactoryConstant(configuration, environment, logger ?? NullLogger<MainService>.Instance);
         }
 
         /// <summary>
@@ -54,16 +39,15 @@ namespace Com.Api
         /// <returns></returns>
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            this._logger.LogInformation("准备启动后台服务");
+            this.constant.logger.LogInformation("准备启动后台服务");
             try
             {
-                FactoryMatching.instance.Init(this._configuration, this._redisCacheClient, this._environment, this._logger);
-                await FactoryMatching.instance.Start();
-                this._logger.LogInformation("启动后台服务成功");
+                FactoryMatching.instance.Init(this.constant);
+                this.constant.logger.LogInformation("启动后台服务成功");
             }
             catch (Exception ex)
             {
-                this._logger.LogError(ex, "启动后台服务异常");
+                this.constant.logger.LogError(ex, "启动后台服务异常");
             }
             await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
         }

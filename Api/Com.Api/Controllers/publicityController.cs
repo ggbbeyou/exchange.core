@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Com.Api.Models;
+using Com.Common;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Com.Api.Controllers
 {
@@ -15,11 +17,14 @@ namespace Com.Api.Controllers
     [Route("api/public")]
     public class publicityController : Controller
     {
-        private readonly ILogger<publicityController> logger;
+        /// <summary>
+        /// 常用接口
+        /// </summary>
+        public FactoryConstant constant = null!;
 
-        public publicityController(ILogger<publicityController> logger)
+        public publicityController(IConfiguration configuration, IHostEnvironment environment, ILogger<publicityController> logger)
         {
-            this.logger = logger;
+            this.constant = new FactoryConstant(configuration, environment, logger ?? NullLogger<publicityController>.Instance);
         }
 
         public IActionResult Index()

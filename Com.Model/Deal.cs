@@ -16,17 +16,7 @@ public struct Deal
     /// 交易对
     /// </summary>
     /// <value></value>
-    public string name { get; set; }
-    /// <summary>
-    /// 买单用户ID
-    /// </summary>
-    /// <value></value>
-    public string uid_bid { get; set; }
-    /// <summary>
-    /// 卖单用户ID
-    /// </summary>
-    /// <value></value>
-    public string uid_ask { get; set; }
+    public string name { get; set; }    
     /// <summary>
     /// 成交价
     /// </summary>
@@ -47,7 +37,6 @@ public struct Deal
     /// </summary>
     /// <value></value>
     public DateTimeOffset time { get; set; }
-
     /// <summary>
     /// 买订单
     /// </summary>

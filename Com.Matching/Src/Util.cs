@@ -72,9 +72,7 @@ public static class Util
         Deal deal = new Deal()
         {
             id = FactoryMatching.instance.constant.worker.NextId().ToString(),
-            name = name,
-            uid_bid = bid.uid,
-            uid_ask = ask.uid,
+            name = name,     
             price = price,
             amount = ask_amount,
             total = price * ask_amount,
@@ -115,9 +113,7 @@ public static class Util
         Deal deal = new Deal()
         {
             id = FactoryMatching.instance.constant.worker.NextId().ToString(),
-            name = name,
-            uid_bid = bid.uid,
-            uid_ask = ask.uid,
+            name = name, 
             price = price,
             amount = bid_amount,
             total = price * bid_amount,

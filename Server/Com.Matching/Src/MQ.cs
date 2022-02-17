@@ -28,7 +28,7 @@ public class MQ
     /// (Direct)发送历史成交记录
     /// </summary>
     /// <value></value>
-    public string key_exchange_deal = "deal";
+    public string key_deal = "deal";
     /// <summary>
     /// (Direct)取消订单队列名称
     /// </summary>
@@ -102,7 +102,7 @@ public class MQ
                         List<Deal> deals = this.core.Match(item);
                         if (deals != null && deals.Count > 0)
                         {
-                            FactoryMatching.instance.constant.i_model.BasicPublish(exchange: this.key_exchange_deal, routingKey: this.core.name, basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(deals)));
+                            FactoryMatching.instance.constant.i_model.BasicPublish(exchange: this.key_deal, routingKey: this.core.name, basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(deals)));
                         }
                         this.mutex.ReleaseMutex();
                     }

@@ -95,7 +95,7 @@ public class Core
     /// <summary>
     /// 消息队列
     /// </summary>
-    // private MQ mq;
+    private MQ mq;
 
     /// <summary>
     /// 初始化
@@ -105,7 +105,7 @@ public class Core
     public Core(string name)
     {
         this.name = name;
-        // this.mq = new MQ(this);
+        this.mq = new MQ(this);
     }
 
     /// <summary>

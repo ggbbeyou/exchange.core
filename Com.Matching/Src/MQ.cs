@@ -20,13 +20,6 @@ public class MQ
     /// </summary>
     private Core core;
     /// <summary>
-    /// 发送历史成交
-    /// </summary>
-    public IConnection connection = null!;
-    public IModel channel_Deal = null!;
-    public IModel channel_OrderBook = null!;
-    public IModel channel_Kline = null!;
-    /// <summary>
     /// (Direct)发送订单队列名称
     /// </summary>
     /// <value></value>
@@ -37,20 +30,25 @@ public class MQ
     /// <value></value>
     public string key_order_cancel = "order_cancel";
     /// <summary>
-    /// (Topics)发送历史成交记录,交易机名称
+    /// (Direct)发送历史成交记录
     /// </summary>
     /// <value></value>
-    public string key_exchange_deal = "deal.{0}";
+    public string key_exchange_deal = "deal";
     /// <summary>
     /// (Topics)发送orderbook记录,交易机名称
     /// </summary>
     /// <value></value>
-    public string key_exchange_orderbook = "orderbook.{0}";
+    public string key_exchange_orderbook = "orderbook";
     /// <summary>
     /// (Topics)发送K线记录,交易机名称
     /// </summary>
     /// <value></value>
-    public string key_exchange_kline = "kline.{0}";
+    public string key_exchange_kline = "kline";
+    /// <summary>
+    /// MQ基本属性
+    /// </summary>
+    /// <returns></returns>
+    private IBasicProperties props = FactoryMatching.instance.constant.i_model.CreateBasicProperties();
 
     /// <summary>
     /// 初始化
@@ -59,9 +57,10 @@ public class MQ
     public MQ(Core core)
     {
         this.core = core;
-        this.key_exchange_deal = string.Format(this.key_exchange_deal, core.name);
-        this.key_exchange_orderbook = string.Format(this.key_exchange_orderbook, core.name);
-        this.key_exchange_kline = string.Format(this.key_exchange_kline, core.name);
+        props.DeliveryMode = 2;
+        FactoryMatching.instance.constant.i_model.ExchangeDeclare(exchange: this.key_exchange_deal, type: ExchangeType.Direct, durable: true, autoDelete: false, arguments: null);
+        FactoryMatching.instance.constant.i_model.ExchangeDeclare(exchange: this.key_exchange_orderbook, type: ExchangeType.Direct, durable: true, autoDelete: false, arguments: null);
+        FactoryMatching.instance.constant.i_model.ExchangeDeclare(exchange: this.key_exchange_kline, type: ExchangeType.Direct, durable: true, autoDelete: false, arguments: null);
         OrderReceive();
         OrderCancel();
     }
@@ -139,8 +138,7 @@ public class MQ
         {
             return;
         }
-        this.channel_Deal.ExchangeDeclare(exchange: this.key_exchange_deal, type: ExchangeType.Topic);
-        this.channel_Deal.BasicPublish(exchange: this.key_exchange_deal, routingKey: this.core.name, basicProperties: null, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(deals)));
+        FactoryMatching.instance.constant.i_model.BasicPublish(exchange: this.key_exchange_deal, routingKey: this.core.name, basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(deals)));
     }
 
     /// <summary>
@@ -153,10 +151,7 @@ public class MQ
         {
             return;
         }
-        string json = JsonConvert.SerializeObject(orderBooks);
-        byte[] body = Encoding.UTF8.GetBytes(json);
-        this.channel_OrderBook.ExchangeDeclare(exchange: this.key_exchange_orderbook, type: ExchangeType.Topic);
-        this.channel_OrderBook.BasicPublish(exchange: this.key_exchange_orderbook, routingKey: this.core.name, basicProperties: null, body: body);
+        FactoryMatching.instance.constant.i_model.BasicPublish(exchange: this.key_exchange_orderbook, routingKey: this.core.name, basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(orderBooks)));
     }
 
     /// <summary>
@@ -169,10 +164,7 @@ public class MQ
         {
             return;
         }
-        string json = JsonConvert.SerializeObject(kline);
-        byte[] body = Encoding.UTF8.GetBytes(json);
-        this.channel_Kline.ExchangeDeclare(exchange: this.key_exchange_kline, type: ExchangeType.Topic);
-        this.channel_Kline.BasicPublish(exchange: this.key_exchange_kline, routingKey: this.core.name, basicProperties: null, body: body);
+        FactoryMatching.instance.constant.i_model.BasicPublish(exchange: this.key_exchange_kline, routingKey: this.core.name, basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(kline)));
     }
 
 }

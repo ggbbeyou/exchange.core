@@ -11,9 +11,9 @@ class Program
         hosts = hosts.ConfigureHostConfiguration(config =>
         {
             config.Sources.Clear();
+            config.AddEnvironmentVariables();
             config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
             config.AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true);
-            config.AddEnvironmentVariables();
             config.Build();
         });
         hosts = hosts.ConfigureServices(config =>

@@ -25,6 +25,11 @@ public class MQ
     /// <value></value>
     public string key_order_send = "order_send";
     /// <summary>
+    /// (Direct)发送历史成交记录
+    /// </summary>
+    /// <value></value>
+    public string key_exchange_deal = "deal";
+    /// <summary>
     /// (Direct)取消订单队列名称
     /// </summary>
     /// <value></value>
@@ -34,11 +39,6 @@ public class MQ
     /// </summary>
     /// <value></value>
     public string key_order_cancel_success = "order_cancel_success";
-    /// <summary>
-    /// (Direct)发送历史成交记录
-    /// </summary>
-    /// <value></value>
-    public string key_exchange_deal = "deal";
     /// <summary>
     /// (Topics)发送orderbook记录,交易机名称
     /// </summary>

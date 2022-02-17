@@ -20,7 +20,7 @@ public enum E_OrderState
     /// </summary>
     completed = 2,
     /// <summary>
-    /// 撤单
+    /// 撤单或部分撤单
     /// </summary>
     cancel = 3
 }

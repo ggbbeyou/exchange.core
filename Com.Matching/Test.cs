@@ -79,7 +79,7 @@ namespace Com.Matching
                     price = price,
                     amount = amount,
                     total = price * amount,
-                    time = DateTimeOffset.UtcNow,
+                    create_time = DateTimeOffset.UtcNow,
                     amount_unsold = amount,
                     amount_done = 0,
                     side = direction,

@@ -507,7 +507,7 @@ public class Core
                     }
                     else
                     {
-                        int index = fixed_bid.FindIndex(P => P.price <= order.price && P.time < order.time);
+                        int index = fixed_bid.FindIndex(P => P.price <= order.price && P.create_time < order.create_time);
                         if (index == -1)
                         {
                             fixed_bid.Add(order);
@@ -666,7 +666,7 @@ public class Core
                     }
                     else
                     {
-                        int index = fixed_ask.FindIndex(P => P.price > order.price && P.time < order.time);
+                        int index = fixed_ask.FindIndex(P => P.price > order.price && P.create_time < order.create_time);
                         if (index == -1)
                         {
                             fixed_ask.Add(order);

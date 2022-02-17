@@ -14,6 +14,11 @@ public class Order
     /// <value></value>
     public string id { get; set; } = null!;
     /// <summary>
+    /// 客户订单id
+    /// </summary>
+    /// <value></value>
+    public string? client_id { get; set; } = null;
+    /// <summary>
     /// 交易对
     /// </summary>
     /// <value></value>
@@ -42,7 +47,7 @@ public class Order
     /// 挂单时间
     /// </summary>
     /// <value></value>
-    public DateTimeOffset time { get; set; }
+    public DateTimeOffset create_time { get; set; }
     /// <summary>
     /// 未成交挂单量/撤单量
     /// </summary>

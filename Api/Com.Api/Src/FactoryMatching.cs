@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using Snowflake;
+
 using StackExchange.Redis.Extensions.Core.Abstractions;
 
 namespace Com.Api

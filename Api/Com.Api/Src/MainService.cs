@@ -39,15 +39,15 @@ namespace Com.Api
         /// <returns></returns>
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            this.constant.logger.LogInformation("准备启动后台服务");
+            this.constant.logger.LogInformation("准备启动Api后台服务");
             try
             {
                 FactoryMatching.instance.Init(this.constant);
-                this.constant.logger.LogInformation("启动后台服务成功");
+                this.constant.logger.LogInformation("启动Api后台服务成功");
             }
             catch (Exception ex)
             {
-                this.constant.logger.LogError(ex, "启动后台服务异常");
+                this.constant.logger.LogError(ex, "启动Api后台服务异常");
             }
             await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
         }

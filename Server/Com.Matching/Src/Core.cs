@@ -36,6 +36,7 @@ A<=C    D=A
 B>=C    D=B
 B<C<A   D=C
 
+价格优先,时间优先
 */
 
 using System;
@@ -51,7 +52,7 @@ using Microsoft.Extensions.Logging;
 namespace Com.Matching;
 
 /// <summary>
-/// 撮合算法核心类 ,注:撮合引擎不保存数据，所以K线只提供实时分钟K线
+/// 撮合算法核心类 ,注:撮合引擎不保存数据
 /// </summary>
 public class Core
 {

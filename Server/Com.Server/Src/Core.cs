@@ -12,14 +12,14 @@ namespace Com.Server;
 public class Core
 {
     /// <summary>
+    /// 是否运行
+    /// </summary>
+    public bool run;
+    /// <summary>
     /// 交易对名称
     /// </summary>
     /// <value></value>
     public string name { get; set; }
-    /// <summary>
-    /// 是否运行
-    /// </summary>
-    public bool run;
     /// <summary>
     /// 常用接口
     /// </summary>

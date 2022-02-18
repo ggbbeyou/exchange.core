@@ -42,6 +42,13 @@ public class Core
     /// <returns></returns>
     public Kline kline_minute = null!;
     /// <summary>
+    /// 最近K线
+    /// </summary>
+    /// <typeparam name="E_KlineType">K线类型</typeparam>
+    /// <typeparam name="Kline">K线</typeparam>
+    /// <returns></returns>
+    public Dictionary<E_KlineType, Kline> kline = new Dictionary<E_KlineType, Kline>();
+    /// <summary>
     /// (Direct)发送历史成交记录
     /// </summary>
     /// <value></value>
@@ -59,7 +66,78 @@ public class Core
         this.kline_minute = new Kline()
         {
             name = name,
+            type = E_KlineType.min1,
         };
+        this.kline.Add(E_KlineType.min1, new Kline()
+        {
+            name = name,
+            type = E_KlineType.min1,
+        });
+        this.kline.Add(E_KlineType.min5, new Kline()
+        {
+            name = name,
+            type = E_KlineType.min5,
+        });
+        this.kline.Add(E_KlineType.min15, new Kline()
+        {
+            name = name,
+            type = E_KlineType.min15,
+        });
+        this.kline.Add(E_KlineType.min30, new Kline()
+        {
+            name = name,
+            type = E_KlineType.min30,
+        });
+        this.kline.Add(E_KlineType.hour1, new Kline()
+        {
+            name = name,
+            type = E_KlineType.hour1,
+        });
+        this.kline.Add(E_KlineType.hour4, new Kline()
+        {
+            name = name,
+            type = E_KlineType.hour4,
+        });
+        this.kline.Add(E_KlineType.hour6, new Kline()
+        {
+            name = name,
+            type = E_KlineType.hour6,
+        });
+        this.kline.Add(E_KlineType.hour12, new Kline()
+        {
+            name = name,
+            type = E_KlineType.hour12,
+        });
+        this.kline.Add(E_KlineType.day1, new Kline()
+        {
+            name = name,
+            type = E_KlineType.day1,
+        });
+        this.kline.Add(E_KlineType.week1, new Kline()
+        {
+            name = name,
+            type = E_KlineType.week1,
+        });
+        this.kline.Add(E_KlineType.month1, new Kline()
+        {
+            name = name,
+            type = E_KlineType.month1,
+        });
+        this.kline.Add(E_KlineType.month3, new Kline()
+        {
+            name = name,
+            type = E_KlineType.month3,
+        });
+        this.kline.Add(E_KlineType.month6, new Kline()
+        {
+            name = name,
+            type = E_KlineType.month6,
+        });
+        this.kline.Add(E_KlineType.year1, new Kline()
+        {
+            name = name,
+            type = E_KlineType.year1,
+        });
         ReceiveMatchOrder();
     }
 
@@ -323,63 +401,36 @@ public class Core
         {
             return null;
         }
-        DateTimeOffset now = DateTimeOffset.UtcNow;
-        int minute = now.Minute;
-        
-        List<Deal> deal = deals.Where(P => (now - P.time).TotalMinutes == 0).OrderBy(P => P.time).ToList();
-        if (deal == null || deal.Count == 0)
+        IEnumerable<IGrouping<double, Deal>> deals_minutes = deals.GroupBy(P => (DateTimeOffset.Now - P.time).TotalMinutes);
+        foreach (var item in deals_minutes)
         {
-            return null;
-        }
-        if (kline_minute.minute != minute)
-        {
-            kline_minute.amount = deal.Sum(P => P.amount);
-            kline_minute.count = 1;
-            kline_minute.total = deal.Sum(P => P.amount * P.price);
-            kline_minute.open = deal[0].price;
-            kline_minute.close = deal[deal.Count - 1].price;
-            kline_minute.low = deal.Min(P => P.price);
-            kline_minute.high = deal.Max(P => P.price);
-            kline_minute.time_start = now.AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond);
-            kline_minute.time_end = deal[deal.Count - 1].time;
-            kline_minute.minute = 1;
-        }
-        else
-        {
-            kline_minute.amount += deal.Sum(P => P.amount);
-            kline_minute.count += 1;
-            kline_minute.total += deal.Sum(P => P.amount * P.price);
-            kline_minute.close = deal[deal.Count - 1].price;
-            kline_minute.low = deal.Min(P => P.price);
-            kline_minute.high = deal.Max(P => P.price);
-            kline_minute.time_end = deal[deal.Count - 1].time;
-        }
-        foreach (var item in deals)
-        {
-            int minute = (int)(item.time - DateTimeOffset.UtcNow.Date).TotalMinutes;
+            List<Deal> deal = item.ToList();
+            if (deal == null || deal.Count == 0)
+            {
+                return null;
+            }
             if (kline_minute.minute != minute)
             {
-                kline_minute.name = this.name;
-                kline_minute.amount = item.amount;
+                kline_minute.amount = deal.Sum(P => P.amount);
                 kline_minute.count = 1;
-                kline_minute.total = item.price * item.amount;
-                kline_minute.open = item.price;
-                kline_minute.close = item.price;
-                kline_minute.low = item.price;
-                kline_minute.high = item.price;
-                kline_minute.time_start = item.time;
-                kline_minute.time_end = item.time;
-                kline_minute.minute = minute;
+                kline_minute.total = deal.Sum(P => P.amount * P.price);
+                kline_minute.open = deal[0].price;
+                kline_minute.close = deal[deal.Count - 1].price;
+                kline_minute.low = deal.Min(P => P.price);
+                kline_minute.high = deal.Max(P => P.price);
+                kline_minute.time_start = now.AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond);
+                kline_minute.time_end = deal[deal.Count - 1].time;
+                kline_minute.minute = 1;
             }
             else
             {
-                kline_minute.amount += item.amount;
+                kline_minute.amount += deal.Sum(P => P.amount);
                 kline_minute.count += 1;
-                kline_minute.total += item.price * item.amount;
-                kline_minute.close = item.price;
-                kline_minute.low = item.price < kline_minute.low ? item.price : kline_minute.low;
-                kline_minute.high = item.price > kline_minute.high ? item.price : kline_minute.high;
-                kline_minute.time_end = item.time;
+                kline_minute.total += deal.Sum(P => P.amount * P.price);
+                kline_minute.close = deal[deal.Count - 1].price;
+                kline_minute.low = deal.Min(P => P.price);
+                kline_minute.high = deal.Max(P => P.price);
+                kline_minute.time_end = deal[deal.Count - 1].time;
             }
         }
         return kline_minute;

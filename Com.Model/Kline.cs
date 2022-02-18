@@ -1,4 +1,5 @@
 using System;
+using Com.Model.Enum;
 
 namespace Com.Model;
 
@@ -48,6 +49,11 @@ public class Kline
     /// <value></value>
     public decimal high { get; set; }
     /// <summary>
+    /// K线类型
+    /// </summary>
+    /// <value></value>
+    public E_KlineType type { get; set; }
+    /// <summary>
     /// 变更开始时间
     /// </summary>
     /// <value></value>
@@ -58,8 +64,8 @@ public class Kline
     /// <value></value>
     public DateTimeOffset time_end { get; set; }
     /// <summary>
-    /// 几分钟K线
+    /// 更新时间
     /// </summary>
     /// <value></value>
-    public int minute { get; set; }
+    public DateTimeOffset time { get; set; }
 }

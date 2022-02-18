@@ -37,10 +37,10 @@ public class Core
     /// <returns></returns>
     public List<OrderBook> ask = new List<OrderBook>();
     /// <summary>
-    /// 一分钟K线
+    /// 最后一分钟K线
     /// </summary>
     /// <returns></returns>
-    public Kline? kline_minute;
+    public Kline kline_minute = null!;
     /// <summary>
     /// (Direct)发送历史成交记录
     /// </summary>
@@ -56,6 +56,10 @@ public class Core
     {
         this.name = name;
         this.constant = constant;
+        this.kline_minute = new Kline()
+        {
+            name = name,
+        };
         ReceiveMatchOrder();
     }
 
@@ -319,9 +323,36 @@ public class Core
         {
             return null;
         }
-        if (kline_minute == null)
+        DateTimeOffset now = DateTimeOffset.UtcNow;
+        int minute = now.Minute;
+        
+        List<Deal> deal = deals.Where(P => (now - P.time).TotalMinutes == 0).OrderBy(P => P.time).ToList();
+        if (deal == null || deal.Count == 0)
         {
-            kline_minute = new Kline();
+            return null;
+        }
+        if (kline_minute.minute != minute)
+        {
+            kline_minute.amount = deal.Sum(P => P.amount);
+            kline_minute.count = 1;
+            kline_minute.total = deal.Sum(P => P.amount * P.price);
+            kline_minute.open = deal[0].price;
+            kline_minute.close = deal[deal.Count - 1].price;
+            kline_minute.low = deal.Min(P => P.price);
+            kline_minute.high = deal.Max(P => P.price);
+            kline_minute.time_start = now.AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond);
+            kline_minute.time_end = deal[deal.Count - 1].time;
+            kline_minute.minute = 1;
+        }
+        else
+        {
+            kline_minute.amount += deal.Sum(P => P.amount);
+            kline_minute.count += 1;
+            kline_minute.total += deal.Sum(P => P.amount * P.price);
+            kline_minute.close = deal[deal.Count - 1].price;
+            kline_minute.low = deal.Min(P => P.price);
+            kline_minute.high = deal.Max(P => P.price);
+            kline_minute.time_end = deal[deal.Count - 1].time;
         }
         foreach (var item in deals)
         {

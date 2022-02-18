@@ -95,10 +95,11 @@ public class Core
             {
                 string json = Encoding.UTF8.GetString(ea.Body.ToArray());
                 this.constant.logger.LogInformation($"接收撮合传过来的成交订单:{json}");
-                List<Deal>? deals = JsonConvert.DeserializeObject<List<Deal>>(json);
+                KeyValuePair<Order, List<Deal>>? deals = JsonConvert.DeserializeObject<KeyValuePair<Order, List<Deal>>>(json);
                 if (deals != null)
                 {
-                    List<OrderBook> orderBooks = GetOrderBooks(null, deals);
+
+                    List<OrderBook> orderBooks = GetOrderBooks(deals?.Key ?? new Order(), deals?.Value ?? new List<Deal>());
                     // this.mq.SendOrderBook(orderBooks);
                     Kline? kline = SetKlink(deals);
                     // this.mq.SendKline(kline);
@@ -150,6 +151,7 @@ public class Core
         FactoryMatching.instance.constant.i_model.BasicConsume(queue: queueName, autoAck: false, consumer: consumer);
     }
 
+
     /// <summary>
     /// 获取有变量的orderbook(增量)
     /// </summary>
@@ -159,6 +161,10 @@ public class Core
     public List<OrderBook> GetOrderBooks(Order order, List<Deal> deals)
     {
         List<OrderBook> orderBooks = new List<OrderBook>();
+        // if (order == null && deals == null)
+        // {
+        //     return orderBooks;
+        // }
         decimal amount_deal = deals.Sum(P => P.amount);
         OrderBook? orderBook;
         if (order.amount > amount_deal)

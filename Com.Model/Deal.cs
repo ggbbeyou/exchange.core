@@ -1,4 +1,5 @@
 using System;
+using Com.Model.Enum;
 
 namespace Com.Model;
 
@@ -16,7 +17,7 @@ public struct Deal
     /// 交易对
     /// </summary>
     /// <value></value>
-    public string name { get; set; }    
+    public string name { get; set; }
     /// <summary>
     /// 成交价
     /// </summary>
@@ -32,6 +33,11 @@ public struct Deal
     /// </summary>
     /// <value></value>
     public decimal total { get; set; }
+    /// <summary>
+    /// 成交触发方向
+    /// </summary>
+    /// <value></value>
+    public E_OrderSide trigger_side { get; set; }
     /// <summary>
     /// 成交时间
     /// </summary>

@@ -49,9 +49,10 @@ public static class Util
     /// <param name="bid">买单</param>
     /// <param name="ask">卖单</param>
     /// <param name="price">成交价</param>
+    /// <param name="trigger_side">触发方向</param>
     /// <param name="now">成交时间</param>
     /// <returns></returns>
-    public static Deal AmountBidAsk(string name, Order bid, Order ask, decimal price, DateTimeOffset now)
+    public static Deal AmountBidAsk(string name, Order bid, Order ask, decimal price, E_OrderSide trigger_side, DateTimeOffset now)
     {
         decimal ask_amount = ask.amount_unsold;
         ask.amount_unsold = 0;
@@ -72,10 +73,11 @@ public static class Util
         Deal deal = new Deal()
         {
             id = FactoryMatching.instance.constant.worker.NextId().ToString(),
-            name = name,     
+            name = name,
             price = price,
             amount = ask_amount,
             total = price * ask_amount,
+            trigger_side = trigger_side,
             time = now,
             bid = bid,
             ask = ask,
@@ -90,9 +92,10 @@ public static class Util
     /// <param name="bid">买单</param>
     /// <param name="ask">卖单</param>
     /// <param name="price">成交价</param>
+    /// <param name="trigger_side">触发方向</param>
     /// <param name="now">成交时间</param>
     /// <returns></returns>
-    public static Deal AmountAskBid(string name, Order bid, Order ask, decimal price, DateTimeOffset now)
+    public static Deal AmountAskBid(string name, Order bid, Order ask, decimal price, E_OrderSide trigger_side, DateTimeOffset now)
     {
         decimal bid_amount = bid.amount_unsold;
         ask.amount_unsold -= bid_amount;
@@ -113,10 +116,11 @@ public static class Util
         Deal deal = new Deal()
         {
             id = FactoryMatching.instance.constant.worker.NextId().ToString(),
-            name = name, 
+            name = name,
             price = price,
             amount = bid_amount,
             total = price * bid_amount,
+            trigger_side = trigger_side,
             time = now,
             bid = bid,
             ask = ask,

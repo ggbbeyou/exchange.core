@@ -34,10 +34,15 @@ public class KlindService
     /// </summary>
     public FactoryConstant constant = null!;
     /// <summary>
-    /// redis 键  zset
+    /// redis(zset)键 已生成K线
     /// </summary>
     /// <value></value>
     public string redis_key_kline = "kline/{0}/{1}";
+    /// <summary>
+    /// redis(hash)键 正在生成K线
+    /// </summary>
+    /// <value></value>
+    public string redis_key_klineing = "klineing/{0}/{1}";
 
     /// <summary>
     /// 初始化

@@ -33,7 +33,10 @@ public class KlindService
     /// 常用接口
     /// </summary>
     public FactoryConstant constant = null!;
-
+    /// <summary>
+    /// redis 键  zset
+    /// </summary>
+    /// <value></value>
     public string redis_key_kline = "kline/{0}/{1}";
 
     /// <summary>

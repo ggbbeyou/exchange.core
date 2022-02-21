@@ -1,10 +1,11 @@
-﻿using Com.Model;
+﻿using Com.Db;
+using Com.Model;
 using Com.Model.Enum;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
 
-namespace Com.Db;
+namespace Com.Bll;
 public class KilneHelper
 {
 

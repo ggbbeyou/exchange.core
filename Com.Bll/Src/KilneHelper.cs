@@ -15,12 +15,13 @@ public class KilneHelper
     /// </summary>
     public FactoryConstant constant = null!;
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="constant"></param>
     public KilneHelper(FactoryConstant constant)
     {
-        // string? dbConnection = config.GetConnectionString("Mysql");
-        // var options = new DbContextOptionsBuilder<DbContextEF>().UseMySQL(dbConnection).Options;
-        // var factory = new PooledDbContextFactory<DbContextEF>(options);
-        // context = factory.CreateDbContext();
+        this.constant = constant;
     }
 
     /// <summary>
@@ -64,7 +65,7 @@ public class KilneHelper
         if (minutes > 0)
         {
             var sql = from deal in this.constant.db.Deal.Where(P => P.market == market && start <= P.time && P.time < end)
-                      group deal by deal.timestamp % minutes into g
+                      group deal by deal.timestamp / minutes into g
                       select new BaseKline
                       {
                           market = market,
@@ -76,8 +77,8 @@ public class KilneHelper
                           low = g.Min(P => P.price),
                           high = g.Max(P => P.price),
                           type = klineType,
-                          time_start = DateTimeOffset.FromUnixTimeSeconds(g.Key % minutes),
-                          time_end = DateTimeOffset.FromUnixTimeSeconds(g.Key % minutes).AddMinutes(minutes),
+                          time_start = DateTimeOffset.FromUnixTimeSeconds(g.Key * minutes),
+                          time_end = DateTimeOffset.FromUnixTimeSeconds(g.Key * minutes).AddMinutes(minutes),
                           time = DateTimeOffset.UtcNow,
                       };
             result = sql.ToList();

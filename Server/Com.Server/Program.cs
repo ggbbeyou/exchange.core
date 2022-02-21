@@ -8,6 +8,7 @@ class Program
     static async Task Main(string[] args)
     {
         IHostBuilder hosts = Host.CreateDefaultBuilder();
+        // hosts.SetBasePath(Environment.CurrentDirectory)
         hosts = hosts.ConfigureHostConfiguration(config =>
         {
             config.Sources.Clear();

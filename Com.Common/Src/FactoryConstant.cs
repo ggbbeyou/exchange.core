@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using RabbitMQ.Client;
 using Snowflake;
 using StackExchange.Redis;
+using StackExchange.Redis.Extensions;
 
 namespace Com.Common;
 
@@ -60,10 +61,6 @@ public class FactoryConstant
         this.config = config;
         this.environment = environment;
         this.logger = logger ?? NullLogger.Instance;
-
-
-        ConfigurationOptions redisConfiguration = config.GetSection("Redis").Get<ConfigurationOptions>();
-
         string redisConnection = config.GetConnectionString("Redis");
         try
         {
@@ -71,8 +68,6 @@ public class FactoryConstant
             {
                 ConnectionMultiplexer redisMultiplexer = ConnectionMultiplexer.Connect(redisConnection);
                 this.redis = redisMultiplexer.GetDatabase();
-
-
             }
         }
         catch (Exception ex)

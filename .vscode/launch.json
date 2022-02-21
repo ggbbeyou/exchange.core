@@ -2,6 +2,21 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Server",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/Server/Com.Server/bin/Debug/net6.0/Com.Server.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/Server/Com.Server",
+            "console": "internalConsole",
+            "stopAtEntry": false,
+            "env": {
+                "DOTNET_ENVIRONMENT": "Development"
+                // "DOTNET_ENVIRONMENT": "Production"
+            }
+        },
+        {
             "name": "Api",
             "type": "coreclr",
             "request": "launch",
@@ -72,16 +87,5 @@
             "console": "internalConsole",
             "stopAtEntry": false
         },
-        {
-            "name": "Server",
-            "type": "coreclr",
-            "request": "launch",
-            "preLaunchTask": "build-Server",
-            "program": "${workspaceFolder}/Server/Com.Server/bin/Debug/net6.0/Com.Server.dll",
-            "args": [],
-            "cwd": "${workspaceFolder}",
-            "console": "internalConsole",
-            "stopAtEntry": false
-        }
     ]
 }

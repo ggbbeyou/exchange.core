@@ -42,7 +42,7 @@ public class KlindService
     /// redis(hash)键 正在生成K线
     /// </summary>
     /// <value></value>
-    public string redis_key_klineing = "klineing/{0}/{1}";
+    public string redis_key_klineing = "klineing:{0}:{1}";
 
     /// <summary>
     /// 初始化
@@ -63,7 +63,7 @@ public class KlindService
     /// <returns></returns>
     public DateTimeOffset GetRedisMaxMinuteKline(string name, E_KlineType klineType)
     {
-        string key = string.Format(redis_key_kline, name, klineType);
+        string key = string.Format(this.redis_key_kline, name, klineType);
         SortedSetEntry[] redisvalue = this.constant.redis.SortedSetRangeByRankWithScores(key, 0, 1, StackExchange.Redis.Order.Descending);
         if (redisvalue.Length > 0)
         {

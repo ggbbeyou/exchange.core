@@ -26,29 +26,25 @@ public class KilneHelper
     public List<BaseKline> GetKlines(string market, E_KlineType klineType, DateTimeOffset start, DateTimeOffset end)
     {
         List<BaseKline> result = new List<BaseKline>();
-        // DateTimeOffset s = new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero);
-        // DateTimeOffset now = DateTimeOffset.UtcNow;
-        // var aaab = (now - s).TotalSeconds;
-
-
-        // DateTimeOffset bbb = DateTimeOffset.FromUnixTimeSeconds((long)aaab);
-
-        // System.Data.Objects.SqlClient.SqlFunctions.DateDiff(start, end);
-        // SqlFunctions sqlFunctions = new SqlFunctions(this.constant);
-        var a = from deal in this.constant.db.Deal.Where(P => start <= P.time && P.time < end)
-                group deal by (deal.market, deal.timestamp) into g
-                select new BaseKline
-                {
-                    market = g.Key.market,
-                    time_start = DateTimeOffset.FromUnixTimeSeconds(g.Key.timestamp),
-                    count = g.Count(),
-                };
-
-
-
-
-
-
+        
+        var sql = from deal in this.constant.db.Deal.Where(P => P.market == market && start <= P.time && P.time < end)
+                  group deal by deal.timestamp % 1 into g
+                  select new BaseKline
+                  {
+                      market = market,
+                      amount = g.Sum(P => P.amount),
+                      count = g.Count(),
+                      total = g.Sum(P => P.price * P.amount),
+                      open = g.First().price,
+                      close = g.Last().price,
+                      low = g.Min(P => P.price),
+                      high = g.Max(P => P.price),
+                      type = klineType,
+                      time_start = DateTimeOffset.FromUnixTimeSeconds(g.Key),
+                      time_end = DateTimeOffset.FromUnixTimeSeconds(g.Key).AddMinutes(1),
+                      time = DateTimeOffset.UtcNow,
+                  };
+        result = sql.ToList();
         return result;
     }
 

@@ -25,10 +25,7 @@ namespace Com.Server
         /// <param name="logger"></param>
         public MainService(IConfiguration configuration, IHostEnvironment environment, IServiceProvider provider, ILogger<MainService> logger)
         {
-            var a = configuration.GetConnectionString("Redis");
-            logger.LogInformation(a);
-            logger.LogError(a);
-            this.constant = new FactoryConstant(configuration, environment, logger ?? NullLogger<MainService>.Instance);
+            this.constant = new FactoryConstant(configuration, environment, logger);
         }
 
         /// <summary>

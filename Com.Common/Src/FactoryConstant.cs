@@ -67,9 +67,9 @@ public class FactoryConstant
         this.config = config;
         this.environment = environment;
         this.logger = logger ?? NullLogger.Instance;
-        string? redisConnection = config.GetConnectionString("Redis");
         try
         {
+            string? redisConnection = config.GetConnectionString("Redis");
             if (!string.IsNullOrWhiteSpace(redisConnection))
             {
                 ConnectionMultiplexer redisMultiplexer = ConnectionMultiplexer.Connect(redisConnection);
@@ -78,11 +78,11 @@ public class FactoryConstant
         }
         catch (Exception ex)
         {
-            this.logger.LogError(ex, $"redis服务器连接不上,地址:{redisConnection}");
+            this.logger.LogError(ex, $"redis服务器连接不上");
         }
-        string? dbConnection = config.GetConnectionString("Mysql");
         try
         {
+            string? dbConnection = config.GetConnectionString("Mysql");
             if (!string.IsNullOrWhiteSpace(dbConnection))
             {
                 var options = new DbContextOptionsBuilder<DbContextEF>().UseMySQL(dbConnection).Options;
@@ -92,11 +92,11 @@ public class FactoryConstant
         }
         catch (Exception ex)
         {
-            this.logger.LogError(ex, $"DB服务器连接不上,地址:{dbConnection}");
+            this.logger.LogError(ex, $"DB服务器连接不上");
         }
-        ConnectionFactory? factory = config.GetSection("RabbitMQ").Get<ConnectionFactory>();
         try
         {
+            ConnectionFactory? factory = config.GetSection("RabbitMQ").Get<ConnectionFactory>();
             if (factory != null)
             {
                 this.i_commection = factory!.CreateConnection();
@@ -105,7 +105,7 @@ public class FactoryConstant
         }
         catch (Exception ex)
         {
-            this.logger.LogError(ex, $"MQ服务器连接不上,地址:{JsonConvert.SerializeObject(factory)}");
+            this.logger.LogError(ex, $"MQ服务器连接不上");
         }
     }
 

@@ -36,6 +36,7 @@ public class KilneHelper
     public List<BaseKline> GetKlines(string market, E_KlineType klineType, DateTimeOffset start, DateTimeOffset end)
     {
         List<BaseKline> result = new List<BaseKline>();
+        // MySql.EntityFrameworkCore.Extensions.MySQLDbFunctionsExtensions.DateDiffDay(null, null, null);
         int minutes = 0;
         switch (klineType)
         {

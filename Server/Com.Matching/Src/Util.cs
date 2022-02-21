@@ -45,14 +45,14 @@ public static class Util
     /// <summary>
     /// 买单量>卖单量
     /// </summary>
-    /// <param name="name">名称</param>
+    /// <param name="market">名称</param>
     /// <param name="bid">买单</param>
     /// <param name="ask">卖单</param>
     /// <param name="price">成交价</param>
     /// <param name="trigger_side">触发方向</param>
     /// <param name="now">成交时间</param>
     /// <returns></returns>
-    public static BaseDeal AmountBidAsk(string name, BaseOrder bid, BaseOrder ask, decimal price, E_OrderSide trigger_side, DateTimeOffset now)
+    public static BaseDeal AmountBidAsk(string market, BaseOrder bid, BaseOrder ask, decimal price, E_OrderSide trigger_side, DateTimeOffset now)
     {
         decimal ask_amount = ask.amount_unsold;
         ask.amount_unsold = 0;
@@ -73,7 +73,7 @@ public static class Util
         BaseDeal deal = new BaseDeal()
         {
             id = FactoryMatching.instance.constant.worker.NextId().ToString(),
-            market = name,
+            market = market,
             price = price,
             amount = ask_amount,
             total = price * ask_amount,
@@ -88,14 +88,14 @@ public static class Util
     /// <summary>
     /// 卖单量>=买单量
     /// </summary>
-    /// <param name="name">名称</param>
+    /// <param name="market">名称</param>
     /// <param name="bid">买单</param>
     /// <param name="ask">卖单</param>
     /// <param name="price">成交价</param>
     /// <param name="trigger_side">触发方向</param>
     /// <param name="now">成交时间</param>
     /// <returns></returns>
-    public static BaseDeal AmountAskBid(string name, BaseOrder bid, BaseOrder ask, decimal price, E_OrderSide trigger_side, DateTimeOffset now)
+    public static BaseDeal AmountAskBid(string market, BaseOrder bid, BaseOrder ask, decimal price, E_OrderSide trigger_side, DateTimeOffset now)
     {
         decimal bid_amount = bid.amount_unsold;
         ask.amount_unsold -= bid_amount;
@@ -116,7 +116,7 @@ public static class Util
         BaseDeal deal = new BaseDeal()
         {
             id = FactoryMatching.instance.constant.worker.NextId().ToString(),
-            market = name,
+            market = market,
             price = price,
             amount = bid_amount,
             total = price * bid_amount,

@@ -7,7 +7,6 @@ using Newtonsoft.Json;
 using RabbitMQ.Client;
 using Snowflake;
 using StackExchange.Redis;
-using StackExchange.Redis.Extensions;
 
 namespace Com.Common;
 

@@ -4,9 +4,9 @@ namespace Com.Db;
 public class KilneHelper
 {
 
-    public List<Kline> GetKlines(string name, DateTimeOffset start, DateTimeOffset end)
+    public List<BaseKline> GetKlines(string name, DateTimeOffset start, DateTimeOffset end)
     {
-        List<Kline> result = new List<Kline>();
+        List<BaseKline> result = new List<BaseKline>();
         return result;
     }
 

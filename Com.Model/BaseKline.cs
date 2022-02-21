@@ -6,13 +6,13 @@ namespace Com.Model;
 /// <summary>
 /// K线
 /// </summary>
-public class Kline
+public class BaseKline
 {
     /// <summary>
     /// 交易对
     /// </summary>
     /// <value></value>
-    public string name { get; set; } = null!;
+    public string market { get; set; } = null!;
     /// <summary>
     /// 成交量
     /// </summary>

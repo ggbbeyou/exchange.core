@@ -4,53 +4,49 @@ using Com.Model.Enum;
 namespace Com.Model;
 
 /// <summary>
-/// 成交单
+/// 盘口
 /// </summary>
-public struct Deal
+public class BaseOrderBook
 {
-    /// <summary>
-    /// 成交id
-    /// </summary>
-    /// <value></value>
-    public string id { get; set; }
     /// <summary>
     /// 交易对
     /// </summary>
     /// <value></value>
-    public string name { get; set; }
+    public string market { get; set; } = null!;
     /// <summary>
-    /// 成交价
+    /// 挂单价
     /// </summary>
     /// <value></value>
     public decimal price { get; set; }
     /// <summary>
-    /// 成交量
+    /// 挂单总量
     /// </summary>
     /// <value></value>
     public decimal amount { get; set; }
     /// <summary>
-    /// 成交总额
+    /// 挂单总金额
     /// </summary>
     /// <value></value>
-    public decimal total { get; set; }
+    public decimal total
+    {
+        get
+        {
+            return price * amount;
+        }
+    }
     /// <summary>
-    /// 成交触发方向
+    /// 挂单笔数量
     /// </summary>
     /// <value></value>
-    public E_OrderSide trigger_side { get; set; }
+    public decimal count { get; set; }
     /// <summary>
-    /// 成交时间
+    /// 变更时间
     /// </summary>
     /// <value></value>
-    public DateTimeOffset time { get; set; }
+    public DateTimeOffset last_time { get; set; }
     /// <summary>
-    /// 买订单
+    /// 交易方向
     /// </summary>
     /// <value></value>
-    public Order bid { get; set; }
-    /// <summary>
-    /// 卖订单
-    /// </summary>
-    /// <value></value>
-    public Order ask { get; set; }
+    public E_OrderSide direction { get; set; }
 }

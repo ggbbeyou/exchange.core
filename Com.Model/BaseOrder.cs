@@ -6,7 +6,7 @@ namespace Com.Model;
 /// <summary>
 /// 订单表
 /// </summary>
-public class Order
+public class BaseOrder
 {
     /// <summary>
     /// 订单id
@@ -22,7 +22,7 @@ public class Order
     /// 交易对
     /// </summary>
     /// <value></value>
-    public string name { get; set; } = null!;
+    public string market { get; set; } = null!;
     /// <summary>
     /// 用户ID
     /// </summary>

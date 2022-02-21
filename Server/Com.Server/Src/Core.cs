@@ -29,25 +29,25 @@ public class Core
     /// </summary>
     /// <typeparam name="OrderBook">买盘</typeparam>
     /// <returns></returns>
-    public List<OrderBook> bid = new List<OrderBook>();
+    public List<BaseOrderBook> bid = new List<BaseOrderBook>();
     /// <summary>
     /// 卖盘 低->高
     /// </summary>
     /// <typeparam name="OrderBook">卖盘</typeparam>
     /// <returns></returns>
-    public List<OrderBook> ask = new List<OrderBook>();
+    public List<BaseOrderBook> ask = new List<BaseOrderBook>();
     /// <summary>
     /// 最后一分钟K线
     /// </summary>
     /// <returns></returns>
-    public Kline kline_minute = null!;
+    public BaseKline kline_minute = null!;
     /// <summary>
     /// 最近K线
     /// </summary>
     /// <typeparam name="E_KlineType">K线类型</typeparam>
     /// <typeparam name="Kline">K线</typeparam>
     /// <returns></returns>
-    public Dictionary<E_KlineType, Kline> kline = new Dictionary<E_KlineType, Kline>();
+    public Dictionary<E_KlineType, BaseKline> kline = new Dictionary<E_KlineType, BaseKline>();
     /// <summary>
     /// (Direct)发送历史成交记录
     /// </summary>
@@ -63,79 +63,79 @@ public class Core
     {
         this.name = name;
         this.constant = constant;
-        this.kline_minute = new Kline()
+        this.kline_minute = new BaseKline()
         {
-            name = name,
+            market = name,
             type = E_KlineType.min1,
         };
-        this.kline.Add(E_KlineType.min1, new Kline()
+        this.kline.Add(E_KlineType.min1, new BaseKline()
         {
-            name = name,
+            market = name,
             type = E_KlineType.min1,
         });
-        this.kline.Add(E_KlineType.min5, new Kline()
+        this.kline.Add(E_KlineType.min5, new BaseKline()
         {
-            name = name,
+            market = name,
             type = E_KlineType.min5,
         });
-        this.kline.Add(E_KlineType.min15, new Kline()
+        this.kline.Add(E_KlineType.min15, new BaseKline()
         {
-            name = name,
+            market = name,
             type = E_KlineType.min15,
         });
-        this.kline.Add(E_KlineType.min30, new Kline()
+        this.kline.Add(E_KlineType.min30, new BaseKline()
         {
-            name = name,
+            market = name,
             type = E_KlineType.min30,
         });
-        this.kline.Add(E_KlineType.hour1, new Kline()
+        this.kline.Add(E_KlineType.hour1, new BaseKline()
         {
-            name = name,
+            market = name,
             type = E_KlineType.hour1,
         });
-        this.kline.Add(E_KlineType.hour4, new Kline()
+        this.kline.Add(E_KlineType.hour4, new BaseKline()
         {
-            name = name,
+            market = name,
             type = E_KlineType.hour4,
         });
-        this.kline.Add(E_KlineType.hour6, new Kline()
+        this.kline.Add(E_KlineType.hour6, new BaseKline()
         {
-            name = name,
+            market = name,
             type = E_KlineType.hour6,
         });
-        this.kline.Add(E_KlineType.hour12, new Kline()
+        this.kline.Add(E_KlineType.hour12, new BaseKline()
         {
-            name = name,
+            market = name,
             type = E_KlineType.hour12,
         });
-        this.kline.Add(E_KlineType.day1, new Kline()
+        this.kline.Add(E_KlineType.day1, new BaseKline()
         {
-            name = name,
+            market = name,
             type = E_KlineType.day1,
         });
-        this.kline.Add(E_KlineType.week1, new Kline()
+        this.kline.Add(E_KlineType.week1, new BaseKline()
         {
-            name = name,
+            market = name,
             type = E_KlineType.week1,
         });
-        this.kline.Add(E_KlineType.month1, new Kline()
+        this.kline.Add(E_KlineType.month1, new BaseKline()
         {
-            name = name,
+            market = name,
             type = E_KlineType.month1,
         });
-        this.kline.Add(E_KlineType.month3, new Kline()
+        this.kline.Add(E_KlineType.month3, new BaseKline()
         {
-            name = name,
+            market = name,
             type = E_KlineType.month3,
         });
-        this.kline.Add(E_KlineType.month6, new Kline()
+        this.kline.Add(E_KlineType.month6, new BaseKline()
         {
-            name = name,
+            market = name,
             type = E_KlineType.month6,
         });
-        this.kline.Add(E_KlineType.year1, new Kline()
+        this.kline.Add(E_KlineType.year1, new BaseKline()
         {
-            name = name,
+            market = name,
             type = E_KlineType.year1,
         });
         ReceiveMatchOrder();
@@ -177,14 +177,14 @@ public class Core
             {
                 string json = Encoding.UTF8.GetString(ea.Body.ToArray());
                 this.constant.logger.LogInformation($"接收撮合传过来的成交订单:{json}");
-                List<Deal>? deals = JsonConvert.DeserializeObject<List<Deal>>(json);
+                List<BaseDeal>? deals = JsonConvert.DeserializeObject<List<BaseDeal>>(json);
                 if (deals != null)
                 {
-                    Deal deal = deals.FirstOrDefault();
-                    Order order = deal.trigger_side == E_OrderSide.buy ? deal.bid : deal.ask;
-                    List<OrderBook> orderBooks = GetOrderBooks(order, deals);
+                    BaseDeal deal = deals.FirstOrDefault();
+                    BaseOrder order = deal.trigger_side == E_OrderSide.buy ? deal.bid : deal.ask;
+                    List<BaseOrderBook> orderBooks = GetOrderBooks(order, deals);
                     // this.mq.SendOrderBook(orderBooks);
-                    Kline? kline = SetKlink(deals);
+                    BaseKline? kline = SetKlink(deals);
                     // this.mq.SendKline(kline);
                     // foreach (var item in deal)
                     // {
@@ -241,15 +241,15 @@ public class Core
     /// <param name="order">订单</param>
     /// <param name="deals">成交记录</param>
     /// <returns>变更的orderbook</returns>
-    public List<OrderBook> GetOrderBooks(Order order, List<Deal> deals)
+    public List<BaseOrderBook> GetOrderBooks(BaseOrder order, List<BaseDeal> deals)
     {
-        List<OrderBook> orderBooks = new List<OrderBook>();
+        List<BaseOrderBook> orderBooks = new List<BaseOrderBook>();
         if (order == null || deals == null || deals.Count == 0)
         {
             return orderBooks;
         }
         decimal amount_deal = deals.Sum(P => P.amount);
-        OrderBook? orderBook;
+        BaseOrderBook? orderBook;
         if (order.type == E_OrderType.price_fixed && order.amount > amount_deal)
         {
             //未完全成交,增加或修改orderBook
@@ -258,9 +258,9 @@ public class Core
                 orderBook = this.bid.FirstOrDefault(P => P.price == order.price);
                 if (orderBook == null)
                 {
-                    orderBook = new OrderBook()
+                    orderBook = new BaseOrderBook()
                     {
-                        name = this.name,
+                        market = this.name,
                         price = order.price,
                         amount = 0,
                         count = 0,
@@ -276,7 +276,7 @@ public class Core
                 var fixed_ask = deals.Where(P => P.ask.type == E_OrderType.price_fixed).GroupBy(P => P.price).Select(P => new { price = P.Key, amount = P.Sum(T => T.amount), complet_count = P.Count(T => T.ask.state == E_OrderState.completed) }).ToList();
                 foreach (var item in fixed_ask)
                 {
-                    OrderBook? orderBook_ask = this.ask.FirstOrDefault(P => P.price == item.price);
+                    BaseOrderBook? orderBook_ask = this.ask.FirstOrDefault(P => P.price == item.price);
                     if (orderBook_ask != null)
                     {
                         orderBook_ask.amount -= item.amount;
@@ -292,9 +292,9 @@ public class Core
                 orderBook = this.ask.FirstOrDefault(P => P.price == order.price);
                 if (orderBook == null)
                 {
-                    orderBook = new OrderBook()
+                    orderBook = new BaseOrderBook()
                     {
-                        name = this.name,
+                        market = this.name,
                         price = order.price,
                         amount = 0,
                         count = 0,
@@ -311,7 +311,7 @@ public class Core
                 var fixed_bid = deals.Where(P => P.bid.type == E_OrderType.price_fixed).GroupBy(P => P.price).Select(P => new { price = P.Key, amount = P.Sum(T => T.amount), complet_count = P.Count(T => T.bid.state == E_OrderState.completed) }).ToList();
                 foreach (var item in fixed_bid)
                 {
-                    OrderBook? orderBook_bid = this.bid.FirstOrDefault(P => P.price == item.price);
+                    BaseOrderBook? orderBook_bid = this.bid.FirstOrDefault(P => P.price == item.price);
                     if (orderBook_bid != null)
                     {
                         orderBook_bid.amount -= item.amount;
@@ -332,10 +332,10 @@ public class Core
     /// </summary>
     /// <param name="order_id">订单ID</param>
     /// <returns>orderbook变更</returns>
-    public OrderBook CancelOrder(List<string> order_id)
+    public BaseOrderBook CancelOrder(List<string> order_id)
     {
 
-        OrderBook orderBook = new OrderBook();
+        BaseOrderBook orderBook = new BaseOrderBook();
         // if (this.market_bid.Exists(P => P.id == order_id))
         // {
         //     this.market_bid.RemoveAll(P => P.id == order_id);
@@ -395,16 +395,16 @@ public class Core
     /// </summary>
     /// <param name="deals">成交记录</param>
     /// <returns>当前一分钟K线</returns>
-    public Kline? SetKlink(List<Deal> deals)
+    public BaseKline? SetKlink(List<BaseDeal> deals)
     {
         if (deals == null || deals.Count == 0)
         {
             return null;
         }
-        IEnumerable<IGrouping<double, Deal>> deals_minutes = deals.GroupBy(P => (DateTimeOffset.Now - P.time).TotalMinutes);
+        IEnumerable<IGrouping<double, BaseDeal>> deals_minutes = deals.GroupBy(P => (DateTimeOffset.Now - P.time).TotalMinutes);
         foreach (var item in deals_minutes)
         {
-            List<Deal> deal = item.ToList();
+            List<BaseDeal> deal = item.ToList();
             if (deal == null || deal.Count == 0)
             {
                 return null;

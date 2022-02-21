@@ -52,7 +52,7 @@ public static class Util
     /// <param name="trigger_side">触发方向</param>
     /// <param name="now">成交时间</param>
     /// <returns></returns>
-    public static Deal AmountBidAsk(string name, Order bid, Order ask, decimal price, E_OrderSide trigger_side, DateTimeOffset now)
+    public static BaseDeal AmountBidAsk(string name, BaseOrder bid, BaseOrder ask, decimal price, E_OrderSide trigger_side, DateTimeOffset now)
     {
         decimal ask_amount = ask.amount_unsold;
         ask.amount_unsold = 0;
@@ -70,10 +70,10 @@ public static class Util
         {
             bid.state = E_OrderState.partial;
         }
-        Deal deal = new Deal()
+        BaseDeal deal = new BaseDeal()
         {
             id = FactoryMatching.instance.constant.worker.NextId().ToString(),
-            name = name,
+            market = name,
             price = price,
             amount = ask_amount,
             total = price * ask_amount,
@@ -95,7 +95,7 @@ public static class Util
     /// <param name="trigger_side">触发方向</param>
     /// <param name="now">成交时间</param>
     /// <returns></returns>
-    public static Deal AmountAskBid(string name, Order bid, Order ask, decimal price, E_OrderSide trigger_side, DateTimeOffset now)
+    public static BaseDeal AmountAskBid(string name, BaseOrder bid, BaseOrder ask, decimal price, E_OrderSide trigger_side, DateTimeOffset now)
     {
         decimal bid_amount = bid.amount_unsold;
         ask.amount_unsold -= bid_amount;
@@ -113,10 +113,10 @@ public static class Util
         bid.amount_done = bid_amount;
         bid.deal_last_time = now;
         bid.state = E_OrderState.completed;
-        Deal deal = new Deal()
+        BaseDeal deal = new BaseDeal()
         {
             id = FactoryMatching.instance.constant.worker.NextId().ToString(),
-            name = name,
+            market = name,
             price = price,
             amount = bid_amount,
             total = price * bid_amount,

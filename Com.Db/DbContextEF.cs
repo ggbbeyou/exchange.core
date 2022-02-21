@@ -37,9 +37,9 @@ public class DbContextEF : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         // if (!string.IsNullOrWhiteSpace(connectionString))
-        {
-            // optionsBuilder.UseMySQL("server=192.168.0.37;port=3306;database=exchange;user=root;password=Abcd@123456;pooling=true;CharSet=utf8mb4;");
-        }
+        // {
+        // optionsBuilder.UseMySQL("server=192.168.0.37;port=3306;database=exchange;user=root;password=Abcd@123456;pooling=true;CharSet=utf8mb4;");
+        // }
     }
 
     /// <summary>

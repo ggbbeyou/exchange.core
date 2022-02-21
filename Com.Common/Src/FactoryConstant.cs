@@ -38,7 +38,7 @@ public class FactoryConstant
     /// <summary>
     /// 数据库
     /// </summary>
-    public readonly DbContextEF db;
+    public readonly DbContextEF db = null!;
     /// <summary>
     /// redis数据库
     /// </summary>

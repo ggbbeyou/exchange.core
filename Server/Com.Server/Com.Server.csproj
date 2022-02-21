@@ -20,4 +20,8 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\Com.Common\Com.Common.csproj" />
+  </ItemGroup>
+
 </Project>

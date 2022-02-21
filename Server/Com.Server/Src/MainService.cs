@@ -1,6 +1,8 @@
+using Com.Common;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Com.Server
 {
@@ -9,12 +11,26 @@ namespace Com.Server
     /// </summary>
     public class MainService : BackgroundService
     {
+        /// <summary>
+        /// 常用接口
+        /// </summary>
+        public FactoryConstant constant = null!;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="configuration"></param>
+        /// <param name="environment"></param>
+        /// <param name="provider"></param>
+        /// <param name="logger"></param>
         public MainService(IConfiguration configuration, IHostEnvironment environment, IServiceProvider provider, ILogger<MainService> logger)
         {
-            var a = configuration.GetConnectionString("RedisConnectionString");
+            var a = configuration.GetConnectionString("Redis");
             logger.LogInformation(a);
             logger.LogError(a);
+            this.constant = new FactoryConstant(configuration, environment, logger ?? NullLogger<MainService>.Instance);
         }
+
         /// <summary>
         /// 任务执行方法
         /// </summary>
@@ -22,8 +38,17 @@ namespace Com.Server
         /// <returns></returns>
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            // 后台任务执行代码
-            await Task.Delay(1000, stoppingToken);
+            this.constant.logger.LogInformation("准备启动业务后台服务");
+            try
+            {
+                FactoryMatching.instance.Init(this.constant);
+                this.constant.logger.LogInformation("启动业务后台服务成功");
+            }
+            catch (Exception ex)
+            {
+                this.constant.logger.LogError(ex, "启动业务后台服务异常");
+            }
+            await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
         }
     }
 }

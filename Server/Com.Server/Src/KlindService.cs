@@ -58,22 +58,22 @@ public class KlindService
     /// <summary>
     /// 预热缓存
     /// </summary>
-    /// <param name="name"></param>
-    public void DBtoRedis(string name)
+    /// <param name="market"></param>
+    public void DBtoRedis(string market)
     {
-        DateTimeOffset max = GetRedisMaxMinuteKline(name, E_KlineType.min1);
-        
+        DateTimeOffset max = GetRedisMaxMinuteKline(market, E_KlineType.min1);
+
     }
 
     /// <summary>
     /// 从redis获取最大的K线时间
     /// </summary>
-    /// <param name="name">交易对</param>
+    /// <param name="market">交易对</param>
     /// <param name="klineType">K线类型</param>
     /// <returns></returns>
-    public DateTimeOffset GetRedisMaxMinuteKline(string name, E_KlineType klineType)
+    public DateTimeOffset GetRedisMaxMinuteKline(string market, E_KlineType klineType)
     {
-        string key = string.Format(this.redis_key_kline, name, klineType);
+        string key = string.Format(this.redis_key_kline, market, klineType);
         SortedSetEntry[] redisvalue = this.constant.redis.SortedSetRangeByRankWithScores(key, 0, 1, StackExchange.Redis.Order.Descending);
         if (redisvalue.Length > 0)
         {

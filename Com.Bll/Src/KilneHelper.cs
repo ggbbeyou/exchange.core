@@ -12,6 +12,7 @@ public class KilneHelper
 
     /// <summary>
     /// 常用接口
+    /// https://dev.mysql.com/doc/connector-net/en/connector-net-entityframework-core-example.html
     /// </summary>
     public FactoryConstant constant = null!;
 
@@ -64,7 +65,7 @@ public class KilneHelper
         }
         if (minutes > 0)
         {
-            var sql = from deal in this.constant.db.Deal.Where(P => P.market == market && start <= P.time && P.time < end)
+            var sql = from deal in this.constant.db.Deal.Where(P => P.market == market && start <= P.time && P.time < end).OrderBy(P => P.timestamp)
                       group deal by deal.timestamp / minutes into g
                       select new BaseKline
                       {
@@ -85,12 +86,31 @@ public class KilneHelper
         }
         else if (klineType == E_KlineType.week1)
         {
-
+            EF.Functions.Random();
+            var sql = from deal in this.constant.db.Deal.Where(P => P.market == market && start <= P.time && P.time < end).OrderBy(P => P.timestamp)
+                      group deal by deal.time.DayOfWeek into g
+                      select new BaseKline
+                      {
+                          market = market,
+                          amount = g.Sum(P => P.amount),
+                          count = g.Count(),
+                          total = g.Sum(P => P.price * P.amount),
+                          open = g.First().price,
+                          close = g.Last().price,
+                          low = g.Min(P => P.price),
+                          high = g.Max(P => P.price),
+                          type = klineType,
+                          time_start = DateTimeOffset.FromUnixTimeSeconds(g.Key * minutes),
+                          time_end = DateTimeOffset.FromUnixTimeSeconds(g.Key * minutes).AddMinutes(minutes),
+                          time = DateTimeOffset.UtcNow,
+                      };
+            result = sql.ToList();
         }
         else if (klineType == E_KlineType.month1)
         {
 
         }
+
         return result;
     }
 

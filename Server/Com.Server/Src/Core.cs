@@ -123,21 +123,7 @@ public class Core
             market = market,
             type = E_KlineType.month1,
         });
-        this.kline.Add(E_KlineType.month3, new BaseKline()
-        {
-            market = market,
-            type = E_KlineType.month3,
-        });
-        this.kline.Add(E_KlineType.month6, new BaseKline()
-        {
-            market = market,
-            type = E_KlineType.month6,
-        });
-        this.kline.Add(E_KlineType.year1, new BaseKline()
-        {
-            market = market,
-            type = E_KlineType.year1,
-        });
+
         ReceiveMatchOrder();
     }
 

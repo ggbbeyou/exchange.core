@@ -51,16 +51,5 @@ public enum E_KlineType
     /// 1月
     /// </summary>
     month1 = 11,
-    /// <summary>
-    /// 3月
-    /// </summary>
-    month3 = 12,
-    /// <summary>
-    /// 6月
-    /// </summary>
-    month6 = 13,
-    /// <summary>
-    /// 1年
-    /// </summary>
-    year1 = 14,
+   
 }

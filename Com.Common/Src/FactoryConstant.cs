@@ -1,4 +1,7 @@
 
+using Com.Db;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -32,6 +35,10 @@ public class FactoryConstant
     /// </summary>
     /// <returns></returns>
     public readonly IdWorker worker = new IdWorker(1, 1);
+    /// <summary>
+    /// 数据库
+    /// </summary>
+    public readonly DbContextEF db;
     /// <summary>
     /// redis数据库
     /// </summary>
@@ -72,6 +79,21 @@ public class FactoryConstant
         catch (Exception ex)
         {
             this.logger.LogError(ex, $"redis服务器连接不上,地址:{redisConnection}");
+        }
+        string? dbConnection = config.GetConnectionString("Mysql");
+        try
+        {
+            // if (!string.IsNullOrWhiteSpace(dbConnection))
+            // {
+            //     this.db = new DbContextEF(dbConnection);
+            // }
+            var options = new DbContextOptionsBuilder<DbContextEF>().UseMySQL(dbConnection).Options;
+            var factorydb = new PooledDbContextFactory<DbContextEF>(options);
+            this.db = factorydb.CreateDbContext();
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogError(ex, $"DB服务器连接不上,地址:{dbConnection}");
         }
         ConnectionFactory? factory = config.GetSection("RabbitMQ").Get<ConnectionFactory>();
         try

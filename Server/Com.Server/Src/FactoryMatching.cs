@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Com.Common;
+using Com.Model.Enum;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -46,6 +47,9 @@ namespace Com.Server
         public void Init(FactoryConstant constant)
         {
             this.constant = constant;
+            KlindService klindService = new KlindService(constant);
+            klindService.GetRedisMaxMinuteKline("btc/usdt", E_KlineType.min1);
+
         }
 
 

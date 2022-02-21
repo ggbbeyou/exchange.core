@@ -37,7 +37,7 @@ public class KlindService
     /// redis(zset)键 已生成K线
     /// </summary>
     /// <value></value>
-    public string redis_key_kline = "kline/{0}/{1}";
+    public string redis_key_kline = "kline:{0}:{1}";
     /// <summary>
     /// redis(hash)键 正在生成K线
     /// </summary>
@@ -61,7 +61,7 @@ public class KlindService
     /// <param name="name">交易对</param>
     /// <param name="klineType">K线类型</param>
     /// <returns></returns>
-    private DateTimeOffset GetRedisMaxMinuteKline(string name, E_KlineType klineType)
+    public DateTimeOffset GetRedisMaxMinuteKline(string name, E_KlineType klineType)
     {
         string key = string.Format(redis_key_kline, name, klineType);
         SortedSetEntry[] redisvalue = this.constant.redis.SortedSetRangeByRankWithScores(key, 0, 1, StackExchange.Redis.Order.Descending);

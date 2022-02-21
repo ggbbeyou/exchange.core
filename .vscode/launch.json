@@ -76,7 +76,7 @@
             "name": "Server",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build-Matching",
+            "preLaunchTask": "build-Server",
             "program": "${workspaceFolder}/Server/Com.Server/bin/Debug/net6.0/Com.Server.dll",
             "args": [],
             "cwd": "${workspaceFolder}",

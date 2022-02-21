@@ -6,7 +6,7 @@ namespace Com.Model;
 /// <summary>
 /// 成交单
 /// </summary>
-public struct BaseDeal
+public class BaseDeal
 {
     /// <summary>
     /// 成交id

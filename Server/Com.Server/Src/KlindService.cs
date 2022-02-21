@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Com.Bll;
 using Com.Common;
 using Com.Db;
 using Com.Model;
@@ -55,7 +56,7 @@ public class KlindService
     public KlindService(FactoryConstant constant)
     {
         this.constant = constant;
-        this.kilneHelper = new KilneHelper(this.constant.config);
+        this.kilneHelper = new KilneHelper(this.constant);
     }
 
     /// <summary>

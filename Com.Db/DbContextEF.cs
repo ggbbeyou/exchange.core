@@ -47,6 +47,11 @@ public class DbContextEF : DbContext
     /// </summary>
     /// <value></value>
     public DbSet<Kline> Kline { get; set; } = null!;
+    /// <summary>
+    /// K线
+    /// </summary>
+    /// <value></value>
+    public DbSet<Deal> Deal { get; set; } = null!;
 
 }
 

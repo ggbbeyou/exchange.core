@@ -47,8 +47,10 @@ namespace Com.Server
         public void Init(FactoryConstant constant)
         {
             this.constant = constant;
+
             KlindService klindService = new KlindService(constant);
-            klindService.GetRedisMaxMinuteKline("btc/usdt", E_KlineType.min1);
+            klindService.DBtoRedis("btc/usdt");
+            // DateTimeOffset max = klindService.GetRedisMaxMinuteKline("btc/usdt", E_KlineType.min1);
 
         }
 

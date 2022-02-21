@@ -1,23 +1,24 @@
 using System;
+using Com.Model;
 using Com.Model.Enum;
 
-namespace Com.Model;
+namespace Com.Db;
 
 /// <summary>
 /// 成交单
 /// </summary>
-public struct Deal
+public class Deal
 {
     /// <summary>
     /// 成交id
     /// </summary>
     /// <value></value>
-    public string id { get; set; }
+    public long trade_id { get; set; }
     /// <summary>
     /// 交易对
     /// </summary>
     /// <value></value>
-    public string market { get; set; }
+    public string market { get; set; } = null!;
     /// <summary>
     /// 成交价
     /// </summary>
@@ -47,10 +48,15 @@ public struct Deal
     /// 买订单
     /// </summary>
     /// <value></value>
-    public BaseOrder bid { get; set; }
+    public long bid { get; set; }
     /// <summary>
     /// 卖订单
     /// </summary>
     /// <value></value>
-    public BaseOrder ask { get; set; }
+    public long ask { get; set; }
+    /// <summary>
+    /// 分钟时间戳(秒)
+    /// </summary>
+    /// <value></value>
+    public long timestamp { get; set; }
 }

@@ -60,7 +60,7 @@ public class FactoryConstant
         this.config = config;
         this.environment = environment;
         this.logger = logger ?? NullLogger.Instance;
-        string redisConnection = config.GetConnectionString("Redis");
+        string? redisConnection = config.GetConnectionString("Redis");
         try
         {
             if (!string.IsNullOrWhiteSpace(redisConnection))

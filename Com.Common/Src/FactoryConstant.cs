@@ -83,10 +83,6 @@ public class FactoryConstant
         string? dbConnection = config.GetConnectionString("Mysql");
         try
         {
-            // if (!string.IsNullOrWhiteSpace(dbConnection))
-            // {
-            //     this.db = new DbContextEF(dbConnection);
-            // }
             var options = new DbContextOptionsBuilder<DbContextEF>().UseMySQL(dbConnection).Options;
             var factorydb = new PooledDbContextFactory<DbContextEF>(options);
             this.db = factorydb.CreateDbContext();

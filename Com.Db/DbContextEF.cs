@@ -10,20 +10,20 @@ namespace Com.Db;
 public class DbContextEF : DbContext
 {
 
-    private readonly string? connectionString;
+    // private readonly string? connectionString;
 
     /// <summary>
     /// 构造函数
     /// </summary>
-    public DbContextEF()
-    {
-        this.Database.SetCommandTimeout(1000 * 10);
-    }
+    // public DbContextEF()
+    // {
+    //     this.Database.SetCommandTimeout(1000 * 10);
+    // }
 
-    public DbContextEF(string connectionString)
-    {
-        this.connectionString = connectionString;
-    }
+    // public DbContextEF(string connectionString)
+    // {
+    //     this.connectionString = connectionString;
+    // }
 
     /// <summary>
     /// 构造函数
@@ -36,9 +36,9 @@ public class DbContextEF : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        if (!string.IsNullOrWhiteSpace(connectionString))
+        // if (!string.IsNullOrWhiteSpace(connectionString))
         {
-            optionsBuilder.UseMySQL(connectionString);
+            // optionsBuilder.UseMySQL("server=192.168.0.37;port=3306;database=exchange;user=root;password=Abcd@123456;pooling=true;CharSet=utf8mb4;");
         }
     }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Com.Common;
+using Com.Db;
 using Com.Model;
 using Com.Model.Enum;
 using Microsoft.Extensions.Configuration;
@@ -43,6 +44,7 @@ public class KlindService
     /// </summary>
     /// <value></value>
     public string redis_key_klineing = "klineing:{0}:{1}";
+    public KilneHelper kilneHelper = null!;
 
     /// <summary>
     /// 初始化
@@ -53,6 +55,7 @@ public class KlindService
     public KlindService(FactoryConstant constant)
     {
         this.constant = constant;
+        this.kilneHelper = new KilneHelper(this.constant.config);
     }
 
     /// <summary>
@@ -62,7 +65,7 @@ public class KlindService
     public void DBtoRedis(string market)
     {
         DateTimeOffset max = GetRedisMaxMinuteKline(market, E_KlineType.min1);
-
+        this.kilneHelper.GetKlines(market, E_KlineType.min1, max, DateTimeOffset.UtcNow);
     }
 
     /// <summary>

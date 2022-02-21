@@ -387,7 +387,7 @@ public class Core
         {
             return null;
         }
-        IEnumerable<IGrouping<double, BaseDeal>> deals_minutes = deals.GroupBy(P => (DateTimeOffset.Now - P.time).TotalMinutes);
+        IEnumerable<IGrouping<double, BaseDeal>> deals_minutes = deals.GroupBy(P => (DateTimeOffset.UtcNow - P.time).TotalMinutes);
         foreach (var item in deals_minutes)
         {
             List<BaseDeal> deal = item.ToList();

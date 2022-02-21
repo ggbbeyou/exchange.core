@@ -409,7 +409,7 @@ public class Core
             {
                 return null;
             }
-            if (kline_minute.minute != minute)
+            // if (kline_minute.minute != minute)
             {
                 kline_minute.amount = deal.Sum(P => P.amount);
                 kline_minute.count = 1;
@@ -418,11 +418,11 @@ public class Core
                 kline_minute.close = deal[deal.Count - 1].price;
                 kline_minute.low = deal.Min(P => P.price);
                 kline_minute.high = deal.Max(P => P.price);
-                kline_minute.time_start = now.AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond);
+                // kline_minute.time_start = now.AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond);
                 kline_minute.time_end = deal[deal.Count - 1].time;
-                kline_minute.minute = 1;
+                // kline_minute.minute = 1;
             }
-            else
+            // else
             {
                 kline_minute.amount += deal.Sum(P => P.amount);
                 kline_minute.count += 1;

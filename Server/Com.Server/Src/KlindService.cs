@@ -72,10 +72,10 @@ public class KlindService
         return DateTimeOffset.MinValue;
     }
 
-    private List<Kline> GetDB()
-    {
+    // private List<Kline> GetDB()
+    // {
 
-    }
+    // }
 
 
 

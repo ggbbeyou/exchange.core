@@ -56,6 +56,16 @@ public class KlindService
     }
 
     /// <summary>
+    /// 预热缓存
+    /// </summary>
+    /// <param name="name"></param>
+    public void DBtoRedis(string name)
+    {
+        DateTimeOffset max = GetRedisMaxMinuteKline(name, E_KlineType.min1);
+        
+    }
+
+    /// <summary>
     /// 从redis获取最大的K线时间
     /// </summary>
     /// <param name="name">交易对</param>

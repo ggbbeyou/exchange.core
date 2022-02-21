@@ -15,6 +15,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Com.Common\Com.Common.csproj" />
     <ProjectReference Include="..\..\Com.Model\Com.Model.csproj" />
+    <ProjectReference Include="..\..\Com.Db\Com.Db.csproj" />
   </ItemGroup>
 
   <ItemGroup>

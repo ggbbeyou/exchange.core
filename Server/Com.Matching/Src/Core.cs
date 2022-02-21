@@ -147,14 +147,14 @@ public class Core
     /// <returns>orderbook变更</returns>
     public List<BaseOrder> CancelOrder(List<string> order_id)
     {
-        List<BaseOrder> cancel_market_bid = this.market_bid.Where(P => order_id.Contains(P.id)).ToList();
-        this.market_bid.RemoveAll(P => cancel_market_bid.Select(P => P.id).Contains(P.id));
-        List<BaseOrder> cancel_market_ask = this.market_ask.Where(P => order_id.Contains(P.id)).ToList();
-        this.market_ask.RemoveAll(P => cancel_market_ask.Select(P => P.id).Contains(P.id));
-        List<BaseOrder> cancel_fixed_bid = this.fixed_bid.Where(P => order_id.Contains(P.id)).ToList();
-        this.fixed_bid.RemoveAll(P => cancel_fixed_bid.Select(P => P.id).Contains(P.id));
-        List<BaseOrder> cancel_fixed_ask = this.fixed_ask.Where(P => order_id.Contains(P.id)).ToList();
-        this.fixed_ask.RemoveAll(P => cancel_fixed_ask.Select(P => P.id).Contains(P.id));
+        List<BaseOrder> cancel_market_bid = this.market_bid.Where(P => order_id.Contains(P.order_id)).ToList();
+        this.market_bid.RemoveAll(P => cancel_market_bid.Select(P => P.order_id).Contains(P.order_id));
+        List<BaseOrder> cancel_market_ask = this.market_ask.Where(P => order_id.Contains(P.order_id)).ToList();
+        this.market_ask.RemoveAll(P => cancel_market_ask.Select(P => P.order_id).Contains(P.order_id));
+        List<BaseOrder> cancel_fixed_bid = this.fixed_bid.Where(P => order_id.Contains(P.order_id)).ToList();
+        this.fixed_bid.RemoveAll(P => cancel_fixed_bid.Select(P => P.order_id).Contains(P.order_id));
+        List<BaseOrder> cancel_fixed_ask = this.fixed_ask.Where(P => order_id.Contains(P.order_id)).ToList();
+        this.fixed_ask.RemoveAll(P => cancel_fixed_ask.Select(P => P.order_id).Contains(P.order_id));
         List<BaseOrder> cancel = new List<BaseOrder>();
         cancel.AddRange(cancel_market_bid);
         cancel.AddRange(cancel_market_ask);

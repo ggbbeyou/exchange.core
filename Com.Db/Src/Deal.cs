@@ -6,13 +6,13 @@ namespace Com.Model;
 /// <summary>
 /// 成交单
 /// </summary>
-public struct BaseDeal
+public struct Deal
 {
     /// <summary>
     /// 成交id
     /// </summary>
     /// <value></value>
-    public string trade_id { get; set; }
+    public string id { get; set; }
     /// <summary>
     /// 交易对
     /// </summary>

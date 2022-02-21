@@ -65,7 +65,7 @@ public class KlindService
     public void DBtoRedis(string market)
     {
         DateTimeOffset max = GetRedisMaxMinuteKline(market, E_KlineType.min1);
-        this.kilneHelper.GetKlines(market, E_KlineType.min1, max, DateTimeOffset.UtcNow);
+        List<BaseKline> klines = this.kilneHelper.GetKlines(market, E_KlineType.min1, max, DateTimeOffset.UtcNow);
     }
 
     /// <summary>

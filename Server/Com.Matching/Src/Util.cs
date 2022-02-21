@@ -72,7 +72,7 @@ public static class Util
         }
         BaseDeal deal = new BaseDeal()
         {
-            id = FactoryMatching.instance.constant.worker.NextId().ToString(),
+            trade_id = FactoryMatching.instance.constant.worker.NextId().ToString(),
             market = market,
             price = price,
             amount = ask_amount,
@@ -115,7 +115,7 @@ public static class Util
         bid.state = E_OrderState.completed;
         BaseDeal deal = new BaseDeal()
         {
-            id = FactoryMatching.instance.constant.worker.NextId().ToString(),
+            trade_id = FactoryMatching.instance.constant.worker.NextId().ToString(),
             market = market,
             price = price,
             amount = bid_amount,

@@ -24,7 +24,7 @@ public class KilneHelper
     public List<BaseKline> GetKlines(string market, E_KlineType klineType, DateTimeOffset start, DateTimeOffset end)
     {
         List<BaseKline> result = new List<BaseKline>();
-
+        // var kline = context.Kline.Where(x => x.market == market && x.KlineType == (int)klineType && x.Time >= start && x.Time <= end).OrderBy(x => x.Time).ToList();
 
 
         return result;

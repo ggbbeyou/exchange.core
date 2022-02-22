@@ -3,6 +3,7 @@ using Com.Db;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -89,7 +90,12 @@ public class FactoryConstant
         try
         {
             string? dbConnection = config.GetConnectionString("Mssql");
-            if (!string.IsNullOrWhiteSpace(dbConnection))
+            DbContextEF? db = provider.GetService<DbContextEF>();
+            if (db != null)
+            {
+                this.db = db;
+            }
+            else if (!string.IsNullOrWhiteSpace(dbConnection))
             {
                 var options = new DbContextOptionsBuilder<DbContextEF>().UseSqlServer(dbConnection).Options;
                 var factorydb = new PooledDbContextFactory<DbContextEF>(options);

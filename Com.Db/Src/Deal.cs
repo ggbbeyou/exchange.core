@@ -13,5 +13,11 @@ public class Deal : BaseDeal
     /// 时间戳(分钟)
     /// </summary>
     /// <value></value>
-    public long timestamp { get; set; }
+    public long timestamp
+    {
+        get
+        {
+            return this.time.AddSeconds(-this.time.Second).AddMilliseconds(-this.time.Millisecond).ToUnixTimeSeconds();
+        }
+    }
 }

@@ -7,7 +7,7 @@ using ShardingCore.VirtualRoutes.Months;
 namespace Com.Db;
 
 /// <summary>
-/// 成交单 路由
+/// 订单 路由
 /// </summary>
 public class RouteOrder : AbstractSimpleShardingMonthKeyDateTimeVirtualTableRoute<Order>
 {

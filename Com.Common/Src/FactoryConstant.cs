@@ -89,17 +89,20 @@ public class FactoryConstant
         }
         try
         {
-            string? dbConnection = config.GetConnectionString("Mssql");
             DbContextEF? db = provider.GetService<DbContextEF>();
             if (db != null)
             {
                 this.db = db;
             }
-            else if (!string.IsNullOrWhiteSpace(dbConnection))
+            else
             {
-                var options = new DbContextOptionsBuilder<DbContextEF>().UseSqlServer(dbConnection).Options;
-                var factorydb = new PooledDbContextFactory<DbContextEF>(options);
-                this.db = factorydb.CreateDbContext();
+                string? dbConnection = config.GetConnectionString("Mssql");
+                if (!string.IsNullOrWhiteSpace(dbConnection))
+                {
+                    var options = new DbContextOptionsBuilder<DbContextEF>().UseSqlServer(dbConnection).Options;
+                    var factorydb = new PooledDbContextFactory<DbContextEF>(options);
+                    this.db = factorydb.CreateDbContext();
+                }
             }
         }
         catch (Exception ex)

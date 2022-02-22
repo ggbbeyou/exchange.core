@@ -101,8 +101,8 @@ public class KilneHelper
                           low = g.Min(P => P.price),
                           high = g.Max(P => P.price),
                           type = klineType,
-                          time_start = DateTimeOffset.FromUnixTimeSeconds(g.Key * minutes),
-                          time_end = DateTimeOffset.FromUnixTimeSeconds(g.Key * minutes).AddMinutes(minutes),
+                          //   time_start = DateTimeOffset.FromUnixTimeSeconds(g.Key * minutes),
+                          //   time_end = DateTimeOffset.FromUnixTimeSeconds(g.Key * minutes).AddMinutes(minutes),
                           time = DateTimeOffset.UtcNow,
                       };
             result = sql.ToList();

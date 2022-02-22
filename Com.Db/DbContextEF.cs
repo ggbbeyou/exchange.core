@@ -22,7 +22,7 @@ public class DbContextEF : AbstractShardingDbContext, IShardingTableDbContext
     /// K线
     /// </summary>
     /// <value></value>
-    public DbSet<Kline> Kline { get; set; } = null!;
+    // public DbSet<Kline> Kline { get; set; } = null!;
     /// <summary>
     /// K线
     /// </summary>

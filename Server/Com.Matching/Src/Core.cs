@@ -169,9 +169,9 @@ public class Core
     /// </summary>
     /// <param name="order">挂单订单(手续费问题在推送到撮合之前扣除)</param>
     /// <returns>成交情况</returns>
-    public List<BaseDeal> Match(BaseOrder order)
+    public List<Dealing> Match(BaseOrder order)
     {
-        List<BaseDeal> deals = new List<BaseDeal>();
+        List<Dealing> deals = new List<Dealing>();
         if (order.market != this.market || order.amount <= 0 || order.amount_unsold <= 0)
         {
             return deals;
@@ -187,7 +187,7 @@ public class Core
                 {
                     if (market_ask[i].amount_unsold >= order.amount_unsold)
                     {
-                        BaseDeal deal = Util.AmountAskBid(this.market, order, market_ask[i], this.price_last, E_OrderSide.buy, now);
+                        Dealing deal = Util.AmountAskBid(this.market, order, market_ask[i], this.price_last, E_OrderSide.buy, now);
                         deals.Add(deal);
                         if (market_ask[i].amount_unsold == order.amount_unsold)
                         {
@@ -197,7 +197,7 @@ public class Core
                     }
                     else if (market_ask[i].amount_unsold < order.amount_unsold)
                     {
-                        BaseDeal deal = Util.AmountBidAsk(this.market, order, market_ask[i], this.price_last, E_OrderSide.buy, now);
+                        Dealing deal = Util.AmountBidAsk(this.market, order, market_ask[i], this.price_last, E_OrderSide.buy, now);
                         deals.Add(deal);
                         //市价卖单完成,从市价卖单移除
                         market_ask.Remove(market_ask[i]);
@@ -221,7 +221,7 @@ public class Core
                         }
                         if (fixed_ask[i].amount_unsold >= order.amount_unsold)
                         {
-                            BaseDeal deal = Util.AmountAskBid(this.market, order, fixed_ask[i], this.price_last, E_OrderSide.buy, now);
+                            Dealing deal = Util.AmountAskBid(this.market, order, fixed_ask[i], this.price_last, E_OrderSide.buy, now);
                             deals.Add(deal);
                             if (fixed_ask[i].amount_unsold == order.amount_unsold)
                             {
@@ -231,7 +231,7 @@ public class Core
                         }
                         else if (fixed_ask[i].amount_unsold < order.amount_unsold)
                         {
-                            BaseDeal deal = Util.AmountBidAsk(this.market, order, fixed_ask[i], this.price_last, E_OrderSide.buy, now);
+                            Dealing deal = Util.AmountBidAsk(this.market, order, fixed_ask[i], this.price_last, E_OrderSide.buy, now);
                             deals.Add(deal);
                             //市价卖单完成,从市价卖单移除
                             fixed_ask.Remove(fixed_ask[i]);
@@ -257,7 +257,7 @@ public class Core
                 {
                     if (market_ask[i].amount_unsold >= order.amount_unsold)
                     {
-                        BaseDeal deal = Util.AmountAskBid(this.market, order, market_ask[i], order.price, E_OrderSide.buy, now);
+                        Dealing deal = Util.AmountAskBid(this.market, order, market_ask[i], order.price, E_OrderSide.buy, now);
                         deals.Add(deal);
                         if (market_ask[i].amount_unsold == order.amount_unsold)
                         {
@@ -267,7 +267,7 @@ public class Core
                     }
                     else if (market_ask[i].amount_unsold < order.amount_unsold)
                     {
-                        BaseDeal deal = Util.AmountBidAsk(this.market, order, market_ask[i], order.price, E_OrderSide.buy, now);
+                        Dealing deal = Util.AmountBidAsk(this.market, order, market_ask[i], order.price, E_OrderSide.buy, now);
                         deals.Add(deal);
                         //市价卖单完成,从市价卖单移除
                         market_ask.Remove(market_ask[i]);
@@ -291,7 +291,7 @@ public class Core
                         }
                         if (fixed_ask[i].amount_unsold >= order.amount_unsold)
                         {
-                            BaseDeal deal = Util.AmountAskBid(this.market, order, fixed_ask[i], new_price, E_OrderSide.buy, now);
+                            Dealing deal = Util.AmountAskBid(this.market, order, fixed_ask[i], new_price, E_OrderSide.buy, now);
                             deals.Add(deal);
                             if (fixed_ask[i].amount_unsold == order.amount_unsold)
                             {
@@ -301,7 +301,7 @@ public class Core
                         }
                         else if (fixed_ask[i].amount_unsold < order.amount_unsold)
                         {
-                            BaseDeal deal = Util.AmountBidAsk(this.market, order, fixed_ask[i], new_price, E_OrderSide.buy, now);
+                            Dealing deal = Util.AmountBidAsk(this.market, order, fixed_ask[i], new_price, E_OrderSide.buy, now);
                             deals.Add(deal);
                             //市价卖单完成,从市价卖单移除
                             fixed_ask.Remove(fixed_ask[i]);
@@ -346,7 +346,7 @@ public class Core
                 {
                     if (market_bid[i].amount_unsold >= order.amount_unsold)
                     {
-                        BaseDeal deal = Util.AmountBidAsk(this.market, market_bid[i], order, this.price_last, E_OrderSide.sell, now);
+                        Dealing deal = Util.AmountBidAsk(this.market, market_bid[i], order, this.price_last, E_OrderSide.sell, now);
                         deals.Add(deal);
                         if (deal.bid.state == E_OrderState.completed)
                         {
@@ -356,7 +356,7 @@ public class Core
                     }
                     else if (market_bid[i].amount_unsold < order.amount_unsold)
                     {
-                        BaseDeal deal = Util.AmountAskBid(this.market, market_bid[i], order, this.price_last, E_OrderSide.sell, now);
+                        Dealing deal = Util.AmountAskBid(this.market, market_bid[i], order, this.price_last, E_OrderSide.sell, now);
                         deals.Add(deal);
                         //市价买单完成,从市价买单移除
                         market_bid.Remove(market_bid[i]);
@@ -380,7 +380,7 @@ public class Core
                         }
                         if (fixed_bid[i].amount_unsold >= order.amount_unsold)
                         {
-                            BaseDeal deal = Util.AmountBidAsk(this.market, fixed_bid[i], order, new_price, E_OrderSide.sell, now);
+                            Dealing deal = Util.AmountBidAsk(this.market, fixed_bid[i], order, new_price, E_OrderSide.sell, now);
                             deals.Add(deal);
                             if (fixed_bid[i].amount_unsold == order.amount_unsold)
                             {
@@ -390,7 +390,7 @@ public class Core
                         }
                         else if (fixed_bid[i].amount_unsold < order.amount_unsold)
                         {
-                            BaseDeal deal = Util.AmountAskBid(this.market, fixed_bid[i], order, new_price, E_OrderSide.sell, now);
+                            Dealing deal = Util.AmountAskBid(this.market, fixed_bid[i], order, new_price, E_OrderSide.sell, now);
                             deals.Add(deal);
                             //市价买单完成,从市价买单移除
                             fixed_bid.Remove(fixed_bid[i]);
@@ -416,7 +416,7 @@ public class Core
                 {
                     if (market_bid[i].amount_unsold >= order.amount_unsold)
                     {
-                        BaseDeal deal = Util.AmountBidAsk(this.market, order, market_bid[i], order.price, E_OrderSide.sell, now);
+                        Dealing deal = Util.AmountBidAsk(this.market, order, market_bid[i], order.price, E_OrderSide.sell, now);
                         deals.Add(deal);
                         if (deal.bid.state == E_OrderState.completed)
                         {
@@ -426,7 +426,7 @@ public class Core
                     }
                     else if (market_bid[i].amount_unsold < order.amount_unsold)
                     {
-                        BaseDeal deal = Util.AmountAskBid(this.market, market_bid[i], order, order.price, E_OrderSide.sell, now);
+                        Dealing deal = Util.AmountAskBid(this.market, market_bid[i], order, order.price, E_OrderSide.sell, now);
                         deals.Add(deal);
                         //市价买单完成,从市价买单移除
                         market_bid.Remove(market_bid[i]);
@@ -450,7 +450,7 @@ public class Core
                         }
                         if (fixed_bid[i].amount_unsold >= order.amount_unsold)
                         {
-                            BaseDeal deal = Util.AmountBidAsk(this.market, fixed_bid[i], order, new_price, E_OrderSide.sell, now);
+                            Dealing deal = Util.AmountBidAsk(this.market, fixed_bid[i], order, new_price, E_OrderSide.sell, now);
                             deals.Add(deal);
                             if (deal.bid.state == E_OrderState.completed)
                             {
@@ -460,7 +460,7 @@ public class Core
                         }
                         else if (fixed_bid[i].amount_unsold < order.amount_unsold)
                         {
-                            BaseDeal deal = Util.AmountAskBid(this.market, fixed_bid[i], order, new_price, E_OrderSide.sell, now);
+                            Dealing deal = Util.AmountAskBid(this.market, fixed_bid[i], order, new_price, E_OrderSide.sell, now);
                             deals.Add(deal);
                             //市价买单完成,从市价买单移除
                             fixed_bid.Remove(fixed_bid[i]);

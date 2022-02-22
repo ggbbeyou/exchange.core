@@ -163,11 +163,11 @@ public class Core
             {
                 string json = Encoding.UTF8.GetString(ea.Body.ToArray());
                 this.constant.logger.LogInformation($"接收撮合传过来的成交订单:{json}");
-                List<BaseDeal>? deals = JsonConvert.DeserializeObject<List<BaseDeal>>(json);
+                List<Dealing>? deals = JsonConvert.DeserializeObject<List<Dealing>>(json);
                 if (deals != null)
                 {
-                    BaseDeal deal = deals.FirstOrDefault();
-                    BaseOrder order = deal.trigger_side == E_OrderSide.buy ? deal.bid : deal.ask;
+                    Dealing? deal = deals.FirstOrDefault();
+                    BaseOrder order = deal!.trigger_side == E_OrderSide.buy ? deal.bid : deal.ask;
                     List<BaseOrderBook> orderBooks = GetOrderBooks(order, deals);
                     // this.mq.SendOrderBook(orderBooks);
                     BaseKline? kline = SetKlink(deals);
@@ -227,7 +227,7 @@ public class Core
     /// <param name="order">订单</param>
     /// <param name="deals">成交记录</param>
     /// <returns>变更的orderbook</returns>
-    public List<BaseOrderBook> GetOrderBooks(BaseOrder order, List<BaseDeal> deals)
+    public List<BaseOrderBook> GetOrderBooks(BaseOrder order, List<Dealing> deals)
     {
         List<BaseOrderBook> orderBooks = new List<BaseOrderBook>();
         if (order == null || deals == null || deals.Count == 0)
@@ -381,16 +381,16 @@ public class Core
     /// </summary>
     /// <param name="deals">成交记录</param>
     /// <returns>当前一分钟K线</returns>
-    public BaseKline? SetKlink(List<BaseDeal> deals)
+    public BaseKline? SetKlink(List<Dealing> deals)
     {
         if (deals == null || deals.Count == 0)
         {
             return null;
         }
-        IEnumerable<IGrouping<double, BaseDeal>> deals_minutes = deals.GroupBy(P => (DateTimeOffset.UtcNow - P.time).TotalMinutes);
+        IEnumerable<IGrouping<double, Dealing>> deals_minutes = deals.GroupBy(P => (DateTimeOffset.UtcNow - P.time).TotalMinutes);
         foreach (var item in deals_minutes)
         {
-            List<BaseDeal> deal = item.ToList();
+            List<Dealing> deal = item.ToList();
             if (deal == null || deal.Count == 0)
             {
                 return null;

@@ -99,7 +99,7 @@ public class MQ
                     foreach (var item in order)
                     {
                         this.mutex.WaitOne();
-                        List<BaseDeal> deals = this.core.Match(item);
+                        List<Dealing> deals = this.core.Match(item);
                         if (deals != null && deals.Count > 0)
                         {
                             FactoryMatching.instance.constant.i_model.BasicPublish(exchange: this.key_deal, routingKey: this.core.market, basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(deals)));

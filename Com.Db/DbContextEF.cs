@@ -1,15 +1,17 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using ShardingCore.Core.VirtualRoutes.TableRoutes.RouteTails.Abstractions;
+using ShardingCore.Sharding;
+using ShardingCore.Sharding.Abstractions;
 
 namespace Com.Db;
 
 /// <summary>
 /// DB上下文
 /// </summary>
-public class DbContextEF : DbContext
+public class DbContextEF : AbstractShardingDbContext, IShardingTableDbContext
 {
-
     /// <summary>
     /// 构造函数
     /// </summary>
@@ -19,13 +21,7 @@ public class DbContextEF : DbContext
 
     }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        // if (!string.IsNullOrWhiteSpace(connectionString))
-        // {
-        // optionsBuilder.UseMySQL("server=192.168.0.37;port=3306;database=exchange;user=root;password=Abcd@123456;pooling=true;CharSet=utf8mb4;");
-        // }
-    }
+
 
     /// <summary>
     /// K线
@@ -38,5 +34,27 @@ public class DbContextEF : DbContext
     /// <value></value>
     public DbSet<Deal> Deal { get; set; } = null!;
 
+    public IRouteTail RouteTail { get; set; } = null!;
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+
+    }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.Entity<Deal>(o =>
+        {
+            o.HasKey(p => p.trade_id);
+            o.Property(p => p.trade_id).IsRequired().HasMaxLength(40).HasComment("交易ID");
+            // o.Property(p => p.Payer).IsRequired().HasMaxLength(50).HasComment("付款用户名");
+            // o.Property(p => p.Money).HasComment("付款金额分");
+            // o.Property(p => p.CreateTime).HasComment("创建时间");
+            // o.Property(p => p.IsDelete).HasComment("是否已删除");
+            // o.HasQueryFilter(p => p.IsDelete == false);
+            o.ToTable(nameof(Deal));
+        });
+    }
 }
 

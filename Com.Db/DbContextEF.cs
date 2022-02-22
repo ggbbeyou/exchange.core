@@ -48,6 +48,7 @@ public class DbContextEF : AbstractShardingDbContext, IShardingTableDbContext
         modelBuilder.Entity<Order>(o =>
         {
             o.HasKey(p => p.order_id);
+            o.HasIndex(P => new { P.uid });
             o.HasIndex(P => new { P.create_time });
             o.Property(P => P.order_id).IsRequired().HasColumnType("bigint").HasComment("订单ID");
             o.Property(P => P.client_id).HasColumnType("nvarchar").HasMaxLength(50).HasComment("客户自定义订单id");
@@ -56,7 +57,7 @@ public class DbContextEF : AbstractShardingDbContext, IShardingTableDbContext
             o.Property(P => P.price).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("成交价");
             o.Property(P => P.amount).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("成交量");
             o.Property(P => P.total).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("成交总额");
-            o.Property(P => P.create_time).IsRequired().HasColumnType("datetimeoffset").HasComment("成交时间");
+            o.Property(P => P.create_time).IsRequired().HasColumnType("datetimeoffset").HasComment("挂单时间");
             o.Property(P => P.amount_unsold).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("未成交量");
             o.Property(P => P.amount_done).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("已成交挂单量");
             o.Property(P => P.deal_last_time).HasColumnType("datetimeoffset").HasComment("最后成交时间");

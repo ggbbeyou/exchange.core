@@ -36,7 +36,6 @@ public class KilneHelper
     public List<BaseKline> GetKlines(string market, E_KlineType klineType, DateTimeOffset start, DateTimeOffset end)
     {
         List<BaseKline> result = new List<BaseKline>();
-        // MySql.EntityFrameworkCore.Extensions.MySQLDbFunctionsExtensions.DateDiffDay(null, null, null);
         int minutes = 0;
         switch (klineType)
         {
@@ -87,9 +86,9 @@ public class KilneHelper
         }
         else if (klineType == E_KlineType.week1)
         {
-            EF.Functions.Random();
+            DateTimeOffset init = new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero);
             var sql = from deal in this.constant.db.Deal.Where(P => P.market == market && start <= P.time && P.time < end).OrderBy(P => P.timestamp)
-                      group deal by deal.time.DayOfWeek into g
+                      group deal by EF.Functions.DateDiffWeek(init, deal.time) into g
                       select new BaseKline
                       {
                           market = market,
@@ -101,15 +100,33 @@ public class KilneHelper
                           low = g.Min(P => P.price),
                           high = g.Max(P => P.price),
                           type = klineType,
-                          //   time_start = DateTimeOffset.FromUnixTimeSeconds(g.Key * minutes),
-                          //   time_end = DateTimeOffset.FromUnixTimeSeconds(g.Key * minutes).AddMinutes(minutes),
+                          time_start = DateTimeOffset.FromUnixTimeSeconds(g.Key * 7 * 24 * 60 * 60),
+                          time_end = DateTimeOffset.FromUnixTimeSeconds(g.Key * 13 * 24 * 60 * 60).AddMinutes(minutes),
                           time = DateTimeOffset.UtcNow,
                       };
             result = sql.ToList();
         }
         else if (klineType == E_KlineType.month1)
         {
-
+            DateTimeOffset init = new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero);
+            var sql = from deal in this.constant.db.Deal.Where(P => P.market == market && start <= P.time && P.time < end).OrderBy(P => P.timestamp)
+                      group deal by EF.Functions.DateDiffMonth(init, deal.time) into g
+                      select new BaseKline
+                      {
+                          market = market,
+                          amount = g.Sum(P => P.amount),
+                          count = g.Count(),
+                          total = g.Sum(P => P.price * P.amount),
+                          open = g.First().price,
+                          close = g.Last().price,
+                          low = g.Min(P => P.price),
+                          high = g.Max(P => P.price),
+                          type = klineType,
+                          time_start = DateTimeOffset.FromUnixTimeSeconds(g.Key * 7 * 24 * 60 * 60),
+                          time_end = DateTimeOffset.FromUnixTimeSeconds(g.Key * 13 * 24 * 60 * 60).AddMinutes(minutes),
+                          time = DateTimeOffset.UtcNow,
+                      };
+            result = sql.ToList();
         }
 
         return result;

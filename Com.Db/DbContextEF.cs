@@ -12,6 +12,10 @@ namespace Com.Db;
 /// </summary>
 public class DbContextEF : AbstractShardingDbContext, IShardingTableDbContext
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <value></value>
     public IRouteTail RouteTail { get; set; } = null!;
 
     /// <summary>
@@ -34,11 +38,10 @@ public class DbContextEF : AbstractShardingDbContext, IShardingTableDbContext
 
     }
 
-    // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    // {
-
-    // }
-
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="modelBuilder"></param>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

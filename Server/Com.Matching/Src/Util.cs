@@ -80,7 +80,9 @@ public static class Util
             trigger_side = trigger_side,
             time = now,
             bid = bid,
+            bid_id = bid.order_id,
             ask = ask,
+            ask_id = ask.order_id
         };
         return deal;
     }
@@ -123,7 +125,9 @@ public static class Util
             trigger_side = trigger_side,
             time = now,
             bid = bid,
+            bid_id = bid.order_id,
             ask = ask,
+            ask_id = ask.order_id
         };
         return deal;
     }

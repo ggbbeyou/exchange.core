@@ -70,7 +70,7 @@ namespace Com.Matching
                 }
                 BaseOrder order = new BaseOrder()
                 {
-                    order_id = i.ToString(),
+                    order_id = i,
                     market = this.name,
                     uid = i.ToString(),
                     price = price,

@@ -12,7 +12,7 @@ public class BaseOrder
     /// 订单id
     /// </summary>
     /// <value></value>
-    public string order_id { get; set; } = null!;
+    public long order_id { get; set; }
     /// <summary>
     /// 客户自定义订单id
     /// </summary>

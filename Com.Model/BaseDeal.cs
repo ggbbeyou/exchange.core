@@ -39,6 +39,16 @@ public class BaseDeal
     /// <value></value>
     public E_OrderSide trigger_side { get; set; }
     /// <summary>
+    /// 
+    /// </summary>
+    /// <value></value>
+    public long bid_id { get; set; }
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <value></value>
+    public long ask_id { get; set; }
+    /// <summary>
     /// 成交时间
     /// </summary>
     /// <value></value>

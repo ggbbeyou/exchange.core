@@ -131,7 +131,7 @@ public class MQ
             }
             else
             {
-                List<string>? order = JsonConvert.DeserializeObject<List<string>>(Encoding.UTF8.GetString(ea.Body.ToArray()));
+                List<long>? order = JsonConvert.DeserializeObject<List<long>>(Encoding.UTF8.GetString(ea.Body.ToArray()));
                 if (order != null)
                 {
                     this.mutex.WaitOne();

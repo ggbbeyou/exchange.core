@@ -145,7 +145,7 @@ public class Core
     /// </summary>
     /// <param name="order_id">订单ID</param>
     /// <returns>orderbook变更</returns>
-    public List<BaseOrder> CancelOrder(List<string> order_id)
+    public List<BaseOrder> CancelOrder(List<long> order_id)
     {
         List<BaseOrder> cancel_market_bid = this.market_bid.Where(P => order_id.Contains(P.order_id)).ToList();
         this.market_bid.RemoveAll(P => cancel_market_bid.Select(P => P.order_id).Contains(P.order_id));

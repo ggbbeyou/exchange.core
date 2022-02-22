@@ -65,7 +65,7 @@ public class KilneHelper
         }
         if (minutes > 0)
         {
-            var sql = from deal in this.constant.db.Deal.Where(P => P.market == market && start <= P.time && P.time < end).OrderBy(P => P.timestamp)
+            var sql = from deal in this.constant.db.Deal.OrderBy(P => P.timestamp).Where(P => P.market == market && start <= P.time && P.time < end)
                       group deal by deal.timestamp / minutes into g
                       select new BaseKline
                       {
@@ -73,8 +73,8 @@ public class KilneHelper
                           amount = g.Sum(P => P.amount),
                           count = g.Count(),
                           total = g.Sum(P => P.price * P.amount),
-                          open = g.First().price,
-                          close = g.Last().price,
+                        //   open = g.First().price,
+                        //   close = g.Last().price,
                           low = g.Min(P => P.price),
                           high = g.Max(P => P.price),
                           type = klineType,
@@ -87,7 +87,7 @@ public class KilneHelper
         else if (klineType == E_KlineType.week1)
         {
             DateTimeOffset init = new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero);
-            var sql = from deal in this.constant.db.Deal.Where(P => P.market == market && start <= P.time && P.time < end).OrderBy(P => P.timestamp)
+            var sql = from deal in this.constant.db.Deal.OrderBy(P => P.timestamp).Where(P => P.market == market && start <= P.time && P.time < end)
                       group deal by EF.Functions.DateDiffWeek(init, deal.time) into g
                       select new BaseKline
                       {
@@ -109,7 +109,7 @@ public class KilneHelper
         else if (klineType == E_KlineType.month1)
         {
             DateTimeOffset init = new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero);
-            var sql = from deal in this.constant.db.Deal.Where(P => P.market == market && start <= P.time && P.time < end).OrderBy(P => P.timestamp)
+            var sql = from deal in this.constant.db.Deal.OrderBy(P => P.timestamp).Where(P => P.market == market && start <= P.time && P.time < end)
                       group deal by EF.Functions.DateDiffMonth(init, deal.time) into g
                       select new BaseKline
                       {

@@ -32,13 +32,7 @@ public class BaseDeal
     /// 成交总额
     /// </summary>
     /// <value></value>
-    public decimal total
-    {
-        get
-        {
-            return price * amount;
-        }
-    }
+    public decimal total { get; set; }
     /// <summary>
     /// 成交触发方向
     /// </summary>

@@ -69,7 +69,7 @@ class Program
                     }).AddConfig(op =>
                     {
                         op.ConfigId = "c1";
-                        op.AddDefaultDataSource(Guid.NewGuid().ToString("n"), "server=192.168.0.37;database=EFCoreShardingDB;uid=sa;pwd=Abcd@123456;pooling=true;min pool size=1;max pool size=2;");
+                        op.AddDefaultDataSource(Guid.NewGuid().ToString("n"), hostContext.Configuration.GetConnectionString("Mssql"));
                     }).EnsureConfig();
             var buildServiceProvider = services.BuildServiceProvider();
             //启动必备

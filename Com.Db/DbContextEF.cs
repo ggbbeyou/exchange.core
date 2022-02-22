@@ -53,7 +53,7 @@ public class DbContextEF : AbstractShardingDbContext, IShardingTableDbContext
             o.Property(P => P.trade_id).IsRequired().HasColumnType("bigint").HasComment("成交订单ID");
             o.Property(P => P.market).IsRequired().HasColumnType("nvarchar").HasMaxLength(50).HasComment("交易对");
             o.Property(P => P.price).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("成交价");
-            o.Property(P => P.amount).IsRequired().HasColumnType("amount").HasPrecision(28, 16).HasComment("成交量");
+            o.Property(P => P.amount).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("成交量");
             o.Property(P => P.total).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("成交总额");
             o.Property(P => P.trigger_side).IsRequired().HasColumnType("tinyint").HasComment("成交触发方向");
             o.Property(P => P.bid_id).IsRequired().HasColumnType("bigint").HasComment("买单id");

@@ -66,6 +66,8 @@ class Program
                             builder.UseSqlServer(conn);
                         });
                         op.AddShardingTableRoute<RouteDeal>();
+                        op.AddShardingTableRoute<RouteOrder>();
+                        op.AddShardingTableRoute<RouteKline>();
                     }).AddConfig(op =>
                     {
                         op.ConfigId = "c1";

@@ -43,5 +43,5 @@ public class BaseDeal
     /// </summary>
     /// <value></value>
     public DateTimeOffset time { get; set; }
-    
+
 }

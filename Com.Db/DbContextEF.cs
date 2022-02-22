@@ -12,16 +12,7 @@ namespace Com.Db;
 /// </summary>
 public class DbContextEF : AbstractShardingDbContext, IShardingTableDbContext
 {
-    /// <summary>
-    /// 构造函数
-    /// </summary>
-    /// <param name="options"></param>
-    public DbContextEF(DbContextOptions<DbContextEF> options) : base(options)
-    {
-
-    }
-
-
+    public IRouteTail RouteTail { get; set; } = null!;
 
     /// <summary>
     /// K线
@@ -34,7 +25,14 @@ public class DbContextEF : AbstractShardingDbContext, IShardingTableDbContext
     /// <value></value>
     public DbSet<Deal> Deal { get; set; } = null!;
 
-    public IRouteTail RouteTail { get; set; } = null!;
+    /// <summary>
+    /// 构造函数
+    /// </summary>
+    /// <param name="options"></param>
+    public DbContextEF(DbContextOptions<DbContextEF> options) : base(options)
+    {
+
+    }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

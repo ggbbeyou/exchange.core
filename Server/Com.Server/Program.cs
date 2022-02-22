@@ -1,7 +1,11 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Com.Db;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using ShardingCore;
+using ShardingCore.Bootstrapers;
 
 namespace Com.Server;
 
@@ -21,15 +25,55 @@ class Program
         await host.RunAsync();
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="args"></param>
-    /// <returns></returns>
+    /*
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+            .ConfigureServices((hostContext, services) =>
+            {
+                services.AddHostedService<MainService>();
+            })
+            .ConfigureLogging(logging =>
+            {
+                logging.ClearProviders();
+
+                logging.AddConsole();
+
+            });
+            */
+
+
     static IHostBuilder CreateHostBuilder(string[] args) =>
         Host.CreateDefaultBuilder(args)
         .ConfigureServices((hostContext, services) =>
         {
+            services.AddDbContext<DbContextEF>(DIExtension.UseDefaultSharding<DbContextEF>);
+            services.AddShardingConfigure<DbContextEF>()
+                    .AddEntityConfig(op =>
+                    {
+                        op.CreateShardingTableOnStart = true;
+                        op.EnsureCreatedWithOutShardingTable = true;
+                        op.UseShardingQuery((conn, builder) =>
+                        {
+                            builder.UseSqlServer(conn);
+                        });
+                        op.UseShardingTransaction((conn, builder) =>
+                        {
+                            builder.UseSqlServer(conn);
+                        });
+                        op.AddShardingTableRoute<DealRoute>();
+                    }).AddConfig(op =>
+                    {
+                        op.ConfigId = "c1";
+                        op.AddDefaultDataSource(Guid.NewGuid().ToString("n"), "server=192.168.0.37;database=EFCoreShardingDB;uid=sa;pwd=Abcd@123456;pooling=true;min pool size=1;max pool size=2;");
+                    }).EnsureConfig();
+            var buildServiceProvider = services.BuildServiceProvider();
+            //启动必备
+            buildServiceProvider.GetRequiredService<IShardingBootstrapper>().Start();
             services.AddHostedService<MainService>();
         })
         .ConfigureLogging(logging =>
@@ -39,4 +83,5 @@ class Program
             logging.AddConsole();
 #endif
         });
+
 }

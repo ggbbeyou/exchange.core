@@ -88,7 +88,7 @@ public class FactoryConstant
         }
         try
         {
-            string? dbConnection = config.GetConnectionString("Mysql");
+            string? dbConnection = config.GetConnectionString("Mssql");
             if (!string.IsNullOrWhiteSpace(dbConnection))
             {
                 var options = new DbContextOptionsBuilder<DbContextEF>().UseSqlServer(dbConnection).Options;

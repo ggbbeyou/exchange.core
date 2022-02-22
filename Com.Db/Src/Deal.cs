@@ -9,5 +9,9 @@ namespace Com.Db;
 /// </summary>
 public class Deal : BaseDeal
 {
-
+    /// <summary>
+    /// 时间戳(分钟)
+    /// </summary>
+    /// <value></value>
+    public long timestamp { get; set; }
 }

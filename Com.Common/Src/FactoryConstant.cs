@@ -35,6 +35,7 @@ public class FactoryConstant
     /// </summary>
     /// <returns></returns>
     public readonly IdWorker worker = new IdWorker(1, 1);
+    public readonly IServiceProvider provider = null!;
     /// <summary>
     /// 数据库
     /// </summary>
@@ -59,11 +60,13 @@ public class FactoryConstant
     /// <summary>
     /// 初始化
     /// </summary>    
+    /// <param name="provider">驱动接口</param>
     /// <param name="config">配置接口</param>
     /// <param name="environment">环境接口</param>
     /// <param name="logger">日志接口</param>
-    public FactoryConstant(IConfiguration config, IHostEnvironment environment, ILogger logger)
+    public FactoryConstant(IServiceProvider provider, IConfiguration config, IHostEnvironment environment, ILogger logger)
     {
+        this.provider = provider;
         this.config = config;
         this.environment = environment;
         this.logger = logger ?? NullLogger.Instance;

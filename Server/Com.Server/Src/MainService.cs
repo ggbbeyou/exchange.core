@@ -23,9 +23,9 @@ namespace Com.Server
         /// <param name="environment"></param>
         /// <param name="provider"></param>
         /// <param name="logger"></param>
-        public MainService(IConfiguration configuration, IHostEnvironment environment, IServiceProvider provider, ILogger<MainService> logger)
+        public MainService(IServiceProvider provider, IConfiguration configuration, IHostEnvironment environment, ILogger<MainService> logger)
         {
-            this.constant = new FactoryConstant(configuration, environment, logger);
+            this.constant = new FactoryConstant(provider, configuration, environment, logger);
         }
 
         /// <summary>

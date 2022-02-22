@@ -27,9 +27,9 @@ namespace Com.Api
         /// <param name="configuration">配置接口</param>
         /// <param name="environment">环境接口</param>
         /// <param name="logger">日志接口</param>
-        public MainService(IConfiguration configuration, IHostEnvironment environment, ILogger<MainService> logger)
+        public MainService(IServiceProvider provider,IConfiguration configuration, IHostEnvironment environment, ILogger<MainService> logger)
         {
-            this.constant = new FactoryConstant(configuration, environment, logger ?? NullLogger<MainService>.Instance);
+            this.constant = new FactoryConstant(provider, configuration, environment, logger ?? NullLogger<MainService>.Instance);
         }
 
         /// <summary>

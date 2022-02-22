@@ -10,21 +10,6 @@ namespace Com.Db;
 public class DbContextEF : DbContext
 {
 
-    // private readonly string? connectionString;
-
-    /// <summary>
-    /// 构造函数
-    /// </summary>
-    // public DbContextEF()
-    // {
-    //     this.Database.SetCommandTimeout(1000 * 10);
-    // }
-
-    // public DbContextEF(string connectionString)
-    // {
-    //     this.connectionString = connectionString;
-    // }
-
     /// <summary>
     /// 构造函数
     /// </summary>

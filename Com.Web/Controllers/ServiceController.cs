@@ -21,9 +21,9 @@ public class ServiceController : Controller
     /// <param name="configuration"></param>
     /// <param name="environment"></param>
     /// <param name="logger"></param>
-    public ServiceController(IConfiguration configuration, IHostEnvironment environment, ILogger<ServiceController> logger)
+    public ServiceController(IServiceProvider provider, IConfiguration configuration, IHostEnvironment environment, ILogger<ServiceController> logger)
     {
-        this.constant = new FactoryConstant(configuration, environment, logger ?? NullLogger<ServiceController>.Instance);
+        this.constant = new FactoryConstant(provider, configuration, environment, logger ?? NullLogger<ServiceController>.Instance);
     }
 
     public IActionResult Index()

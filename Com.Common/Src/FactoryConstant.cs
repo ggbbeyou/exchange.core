@@ -35,6 +35,9 @@ public class FactoryConstant
     /// </summary>
     /// <returns></returns>
     public readonly IdWorker worker = new IdWorker(1, 1);
+    /// <summary>
+    /// 驱动接口
+    /// </summary>
     public readonly IServiceProvider provider = null!;
     /// <summary>
     /// 数据库

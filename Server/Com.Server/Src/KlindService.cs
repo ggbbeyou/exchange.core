@@ -18,9 +18,6 @@ using StackExchange.Redis;
 namespace Com.Server;
 
 /*
-redis key
-kline/name/E_KlineType
-
 
 
 */

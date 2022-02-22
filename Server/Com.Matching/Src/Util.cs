@@ -72,7 +72,7 @@ public static class Util
         }
         Dealing deal = new Dealing()
         {
-            trade_id = FactoryMatching.instance.constant.worker.NextId().ToString(),
+            trade_id = FactoryMatching.instance.constant.worker.NextId(),
             market = market,
             price = price,
             amount = ask_amount,
@@ -115,7 +115,7 @@ public static class Util
         bid.state = E_OrderState.completed;
         Dealing deal = new Dealing()
         {
-            trade_id = FactoryMatching.instance.constant.worker.NextId().ToString(),
+            trade_id = FactoryMatching.instance.constant.worker.NextId(),
             market = market,
             price = price,
             amount = bid_amount,

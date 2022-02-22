@@ -12,7 +12,7 @@ public class BaseDeal
     /// 成交id
     /// </summary>
     /// <value></value>
-    public string trade_id { get; set; } = null!;
+    public long trade_id { get; set; }
     /// <summary>
     /// 交易对
     /// </summary>

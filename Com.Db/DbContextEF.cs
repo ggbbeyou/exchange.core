@@ -48,9 +48,9 @@ public class DbContextEF : AbstractShardingDbContext, IShardingTableDbContext
         modelBuilder.Entity<Kline>(o =>
         {
             o.HasKey(p => p.id);
-            o.HasIndex(P => new { P.type,P.time_start ,P.time_end});
+            o.HasIndex(P => new { P.market, P.type, P.time_start, P.time_end });
             // o.HasIndex(P => new { P.create_time });
-            o.Property(P => P.id).IsRequired().HasColumnType("bigint").HasComment("K线ID");            
+            o.Property(P => P.id).IsRequired().HasColumnType("bigint").HasComment("K线ID");
             o.Property(P => P.market).IsRequired().HasColumnType("nvarchar").HasMaxLength(50).HasComment("交易对");
             o.Property(P => P.amount).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("成交量");
             o.Property(P => P.count).IsRequired().HasColumnType("bigint").HasComment("成交笔数");
@@ -62,7 +62,7 @@ public class DbContextEF : AbstractShardingDbContext, IShardingTableDbContext
             o.Property(P => P.type).IsRequired().HasColumnType("tinyint").HasComment("K线类型");
             o.Property(P => P.time_start).IsRequired().HasColumnType("datetimeoffset").HasComment("变更开始时间");
             o.Property(P => P.time_end).IsRequired().HasColumnType("datetimeoffset").HasComment("变更开始时间");
-            o.Property(P => P.time).IsRequired().HasColumnType("datetimeoffset").HasComment("更新时间");           
+            o.Property(P => P.time).IsRequired().HasColumnType("datetimeoffset").HasComment("更新时间");
             o.ToTable(nameof(Kline));
         });
         modelBuilder.Entity<Order>(o =>

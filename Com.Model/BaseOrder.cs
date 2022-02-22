@@ -27,7 +27,7 @@ public class BaseOrder
     /// 用户ID
     /// </summary>
     /// <value></value>
-    public string uid { get; set; } = null!;
+    public long uid { get; set; }
     /// <summary>
     /// 挂单价
     /// </summary>
@@ -82,6 +82,6 @@ public class BaseOrder
     /// 附加数据
     /// </summary>
     /// <value></value>
-    public string data { get; set; } = null!;
+    public string? data { get; set; } 
 
 }

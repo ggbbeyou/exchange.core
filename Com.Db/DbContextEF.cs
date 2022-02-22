@@ -45,6 +45,27 @@ public class DbContextEF : AbstractShardingDbContext, IShardingTableDbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        modelBuilder.Entity<Order>(o =>
+        {
+            o.HasKey(p => p.order_id);
+            o.HasIndex(P => new { P.create_time });
+            o.Property(P => P.order_id).IsRequired().HasColumnType("bigint").HasComment("订单ID");
+            o.Property(P => P.client_id).HasColumnType("nvarchar").HasMaxLength(50).HasComment("客户自定义订单id");
+            o.Property(P => P.market).IsRequired().HasColumnType("nvarchar").HasMaxLength(50).HasComment("交易对");
+            o.Property(P => P.uid).IsRequired().HasColumnType("bigint").HasComment("用户ID");
+            o.Property(P => P.price).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("成交价");
+            o.Property(P => P.amount).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("成交量");
+            o.Property(P => P.total).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("成交总额");
+            o.Property(P => P.create_time).IsRequired().HasColumnType("datetimeoffset").HasComment("成交时间");
+            o.Property(P => P.amount_unsold).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("未成交量");
+            o.Property(P => P.amount_done).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("已成交挂单量");
+            o.Property(P => P.deal_last_time).HasColumnType("datetimeoffset").HasComment("最后成交时间");
+            o.Property(P => P.side).IsRequired().HasColumnType("tinyint").HasComment("交易方向");
+            o.Property(P => P.state).IsRequired().HasColumnType("tinyint").HasComment("成交状态");
+            o.Property(P => P.type).IsRequired().HasColumnType("tinyint").HasComment("订单类型");
+            o.Property(P => P.data).HasColumnType("nvarchar").HasMaxLength(200).HasComment("附加数据");
+            o.ToTable(nameof(Order));
+        });
         modelBuilder.Entity<Deal>(o =>
         {
             o.HasKey(p => p.trade_id);

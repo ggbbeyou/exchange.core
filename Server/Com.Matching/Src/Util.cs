@@ -76,7 +76,7 @@ public static class Util
             market = market,
             price = price,
             amount = ask_amount,
-            total = price * ask_amount,
+           
             trigger_side = trigger_side,
             time = now,
             bid = bid,
@@ -121,7 +121,7 @@ public static class Util
             market = market,
             price = price,
             amount = bid_amount,
-            total = price * bid_amount,
+            
             trigger_side = trigger_side,
             time = now,
             bid = bid,

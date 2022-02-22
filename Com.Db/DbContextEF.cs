@@ -34,10 +34,10 @@ public class DbContextEF : AbstractShardingDbContext, IShardingTableDbContext
 
     }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
+    // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    // {
 
-    }
+    // }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -45,12 +45,17 @@ public class DbContextEF : AbstractShardingDbContext, IShardingTableDbContext
         modelBuilder.Entity<Deal>(o =>
         {
             o.HasKey(p => p.trade_id);
-            o.Property(p => p.trade_id).IsRequired().HasMaxLength(40).HasComment("交易ID");
-            // o.Property(p => p.Payer).IsRequired().HasMaxLength(50).HasComment("付款用户名");
-            // o.Property(p => p.Money).HasComment("付款金额分");
-            // o.Property(p => p.CreateTime).HasComment("创建时间");
-            // o.Property(p => p.IsDelete).HasComment("是否已删除");
-            // o.HasQueryFilter(p => p.IsDelete == false);
+            o.HasIndex(P => new { P.market, P.time });//.IsUnique();
+            o.HasIndex(P => new { P.market, P.time, P.timestamp });
+            o.Property(P => P.trade_id).IsRequired().HasColumnType("bigint").HasComment("成交订单ID");
+            o.Property(P => P.market).IsRequired().HasColumnType("nvarchar").HasMaxLength(50).HasComment("交易对");
+            o.Property(P => P.price).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("成交价");
+            o.Property(P => P.amount).IsRequired().HasColumnType("amount").HasPrecision(28, 16).HasComment("成交量");
+            o.Property(P => P.total).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("成交总额");
+            o.Property(P => P.trigger_side).IsRequired().HasColumnType("tinyint").HasComment("成交触发方向");
+            o.Property(P => P.bid_id).IsRequired().HasColumnType("bigint").HasComment("买单id");
+            o.Property(P => P.ask_id).IsRequired().HasColumnType("bigint").HasComment("卖单id");
+            o.Property(P => P.time).IsRequired().HasColumnType("datetimeoffset").HasComment("成交时间");
             o.ToTable(nameof(Deal));
         });
     }

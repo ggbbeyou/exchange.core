@@ -32,19 +32,25 @@ public class BaseDeal
     /// 成交总额
     /// </summary>
     /// <value></value>
-    public decimal total { get; set; }
+    public decimal total
+    {
+        get
+        {
+            return price * amount;
+        }
+    }
     /// <summary>
     /// 成交触发方向
     /// </summary>
     /// <value></value>
     public E_OrderSide trigger_side { get; set; }
     /// <summary>
-    /// 
+    /// 买单id
     /// </summary>
     /// <value></value>
     public long bid_id { get; set; }
     /// <summary>
-    /// 
+    /// 卖单id
     /// </summary>
     /// <value></value>
     public long ask_id { get; set; }

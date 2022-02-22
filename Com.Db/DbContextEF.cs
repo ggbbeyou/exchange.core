@@ -45,6 +45,26 @@ public class DbContextEF : AbstractShardingDbContext, IShardingTableDbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        modelBuilder.Entity<Kline>(o =>
+        {
+            o.HasKey(p => p.id);
+            o.HasIndex(P => new { P.type,P.time_start ,P.time_end});
+            // o.HasIndex(P => new { P.create_time });
+            o.Property(P => P.id).IsRequired().HasColumnType("bigint").HasComment("K线ID");            
+            o.Property(P => P.market).IsRequired().HasColumnType("nvarchar").HasMaxLength(50).HasComment("交易对");
+            o.Property(P => P.amount).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("成交量");
+            o.Property(P => P.count).IsRequired().HasColumnType("bigint").HasComment("成交笔数");
+            o.Property(P => P.total).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("成交总额");
+            o.Property(P => P.open).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("开盘价");
+            o.Property(P => P.close).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("收盘价");
+            o.Property(P => P.low).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("最低价");
+            o.Property(P => P.high).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("最高价");
+            o.Property(P => P.type).IsRequired().HasColumnType("tinyint").HasComment("K线类型");
+            o.Property(P => P.time_start).IsRequired().HasColumnType("datetimeoffset").HasComment("变更开始时间");
+            o.Property(P => P.time_end).IsRequired().HasColumnType("datetimeoffset").HasComment("变更开始时间");
+            o.Property(P => P.time).IsRequired().HasColumnType("datetimeoffset").HasComment("更新时间");           
+            o.ToTable(nameof(Kline));
+        });
         modelBuilder.Entity<Order>(o =>
         {
             o.HasKey(p => p.order_id);

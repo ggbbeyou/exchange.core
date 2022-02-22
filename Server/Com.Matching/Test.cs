@@ -72,7 +72,7 @@ namespace Com.Matching
                 {
                     order_id = i,
                     market = this.name,
-                    uid = i.ToString(),
+                    uid = i,
                     price = price,
                     amount = amount,
                     total = price * amount,

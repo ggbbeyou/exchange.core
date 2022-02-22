@@ -9,7 +9,7 @@ namespace Com.Db;
 /// <summary>
 /// 成交单 路由
 /// </summary>
-public class DealRoute : AbstractSimpleShardingMonthKeyDateTimeVirtualTableRoute<Deal>
+public class RouteDeal : AbstractSimpleShardingMonthKeyDateTimeVirtualTableRoute<Deal>
 {
     public override DateTime GetBeginTime()
     {

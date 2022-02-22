@@ -65,7 +65,7 @@ class Program
                         {
                             builder.UseSqlServer(conn);
                         });
-                        op.AddShardingTableRoute<DealRoute>();
+                        op.AddShardingTableRoute<RouteDeal>();
                     }).AddConfig(op =>
                     {
                         op.ConfigId = "c1";

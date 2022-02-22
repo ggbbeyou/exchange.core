@@ -9,14 +9,14 @@ namespace Com.Db;
 /// <summary>
 /// 成交单 路由
 /// </summary>
-public class DealRoute : AbstractSimpleShardingMonthKeyDateTimeVirtualTableRoute<Deal>
+public class RouteKline : AbstractSimpleShardingMonthKeyDateTimeVirtualTableRoute<Kline>
 {
     public override DateTime GetBeginTime()
     {
         return new DateTime(2022, 1, 1);
     }
 
-    public override void Configure(EntityMetadataTableBuilder<Deal> builder)
+    public override void Configure(EntityMetadataTableBuilder<Kline> builder)
     {
         builder.ShardingProperty(o => o.time);
     }

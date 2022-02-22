@@ -9,16 +9,16 @@ namespace Com.Db;
 /// <summary>
 /// 成交单 路由
 /// </summary>
-public class DealRoute : AbstractSimpleShardingMonthKeyDateTimeVirtualTableRoute<Deal>
+public class RouteOrder : AbstractSimpleShardingMonthKeyDateTimeVirtualTableRoute<Order>
 {
     public override DateTime GetBeginTime()
     {
         return new DateTime(2022, 1, 1);
     }
 
-    public override void Configure(EntityMetadataTableBuilder<Deal> builder)
+    public override void Configure(EntityMetadataTableBuilder<Order> builder)
     {
-        builder.ShardingProperty(o => o.time);
+        builder.ShardingProperty(o => o.create_time);
     }
 
     public override bool AutoCreateTableByTime()

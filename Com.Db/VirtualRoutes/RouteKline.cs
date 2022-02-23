@@ -13,7 +13,7 @@ public class RouteKline : AbstractSimpleShardingMonthKeyDateTimeVirtualTableRout
 {
     public override DateTime GetBeginTime()
     {
-        return new DateTime(2022, 1, 1);
+        return DateTimeOffset.UtcNow.DateTime;
     }
 
     public override void Configure(EntityMetadataTableBuilder<Kline> builder)

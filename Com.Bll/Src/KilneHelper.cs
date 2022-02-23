@@ -64,75 +64,80 @@ public class KilneHelper
                 break;
         }
         DateTimeOffset init = new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero);
-        if (minutes > 0)
-        {
-            var bbbb = this.constant.db.Deal.OrderBy(P => P.time).Where(P => P.market == market &&end== P.time).ToList();
-
-            var sql = from deal in this.constant.db.Deal.OrderBy(P => P.time).Where(P => P.market == market && start <= P.time && P.time < end)
-                      group deal by EF.Functions.DateDiffWeek(init, deal.time) into g
-                      select new BaseKline
-                      {
-                          //   market = market,
-                          //   amount = g.Sum(P => P.amount),
-                          //   count = g.Count(),
-                          //   total = g.Sum(P => P.price * P.amount),
-                          //   open = g.First().price,
-                          //   close = g.Last().price,
-                          //   low = g.Min(P => P.price),
-                          //   high = g.Max(P => P.price),
-                          //   type = klineType,
-                          //   time_start = DateTimeOffset.FromUnixTimeSeconds(g.Key * minutes),
-                          //   time_end = DateTimeOffset.FromUnixTimeSeconds(g.Key * minutes).AddMinutes(minutes),
-                          //   time = DateTimeOffset.UtcNow,
-                      };
-            result = sql.ToList();
-        }
-        else if (klineType == E_KlineType.week1)
-        {
-
-            var sql = from deal in this.constant.db.Deal.OrderBy(P => P.timestamp).Where(P => P.market == market && start <= P.time && P.time < end)
-                      group deal by EF.Functions.DateDiffWeek(init, deal.time) into g
-                      select new BaseKline
-                      {
-                          market = market,
-                          amount = g.Sum(P => P.amount),
-                          count = g.Count(),
-                          total = g.Sum(P => P.price * P.amount),
-                          open = g.First().price,
-                          close = g.Last().price,
-                          low = g.Min(P => P.price),
-                          high = g.Max(P => P.price),
-                          type = klineType,
-                          time_start = DateTimeOffset.FromUnixTimeSeconds(g.Key * 7 * 24 * 60 * 60),
-                          time_end = DateTimeOffset.FromUnixTimeSeconds(g.Key * 13 * 24 * 60 * 60).AddMinutes(minutes),
-                          time = DateTimeOffset.UtcNow,
-                      };
-            result = sql.ToList();
-        }
-        else if (klineType == E_KlineType.month1)
-        {
-
-            var sql = from deal in this.constant.db.Deal.OrderBy(P => P.timestamp).Where(P => P.market == market && start <= P.time && P.time < end)
-                      group deal by EF.Functions.DateDiffMonth(init, deal.time) into g
-                      select new BaseKline
-                      {
-                          market = market,
-                          amount = g.Sum(P => P.amount),
-                          count = g.Count(),
-                          total = g.Sum(P => P.price * P.amount),
-                          open = g.First().price,
-                          close = g.Last().price,
-                          low = g.Min(P => P.price),
-                          high = g.Max(P => P.price),
-                          type = klineType,
-                          time_start = DateTimeOffset.FromUnixTimeSeconds(g.Key * 7 * 24 * 60 * 60),
-                          time_end = DateTimeOffset.FromUnixTimeSeconds(g.Key * 13 * 24 * 60 * 60).AddMinutes(minutes),
-                          time = DateTimeOffset.UtcNow,
-                      };
-            result = sql.ToList();
-        }
+        // var bbbb = this.constant.db.Deal_202202.OrderBy(P => P.time).Where(P => P.market == market && P.time < end).ToList();
+        var aaa = this.constant.db.Set<Deal>().ToList();
+        var ccc = this.constant.db.Set<Deal>().OrderBy(P => P.time).Where(P => P.market == market).ToList();
 
         return result;
-    }
+        if (minutes > 0)
+        {
 
+            // var sql = from deal in this.constant.db.Deal.OrderBy(P => P.time).Where(P => P.market == market && start <= P.time && P.time < end)
+            //           group deal by EF.Functions.DateDiffWeek(init, deal.time) into g
+            //           select new BaseKline
+            //           {
+            //   market = market,
+            //   amount = g.Sum(P => P.amount),
+            //   count = g.Count(),
+            //   total = g.Sum(P => P.price * P.amount),
+            //   open = g.First().price,
+            //   close = g.Last().price,
+            //   low = g.Min(P => P.price),
+            //   high = g.Max(P => P.price),
+            //   type = klineType,
+            //   time_start = DateTimeOffset.FromUnixTimeSeconds(g.Key * minutes),
+            //   time_end = DateTimeOffset.FromUnixTimeSeconds(g.Key * minutes).AddMinutes(minutes),
+            //   time = DateTimeOffset.UtcNow,
+        };
+        // result = sql.ToList();
+    }
+    // else if (klineType == E_KlineType.week1)
+    // {
+
+    //     var sql = from deal in this.constant.db.Deal.OrderBy(P => P.timestamp).Where(P => P.market == market && start <= P.time && P.time < end)
+    //               group deal by EF.Functions.DateDiffWeek(init, deal.time) into g
+    //               select new BaseKline
+    //               {
+    //                   market = market,
+    //                   amount = g.Sum(P => P.amount),
+    //                   count = g.Count(),
+    //                   total = g.Sum(P => P.price * P.amount),
+    //                   open = g.First().price,
+    //                   close = g.Last().price,
+    //                   low = g.Min(P => P.price),
+    //                   high = g.Max(P => P.price),
+    //                   type = klineType,
+    //                   time_start = DateTimeOffset.FromUnixTimeSeconds(g.Key * 7 * 24 * 60 * 60),
+    //                   time_end = DateTimeOffset.FromUnixTimeSeconds(g.Key * 13 * 24 * 60 * 60).AddMinutes(minutes),
+    //                   time = DateTimeOffset.UtcNow,
+    //               };
+    //     result = sql.ToList();
+    // }
+    // else if (klineType == E_KlineType.month1)
+    // {
+
+    //     var sql = from deal in this.constant.db.Deal.OrderBy(P => P.timestamp).Where(P => P.market == market && start <= P.time && P.time < end)
+    //               group deal by EF.Functions.DateDiffMonth(init, deal.time) into g
+    //               select new BaseKline
+    //               {
+    //                   market = market,
+    //                   amount = g.Sum(P => P.amount),
+    //                   count = g.Count(),
+    //                   total = g.Sum(P => P.price * P.amount),
+    //                   open = g.First().price,
+    //                   close = g.Last().price,
+    //                   low = g.Min(P => P.price),
+    //                   high = g.Max(P => P.price),
+    //                   type = klineType,
+    //                   time_start = DateTimeOffset.FromUnixTimeSeconds(g.Key * 7 * 24 * 60 * 60),
+    //                   time_end = DateTimeOffset.FromUnixTimeSeconds(g.Key * 13 * 24 * 60 * 60).AddMinutes(minutes),
+    //                   time = DateTimeOffset.UtcNow,
+    //               };
+    //     result = sql.ToList();
+    // }
+
+    // return result;
 }
+
+
+

@@ -27,7 +27,9 @@ public class DbContextEF : AbstractShardingDbContext, IShardingTableDbContext
     /// K线
     /// </summary>
     /// <value></value>
-    public DbSet<Deal> Deal { get; set; } = null!;
+    // public DbSet<Deal> Deal { get; set; } = null!;
+
+    public DbSet<Deal> Deal_202202 { get; set; } = null!;
 
     /// <summary>
     /// 构造函数
@@ -100,7 +102,7 @@ public class DbContextEF : AbstractShardingDbContext, IShardingTableDbContext
             o.Property(P => P.trigger_side).IsRequired().HasColumnType("tinyint").HasComment("成交触发方向");
             o.Property(P => P.bid_id).IsRequired().HasColumnType("bigint").HasComment("买单id");
             o.Property(P => P.ask_id).IsRequired().HasColumnType("bigint").HasComment("卖单id");
-            o.Property(P => P.time).IsRequired().HasColumnType("datetimeoffset").HasComment("成交时间");
+            o.Property(P => P.time).IsRequired().HasColumnType("datetimeoffset").HasMaxLength(50).HasComment("成交时间");
             o.ToTable(nameof(Deal));
         });
     }

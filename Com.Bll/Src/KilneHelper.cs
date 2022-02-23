@@ -72,11 +72,11 @@ public class KilneHelper
         // return result;
         if (minutes > 0)
         {
-
+            TimeSpan groupSpan = new TimeSpan(0, 10, 0);
             var sql = from deal in this.constant.db.Deal
                       where deal.market == market && start <= deal.time && deal.time < end
                       orderby deal.time
-                      group deal by EF.Functions.DateDiffWeek(init, deal.time) into g
+                      group deal by deal.time.Ticks / groupSpan.Ticks into g
                       select new BaseKline
                       {
                           market = market,
@@ -88,8 +88,8 @@ public class KilneHelper
                           low = g.Min(P => P.price),
                           high = g.Max(P => P.price),
                           type = klineType,
-                          time_start = DateTimeOffset.FromUnixTimeSeconds(g.Key * minutes),
-                          time_end = DateTimeOffset.FromUnixTimeSeconds(g.Key * minutes).AddMinutes(minutes),
+                          time_start = new DateTimeOffset(g.Key * groupSpan.Ticks, TimeSpan.Zero),
+                          time_end = new DateTimeOffset((g.Key + 1) * groupSpan.Ticks, TimeSpan.Zero),
                           time = DateTimeOffset.UtcNow,
                       };
             result = sql.ToList();

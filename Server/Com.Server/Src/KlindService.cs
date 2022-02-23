@@ -62,8 +62,41 @@ public class KlindService
     /// <param name="market"></param>
     public void DBtoRedis(string market)
     {
+        string key = string.Format(this.redis_key_kline, market, E_KlineType.min1);
         DateTimeOffset max = GetRedisMaxMinuteKline(market, E_KlineType.min1);
+        max = TimeAdd(max, E_KlineType.min1);
         List<BaseKline> klines = this.kilneHelper.GetKlines(market, E_KlineType.min1, max, DateTimeOffset.UtcNow);
+        if (klines != null && klines.Count() > 0)
+        {
+            SortedSetEntry[] entries = new SortedSetEntry[klines.Count()];
+            for (int i = 0; i < klines.Count(); i++)
+            {
+                entries[i] = new SortedSetEntry(JsonConvert.SerializeObject(klines[i]), klines[i].time_start.ToUnixTimeSeconds());
+            }
+            this.constant.redis.SortedSetAdd(key, entries);
+        }
+        List<BaseKline> klines_temp = new List<BaseKline>();
+        foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
+        {
+            if (cycle == E_KlineType.min1)
+            {
+                continue;
+            }
+            klines_temp.Clear();
+            DateTimeOffset max_other = GetRedisMaxMinuteKline(market, cycle);
+            max_other = TimeAdd(max, cycle);
+            RedisValue[] value = this.constant.redis.SortedSetRangeByScore(key, max_other.ToUnixTimeSeconds(), double.PositiveInfinity, Exclude.Stop, StackExchange.Redis.Order.Ascending);
+            foreach (var item in value)
+            {
+                if (item.IsNullOrEmpty)
+                {
+                    continue;
+                }
+                klines_temp.Add(JsonConvert.DeserializeObject<BaseKline>(item)!);
+                List<BaseKline> klines1 = MergeKline(klines_temp, cycle);
+                this.constant.redis.SortedSetAdd(string.Format(this.redis_key_kline, market, cycle), klines1.Select(x => new SortedSetEntry(JsonConvert.SerializeObject(x), x.time_start.ToUnixTimeSeconds())).ToArray());
+            }
+        }
     }
 
     /// <summary>
@@ -83,11 +116,32 @@ public class KlindService
         return DateTimeOffset.MinValue;
     }
 
-    // private List<Kline> GetDB()
-    // {
+    /// <summary>
+    /// 以K线开始时间获取结束时间
+    /// </summary>
+    /// <param name="start"></param>
+    /// <param name="klineType"></param>
+    /// <returns></returns>
+    public DateTimeOffset TimeAdd(DateTimeOffset start, E_KlineType klineType)
+    {
+        switch (klineType)
+        {
+            case E_KlineType.min1:
+                return start.AddMinutes(1);
+            case E_KlineType.min5:
+                return start.AddMinutes(5);
 
-    // }
 
+            default:
+                return start;
+        }
+    }
 
+    public List<BaseKline> MergeKline(List<BaseKline> klines, E_KlineType klineType)
+    {
+        List<BaseKline> resutl = new List<BaseKline>();
+
+        return resutl;
+    }
 
 }

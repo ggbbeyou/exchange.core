@@ -27,9 +27,9 @@ public class DbContextEF : AbstractShardingDbContext, IShardingTableDbContext
     /// K线
     /// </summary>
     /// <value></value>
-    // public DbSet<Deal> Deal { get; set; } = null!;
+    public DbSet<Deal> Deal { get; set; } = null!;
 
-    public DbSet<Deal> Deal_202202 { get; set; } = null!;
+    // public DbSet<Deal> Deal_202202 { get; set; } = null!;
 
     /// <summary>
     /// 构造函数

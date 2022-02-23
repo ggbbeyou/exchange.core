@@ -22,7 +22,7 @@ public class BaseKline
     /// 成交笔数
     /// </summary>
     /// <value></value>
-    public decimal count { get; set; }
+    public long count { get; set; }
     /// <summary>
     /// 成交总金额
     /// </summary>

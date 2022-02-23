@@ -133,8 +133,22 @@ public class KlindService
                 return span = new TimeSpan(0, 1, 0);
             case E_KlineType.min5:
                 return span = new TimeSpan(0, 5, 0);
-
-
+            case E_KlineType.min15:
+                return span = new TimeSpan(0, 15, 0);
+            case E_KlineType.min30:
+                return span = new TimeSpan(0, 30, 0);
+            case E_KlineType.hour1:
+                return span = new TimeSpan(1, 0, 0);
+            case E_KlineType.hour4:
+                return span = new TimeSpan(4, 0, 0);
+            case E_KlineType.hour12:
+                return span = new TimeSpan(12, 0, 0);
+            case E_KlineType.day1:
+                return span = new TimeSpan(24, 0, 0);
+            case E_KlineType.week1:
+                return span = new TimeSpan(168, 0, 0);
+            case E_KlineType.month1:
+                return span = new TimeSpan(720, 0, 0);
             default:
                 return span;
         }

@@ -73,17 +73,18 @@ public class KilneHelper
         if (minutes > 0)
         {
 
-            var sql = from deal in this.constant.db.Deal.Where(P => P.market == market && start <= P.time && P.time < end).OrderBy(P => P.time)
+            var sql = from deal in this.constant.db.Deal
+                      where deal.market == market && start <= deal.time && deal.time < end
+                      orderby deal.time
                       group deal by EF.Functions.DateDiffWeek(init, deal.time) into g
-
                       select new BaseKline
                       {
                           market = market,
                           amount = g.Sum(P => P.amount),
                           count = g.Count(),
                           total = g.Sum(P => P.price * P.amount),
-                          open = g.FirstOrDefault().price,
-                          close = g.LastOrDefault().price,
+                          open = g.First().price,
+                          close = g.Last().price,
                           low = g.Min(P => P.price),
                           high = g.Max(P => P.price),
                           type = klineType,

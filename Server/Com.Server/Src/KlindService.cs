@@ -64,8 +64,9 @@ public class KlindService
     {
         string key = string.Format(this.redis_key_kline, market, E_KlineType.min1);
         DateTimeOffset max = GetRedisMaxMinuteKline(market, E_KlineType.min1);
-        max = TimeAdd(max, E_KlineType.min1);
-        List<BaseKline> klines = this.kilneHelper.GetKlines(market, E_KlineType.min1, max, DateTimeOffset.UtcNow);
+        TimeSpan span = TimeAdd(max, E_KlineType.min1);
+        max = max.Add(span);
+        List<BaseKline> klines = this.kilneHelper.GetKlines(market, E_KlineType.min1, max, DateTimeOffset.UtcNow, span);
         if (klines != null && klines.Count() > 0)
         {
             SortedSetEntry[] entries = new SortedSetEntry[klines.Count()];
@@ -84,7 +85,8 @@ public class KlindService
             }
             klines_temp.Clear();
             DateTimeOffset max_other = GetRedisMaxMinuteKline(market, cycle);
-            max_other = TimeAdd(max, cycle);
+            TimeSpan span_other = TimeAdd(max, cycle);
+            max_other = max_other.Add(span_other);
             RedisValue[] value = this.constant.redis.SortedSetRangeByScore(key, max_other.ToUnixTimeSeconds(), double.PositiveInfinity, Exclude.Stop, StackExchange.Redis.Order.Ascending);
             foreach (var item in value)
             {
@@ -122,18 +124,19 @@ public class KlindService
     /// <param name="start"></param>
     /// <param name="klineType"></param>
     /// <returns></returns>
-    public DateTimeOffset TimeAdd(DateTimeOffset start, E_KlineType klineType)
+    public TimeSpan TimeAdd(DateTimeOffset start, E_KlineType klineType)
     {
+        TimeSpan span = new TimeSpan();
         switch (klineType)
         {
             case E_KlineType.min1:
-                return start.AddMinutes(1);
+                return span = new TimeSpan(0, 1, 0);
             case E_KlineType.min5:
-                return start.AddMinutes(5);
+                return span = new TimeSpan(0, 5, 0);
 
 
             default:
-                return start;
+                return span;
         }
     }
 

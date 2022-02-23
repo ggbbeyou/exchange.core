@@ -34,7 +34,7 @@ public class KilneHelper
     /// <param name="start"></param>
     /// <param name="end"></param>
     /// <returns></returns>
-    public List<BaseKline> GetKlines(string market, E_KlineType klineType, DateTimeOffset start, DateTimeOffset end)
+    public List<BaseKline> GetKlines(string market, E_KlineType klineType, DateTimeOffset start, DateTimeOffset end, TimeSpan span)
     {
         List<BaseKline> result = new List<BaseKline>();
         int minutes = 0;
@@ -64,7 +64,7 @@ public class KilneHelper
             default:
                 break;
         }
-        DateTimeOffset init = new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero);
+        // DateTimeOffset init = new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero);
         // var bbbb = this.constant.db.Deal.OrderBy(P => P.time).Where(P => P.market == market && P.time < end).ToList();
         // var aaa = this.constant.db.Set<Deal>().ToList();
         // var ccc = this.constant.db.Set<Deal>().OrderBy(P => P.time).Where(P => P.market == market).ToList();
@@ -72,11 +72,10 @@ public class KilneHelper
         // return result;
         if (minutes > 0)
         {
-            TimeSpan groupSpan = new TimeSpan(0, 10, 0);
             var sql = from deal in this.constant.db.Deal
                       where deal.market == market && start <= deal.time && deal.time < end
                       orderby deal.time
-                      group deal by deal.time.Ticks / groupSpan.Ticks into g
+                      group deal by deal.time.Ticks / span.Ticks into g
                       select new BaseKline
                       {
                           market = market,
@@ -88,8 +87,8 @@ public class KilneHelper
                           low = g.Min(P => P.price),
                           high = g.Max(P => P.price),
                           type = klineType,
-                          time_start = new DateTimeOffset(g.Key * groupSpan.Ticks, TimeSpan.Zero),
-                          time_end = new DateTimeOffset((g.Key + 1) * groupSpan.Ticks, TimeSpan.Zero),
+                          time_start = new DateTimeOffset(g.Key * span.Ticks, TimeSpan.Zero),
+                          time_end = new DateTimeOffset((g.Key + 1) * span.Ticks, TimeSpan.Zero),
                           time = DateTimeOffset.UtcNow,
                       };
             result = sql.ToList();

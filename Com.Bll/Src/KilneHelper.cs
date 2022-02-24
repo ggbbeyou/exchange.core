@@ -23,7 +23,7 @@ public class KilneHelper
     public KilneHelper(FactoryConstant constant)
     {
         this.constant = constant;
-        // AddTest();
+        AddTest();
     }
 
     /// <summary>
@@ -35,6 +35,25 @@ public class KilneHelper
     /// <param name="end"></param>
     /// <returns></returns>
     public List<BaseKline> GetKlines(string market, E_KlineType klineType, DateTimeOffset start, DateTimeOffset end, TimeSpan span)
+    {
+        List<BaseKline> result = new List<BaseKline>();
+        List<Deal> deals = this.constant.db.Deal.Where(P => P.market == market && P.time < end).OrderBy(P => P.time).ToList();
+
+
+
+
+        return result;
+    }
+
+    /// <summary>
+    /// 从数据库统计K线
+    /// </summary>
+    /// <param name="market"></param>
+    /// <param name="klineType"></param>
+    /// <param name="start"></param>
+    /// <param name="end"></param>
+    /// <returns></returns>
+    public List<BaseKline> GetKlines1(string market, E_KlineType klineType, DateTimeOffset start, DateTimeOffset end, TimeSpan span)
     {
         List<BaseKline> result = new List<BaseKline>();
         int minutes = 0;
@@ -145,9 +164,9 @@ public class KilneHelper
     public void AddTest()
     {
         Random r = new Random();
-        for (int i = 0; i < 100_000; i++)
+        for (int i = 0; i < 10; i++)
         {
-            this.constant.db.Deal.Add(new Deal
+            this.constant.db.Set<Deal>().Add(new Deal
             {
                 trade_id = this.constant.worker.NextId(),
                 market = "btc/usdt",

@@ -89,13 +89,13 @@ public class FactoryConstant
         }
         try
         {
-            // var scope = provider.CreateScope();
-            // DbContextEF? db = scope.ServiceProvider.GetService<DbContextEF>();
-            // if (db != null)
-            // {
-            //     this.db = db;
-            // }
-            // else
+            var scope = provider.CreateScope();
+            DbContextEF? db = scope.ServiceProvider.GetService<DbContextEF>();
+            if (db != null)
+            {
+                this.db = db;
+            }
+            else
             {
                 string? dbConnection = config.GetConnectionString("Mssql");
                 if (!string.IsNullOrWhiteSpace(dbConnection))

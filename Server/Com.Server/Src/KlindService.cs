@@ -65,17 +65,18 @@ public class KlindService
     /// <param name="market"></param>
     public void DBtoRedis(string market)
     {
-        SyncMin1Kline(market);
-        SyncKline(market);
+        DateTimeOffset now = DateTimeOffset.UtcNow;
+        SyncMin1Kline(market, now);
+        SyncKline(market, now);
     }
 
     /// <summary>
     /// 同步一分钟K线 deal转成kline，再分别保存到redis和db中。
     /// </summary>
     /// <param name="market"></param>
-    public void SyncMin1Kline(string market)
+    public void SyncMin1Kline(string market, DateTimeOffset now)
     {
-        DateTimeOffset now = DateTimeOffset.UtcNow;
+
         BaseKline? last_kline = GetRedisLastKline(market, E_KlineType.min1);
         TimeSpan span = KlineTypeSpan(E_KlineType.min1);
         List<BaseKline> klines = this.kilneHelper.GetKlines(market, E_KlineType.min1, last_kline, new DateTimeOffset(now.Year, now.Month, now.Day, now.Hour, now.Minute, 0, 0, new TimeSpan()).AddMilliseconds(-1), span);
@@ -95,7 +96,7 @@ public class KlindService
     /// 同步K线 从redis获取到1分钟K线,再转成其它K线,再分别保存到redis和db中。
     /// </summary>
     /// <param name="market"></param>
-    public void SyncKline(string market)
+    public void SyncKline(string market, DateTimeOffset now)
     {
         List<BaseKline> klines_temp = new List<BaseKline>();
         foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
@@ -122,15 +123,18 @@ public class KlindService
                     continue;
                 }
                 klines_temp.Add(JsonConvert.DeserializeObject<BaseKline>(item)!);
-                List<BaseKline> klines = MergeKline(market, cycle, start, klines_temp.Last().time_end, last_price, span, klines_temp);
-                SortedSetEntry[] entries = new SortedSetEntry[klines.Count()];
-                for (int i = 0; i < klines.Count(); i++)
-                {
-                    entries[i] = new SortedSetEntry(JsonConvert.SerializeObject(klines[i]), klines[i].time_start.ToUnixTimeSeconds());
-                }
-                this.constant.redis.SortedSetAdd(string.Format(this.redis_key_kline, market, cycle), entries);
-                this.kilneHelper.SaveKline(market, cycle, klines);
             }
+            // DateTimeOffset end = new DateTimeOffset(now.Year, now.Month, now.Day, now.Hour, now.Minute, 0, 0, new TimeSpan());
+            // var bbbb = end / span;
+            List<BaseKline> klines = MergeKline(market, cycle, start, now, last_price, span, klines_temp);
+            SortedSetEntry[] entries = new SortedSetEntry[klines.Count()];
+            for (int i = 0; i < klines.Count(); i++)
+            {
+                entries[i] = new SortedSetEntry(JsonConvert.SerializeObject(klines[i]), klines[i].time_start.ToUnixTimeSeconds());
+            }
+            this.constant.redis.SortedSetAdd(string.Format(this.redis_key_kline, market, cycle), entries);
+            this.kilneHelper.SaveKline(market, cycle, klines);
+
         }
     }
 

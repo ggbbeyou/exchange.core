@@ -61,6 +61,7 @@ public class KilneHelper
             if (kline != null)
             {
                 result.Add(kline);
+                last_price = kline.close;
             }
         }
         return result;

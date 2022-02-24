@@ -100,7 +100,7 @@ public class KlindService
         List<BaseKline> klines_temp = new List<BaseKline>();
         foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
         {
-            if (cycle == E_KlineType.min1)
+            if (cycle == E_KlineType.min1 || cycle == E_KlineType.week1 || cycle == E_KlineType.month1)
             {
                 continue;
             }

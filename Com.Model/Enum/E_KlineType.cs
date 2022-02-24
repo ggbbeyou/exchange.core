@@ -51,5 +51,4 @@ public enum E_KlineType
     /// 1月
     /// </summary>
     month1 = 11,
-   
 }

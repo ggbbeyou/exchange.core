@@ -204,7 +204,7 @@ public class KlindService
     public List<BaseKline> MergeKline(string market, E_KlineType klineType, DateTimeOffset start, DateTimeOffset end, decimal last_price, TimeSpan span, List<BaseKline> klines)
     {
         List<BaseKline> resutl = new List<BaseKline>();
-
+        klines = klines.OrderBy(P => P.time_start).ToList();
         for (DateTimeOffset i = start; i <= end; i = i.Add(span))
         {
             DateTimeOffset end_time = i.Add(span).AddMilliseconds(-1);

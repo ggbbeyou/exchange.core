@@ -56,6 +56,7 @@ public class KilneHelper
         else if (deals.Count > 0)
         {
             start = deals.First().time;
+            start = start.AddSeconds(-start.Second).AddMilliseconds(-start.Millisecond);
         }
         for (DateTimeOffset i = start; i <= end; i = i.Add(span))
         {
@@ -149,7 +150,7 @@ public class KilneHelper
                 this.constant.db.Kline.Add(kline);
             }
             kline.market = market;
-            kline.type = item.type;
+            kline.type = klineType;
             kline.amount = item.amount;
             kline.count = item.count;
             kline.total = item.total;

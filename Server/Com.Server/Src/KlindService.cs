@@ -105,6 +105,7 @@ public class KlindService
             {
                 continue;
             }
+            this.constant.logger.LogTrace(cycle.ToString());
             klines_temp.Clear();
             BaseKline? last_kline = GetRedisLastKline(market, cycle);
             TimeSpan span = KlineTypeSpan(cycle);
@@ -124,9 +125,13 @@ public class KlindService
                 }
                 klines_temp.Add(JsonConvert.DeserializeObject<BaseKline>(item)!);
             }
-            if (klines_temp.Count == 0)
+            if (last_price == 0 && klines_temp.Count == 0)
             {
                 continue;
+            }
+            else
+            {
+                start = klines_temp.Last().time_start;
             }
             List<BaseKline> klines = MergeKline(market, cycle, start, now, last_price, span, klines_temp);
             SortedSetEntry[] entries = new SortedSetEntry[klines.Count()];

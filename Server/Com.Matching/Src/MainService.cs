@@ -43,7 +43,7 @@ public class MainService : BackgroundService
         try
         {
             FactoryMatching.instance.Info(constant);
-            Test test = new Test(constant);
+            // Test test = new Test(constant);
             this.constant.logger.LogInformation("启动撮合后台服务成功");
         }
         catch (Exception ex)

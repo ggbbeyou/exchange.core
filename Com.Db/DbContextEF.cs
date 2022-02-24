@@ -22,14 +22,17 @@ public class DbContextEF : AbstractShardingDbContext, IShardingTableDbContext
     /// K线
     /// </summary>
     /// <value></value>
-    // public DbSet<Kline> Kline { get; set; } = null!;
+    public DbSet<Kline> Kline { get; set; } = null!;
     /// <summary>
-    /// K线
+    /// 成交单
     /// </summary>
     /// <value></value>
     public DbSet<Deal> Deal { get; set; } = null!;
-
-    // public DbSet<Deal> Deal_202202 { get; set; } = null!;
+    /// <summary>
+    /// 订单表
+    /// </summary>
+    /// <value></value>
+    public DbSet<Order> Order { get; set; } = null!;
 
     /// <summary>
     /// 构造函数
@@ -52,7 +55,7 @@ public class DbContextEF : AbstractShardingDbContext, IShardingTableDbContext
             o.HasKey(p => p.id);
             o.HasIndex(P => new { P.market, P.type, P.time_start, P.time_end });
             // o.HasIndex(P => new { P.create_time });
-            o.Property(P => P.id).IsRequired().HasColumnType("bigint").HasComment("K线ID");
+            o.Property(P => P.id).IsRequired().ValueGeneratedNever().HasColumnType("bigint").HasComment("K线ID");
             o.Property(P => P.market).IsRequired().HasColumnType("nvarchar").HasMaxLength(50).HasComment("交易对");
             o.Property(P => P.amount).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("成交量");
             o.Property(P => P.count).IsRequired().HasColumnType("bigint").HasComment("成交笔数");
@@ -72,7 +75,7 @@ public class DbContextEF : AbstractShardingDbContext, IShardingTableDbContext
             o.HasKey(p => p.order_id);
             o.HasIndex(P => new { P.uid });
             o.HasIndex(P => new { P.create_time });
-            o.Property(P => P.order_id).IsRequired().HasColumnType("bigint").HasComment("订单ID");
+            o.Property(P => P.order_id).IsRequired().ValueGeneratedNever().HasColumnType("bigint").HasComment("订单ID");
             o.Property(P => P.client_id).HasColumnType("nvarchar").HasMaxLength(50).HasComment("客户自定义订单id");
             o.Property(P => P.market).IsRequired().HasColumnType("nvarchar").HasMaxLength(50).HasComment("交易对");
             o.Property(P => P.uid).IsRequired().HasColumnType("bigint").HasComment("用户ID");

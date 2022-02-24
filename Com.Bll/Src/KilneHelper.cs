@@ -12,17 +12,21 @@ public class KilneHelper
 
     /// <summary>
     /// 常用接口
-    /// https://dev.mysql.com/doc/connector-net/en/connector-net-entityframework-core-example.html
     /// </summary>
     public FactoryConstant constant = null!;
+    /// <summary>
+    /// 系统初始化时间
+    /// </summary>
+    public DateTimeOffset system_init;
 
     /// <summary>
     /// 
     /// </summary>
     /// <param name="constant"></param>
-    public KilneHelper(FactoryConstant constant)
+    public KilneHelper(FactoryConstant constant, DateTimeOffset system_init)
     {
         this.constant = constant;
+        this.system_init = system_init;
         AddTest();
     }
 
@@ -37,7 +41,7 @@ public class KilneHelper
     public List<BaseKline> GetKlines(string market, E_KlineType klineType, BaseKline? last_kline, DateTimeOffset end, TimeSpan span)
     {
         List<BaseKline> result = new List<BaseKline>();
-        DateTimeOffset start = new DateTimeOffset(2020, 1, 1, 0, 0, 0, TimeSpan.Zero);
+        DateTimeOffset start = system_init;
         decimal last_price = 0;
         if (last_kline != null)
         {

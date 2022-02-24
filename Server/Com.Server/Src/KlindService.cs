@@ -119,10 +119,10 @@ public class KlindService
         return null;
     }
 
+
     /// <summary>
-    /// 以K线开始时间获取结束时间
+    /// K线类型间隔时长
     /// </summary>
-    /// <param name="start"></param>
     /// <param name="klineType"></param>
     /// <returns></returns>
     public TimeSpan KlineTypeSpan(E_KlineType klineType)

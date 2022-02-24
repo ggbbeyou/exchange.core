@@ -14,6 +14,11 @@ public class BaseKline
     /// <value></value>
     public string market { get; set; } = null!;
     /// <summary>
+    /// K线类型
+    /// </summary>
+    /// <value></value>
+    public E_KlineType type { get; set; }
+    /// <summary>
     /// 成交量
     /// </summary>
     /// <value></value>
@@ -48,11 +53,6 @@ public class BaseKline
     /// </summary>
     /// <value></value>
     public decimal high { get; set; }
-    /// <summary>
-    /// K线类型
-    /// </summary>
-    /// <value></value>
-    public E_KlineType type { get; set; }
     /// <summary>
     /// 变更开始时间
     /// </summary>

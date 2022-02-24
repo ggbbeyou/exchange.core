@@ -47,82 +47,72 @@ public class KilneHelper
         List<Deal> deals = this.constant.db.Deal.Where(P => P.market == market && start <= P.time && P.time <= end).OrderBy(P => P.time).ToList();
         for (DateTimeOffset i = start; i <= end; i = i.Add(span))
         {
-            DateTimeOffset end_time = i.Add(span);
-
-            // BaseKline kline = new BaseKline();
-            // kline.time_start = i;
-            // kline.time_end = i.Add(span);
-            // kline.market = market;
-            // kline.klineType = klineType;
-            // kline.open = deals.Where(P => P.time >= i && P.time < i.Add(span)).Min(P => P.price);
-            // kline.close = deals.Where(P => P.time >= i && P.time < i.Add(span)).Max(P => P.price);
-            // kline.high = deals.Where(P => P.time >= i && P.time < i.Add(span)).Max(P => P.price);
-            // kline.low = deals.Where(P => P.time >= i && P.time < i.Add(span)).Min(P => P.price);
-            // kline.vol = deals.Where(P => P.time >= i && P.time < i.Add(span)).Sum(P => P.vol);
-            // kline.amount = deals.Where(P => P.time >= i && P.time < i.Add(span)).Sum(P => P.amount);
-            // kline.last_price = last_price;
-            // kline.last_vol = 0;
-            // kline.last_amount = 0;
-            // kline.last_time = DateTimeOffset.MinValue;
-            // kline.last_close = 0;
-            // kline.last_open = 0;
-            // kline.last_high = 0;
-            // kline.last_low = 0;
-            // kline.last_klineType = E_KlineType.min1;
-            // kline.last_klineType_span = KlineTypeSpan(E_KlineType.min1);
-            // kline.last_klineType_span_time = kline.last_klineType_span.Add(kline.time_start);
-            // kline.last_klineType_span_time_end = kline.last_klineType_span_time.Add(kline.last_kline
+            DateTimeOffset end_time = i.Add(span).AddMilliseconds(-1);
+            List<Deal> deal = deals.Where(P => P.time >= i && P.time <= end_time).ToList().ToList();
+            if (last_price == 0 && deal.Count == 0)
+            {
+                continue;
+            }
+            BaseKline? kline = DealToKline(market, klineType, start, end_time, deal, last_price);
+            if (kline != null)
+            {
+                result.Add(kline);
+            }
         }
         return result;
     }
 
     /// <summary>
-    /// 从数据库统计K线
+    /// 交易记录转换成K线
     /// </summary>
-    /// <param name="market"></param>
     /// <param name="klineType"></param>
     /// <param name="start"></param>
     /// <param name="end"></param>
+    /// <param name="deals"></param>
     /// <returns></returns>
-    public List<BaseKline> GetKlines1(string market, E_KlineType klineType, DateTimeOffset start, DateTimeOffset end, TimeSpan span)
+    public BaseKline? DealToKline(string market, E_KlineType klineType, DateTimeOffset start, DateTimeOffset end, List<Deal> deals, decimal last_price)
     {
-        List<BaseKline> result = new List<BaseKline>();
-        int minutes = 0;
-        switch (klineType)
+        BaseKline kline = new BaseKline();
+        if (last_price > 0 && deals.Count == 0)
         {
-            case E_KlineType.min1:
-                minutes = 1;
-                break;
-            case E_KlineType.min5:
-                minutes = 5;
-                break;
-            case E_KlineType.min15:
-                minutes = 15;
-                break;
-            case E_KlineType.min30:
-                minutes = 30;
-                break;
-            case E_KlineType.hour1:
-                minutes = 60;
-                break;
-            case E_KlineType.hour4:
-                minutes = 240;
-                break;
-            case E_KlineType.day1:
-                minutes = 1440;
-                break;
-            default:
-                break;
+            kline.market = market;
+            kline.type = klineType;
+            kline.amount = 0;
+            kline.count = 0;
+            kline.total = 0;
+            kline.open = last_price;
+            kline.close = last_price;
+            kline.low = last_price;
+            kline.high = last_price;
+            kline.time_start = start;
+            kline.time_end = end;
+            kline.time = DateTimeOffset.UtcNow;
+            return kline;
         }
-        // DateTimeOffset init = new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero);
-        // var bbbb = this.constant.db.Deal.OrderBy(P => P.time).Where(P => P.market == market && P.time < end).ToList();
-        // var aaa = this.constant.db.Set<Deal>().ToList();
-        // var ccc = this.constant.db.Set<Deal>().OrderBy(P => P.time).Where(P => P.market == market).ToList();
-
-        // return result;
-        if (minutes > 0)
+        else if (deals.Count == 0)
         {
-            var sql = from deal in this.constant.db.Deal
+            deals = deals.OrderBy(P => P.time).ToList();
+            kline.market = market;
+            kline.type = klineType;
+            kline.amount = deals.Sum(P => P.amount);
+            kline.count = deals.Count;
+            kline.total = deals.Sum(P => P.amount * P.price);
+            kline.open = deals[0].price;
+            kline.close = deals[deals.Count - 1].price;
+            kline.low = deals.Min(P => P.price);
+            kline.high = deals.Max(P => P.price);
+            kline.time_start = start;
+            kline.time_end = end;
+            kline.time = DateTimeOffset.UtcNow;
+            return kline;
+        }
+        return null;
+    }
+
+
+    /*
+
+  var sql = from deal in this.constant.db.Deal
                       where deal.market == market && start <= deal.time && deal.time < end
                       orderby deal.time
                       group deal by deal.time.Ticks / span.Ticks into g
@@ -142,55 +132,8 @@ public class KilneHelper
                           time = DateTimeOffset.UtcNow,
                       };
             result = sql.ToList();
-        }
-        // else if (klineType == E_KlineType.week1)
-        // {
 
-        //     var sql = from deal in this.constant.db.Deal.OrderBy(P => P.timestamp).Where(P => P.market == market && start <= P.time && P.time < end)
-        //               group deal by EF.Functions.DateDiffWeek(init, deal.time) into g
-        //               select new BaseKline
-        //               {
-        //                   market = market,
-        //                   amount = g.Sum(P => P.amount),
-        //                   count = g.Count(),
-        //                   total = g.Sum(P => P.price * P.amount),
-        //                   open = g.First().price,
-        //                   close = g.Last().price,
-        //                   low = g.Min(P => P.price),
-        //                   high = g.Max(P => P.price),
-        //                   type = klineType,
-        //                   time_start = DateTimeOffset.FromUnixTimeSeconds(g.Key * 7 * 24 * 60 * 60),
-        //                   time_end = DateTimeOffset.FromUnixTimeSeconds(g.Key * 13 * 24 * 60 * 60).AddMinutes(minutes),
-        //                   time = DateTimeOffset.UtcNow,
-        //               };
-        //     result = sql.ToList();
-        // }
-        // else if (klineType == E_KlineType.month1)
-        // {
-
-        //     var sql = from deal in this.constant.db.Deal.OrderBy(P => P.timestamp).Where(P => P.market == market && start <= P.time && P.time < end)
-        //               group deal by EF.Functions.DateDiffMonth(init, deal.time) into g
-        //               select new BaseKline
-        //               {
-        //                   market = market,
-        //                   amount = g.Sum(P => P.amount),
-        //                   count = g.Count(),
-        //                   total = g.Sum(P => P.price * P.amount),
-        //                   open = g.First().price,
-        //                   close = g.Last().price,
-        //                   low = g.Min(P => P.price),
-        //                   high = g.Max(P => P.price),
-        //                   type = klineType,
-        //                   time_start = DateTimeOffset.FromUnixTimeSeconds(g.Key * 7 * 24 * 60 * 60),
-        //                   time_end = DateTimeOffset.FromUnixTimeSeconds(g.Key * 13 * 24 * 60 * 60).AddMinutes(minutes),
-        //                   time = DateTimeOffset.UtcNow,
-        //               };
-        //     result = sql.ToList();
-
-
-        return result;
-    }
-
+    */
 
     public void AddTest()
     {

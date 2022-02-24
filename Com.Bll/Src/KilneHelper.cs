@@ -23,7 +23,7 @@ public class KilneHelper
     public KilneHelper(FactoryConstant constant)
     {
         this.constant = constant;
-        AddTest();
+        // AddTest();
     }
 
     /// <summary>

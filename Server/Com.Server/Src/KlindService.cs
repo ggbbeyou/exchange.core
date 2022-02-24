@@ -80,7 +80,7 @@ public class KlindService
         BaseKline? last_kline = GetRedisLastKline(market, E_KlineType.min1);
         TimeSpan span = KlineTypeSpan(E_KlineType.min1);
         List<BaseKline> klines = this.kilneHelper.GetKlines(market, E_KlineType.min1, last_kline, new DateTimeOffset(now.Year, now.Month, now.Day, now.Hour, now.Minute, 0, 0, new TimeSpan()).AddMilliseconds(-1), span);
-        if (klines != null && klines.Count() > 0)
+        if (klines.Count() > 0)
         {
             SortedSetEntry[] entries = new SortedSetEntry[klines.Count()];
             for (int i = 0; i < klines.Count(); i++)

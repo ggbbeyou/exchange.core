@@ -27,7 +27,7 @@ public class KilneHelper
     {
         this.constant = constant;
         this.system_init = system_init;
-        AddTest();
+        // AddTest();
     }
 
     /// <summary>
@@ -49,10 +49,18 @@ public class KilneHelper
             last_price = last_kline.close;
         }
         List<Deal> deals = this.constant.db.Deal.Where(P => P.market == market && start <= P.time && P.time <= end).OrderBy(P => P.time).ToList();
+        if (last_price == 0 && deals.Count == 0)
+        {
+            return result;
+        }
+        else if (deals.Count > 0)
+        {
+            start = deals.First().time;
+        }
         for (DateTimeOffset i = start; i <= end; i = i.Add(span))
         {
             DateTimeOffset end_time = i.Add(span).AddMilliseconds(-1);
-            List<Deal> deal = deals.Where(P => P.time >= i && P.time <= end_time).ToList().ToList();
+            List<Deal> deal = deals.Where(P => P.time >= i && P.time <= end_time).ToList();
             if (last_price == 0 && deal.Count == 0)
             {
                 continue;
@@ -185,7 +193,7 @@ public class KilneHelper
     public void AddTest()
     {
         Random r = new Random();
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 5000; i++)
         {
             decimal price = r.NextInt64(2000, 4000);
             decimal amount = r.NextInt64(1, 25);
@@ -199,7 +207,7 @@ public class KilneHelper
                 trigger_side = E_OrderSide.buy,
                 bid_id = this.constant.worker.NextId(),
                 ask_id = this.constant.worker.NextId(),
-                time = DateTimeOffset.UtcNow.AddDays(-1).AddMinutes(i),
+                time = DateTimeOffset.UtcNow.AddMinutes(-i),
             });
         }
         this.constant.db.SaveChanges();

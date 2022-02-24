@@ -31,6 +31,6 @@ public class RouteDeal : AbstractSimpleShardingMonthKeyDateTimeOffsetVirtualTabl
 
     public override DateTimeOffset GetBeginTime()
     {
-        return DateTimeOffset.Now;
+        return new DateTimeOffset(2022, 1, 1, 0, 0, 0, TimeSpan.Zero);
     }
 }

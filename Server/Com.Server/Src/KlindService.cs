@@ -156,7 +156,6 @@ public class KlindService
         return null;
     }
 
-
     /// <summary>
     /// K线类型间隔时长
     /// </summary>
@@ -235,53 +234,6 @@ public class KlindService
             resutl.Add(baseKline);
         }
         return resutl;
-    }
-
-    /// <summary>
-    /// 交易记录转换成K线
-    /// </summary>
-    /// <param name="klineType"></param>
-    /// <param name="start"></param>
-    /// <param name="end"></param>
-    /// <param name="deals"></param>
-    /// <returns></returns>
-    public BaseKline? DealToKline(string market, E_KlineType klineType, DateTimeOffset start, DateTimeOffset end, List<Deal> deals, decimal last_price)
-    {
-        BaseKline kline = new BaseKline();
-        if (last_price > 0 && deals.Count == 0)
-        {
-            kline.market = market;
-            kline.type = klineType;
-            kline.amount = 0;
-            kline.count = 0;
-            kline.total = 0;
-            kline.open = last_price;
-            kline.close = last_price;
-            kline.low = last_price;
-            kline.high = last_price;
-            kline.time_start = start;
-            kline.time_end = end;
-            kline.time = DateTimeOffset.UtcNow;
-            return kline;
-        }
-        else if (deals.Count > 0)
-        {
-            deals = deals.OrderBy(P => P.time).ToList();
-            kline.market = market;
-            kline.type = klineType;
-            kline.amount = deals.Sum(P => P.amount);
-            kline.count = deals.Count;
-            kline.total = deals.Sum(P => P.amount * P.price);
-            kline.open = deals[0].price;
-            kline.close = deals[deals.Count - 1].price;
-            kline.low = deals.Min(P => P.price);
-            kline.high = deals.Max(P => P.price);
-            kline.time_start = start;
-            kline.time_end = end;
-            kline.time = DateTimeOffset.UtcNow;
-            return kline;
-        }
-        return null;
     }
 
 }

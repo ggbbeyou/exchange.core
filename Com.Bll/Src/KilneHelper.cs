@@ -79,12 +79,14 @@ public class KilneHelper
     /// <summary>
     /// 交易记录转换成K线
     /// </summary>
+    /// <param name="market"></param>
     /// <param name="klineType"></param>
     /// <param name="start"></param>
     /// <param name="end"></param>
+    /// <param name="last_price"></param>
     /// <param name="deals"></param>
     /// <returns></returns>
-    public BaseKline? DealToKline(string market, E_KlineType klineType, DateTimeOffset start, DateTimeOffset end, List<Deal> deals, decimal last_price)
+    public BaseKline? DealToKline(string market, E_KlineType klineType, DateTimeOffset start, DateTimeOffset end, decimal last_price, List<Deal> deals)
     {
         BaseKline kline = new BaseKline();
         if (last_price > 0 && deals.Count == 0)

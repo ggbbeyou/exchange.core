@@ -223,6 +223,13 @@ public class KlindService
             baseKline.time_start = i;
             baseKline.time_end = end_time;
             baseKline.time = DateTimeOffset.UtcNow;
+            baseKline.amount = 0;
+            baseKline.count = 0;
+            baseKline.total = 0;
+            baseKline.open = last_price;
+            baseKline.close = last_price;
+            baseKline.high = last_price;
+            baseKline.low = last_price;
             if (deal.Count > 0)
             {
                 baseKline.amount = deal.Sum(P => P.amount);

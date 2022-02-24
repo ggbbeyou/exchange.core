@@ -66,7 +66,7 @@ public class KilneHelper
             {
                 continue;
             }
-            BaseKline? kline = DealToKline(market, klineType, i, end_time, deal, last_price);
+            BaseKline? kline = DealToKline(market, klineType, i, end_time, last_price, deal);
             if (kline != null)
             {
                 result.Add(kline);

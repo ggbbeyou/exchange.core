@@ -136,7 +136,6 @@ public class KlindService
             }
             this.constant.redis.SortedSetAdd(string.Format(this.redis_key_kline, market, cycle), entries);
             this.kilneHelper.SaveKline(market, cycle, klines);
-
         }
     }
 

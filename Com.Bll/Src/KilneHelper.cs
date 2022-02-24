@@ -1,4 +1,5 @@
-﻿using Com.Common;
+﻿using System.Linq.Expressions;
+using Com.Common;
 using Com.Db;
 using Com.Model;
 using Com.Model.Enum;
@@ -31,7 +32,7 @@ public class KilneHelper
     }
 
     /// <summary>
-    /// 从数据库统计K线
+    /// 从数据库Deal统计K线
     /// </summary>
     /// <param name="market"></param>
     /// <param name="klineType"></param>
@@ -168,30 +169,73 @@ public class KilneHelper
     }
 
 
-    /*
-
-    var sql = from deal in this.constant.db.Deal
-                      where deal.market == market && start <= deal.time && deal.time < end
-                      orderby deal.time
-                      group deal by deal.time.Ticks / span.Ticks into g
-                      select new BaseKline
-                      {
-                          market = market,
-                          amount = g.Sum(P => P.amount),
-                          count = g.Count(),
-                          total = g.Sum(P => P.price * P.amount),
-                          open = g.First().price,
-                          close = g.Last().price,
-                          low = g.Min(P => P.price),
-                          high = g.Max(P => P.price),
-                          type = klineType,
-                          time_start = new DateTimeOffset(g.Key * span.Ticks, TimeSpan.Zero),
-                          time_end = new DateTimeOffset((g.Key + 1) * span.Ticks, TimeSpan.Zero),
-                          time = DateTimeOffset.UtcNow,
-                      };
-            result = sql.ToList();
-
-    */
+    /// <summary>
+    /// 从数据库统计K线
+    /// </summary>
+    /// <param name="market"></param>
+    /// <param name="klineType_source"></param>
+    /// <param name="klineType_target"></param>
+    /// <param name="start"></param>
+    /// <param name="end"></param>
+    /// <returns></returns>
+    public List<BaseKline> GetKlines(string market, E_KlineType klineType_source, E_KlineType klineType_target, DateTimeOffset start, DateTimeOffset end)
+    {
+        List<BaseKline> result = new List<BaseKline>();
+        Expression<Func<Kline, int>> lambda = P => EF.Functions.DateDiffMinute(this.system_init, P.time_start);
+        switch (klineType_target)
+        {
+            case E_KlineType.min1:
+                lambda = P => EF.Functions.DateDiffMinute(this.system_init, P.time_start);
+                break;
+            case E_KlineType.min5:
+                lambda = P => EF.Functions.DateDiffMinute(this.system_init, P.time_start) / 5;
+                break;
+            case E_KlineType.min15:
+                lambda = P => EF.Functions.DateDiffMinute(this.system_init, P.time_start) / 15;
+                break;
+            case E_KlineType.min30:
+                lambda = P => EF.Functions.DateDiffMinute(this.system_init, P.time_start) / 30;
+                break;
+            case E_KlineType.hour1:
+                lambda = P => EF.Functions.DateDiffHour(this.system_init, P.time_start);
+                break;
+            case E_KlineType.hour12:
+                lambda = P => EF.Functions.DateDiffHour(this.system_init, P.time_start) / 12;
+                break;
+            case E_KlineType.day1:
+                lambda = P => EF.Functions.DateDiffDay(this.system_init, P.time_start);
+                break;
+            case E_KlineType.week1:
+                lambda = P => EF.Functions.DateDiffWeek(this.system_init, P.time_start);
+                break;
+            case E_KlineType.month1:
+                lambda = P => EF.Functions.DateDiffMonth(this.system_init, P.time_start);
+                break;
+            default:
+                lambda = P => EF.Functions.DateDiffMinute(this.system_init, P.time_start);
+                break;
+        }
+        var sql = from kline in this.constant.db.Kline
+                  where kline.market == market && kline.type == klineType_source && start <= kline.time && kline.time <= end
+                  orderby kline.time_start
+                  group kline by lambda into g
+                  select new BaseKline
+                  {
+                      market = market,
+                      amount = g.Sum(P => P.amount),
+                      count = g.Count(),
+                      total = g.Sum(P => P.total),
+                      open = g.First().open,
+                      close = g.Last().close,
+                      low = g.Min(P => P.low),
+                      high = g.Max(P => P.high),
+                      type = klineType_target,
+                      time_start = g.First().time_start,
+                      time_end = g.Last().time_end,
+                      time = DateTimeOffset.UtcNow,
+                  };
+        return sql.ToList();
+    }
 
     public void AddTest()
     {

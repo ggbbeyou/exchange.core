@@ -96,7 +96,7 @@ public class DbContextEF : AbstractShardingDbContext, IShardingTableDbContext
         {
             o.HasKey(p => p.trade_id);
             o.HasIndex(P => new { P.market, P.time });
-            o.Property(P => P.trade_id).IsRequired().HasColumnType("bigint").ValueGeneratedNever().HasComment("成交订单ID");
+            o.Property(P => P.trade_id).IsRequired().ValueGeneratedNever().HasColumnType("bigint").HasComment("成交订单ID");
             o.Property(P => P.market).IsRequired().HasColumnType("nvarchar").HasMaxLength(50).HasComment("交易对");
             o.Property(P => P.price).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("成交价");
             o.Property(P => P.amount).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("成交量");

@@ -48,7 +48,7 @@ public class KlindService
     public KilneHelper kilneHelper = null!;
 
     /// <summary>
-    /// 初始化
+    /// 初始化  注:2018-1-1 此时是一年第一天，一年第一月，一年第一个星期一
     /// </summary>
     /// <param name="configuration">配置接口</param>
     /// <param name="environment">环境接口</param>
@@ -56,7 +56,7 @@ public class KlindService
     public KlindService(FactoryConstant constant)
     {
         this.constant = constant;
-        this.kilneHelper = new KilneHelper(this.constant, new DateTimeOffset(2020, 1, 1, 0, 0, 0, TimeSpan.Zero));
+        this.kilneHelper = new KilneHelper(this.constant, new DateTimeOffset(2018, 1, 1, 0, 0, 0, TimeSpan.Zero));
     }
 
     /// <summary>

@@ -20,7 +20,7 @@ class Program
     /// <param name="args"></param>
     /// <returns></returns>
     static async Task Main(string[] args)
-    {
+    {       
         using IHost host = CreateHostBuilder(args).Build();
         await host.RunAsync();
     }

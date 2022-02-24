@@ -7,25 +7,26 @@ using ShardingCore.VirtualRoutes.Abstractions;
 * @Date: DATE TIME
 * @Email: 326308290@qq.com
 */
-namespace Com.Db;
-
-public abstract class AbstractShardingTimeKeyDateTimeOffsetVirtualTableRoute<TEntity> : AbstractShardingAutoCreateOperatorVirtualTableRoute<TEntity, DateTimeOffset> where TEntity : class
+namespace Com.Db
 {
-    /// <summary>
-    /// how convert sharding key to tail
-    /// </summary>
-    /// <param name="shardingKey"></param>
-    /// <returns></returns>
-    public override string ShardingKeyToTail(object shardingKey)
+    public abstract class AbstractShardingTimeKeyDateTimeOffsetVirtualTableRoute<TEntity> : AbstractShardingAutoCreateOperatorVirtualTableRoute<TEntity, DateTimeOffset> where TEntity : class
     {
-        var time = (DateTime)shardingKey;
-        return TimeFormatToTail(time);
-    }
-    /// <summary>
-    /// how format date time to tail
-    /// </summary>
-    /// <param name="time"></param>
-    /// <returns></returns>
-    protected abstract string TimeFormatToTail(DateTimeOffset time);
+        /// <summary>
+        /// how convert sharding key to tail
+        /// </summary>
+        /// <param name="shardingKey"></param>
+        /// <returns></returns>
+        public override string ShardingKeyToTail(object shardingKey)
+        {
+            var time = (DateTimeOffset)shardingKey;
+            return TimeFormatToTail(time);
+        }
+        /// <summary>
+        /// how format date time to tail
+        /// </summary>
+        /// <param name="time"></param>
+        /// <returns></returns>
+        protected abstract string TimeFormatToTail(DateTimeOffset time);
 
+    }
 }

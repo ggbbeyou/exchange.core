@@ -24,13 +24,13 @@ public class RouteDeal : AbstractSimpleShardingMonthKeyDateTimeOffsetVirtualTabl
 
     public override void Configure(EntityMetadataTableBuilder<Deal> builder)
     {
-        builder.ShardingProperty(o => o.trade_id);
+        builder.ShardingProperty(o => o.time);
         builder.AutoCreateTable(false);
         builder.TableSeparator("_");
     }
 
     public override DateTimeOffset GetBeginTime()
     {
-        return DateTimeOffset.UtcNow.DateTime;
+        return DateTimeOffset.Now;
     }
 }

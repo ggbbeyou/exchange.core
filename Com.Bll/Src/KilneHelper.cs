@@ -38,22 +38,40 @@ public class KilneHelper
     {
         List<BaseKline> result = new List<BaseKline>();
         DateTimeOffset start = DateTimeOffset.MinValue;
+        decimal last_price = 0;
         if (last_kline != null)
         {
             start = last_kline.time_start.Add(span);
+            last_price = last_kline.close;
         }
-        List<Deal> deals = this.constant.db.Deal.Where(P => P.market == market && start <= P.time && P.time < end).OrderBy(P => P.time).ToList();
-        // foreach (var item in deals)
-        // {
-        //     item.timestamp = item.time.ToUnixTimeMilliseconds();
-        // }
-        // this.constant.db.SaveChanges();
-        // this.constant.db.Remove(deals[0]);
-        // this.constant.db.SaveChanges();
-
-        for (DateTimeOffset i = start; i <= end; i.Add(span))
+        List<Deal> deals = this.constant.db.Deal.Where(P => P.market == market && start <= P.time && P.time <= end).OrderBy(P => P.time).ToList();
+        for (DateTimeOffset i = start; i <= end; i = i.Add(span))
         {
+            DateTimeOffset end_time = i.Add(span);
 
+            // BaseKline kline = new BaseKline();
+            // kline.time_start = i;
+            // kline.time_end = i.Add(span);
+            // kline.market = market;
+            // kline.klineType = klineType;
+            // kline.open = deals.Where(P => P.time >= i && P.time < i.Add(span)).Min(P => P.price);
+            // kline.close = deals.Where(P => P.time >= i && P.time < i.Add(span)).Max(P => P.price);
+            // kline.high = deals.Where(P => P.time >= i && P.time < i.Add(span)).Max(P => P.price);
+            // kline.low = deals.Where(P => P.time >= i && P.time < i.Add(span)).Min(P => P.price);
+            // kline.vol = deals.Where(P => P.time >= i && P.time < i.Add(span)).Sum(P => P.vol);
+            // kline.amount = deals.Where(P => P.time >= i && P.time < i.Add(span)).Sum(P => P.amount);
+            // kline.last_price = last_price;
+            // kline.last_vol = 0;
+            // kline.last_amount = 0;
+            // kline.last_time = DateTimeOffset.MinValue;
+            // kline.last_close = 0;
+            // kline.last_open = 0;
+            // kline.last_high = 0;
+            // kline.last_low = 0;
+            // kline.last_klineType = E_KlineType.min1;
+            // kline.last_klineType_span = KlineTypeSpan(E_KlineType.min1);
+            // kline.last_klineType_span_time = kline.last_klineType_span.Add(kline.time_start);
+            // kline.last_klineType_span_time_end = kline.last_klineType_span_time.Add(kline.last_kline
         }
         return result;
     }

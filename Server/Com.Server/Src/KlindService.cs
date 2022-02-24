@@ -65,9 +65,8 @@ public class KlindService
         string key = string.Format(this.redis_key_kline, market, E_KlineType.min1);
         DateTimeOffset now = DateTimeOffset.UtcNow;
         BaseKline? last_kline = GetRedisLastKline(market, E_KlineType.min1);
-        // TimeSpan span = TimeAdd(last_kline.time_start, E_KlineType.min1);
-        // max = max.Add(span);
-        List<BaseKline> klines = this.kilneHelper.GetKlines(market, E_KlineType.min1, last_kline, new DateTimeOffset(now.Year, now.Month, now.Day, now.Hour, now.Minute, 0, 0, new TimeSpan()), span);
+        TimeSpan span = KlineTypeSpan(E_KlineType.min1);
+        List<BaseKline> klines = this.kilneHelper.GetKlines(market, E_KlineType.min1, last_kline, new DateTimeOffset(now.Year, now.Month, now.Day, now.Hour, now.Minute, 0, 0, new TimeSpan()).AddMilliseconds(-1), span);
         if (klines != null && klines.Count() > 0)
         {
             SortedSetEntry[] entries = new SortedSetEntry[klines.Count()];
@@ -125,7 +124,7 @@ public class KlindService
     /// <param name="start"></param>
     /// <param name="klineType"></param>
     /// <returns></returns>
-    public TimeSpan TimeAdd(DateTimeOffset start, E_KlineType klineType)
+    public TimeSpan KlineTypeSpan(E_KlineType klineType)
     {
         TimeSpan span = new TimeSpan();
         switch (klineType)

@@ -18,7 +18,7 @@ public abstract class AbstractShardingTimeKeyDateTimeOffsetVirtualTableRoute<TEn
     /// <returns></returns>
     public override string ShardingKeyToTail(object shardingKey)
     {
-        var time = (DateTimeOffset)shardingKey;
+        var time = (DateTime)shardingKey;
         return TimeFormatToTail(time);
     }
     /// <summary>

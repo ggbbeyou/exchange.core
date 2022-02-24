@@ -92,12 +92,7 @@ public class Core
         {
             market = market,
             type = E_KlineType.hour1,
-        });
-        this.kline.Add(E_KlineType.hour4, new BaseKline()
-        {
-            market = market,
-            type = E_KlineType.hour4,
-        });
+        });      
         this.kline.Add(E_KlineType.hour6, new BaseKline()
         {
             market = market,

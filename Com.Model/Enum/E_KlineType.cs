@@ -28,27 +28,23 @@ public enum E_KlineType
     /// </summary>
     hour1 = 5,
     /// <summary>
-    /// 4小时
-    /// </summary>
-    hour4 = 6,
-    /// <summary>
     /// 6小时
     /// </summary>
-    hour6 = 7,
+    hour6 = 6,
     /// <summary>
     /// 12小时
     /// </summary>
-    hour12 = 8,
+    hour12 = 7,
     /// <summary>
     /// 1天
     /// </summary>
-    day1 = 9,
+    day1 = 8,
     /// <summary>
     /// 1周
     /// </summary>
-    week1 = 10,
+    week1 = 9,
     /// <summary>
     /// 1月
     /// </summary>
-    month1 = 11,
+    month1 = 10,
 }

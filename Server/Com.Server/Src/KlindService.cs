@@ -75,6 +75,7 @@ public class KlindService
                 entries[i] = new SortedSetEntry(JsonConvert.SerializeObject(klines[i]), klines[i].time_start.ToUnixTimeSeconds());
             }
             this.constant.redis.SortedSetAdd(key, entries);
+            this.kilneHelper.SaveKline(market, E_KlineType.min1, klines);
         }
         List<BaseKline> klines_temp = new List<BaseKline>();
         foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))

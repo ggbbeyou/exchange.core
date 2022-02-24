@@ -109,10 +109,49 @@ public class KilneHelper
         return null;
     }
 
+    /// <summary>
+    /// 保存K线
+    /// </summary>
+    /// <param name="market"></param>
+    /// <param name="klineType"></param>
+    /// <param name="klines"></param>
+    /// <returns></returns>
+    public int SaveKline(string market, E_KlineType klineType, List<BaseKline> klines)
+    {
+        if (klines == null || klines.Count == 0)
+        {
+            return 0;
+        }
+        List<Kline> db_kline = this.constant.db.Kline.Where(P => P.market == market && P.type == klineType && P.time_start >= klines[0].time_start && P.time_end <= klines[klines.Count - 1].time_end).ToList();
+        foreach (var item in klines)
+        {
+            Kline? kline = db_kline.FirstOrDefault(P => P.time_start == item.time_start);
+            if (kline == null)
+            {
+                kline = new Kline();
+                kline.id = this.constant.worker.NextId();
+                this.constant.db.Kline.Add(kline);
+            }
+            kline.market = market;
+            kline.type = item.type;
+            kline.amount = item.amount;
+            kline.count = item.count;
+            kline.total = item.total;
+            kline.open = item.open;
+            kline.close = item.close;
+            kline.low = item.low;
+            kline.high = item.high;
+            kline.time_start = item.time_start;
+            kline.time_end = item.time_end;
+            kline.time = item.time;
+        }
+        return this.constant.db.SaveChanges();
+    }
+
 
     /*
 
-  var sql = from deal in this.constant.db.Deal
+    var sql = from deal in this.constant.db.Deal
                       where deal.market == market && start <= deal.time && deal.time < end
                       orderby deal.time
                       group deal by deal.time.Ticks / span.Ticks into g

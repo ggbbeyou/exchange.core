@@ -23,7 +23,7 @@ public class KilneHelper
     public KilneHelper(FactoryConstant constant)
     {
         this.constant = constant;
-        // AddTest();
+        AddTest();
     }
 
     /// <summary>
@@ -130,6 +130,9 @@ public class KilneHelper
             {
                 kline = new Kline();
                 kline.id = this.constant.worker.NextId();
+                kline.time_start = item.time_start;
+                kline.time_end = item.time_end;
+                kline.time = item.time;
                 this.constant.db.Kline.Add(kline);
             }
             kline.market = market;
@@ -179,13 +182,15 @@ public class KilneHelper
         Random r = new Random();
         for (int i = 0; i < 10; i++)
         {
+            decimal price = r.NextInt64(2000, 4000);
+            decimal amount = r.NextInt64(1, 25);
             this.constant.db.Set<Deal>().Add(new Deal
             {
                 trade_id = this.constant.worker.NextId(),
                 market = "btc/usdt",
-                amount = (decimal)r.NextDouble(),
-                price = (decimal)r.NextDouble(),
-                total = (decimal)r.NextDouble(),
+                amount = amount,
+                price = price,
+                total = amount * price,
                 trigger_side = E_OrderSide.buy,
                 bid_id = this.constant.worker.NextId(),
                 ask_id = this.constant.worker.NextId(),

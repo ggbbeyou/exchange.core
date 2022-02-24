@@ -170,7 +170,7 @@ public class KilneHelper
 
 
     /// <summary>
-    /// 从数据库统计K线
+    /// 从数据库统计K线(除1分钟K线外)
     /// </summary>
     /// <param name="market"></param>
     /// <param name="klineType_source"></param>

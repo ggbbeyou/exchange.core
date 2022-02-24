@@ -37,7 +37,7 @@ public class KilneHelper
     public List<BaseKline> GetKlines(string market, E_KlineType klineType, BaseKline? last_kline, DateTimeOffset end, TimeSpan span)
     {
         List<BaseKline> result = new List<BaseKline>();
-        DateTimeOffset start = DateTimeOffset.MinValue;
+        DateTimeOffset start = new DateTimeOffset(2020, 1, 1, 0, 0, 0, TimeSpan.Zero);
         decimal last_price = 0;
         if (last_kline != null)
         {
@@ -53,7 +53,7 @@ public class KilneHelper
             {
                 continue;
             }
-            BaseKline? kline = DealToKline(market, klineType, start, end_time, deal, last_price);
+            BaseKline? kline = DealToKline(market, klineType, i, end_time, deal, last_price);
             if (kline != null)
             {
                 result.Add(kline);
@@ -89,7 +89,7 @@ public class KilneHelper
             kline.time = DateTimeOffset.UtcNow;
             return kline;
         }
-        else if (deals.Count == 0)
+        else if (deals.Count > 0)
         {
             deals = deals.OrderBy(P => P.time).ToList();
             kline.market = market;

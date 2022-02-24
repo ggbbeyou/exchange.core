@@ -84,20 +84,20 @@ public class KlindService
                 continue;
             }
             klines_temp.Clear();
-            DateTimeOffset max_other = GetRedisLastKline(market, cycle);
-            TimeSpan span_other = TimeAdd(max, cycle);
-            max_other = max_other.Add(span_other);
-            RedisValue[] value = this.constant.redis.SortedSetRangeByScore(key, max_other.ToUnixTimeSeconds(), double.PositiveInfinity, Exclude.Stop, StackExchange.Redis.Order.Ascending);
-            foreach (var item in value)
-            {
-                if (item.IsNullOrEmpty)
-                {
-                    continue;
-                }
-                klines_temp.Add(JsonConvert.DeserializeObject<BaseKline>(item)!);
-                List<BaseKline> klines1 = MergeKline(klines_temp, cycle);
-                this.constant.redis.SortedSetAdd(string.Format(this.redis_key_kline, market, cycle), klines1.Select(x => new SortedSetEntry(JsonConvert.SerializeObject(x), x.time_start.ToUnixTimeSeconds())).ToArray());
-            }
+            // DateTimeOffset max_other = GetRedisLastKline(market, cycle);
+            // TimeSpan span_other = TimeAdd(max, cycle);
+            // max_other = max_other.Add(span_other);
+            // RedisValue[] value = this.constant.redis.SortedSetRangeByScore(key, max_other.ToUnixTimeSeconds(), double.PositiveInfinity, Exclude.Stop, StackExchange.Redis.Order.Ascending);
+            // foreach (var item in value)
+            // {
+            //     if (item.IsNullOrEmpty)
+            //     {
+            //         continue;
+            //     }
+            //     klines_temp.Add(JsonConvert.DeserializeObject<BaseKline>(item)!);
+            //     List<BaseKline> klines1 = MergeKline(klines_temp, cycle);
+            //     this.constant.redis.SortedSetAdd(string.Format(this.redis_key_kline, market, cycle), klines1.Select(x => new SortedSetEntry(JsonConvert.SerializeObject(x), x.time_start.ToUnixTimeSeconds())).ToArray());
+            // }
         }
     }
 

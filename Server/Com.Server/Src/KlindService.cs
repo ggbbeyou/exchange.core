@@ -105,7 +105,6 @@ public class KlindService
                 continue;
             }
             klines_temp.Clear();
-            string key = string.Format(this.redis_key_kline, market, cycle);
             BaseKline? last_kline = GetRedisLastKline(market, cycle);
             TimeSpan span = KlineTypeSpan(cycle);
             DateTimeOffset start = this.kilneHelper.system_init;
@@ -123,7 +122,7 @@ public class KlindService
                     continue;
                 }
                 klines_temp.Add(JsonConvert.DeserializeObject<BaseKline>(item)!);
-                List<BaseKline> klines = MergeKline(klines_temp, cycle);
+                List<BaseKline> klines = MergeKline(market, cycle, start, klines_temp.Last().time_end, last_price, span, klines_temp);
                 SortedSetEntry[] entries = new SortedSetEntry[klines.Count()];
                 for (int i = 0; i < klines.Count(); i++)
                 {
@@ -143,8 +142,7 @@ public class KlindService
     /// <returns></returns>
     public BaseKline? GetRedisLastKline(string market, E_KlineType klineType)
     {
-        string key = string.Format(this.redis_key_kline, market, klineType);
-        RedisValue[] redisvalue = this.constant.redis.SortedSetRangeByRank(key, 0, 1, StackExchange.Redis.Order.Descending);
+        RedisValue[] redisvalue = this.constant.redis.SortedSetRangeByRank(string.Format(this.redis_key_kline, market, klineType), 0, 1, StackExchange.Redis.Order.Descending);
         if (redisvalue.Length > 0)
         {
             return JsonConvert.DeserializeObject<BaseKline>(redisvalue[0]);
@@ -188,7 +186,7 @@ public class KlindService
         }
     }
 
-    public List<BaseKline> MergeKline(List<BaseKline> klines, E_KlineType klineType)
+    public List<BaseKline> MergeKline(string market, E_KlineType klineType, DateTimeOffset start, DateTimeOffset end, decimal last_price, TimeSpan span, List<BaseKline> klines)
     {
         List<BaseKline> resutl = new List<BaseKline>();
 

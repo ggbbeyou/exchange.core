@@ -64,10 +64,10 @@ public class KlindService
     {
         string key = string.Format(this.redis_key_kline, market, E_KlineType.min1);
         DateTimeOffset now = DateTimeOffset.UtcNow;
-        DateTimeOffset max = GetRedisMaxMinuteKline(market, E_KlineType.min1);
-        TimeSpan span = TimeAdd(max, E_KlineType.min1);
-        max = max.Add(span);
-        List<BaseKline> klines = this.kilneHelper.GetKlines(market, E_KlineType.min1, max, new DateTimeOffset(now.Year, now.Month, now.Day, now.Hour, now.Minute, 0, 0, new TimeSpan()), span);
+        BaseKline? last_kline = GetRedisLastKline(market, E_KlineType.min1);
+        // TimeSpan span = TimeAdd(last_kline.time_start, E_KlineType.min1);
+        // max = max.Add(span);
+        List<BaseKline> klines = this.kilneHelper.GetKlines(market, E_KlineType.min1, last_kline, new DateTimeOffset(now.Year, now.Month, now.Day, now.Hour, now.Minute, 0, 0, new TimeSpan()), span);
         if (klines != null && klines.Count() > 0)
         {
             SortedSetEntry[] entries = new SortedSetEntry[klines.Count()];
@@ -85,7 +85,7 @@ public class KlindService
                 continue;
             }
             klines_temp.Clear();
-            DateTimeOffset max_other = GetRedisMaxMinuteKline(market, cycle);
+            DateTimeOffset max_other = GetRedisLastKline(market, cycle);
             TimeSpan span_other = TimeAdd(max, cycle);
             max_other = max_other.Add(span_other);
             RedisValue[] value = this.constant.redis.SortedSetRangeByScore(key, max_other.ToUnixTimeSeconds(), double.PositiveInfinity, Exclude.Stop, StackExchange.Redis.Order.Ascending);
@@ -108,15 +108,15 @@ public class KlindService
     /// <param name="market">交易对</param>
     /// <param name="klineType">K线类型</param>
     /// <returns></returns>
-    public DateTimeOffset GetRedisMaxMinuteKline(string market, E_KlineType klineType)
+    public BaseKline? GetRedisLastKline(string market, E_KlineType klineType)
     {
         string key = string.Format(this.redis_key_kline, market, klineType);
-        SortedSetEntry[] redisvalue = this.constant.redis.SortedSetRangeByRankWithScores(key, 0, 1, StackExchange.Redis.Order.Descending);
+        RedisValue[] redisvalue = this.constant.redis.SortedSetRangeByRank(key, 0, 1, StackExchange.Redis.Order.Descending);
         if (redisvalue.Length > 0)
         {
-            return DateTimeOffset.FromUnixTimeSeconds((long)redisvalue[0].Score);
+            return JsonConvert.DeserializeObject<BaseKline>(redisvalue[0]);
         }
-        return DateTimeOffset.MinValue;
+        return null;
     }
 
     /// <summary>

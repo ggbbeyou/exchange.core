@@ -34,9 +34,14 @@ public class KilneHelper
     /// <param name="start"></param>
     /// <param name="end"></param>
     /// <returns></returns>
-    public List<BaseKline> GetKlines(string market, E_KlineType klineType, DateTimeOffset start, DateTimeOffset end, TimeSpan span)
+    public List<BaseKline> GetKlines(string market, E_KlineType klineType, BaseKline? last_kline, DateTimeOffset end, TimeSpan span)
     {
         List<BaseKline> result = new List<BaseKline>();
+        DateTimeOffset start = DateTimeOffset.MinValue;
+        if (last_kline != null)
+        {
+            start = last_kline.time_start.Add(span);
+        }
         List<Deal> deals = this.constant.db.Deal.Where(P => P.market == market && start <= P.time && P.time < end).OrderBy(P => P.time).ToList();
         // foreach (var item in deals)
         // {

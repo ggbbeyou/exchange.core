@@ -231,6 +231,7 @@ public class KlindService
                 baseKline.high = deal.Max(P => P.high);
                 baseKline.low = deal.Min(P => P.low);
             }
+            last_price = baseKline.close;
             resutl.Add(baseKline);
         }
         return resutl;

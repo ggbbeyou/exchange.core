@@ -76,7 +76,6 @@ public class KlindService
     /// <param name="market"></param>
     public void SyncMin1Kline(string market, DateTimeOffset now)
     {
-
         BaseKline? last_kline = GetRedisLastKline(market, E_KlineType.min1);
         TimeSpan span = KlineTypeSpan(E_KlineType.min1);
         List<BaseKline> klines = this.kilneHelper.GetKlines(market, E_KlineType.min1, last_kline, new DateTimeOffset(now.Year, now.Month, now.Day, now.Hour, now.Minute, 0, 0, new TimeSpan()).AddMilliseconds(-1), span);

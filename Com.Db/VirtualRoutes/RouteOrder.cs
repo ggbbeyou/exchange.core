@@ -9,20 +9,27 @@ namespace Com.Db;
 /// <summary>
 /// 订单 路由
 /// </summary>
-public class RouteOrder : AbstractSimpleShardingMonthKeyDateTimeVirtualTableRoute<Order>
+public class RouteOrder : AbstractSimpleShardingMonthKeyDateTimeOffsetVirtualTableRoute<Order>
 {
-    public override DateTime GetBeginTime()
-    {
-        return DateTimeOffset.UtcNow.DateTime;
-    }
 
-    public override void Configure(EntityMetadataTableBuilder<Order> builder)
+    public RouteOrder()
     {
-        builder.ShardingProperty(o => o.create_time);
     }
 
     public override bool AutoCreateTableByTime()
     {
         return true;
+    }
+
+    public override void Configure(EntityMetadataTableBuilder<Order> builder)
+    {
+        builder.ShardingProperty(o => o.create_time);
+        builder.AutoCreateTable(false);
+        builder.TableSeparator("_");
+    }
+
+    public override DateTimeOffset GetBeginTime()
+    {
+        return DateTimeOffset.Now;
     }
 }

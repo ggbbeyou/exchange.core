@@ -37,11 +37,19 @@ public class KilneHelper
     public List<BaseKline> GetKlines(string market, E_KlineType klineType, DateTimeOffset start, DateTimeOffset end, TimeSpan span)
     {
         List<BaseKline> result = new List<BaseKline>();
-        List<Deal> deals = this.constant.db.Deal.Where(P => P.market == market && P.time < end).OrderBy(P => P.time).ToList();
+        List<Deal> deals = this.constant.db.Deal.Where(P => P.market == market && start <= P.time && P.time < end).OrderBy(P => P.time).ToList();
+        // foreach (var item in deals)
+        // {
+        //     item.timestamp = item.time.ToUnixTimeMilliseconds();
+        // }
+        // this.constant.db.SaveChanges();
+        // this.constant.db.Remove(deals[0]);
+        // this.constant.db.SaveChanges();
 
+        for (DateTimeOffset i = start; i <= end; i.Add(span))
+        {
 
-
-
+        }
         return result;
     }
 
@@ -176,7 +184,7 @@ public class KilneHelper
                 trigger_side = E_OrderSide.buy,
                 bid_id = this.constant.worker.NextId(),
                 ask_id = this.constant.worker.NextId(),
-                time = DateTimeOffset.UtcNow.AddMonths(-3).AddMinutes(i),
+                time = DateTimeOffset.UtcNow.AddDays(-1).AddMinutes(i),
             });
         }
         this.constant.db.SaveChanges();

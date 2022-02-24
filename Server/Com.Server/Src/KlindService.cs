@@ -63,10 +63,11 @@ public class KlindService
     public void DBtoRedis(string market)
     {
         string key = string.Format(this.redis_key_kline, market, E_KlineType.min1);
+        DateTimeOffset now = DateTimeOffset.UtcNow;
         DateTimeOffset max = GetRedisMaxMinuteKline(market, E_KlineType.min1);
         TimeSpan span = TimeAdd(max, E_KlineType.min1);
         max = max.Add(span);
-        List<BaseKline> klines = this.kilneHelper.GetKlines(market, E_KlineType.min1, max, DateTimeOffset.UtcNow, span);
+        List<BaseKline> klines = this.kilneHelper.GetKlines(market, E_KlineType.min1, max, new DateTimeOffset(now.Year, now.Month, now.Day, now.Hour, now.Minute, 0, 0, new TimeSpan()), span);
         if (klines != null && klines.Count() > 0)
         {
             SortedSetEntry[] entries = new SortedSetEntry[klines.Count()];

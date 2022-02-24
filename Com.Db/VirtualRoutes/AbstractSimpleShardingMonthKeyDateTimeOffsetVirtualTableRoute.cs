@@ -26,7 +26,8 @@ namespace Com.Db
             var currentTimeStamp = beginTime;
             while (currentTimeStamp <= nowTimeStamp)
             {
-                var tail = ShardingKeyToTail(currentTimeStamp);
+                //var tail = ShardingKeyToTail(currentTimeStamp);
+                var tail = ShardingKeyToTail(new DateTimeOffset(currentTimeStamp));
                 tails.Add(tail);
                 currentTimeStamp = ShardingCoreHelper.GetNextMonthFirstDay(currentTimeStamp);
             }

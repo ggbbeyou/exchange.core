@@ -220,9 +220,6 @@ public class KlindService
             BaseKline baseKline = new BaseKline();
             baseKline.market = market;
             baseKline.type = klineType;
-            baseKline.time_start = i;
-            baseKline.time_end = end_time;
-            baseKline.time = DateTimeOffset.UtcNow;
             baseKline.amount = 0;
             baseKline.count = 0;
             baseKline.total = 0;
@@ -230,6 +227,9 @@ public class KlindService
             baseKline.close = last_price;
             baseKline.high = last_price;
             baseKline.low = last_price;
+            baseKline.time_start = i;
+            baseKline.time_end = end_time;
+            baseKline.time = DateTimeOffset.UtcNow;
             if (deal.Count > 0)
             {
                 baseKline.amount = deal.Sum(P => P.amount);

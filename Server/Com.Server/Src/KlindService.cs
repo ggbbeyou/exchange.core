@@ -98,6 +98,7 @@ public class KlindService
     public void SyncKline(string market, DateTimeOffset now)
     {
         List<BaseKline> klines_temp = new List<BaseKline>();
+        E_KlineType previous = E_KlineType.min1;
         foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
         {
             if (cycle == E_KlineType.min1 || cycle == E_KlineType.week1 || cycle == E_KlineType.month1)
@@ -115,7 +116,8 @@ public class KlindService
                 start = last_kline.time_start.Add(span);
                 last_price = last_kline.close;
             }
-            RedisValue[] value = this.constant.redis.SortedSetRangeByScore(string.Format(this.redis_key_kline, market, E_KlineType.min1), start.ToUnixTimeSeconds(), double.PositiveInfinity, Exclude.Stop, StackExchange.Redis.Order.Ascending);
+            RedisValue[] value = this.constant.redis.SortedSetRangeByScore(string.Format(this.redis_key_kline, market, previous), start.ToUnixTimeSeconds(), double.PositiveInfinity, Exclude.Stop, StackExchange.Redis.Order.Ascending);
+            previous = cycle;
             foreach (var item in value)
             {
                 if (item.IsNullOrEmpty)
@@ -178,7 +180,7 @@ public class KlindService
             case E_KlineType.min30:
                 return span = new TimeSpan(0, 30, 0);
             case E_KlineType.hour1:
-                return span = new TimeSpan(1, 0, 0);          
+                return span = new TimeSpan(1, 0, 0);
             case E_KlineType.hour12:
                 return span = new TimeSpan(12, 0, 0);
             case E_KlineType.day1:

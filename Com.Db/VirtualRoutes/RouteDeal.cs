@@ -10,11 +10,16 @@ namespace Com.Db;
 /// <summary>
 /// 成交单 路由
 /// </summary>
-public class RouteDeal : AbstractSimpleShardingModKeyStringVirtualTableRoute<Deal>
+public class RouteDeal : AbstractSimpleShardingMonthKeyDateTimeOffsetVirtualTableRoute<Deal>
 {
 
-    public RouteDeal() : base(2, 3)
+    public RouteDeal()
     {
+    }
+
+    public override bool AutoCreateTableByTime()
+    {
+        return true;
     }
 
     public override void Configure(EntityMetadataTableBuilder<Deal> builder)
@@ -24,18 +29,8 @@ public class RouteDeal : AbstractSimpleShardingModKeyStringVirtualTableRoute<Dea
         builder.TableSeparator("_");
     }
 
-    // public override DateTime GetBeginTime()
-    // {
-    //     return DateTimeOffset.UtcNow.DateTime;
-    // }
-
-    // public override void Configure(EntityMetadataTableBuilder<Deal> builder)
-    // {
-    //     builder.ShardingProperty(o => o.time);
-    // }
-
-    // public override bool AutoCreateTableByTime()
-    // {
-    //     return true;
-    // }
+    public override DateTimeOffset GetBeginTime()
+    {
+        return DateTimeOffset.UtcNow.DateTime;
+    }
 }

@@ -275,8 +275,31 @@ public class KilneHelper
                 lambda = P => EF.Functions.DateDiffMinute(this.system_init, P.time_start);
                 break;
         }
+        // var sql = from kline in this.constant.db.Kline
+        //           where kline.market == market && kline.type == klineType_source && start <= kline.time && kline.time <= end
+        //           orderby kline.time_start
+        //           group kline by lambda into g
+        //           select new BaseKline
+        //           {
+        //               market = market,
+        //               amount = g.Sum(P => P.amount),
+        //               count = g.Count(),
+        //               total = g.Sum(P => P.total),
+        //               open = g.First().open,
+        //               close = g.Last().close,
+        //               low = g.Min(P => P.low),
+        //               high = g.Max(P => P.high),
+        //               type = klineType_target,
+        //               time_start = g.First().time_start,
+        //               time_end = g.Last().time_end,
+        //               time = DateTimeOffset.UtcNow,
+        //           };
+
+        List<Kline> klines1 = this.constant.db.Kline.ToList();
+        List<Kline> klines = this.constant.db.Kline.Where(P => P.market == market && P.type == klineType_source && end >= P.time && end > P.time).OrderBy(P => P.time_start).ToList();
+
         var sql = from kline in this.constant.db.Kline
-                  where kline.market == market && kline.type == klineType_source && start <= kline.time && kline.time <= end
+                      //   where kline.market == market && kline.type == klineType_source && end >= kline.time && end > kline.time
                   orderby kline.time_start
                   group kline by lambda into g
                   select new BaseKline

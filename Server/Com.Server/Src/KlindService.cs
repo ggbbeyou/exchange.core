@@ -81,7 +81,7 @@ public class KlindService
     {
         BaseKline? last_kline = this.kilneHelper.GetLastKline(market, E_KlineType.min1);
         List<BaseKline> klines = this.kilneHelper.GetKlineMin(market, now, last_kline);
-        this.kilneHelper.SaveKline(market, E_KlineType.min1, klines);
+        int min1_count = this.kilneHelper.SaveKline(market, E_KlineType.min1, klines);
     }
 
     /// <summary>
@@ -91,22 +91,26 @@ public class KlindService
     /// <param name="now"></param>
     public void SyncKlines(string market, DateTimeOffset now)
     {
-        E_KlineType type = E_KlineType.min1;
+        E_KlineType previous_type = E_KlineType.min1;
         BaseKline? last_kline = null;
         foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
         {
-            type = cycle;
             if (cycle == E_KlineType.min1)
             {
+                previous_type = E_KlineType.min1;
                 continue;
             }
-            else if (cycle == E_KlineType.month1)
-            {
-                type = E_KlineType.day1;
-            }
             last_kline = this.kilneHelper.GetLastKline(market, cycle);
-            List<BaseKline> klines = this.kilneHelper.GetKlines(market, type, cycle, last_kline?.time_end ?? this.kilneHelper.system_init, now);
-            this.kilneHelper.SaveKline(market, cycle, klines);
+            List<BaseKline> klines = this.kilneHelper.GetKlines(market, previous_type, cycle, last_kline?.time_end ?? this.kilneHelper.system_init, now);
+            int count = this.kilneHelper.SaveKline(market, cycle, klines);
+            if (cycle == E_KlineType.month1)
+            {
+                previous_type = E_KlineType.day1;
+            }
+            else
+            {
+                previous_type = cycle;
+            }
         }
     }
 

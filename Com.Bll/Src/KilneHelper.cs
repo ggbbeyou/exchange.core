@@ -3,6 +3,7 @@ using Com.Common;
 using Com.Db;
 using Com.Model;
 using Com.Model.Enum;
+using LinqKit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
@@ -30,6 +31,65 @@ public class KilneHelper
         this.system_init = system_init;
         // AddTest();
     }
+
+    /// <summary>
+    /// 获取最后一条K线
+    /// </summary>
+    /// <param name="market"></param>
+    /// <param name="klineType"></param>
+    /// <returns></returns>
+    public BaseKline? GetLastKline(string market, E_KlineType klineType)
+    {
+        return this.constant.db.Kline.Where(P => P.market == market && P.type == klineType).OrderByDescending(P => P.time_start).FirstOrDefault();
+    }
+
+
+    /// <summary>
+    /// Deal 转1分钟K线
+    /// </summary>
+    /// <param name="market"></param>
+    /// <param name="end"></param>
+    /// <param name="last_kline"></param>
+    /// <returns></returns>
+    public List<BaseKline> GetKlineMin(string market, DateTimeOffset end, BaseKline? last_kline)
+    {
+        List<BaseKline> result = new List<BaseKline>();
+        DateTimeOffset start = this.system_init;
+        decimal last_price = 0;
+        Expression<Func<Deal, bool>> predicate = P => P.market == market && P.time <= end;
+        if (last_kline != null)
+        {
+            last_price = last_kline.close;
+            predicate = predicate.And(P => P.time > last_kline.time_end);
+            start = last_kline.time_end.AddMilliseconds(1);
+        }
+        List<Deal> deals = this.constant.db.Deal.Where(predicate).OrderBy(P => P.time).ToList();
+        if (last_kline == null && deals.Count > 0)
+        {
+            DateTimeOffset first_time = deals.First().time;
+            start = first_time.AddSeconds(-first_time.Second).AddMilliseconds(-first_time.Millisecond);
+        }
+        for (DateTimeOffset i = start; i <= end; i = i.AddMinutes(1))
+        {
+            DateTimeOffset end_time = i.AddMinutes(1).AddMilliseconds(-1);
+            List<Deal> deal = deals.Where(P => P.time >= i && P.time <= end_time).ToList();
+            if (deal.Count > 0)
+            {
+                last_price = deal.Last().price;
+            }
+            if (last_price == 0 && deal.Count == 0)
+            {
+                continue;
+            }
+            BaseKline? kline = DealToKline(market, E_KlineType.min1, i, end_time, last_price, deal);
+            if (kline != null)
+            {
+                result.Add(kline);
+            }
+        }
+        return result;
+    }
+
 
     /// <summary>
     /// 从数据库Deal统计K线

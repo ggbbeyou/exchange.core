@@ -49,7 +49,7 @@ namespace Com.Server
             this.constant = constant;
 
             KlindService klindService = new KlindService(constant);
-            klindService.DBtoRedis("btc/usdt");
+            klindService.DBtoRedis("btc/usdt", DateTimeOffset.UtcNow);
             // DateTimeOffset max = klindService.GetRedisMaxMinuteKline("btc/usdt", E_KlineType.min1);
 
         }

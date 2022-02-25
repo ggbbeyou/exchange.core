@@ -20,7 +20,15 @@ class Program
     /// <param name="args"></param>
     /// <returns></returns>
     static async Task Main(string[] args)
-    {       
+    {
+        // DateTimeOffset startTime = new DateTimeOffset(2022, 1, 1, 0, 0, 0, TimeSpan.Zero);
+        // for (int i = 0; i < 2000; i++)
+        // {
+        //     if (startTime.AddYears(-i).DayOfWeek == DayOfWeek.Sunday)
+        //     {
+
+        //     }
+        // }
         using IHost host = CreateHostBuilder(args).Build();
         await host.RunAsync();
     }

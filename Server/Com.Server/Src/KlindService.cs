@@ -48,7 +48,7 @@ public class KlindService
     public KilneHelper kilneHelper = null!;
 
     /// <summary>
-    /// 初始化  注:2018-1-1 此时是一年第一天，一年第一月，一年第一个星期一
+    /// 初始化  注:2017-1-1 此时是一年第一天，一年第一月，一年第一个星期日(星期日是一个星期开始的第一天)
     /// </summary>
     /// <param name="configuration">配置接口</param>
     /// <param name="environment">环境接口</param>
@@ -56,25 +56,112 @@ public class KlindService
     public KlindService(FactoryConstant constant)
     {
         this.constant = constant;
-        this.kilneHelper = new KilneHelper(this.constant, new DateTimeOffset(2018, 1, 1, 0, 0, 0, TimeSpan.Zero));
+        this.kilneHelper = new KilneHelper(this.constant, new DateTimeOffset(2017, 1, 1, 0, 0, 0, TimeSpan.Zero));
     }
 
     /// <summary>
     /// 缓存预热
     /// </summary>
     /// <param name="market"></param>
-    public void DBtoRedis(string market)
+    /// <param name="end">同步到结束时间</param>
+    public void DBtoRedis(string market, DateTimeOffset end)
     {
-        DateTimeOffset now = DateTimeOffset.UtcNow;
-        SyncMin1Kline(market, now);
-        SyncKline(market, now);
+        DateTimeOffset now = end.AddSeconds(-end.Second).AddMilliseconds(-end.Millisecond).AddMilliseconds(-1);
+        SyncDealToKlineMin1(market, now);
+        SyncKlines(market, now);
+        // SyncKline(market, now);
     }
+
+    /// <summary>
+    /// 在DB中,由Deal转成1分钟K线
+    /// </summary>
+    /// <param name="market"></param>
+    /// <param name="now"></param>
+    public void SyncDealToKlineMin1(string market, DateTimeOffset now)
+    {
+        BaseKline? last_kline = this.kilneHelper.GetLastKline(market, E_KlineType.min1);
+        List<BaseKline> klines = this.kilneHelper.GetKlineMin(market, now, last_kline);
+        this.kilneHelper.SaveKline(market, E_KlineType.min1, klines);
+    }
+
+    /// <summary>
+    /// 高频K线转低频K线
+    /// </summary>
+    /// <param name="market"></param>
+    /// <param name="now"></param>
+    public void SyncKlines(string market, DateTimeOffset now)
+    {
+        E_KlineType type = E_KlineType.min1;
+        BaseKline? last_kline = null;
+        foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
+        {
+            type = cycle;
+            if (cycle == E_KlineType.min1)
+            {
+                continue;
+            }
+            else if (cycle == E_KlineType.month1)
+            {
+                type = E_KlineType.day1;
+            }
+            last_kline = this.kilneHelper.GetLastKline(market, cycle);
+            List<BaseKline> klines = this.kilneHelper.GetKlines(market, type, cycle, last_kline?.time_end ?? this.kilneHelper.system_init, now);
+            this.kilneHelper.SaveKline(market, cycle, klines);
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
     /// <summary>
     /// 同步一分钟K线 deal转成kline，再分别保存到redis和db中。
     /// </summary>
     /// <param name="market"></param>
-    public void SyncMin1Kline(string market, DateTimeOffset now)
+    public void SyncMin1Kline1(string market, DateTimeOffset now)
     {
         BaseKline? last_kline = GetRedisLastKline(market, E_KlineType.min1);
         TimeSpan span = KlineTypeSpan(E_KlineType.min1);
@@ -95,7 +182,7 @@ public class KlindService
     /// 同步K线 从redis获取到1分钟K线,再转成其它K线,再分别保存到redis和db中。
     /// </summary>
     /// <param name="market"></param>
-    public void SyncKline(string market, DateTimeOffset now)
+    public void SyncKline1(string market, DateTimeOffset now)
     {
         List<BaseKline> klines_temp = new List<BaseKline>();
         E_KlineType previous = E_KlineType.min1;

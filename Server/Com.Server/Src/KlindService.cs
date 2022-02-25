@@ -66,7 +66,7 @@ public class KlindService
     /// <param name="end">同步到结束时间</param>
     public void DBtoRedis(string market, DateTimeOffset end)
     {
-        DateTimeOffset now = end.AddSeconds(-end.Second).AddMilliseconds(-end.Millisecond + 1);
+        DateTimeOffset now = end.AddSeconds(-end.Second).AddMilliseconds(-end.Millisecond - 1);
         SyncDealToKlineMin1(market, now);
         SyncKlines(market, now);
         // SyncKline(market, now);

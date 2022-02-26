@@ -6,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using ShardingCore;
 using ShardingCore.Bootstrapers;
+using ShardingCore.TableExists;
 
 namespace Com.Server;
 
@@ -80,6 +81,7 @@ class Program
                     {
                         op.ConfigId = "c1";
                         op.AddDefaultDataSource(Guid.NewGuid().ToString("n"), hostContext.Configuration.GetConnectionString("Mssql"));
+                        op.ReplaceTableEnsureManager(P => new SqlServerTableEnsureManager<DbContextEF>());
                     }).EnsureConfig();
             var buildServiceProvider = services.BuildServiceProvider();
             //启动必备

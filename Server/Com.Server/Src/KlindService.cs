@@ -70,7 +70,6 @@ public class KlindService
         SyncDealToKlineMin1(market, now);
         SyncKlines(market, now);
         DbSaveRedis(market);
-        // SyncKline(market, now);
     }
 
     /// <summary>
@@ -139,6 +138,22 @@ public class KlindService
                 this.constant.redis.SortedSetAdd(string.Format(this.redis_key_kline, market, E_KlineType.min1), entries);
             }
         }
+    }
+
+    /// <summary>
+    /// 从redis获取最大的K线时间
+    /// </summary>
+    /// <param name="market">交易对</param>
+    /// <param name="klineType">K线类型</param>
+    /// <returns></returns>
+    public Kline? GetRedisLastKline(string market, E_KlineType klineType)
+    {
+        RedisValue[] redisvalue = this.constant.redis.SortedSetRangeByRank(string.Format(this.redis_key_kline, market, klineType), 0, 1, StackExchange.Redis.Order.Descending);
+        if (redisvalue.Length > 0)
+        {
+            return JsonConvert.DeserializeObject<Kline>(redisvalue[0]);
+        }
+        return null;
     }
 
 
@@ -263,21 +278,7 @@ public class KlindService
         }
     }
 
-    /// <summary>
-    /// 从redis获取最大的K线时间
-    /// </summary>
-    /// <param name="market">交易对</param>
-    /// <param name="klineType">K线类型</param>
-    /// <returns></returns>
-    public Kline? GetRedisLastKline(string market, E_KlineType klineType)
-    {
-        RedisValue[] redisvalue = this.constant.redis.SortedSetRangeByRank(string.Format(this.redis_key_kline, market, klineType), 0, 1, StackExchange.Redis.Order.Descending);
-        if (redisvalue.Length > 0)
-        {
-            return JsonConvert.DeserializeObject<Kline>(redisvalue[0]);
-        }
-        return null;
-    }
+
 
     /// <summary>
     /// K线类型间隔时长

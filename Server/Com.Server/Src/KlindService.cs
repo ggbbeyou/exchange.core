@@ -69,6 +69,7 @@ public class KlindService
         DateTimeOffset now = end.AddSeconds(-end.Second).AddMilliseconds(-end.Millisecond - 1);
         SyncDealToKlineMin1(market, now);
         SyncKlines(market, now);
+        DbSaveRedis(market);
         // SyncKline(market, now);
     }
 
@@ -79,8 +80,8 @@ public class KlindService
     /// <param name="now"></param>
     public void SyncDealToKlineMin1(string market, DateTimeOffset now)
     {
-        BaseKline? last_kline = this.kilneHelper.GetLastKline(market, E_KlineType.min1);
-        List<BaseKline> klines = this.kilneHelper.GetKlineMin(market, now, last_kline);
+        Kline? last_kline = this.kilneHelper.GetLastKline(market, E_KlineType.min1);
+        List<Kline> klines = this.kilneHelper.GetKlineMin(market, now, last_kline);
         int min1_count = this.kilneHelper.SaveKline(market, E_KlineType.min1, klines);
     }
 
@@ -92,7 +93,7 @@ public class KlindService
     public void SyncKlines(string market, DateTimeOffset now)
     {
         E_KlineType previous_type = E_KlineType.min1;
-        BaseKline? last_kline = null;
+        Kline? last_kline = null;
         foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
         {
             if (cycle == E_KlineType.min1)
@@ -101,7 +102,7 @@ public class KlindService
                 continue;
             }
             last_kline = this.kilneHelper.GetLastKline(market, cycle);
-            List<BaseKline> klines = this.kilneHelper.GetKlines(market, previous_type, cycle, last_kline?.time_end ?? this.kilneHelper.system_init, now);
+            List<Kline> klines = this.kilneHelper.GetKlines(market, previous_type, cycle, last_kline?.time_end ?? this.kilneHelper.system_init, now);
             int count = this.kilneHelper.SaveKline(market, cycle, klines);
             if (cycle == E_KlineType.month1)
             {
@@ -111,6 +112,20 @@ public class KlindService
             {
                 previous_type = cycle;
             }
+        }
+    }
+
+    public void DbSaveRedis(string market)
+    {
+        foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
+        {
+            if (cycle == E_KlineType.min1)
+            {
+                continue;
+            }
+            Kline? Last_kline = GetRedisLastKline(market, cycle);
+            List<Kline> klines = this.kilneHelper.GetKlines(market, cycle, Last_kline?.time_end ?? this.kilneHelper.system_init, DateTimeOffset.Now);
+            this.kilneHelper.SaveKline(market, cycle, klines);
         }
     }
 
@@ -167,9 +182,9 @@ public class KlindService
     /// <param name="market"></param>
     public void SyncMin1Kline1(string market, DateTimeOffset now)
     {
-        BaseKline? last_kline = GetRedisLastKline(market, E_KlineType.min1);
+        Kline? last_kline = GetRedisLastKline(market, E_KlineType.min1);
         TimeSpan span = KlineTypeSpan(E_KlineType.min1);
-        List<BaseKline> klines = this.kilneHelper.GetKlines(market, E_KlineType.min1, last_kline, new DateTimeOffset(now.Year, now.Month, now.Day, now.Hour, now.Minute, 0, 0, new TimeSpan()).AddMilliseconds(-1), span);
+        List<Kline> klines = this.kilneHelper.GetKlines(market, E_KlineType.min1, last_kline, new DateTimeOffset(now.Year, now.Month, now.Day, now.Hour, now.Minute, 0, 0, new TimeSpan()).AddMilliseconds(-1), span);
         if (klines.Count() > 0)
         {
             SortedSetEntry[] entries = new SortedSetEntry[klines.Count()];
@@ -188,7 +203,7 @@ public class KlindService
     /// <param name="market"></param>
     public void SyncKline1(string market, DateTimeOffset now)
     {
-        List<BaseKline> klines_temp = new List<BaseKline>();
+        List<Kline> klines_temp = new List<Kline>();
         E_KlineType previous = E_KlineType.min1;
         foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
         {
@@ -198,7 +213,7 @@ public class KlindService
             }
             this.constant.logger.LogTrace(cycle.ToString());
             klines_temp.Clear();
-            BaseKline? last_kline = GetRedisLastKline(market, cycle);
+            Kline? last_kline = GetRedisLastKline(market, cycle);
             TimeSpan span = KlineTypeSpan(cycle);
             DateTimeOffset start = this.kilneHelper.system_init;
             decimal last_price = 0;
@@ -215,7 +230,7 @@ public class KlindService
                 {
                     continue;
                 }
-                klines_temp.Add(JsonConvert.DeserializeObject<BaseKline>(item)!);
+                klines_temp.Add(JsonConvert.DeserializeObject<Kline>(item)!);
             }
             if (last_price == 0 && klines_temp.Count == 0)
             {
@@ -225,7 +240,7 @@ public class KlindService
             {
                 start = klines_temp.Last().time_start;
             }
-            List<BaseKline> klines = MergeKline(market, cycle, start, now, last_price, span, klines_temp);
+            List<Kline> klines = MergeKline(market, cycle, start, now, last_price, span, klines_temp);
             SortedSetEntry[] entries = new SortedSetEntry[klines.Count()];
             for (int i = 0; i < klines.Count(); i++)
             {
@@ -242,12 +257,12 @@ public class KlindService
     /// <param name="market">交易对</param>
     /// <param name="klineType">K线类型</param>
     /// <returns></returns>
-    public BaseKline? GetRedisLastKline(string market, E_KlineType klineType)
+    public Kline? GetRedisLastKline(string market, E_KlineType klineType)
     {
         RedisValue[] redisvalue = this.constant.redis.SortedSetRangeByRank(string.Format(this.redis_key_kline, market, klineType), 0, 1, StackExchange.Redis.Order.Descending);
         if (redisvalue.Length > 0)
         {
-            return JsonConvert.DeserializeObject<BaseKline>(redisvalue[0]);
+            return JsonConvert.DeserializeObject<Kline>(redisvalue[0]);
         }
         return null;
     }
@@ -296,19 +311,19 @@ public class KlindService
     /// <param name="span"></param>
     /// <param name="klines"></param>
     /// <returns></returns>
-    public List<BaseKline> MergeKline(string market, E_KlineType klineType, DateTimeOffset start, DateTimeOffset end, decimal last_price, TimeSpan span, List<BaseKline> klines)
+    public List<Kline> MergeKline(string market, E_KlineType klineType, DateTimeOffset start, DateTimeOffset end, decimal last_price, TimeSpan span, List<Kline> klines)
     {
-        List<BaseKline> resutl = new List<BaseKline>();
+        List<Kline> resutl = new List<Kline>();
         klines = klines.OrderBy(P => P.time_start).ToList();
         for (DateTimeOffset i = start; i <= end; i = i.Add(span))
         {
             DateTimeOffset end_time = i.Add(span).AddMilliseconds(-1);
-            List<BaseKline> deal = klines.Where(P => P.time_start >= i && P.time_end <= end_time).ToList();
+            List<Kline> deal = klines.Where(P => P.time_start >= i && P.time_end <= end_time).ToList();
             if (last_price == 0 && deal.Count == 0)
             {
                 continue;
             }
-            BaseKline baseKline = new BaseKline();
+            Kline baseKline = new Kline();
             baseKline.market = market;
             baseKline.type = klineType;
             baseKline.amount = 0;

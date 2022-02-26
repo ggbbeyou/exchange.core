@@ -38,7 +38,7 @@ public class KilneHelper
     /// <param name="market"></param>
     /// <param name="klineType"></param>
     /// <returns></returns>
-    public BaseKline? GetLastKline(string market, E_KlineType klineType)
+    public Kline? GetLastKline(string market, E_KlineType klineType)
     {
         return this.constant.db.Kline.Where(P => P.market == market && P.type == klineType).OrderByDescending(P => P.time_start).FirstOrDefault();
     }
@@ -51,9 +51,9 @@ public class KilneHelper
     /// <param name="end"></param>
     /// <param name="last_kline"></param>
     /// <returns></returns>
-    public List<BaseKline> GetKlineMin(string market, DateTimeOffset end, BaseKline? last_kline)
+    public List<Kline> GetKlineMin(string market, DateTimeOffset end, Kline? last_kline)
     {
-        List<BaseKline> result = new List<BaseKline>();
+        List<Kline> result = new List<Kline>();
         DateTimeOffset start = this.system_init;
         decimal last_price = 0;
         Expression<Func<Deal, bool>> predicate = P => P.market == market && P.time <= end;
@@ -81,7 +81,7 @@ public class KilneHelper
             {
                 continue;
             }
-            BaseKline? kline = DealToKline(market, E_KlineType.min1, i, end_time, last_price, deal);
+            Kline? kline = DealToKline(market, E_KlineType.min1, i, end_time, last_price, deal);
             if (kline != null)
             {
                 result.Add(kline);
@@ -99,9 +99,9 @@ public class KilneHelper
     /// <param name="start"></param>
     /// <param name="end"></param>
     /// <returns></returns>
-    public List<BaseKline> GetKlines(string market, E_KlineType klineType, BaseKline? last_kline, DateTimeOffset end, TimeSpan span)
+    public List<Kline> GetKlines(string market, E_KlineType klineType, Kline? last_kline, DateTimeOffset end, TimeSpan span)
     {
-        List<BaseKline> result = new List<BaseKline>();
+        List<Kline> result = new List<Kline>();
         DateTimeOffset start = system_init;
         decimal last_price = 0;
         if (last_kline != null)
@@ -127,7 +127,7 @@ public class KilneHelper
             {
                 continue;
             }
-            BaseKline? kline = DealToKline(market, klineType, i, end_time, last_price, deal);
+            Kline? kline = DealToKline(market, klineType, i, end_time, last_price, deal);
             if (kline != null)
             {
                 result.Add(kline);
@@ -147,9 +147,9 @@ public class KilneHelper
     /// <param name="last_price"></param>
     /// <param name="deals"></param>
     /// <returns></returns>
-    public BaseKline? DealToKline(string market, E_KlineType klineType, DateTimeOffset start, DateTimeOffset end, decimal last_price, List<Deal> deals)
+    public Kline? DealToKline(string market, E_KlineType klineType, DateTimeOffset start, DateTimeOffset end, decimal last_price, List<Deal> deals)
     {
-        BaseKline kline = new BaseKline();
+        Kline kline = new Kline();
         if (last_price > 0 && deals.Count == 0)
         {
             kline.market = market;
@@ -193,7 +193,7 @@ public class KilneHelper
     /// <param name="klineType"></param>
     /// <param name="klines"></param>
     /// <returns></returns>
-    public int SaveKline(string market, E_KlineType klineType, List<BaseKline> klines)
+    public int SaveKline(string market, E_KlineType klineType, List<Kline> klines)
     {
         if (klines == null || klines.Count == 0)
         {
@@ -238,9 +238,9 @@ public class KilneHelper
     /// <param name="start"></param>
     /// <param name="end"></param>
     /// <returns></returns>
-    public List<BaseKline> GetKlines(string market, E_KlineType klineType_source, E_KlineType klineType_target, DateTimeOffset start, DateTimeOffset end)
+    public List<Kline> GetKlines(string market, E_KlineType klineType_source, E_KlineType klineType_target, DateTimeOffset start, DateTimeOffset end)
     {
-        List<BaseKline> result = new List<BaseKline>();
+        List<Kline> result = new List<Kline>();
         Expression<Func<Kline, int>> lambda = P => EF.Functions.DateDiffMinute(this.system_init, P.time_start);
         switch (klineType_target)
         {
@@ -279,7 +279,7 @@ public class KilneHelper
         //           where kline.market == market && kline.type == klineType_source && start <= kline.time && kline.time <= end
         //           orderby kline.time_start
         //           group kline by lambda into g
-        //           select new BaseKline
+        //           select new Kline
         //           {
         //               market = market,
         //               amount = g.Sum(P => P.amount),
@@ -310,9 +310,9 @@ public class KilneHelper
                   //       time_end = g.Key,
                   //       //   amount = g.Sum(P => P.amount),
                   //   };
-                  select new BaseKline
+                  select new Kline
                   {
-                    //   open = g.Key,
+                      //   open = g.Key,
                       market = market,
                       amount = g.Sum(P => P.amount),
                       count = g.Count(),
@@ -337,6 +337,19 @@ public class KilneHelper
             throw;
         }
         return result;
+    }
+
+    /// <summary>
+    /// 从数据库获取K线数据
+    /// </summary>
+    /// <param name="market"></param>
+    /// <param name="klineType"></param>
+    /// <param name="start"></param>
+    /// <param name="end"></param>
+    /// <returns></returns>
+    public List<Kline> GetKlines(string market, E_KlineType klineType, DateTimeOffset start, DateTimeOffset end)
+    {
+        return this.constant.db.Kline.Where(P => P.market == market && P.type == klineType && P.time_start >= start && P.time_start <= end).OrderBy(P => P.time_start).ToList();
     }
 
     public void AddTest()

@@ -296,28 +296,40 @@ public class KilneHelper
         //           };
 
         List<Kline> klines1 = this.constant.db.Kline.ToList();
-        List<Kline> klines = this.constant.db.Kline.Where(P => P.market == market && P.type == klineType_source && end >= P.time && end > P.time).OrderBy(P => P.time_start).ToList();
+        List<Kline> klines2 = this.constant.db.Kline.Where(P => P.time_start >= start && P.time_start <= end).ToList();
+        List<Kline> klines = this.constant.db.Kline.Where(P => P.market == market && P.type == klineType_source && P.time_start >= start && P.time_start <= end).OrderBy(P => P.time_start).ToList();
 
-        var sql = from kline in this.constant.db.Kline
+        var sql = from kline in this.constant.db.Set<Kline>()
                       //   where kline.market == market && kline.type == klineType_source && end >= kline.time && end > kline.time
-                  orderby kline.time_start
-                  group kline by lambda into g
+                  orderby kline.time_end
+                  //   group kline by lambda into g
+                  //   group kline by EF.Functions.DateDiffMinute(this.system_init, kline.time_end) into g
+                  group kline by kline.open into g
                   select new BaseKline
                   {
-                      market = market,
-                      amount = g.Sum(P => P.amount),
-                      count = g.Count(),
-                      total = g.Sum(P => P.total),
-                      open = g.First().open,
-                      close = g.Last().close,
-                      low = g.Min(P => P.low),
-                      high = g.Max(P => P.high),
-                      type = klineType_target,
-                      time_start = g.First().time_start,
-                      time_end = g.Last().time_end,
+                      //   market = market,
+                      //   amount = g.Sum(P => P.amount),
+                      //   count = g.Count(),
+                      //   total = g.Sum(P => P.total),
+                      //   open = g.First().open,
+                      //   close = g.Last().close,
+                      //   low = g.Min(P => P.low),
+                      //   high = g.Max(P => P.high),
+                      //   type = klineType_target,
+                      //   time_start = g.First().time_start,
+                      //   time_end = g.Last().time_end,
                       time = DateTimeOffset.UtcNow,
                   };
-        return sql.ToList();
+        try
+        {
+            result = sql.ToList();
+        }
+        catch (System.Exception ex)
+        {
+
+            throw;
+        }
+        return result;
     }
 
     public void AddTest()

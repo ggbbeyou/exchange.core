@@ -61,7 +61,7 @@ namespace Com.Server
         public void DealDbToRedis()
         {
             DealService.instance.Init(constant, systemTime);
-
+            
         }
 
         /// <summary>

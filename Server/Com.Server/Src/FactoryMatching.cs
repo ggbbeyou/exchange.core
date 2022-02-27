@@ -52,12 +52,9 @@ namespace Com.Server
         public void Init(FactoryConstant constant)
         {
             this.constant = constant;
-
             this.systemTime = new DateTimeOffset(2017, 1, 1, 0, 0, 0, TimeSpan.Zero);
-
             KlineService.instance.Init(constant, systemTime);
-
-            // DateTimeOffset max = klindService.GetRedisMaxMinuteKline("btc/usdt", E_KlineType.min1);
+            DealService.instance.Init(constant, systemTime);
         }
 
         public void DBtoRedis()

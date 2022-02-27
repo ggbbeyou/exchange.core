@@ -39,7 +39,8 @@ namespace Com.Server
             try
             {
                 FactoryMatching.instance.Init(this.constant);
-                FactoryMatching.instance.DBtoRedis();
+                FactoryMatching.instance.DealDbToRedis();
+                FactoryMatching.instance.KlindDBtoRedis();
                 this.constant.logger.LogInformation("启动业务后台服务成功");
             }
             catch (Exception ex)

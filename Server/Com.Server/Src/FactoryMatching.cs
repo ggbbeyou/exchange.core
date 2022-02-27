@@ -53,12 +53,23 @@ namespace Com.Server
         {
             this.constant = constant;
             this.systemTime = new DateTimeOffset(2017, 1, 1, 0, 0, 0, TimeSpan.Zero);
-            KlineService.instance.Init(constant, systemTime);
-            DealService.instance.Init(constant, systemTime);
         }
 
-        public void DBtoRedis()
+        /// <summary>
+        /// 交易记录数据从DB同步到Redis
+        /// </summary>
+        public void DealDbToRedis()
         {
+            DealService.instance.Init(constant, systemTime);
+
+        }
+
+        /// <summary>
+        /// K线数据从DB同步到Redis
+        /// </summary>
+        public void KlindDBtoRedis()
+        {
+            KlineService.instance.Init(constant, systemTime);
             DateTimeOffset now = DateTimeOffset.UtcNow;
             DateTimeOffset end = now.AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond - 1);
             KlineService.instance.DBtoRedised(new List<string>() { "btc/usdt" }, end);

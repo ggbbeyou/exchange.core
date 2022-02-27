@@ -60,10 +60,9 @@ public class KilneHelper
         if (last_kline != null)
         {
             last_price = last_kline.close;
-            predicate = predicate.And(P => P.time > last_kline.time_end);
             start = last_kline.time_end.AddMilliseconds(1);
         }
-        List<Deal> deals = this.constant.db.Deal.Where(predicate).OrderBy(P => P.time).ToList();
+        List<Deal> deals = KlineService.instance.dealHelper.GetDeals(market, start, end);
         if (last_kline == null && deals.Count > 0)
         {
             DateTimeOffset first_time = deals.First().time;

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Com.Bll;
 using Com.Common;
 using Com.Model.Enum;
 using Microsoft.Extensions.Configuration;
@@ -32,6 +33,10 @@ namespace Com.Server
         /// </summary>
         public FactoryConstant constant = null!;
 
+
+        DateTimeOffset systemTime = DateTimeOffset.Now;
+
+
         /// <summary>
         /// 私有构造方法
         /// </summary>
@@ -48,10 +53,19 @@ namespace Com.Server
         {
             this.constant = constant;
 
-            KlindService klindService = new KlindService(constant);
-            klindService.DBtoRedis("btc/usdt", DateTimeOffset.UtcNow);
-            // DateTimeOffset max = klindService.GetRedisMaxMinuteKline("btc/usdt", E_KlineType.min1);
+            this.systemTime = new DateTimeOffset(2017, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
+            KlineService.instance.Init(constant, systemTime);
+
+            // DateTimeOffset max = klindService.GetRedisMaxMinuteKline("btc/usdt", E_KlineType.min1);
+        }
+
+        public void DBtoRedis()
+        {
+            DateTimeOffset now = DateTimeOffset.UtcNow;
+            DateTimeOffset end = now.AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond - 1);
+            KlineService.instance.DBtoRedised(new List<string>() { "btc/usdt" }, end);
+            KlineService.instance.DBtoRedising(new List<string>() { "btc/usdt" }, end);
         }
 
 

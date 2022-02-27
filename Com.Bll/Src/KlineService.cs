@@ -15,7 +15,7 @@ using Newtonsoft.Json;
 using StackExchange;
 using StackExchange.Redis;
 
-namespace Com.Server;
+namespace Com.Bll;
 
 /*
 
@@ -26,8 +26,13 @@ namespace Com.Server;
 /// <summary>
 /// K线逻辑
 /// </summary>
-public class KlindService
+public class KlineService
 {
+    /// <summary>
+    /// 单例类的实例
+    /// </summary>
+    /// <returns></returns>
+    public static readonly KlineService instance = new KlineService();
     /// <summary>
     /// 常用接口
     /// </summary>
@@ -43,34 +48,81 @@ public class KlindService
     /// <value></value>
     public string redis_key_klineing = "klineing:{0}:{1}";
     /// <summary>
-    /// K线数据库操作
+    /// k线DB类
     /// </summary>
     public KilneHelper kilneHelper = null!;
+    /// <summary>
+    /// 交易记录Db类
+    /// </summary>
+    public DealHelper dealHelper = null!;
+    /// <summary>
+    /// 系统初始化时间  初始化  注:2017-1-1 此时是一年第一天，一年第一月，一年第一个星期日(星期日是一个星期开始的第一天)
+    /// </summary>
+    public DateTimeOffset system_init;
 
     /// <summary>
-    /// 初始化  注:2017-1-1 此时是一年第一天，一年第一月，一年第一个星期日(星期日是一个星期开始的第一天)
+    ///
     /// </summary>
     /// <param name="configuration">配置接口</param>
     /// <param name="environment">环境接口</param>
     /// <param name="logger">日志接口</param>
-    public KlindService(FactoryConstant constant)
+    private KlineService()
     {
-        this.constant = constant;
-        this.kilneHelper = new KilneHelper(this.constant, new DateTimeOffset(2017, 1, 1, 0, 0, 0, TimeSpan.Zero));
+
     }
 
     /// <summary>
-    /// 缓存预热
+    ///
+    /// </summary>
+    /// <param name="configuration">配置接口</param>
+    /// <param name="environment">环境接口</param>
+    /// <param name="logger">日志接口</param>
+    public void Init(FactoryConstant constant, DateTimeOffset system_init)
+    {
+        this.system_init = system_init;
+        this.constant = constant;
+        this.dealHelper = new DealHelper(constant);
+        this.kilneHelper = new KilneHelper(constant, system_init);
+    }
+
+
+
+    /// <summary>
+    /// 缓存预热(已确定K线)
     /// </summary>
     /// <param name="market"></param>
     /// <param name="end">同步到结束时间</param>
-    public void DBtoRedis(string market, DateTimeOffset end)
+    public void DBtoRedised(List<string> markets, DateTimeOffset end)
     {
-        DateTimeOffset now = end.AddSeconds(-end.Second).AddMilliseconds(-end.Millisecond - 1);
-        SyncDealToKlineMin1(market, now);
-        SyncKlines(market, now);
-        DbSaveRedis(market);
+        foreach (var market in markets)
+        {
+            SyncDealToKlineMin1(market, end);
+            SyncKlines(market, end);
+            DbSaveRedis(market);
+        }
     }
+
+
+    #region 已确定K线
+
+
+    #endregion
+
+
+    #region 未确定K线
+    /// <summary>
+    /// 缓存预热(未确定K线)
+    /// </summary>
+    /// <param name="market"></param>
+    /// <param name="end">同步到结束时间</param>
+    public void DBtoRedising(List<string> markets, DateTimeOffset end)
+    {
+
+    }
+
+    #endregion
+
+
 
     /// <summary>
     /// 在DB中,由Deal转成1分钟K线
@@ -101,7 +153,7 @@ public class KlindService
                 continue;
             }
             last_kline = this.kilneHelper.GetLastKline(market, cycle);
-            List<Kline> klines = this.kilneHelper.GetKlines(market, previous_type, cycle, last_kline?.time_end ?? this.kilneHelper.system_init, now);
+            List<Kline> klines = this.kilneHelper.GetKlines(market, previous_type, cycle, last_kline?.time_end ?? this.system_init, now);
             int count = this.kilneHelper.SaveKline(market, cycle, klines);
             if (cycle == E_KlineType.month1)
             {
@@ -127,7 +179,7 @@ public class KlindService
                 continue;
             }
             Kline? Last_kline = GetRedisLastKline(market, cycle);
-            List<Kline> klines = this.kilneHelper.GetKlines(market, cycle, Last_kline?.time_end ?? this.kilneHelper.system_init, DateTimeOffset.Now);
+            List<Kline> klines = this.kilneHelper.GetKlines(market, cycle, Last_kline?.time_end ?? this.system_init, DateTimeOffset.Now);
             if (klines.Count() > 0)
             {
                 SortedSetEntry[] entries = new SortedSetEntry[klines.Count()];
@@ -242,7 +294,7 @@ public class KlindService
             klines_temp.Clear();
             Kline? last_kline = GetRedisLastKline(market, cycle);
             TimeSpan span = KlineTypeSpan(cycle);
-            DateTimeOffset start = this.kilneHelper.system_init;
+            DateTimeOffset start = this.system_init;
             decimal last_price = 0;
             if (last_kline != null)
             {

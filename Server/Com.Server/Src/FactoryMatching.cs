@@ -73,7 +73,7 @@ namespace Com.Server
             DateTimeOffset now = DateTimeOffset.UtcNow;
             DateTimeOffset end = now.AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond - 1);
             KlineService.instance.DBtoRedised(new List<string>() { "btc/usdt" }, end);
-            KlineService.instance.DBtoRedising(new List<string>() { "btc/usdt" }, end);
+            KlineService.instance.DBtoRedising(new List<string>() { "btc/usdt" });
         }
 
 

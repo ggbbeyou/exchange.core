@@ -218,9 +218,12 @@ public class KlineService
     /// </summary>
     /// <param name="market"></param>
     /// <param name="end">同步到结束时间</param>
-    public void DBtoRedising(List<string> markets, DateTimeOffset end)
+    public void DBtoRedising(List<string> markets)
     {
+        foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
+        {
 
+        }
     }
 
     #endregion

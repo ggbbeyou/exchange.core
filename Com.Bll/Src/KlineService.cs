@@ -110,8 +110,47 @@ public class KlineService
     public void SyncDealToKlineMin1(string market, DateTimeOffset end)
     {
         Kline? last_kline = this.kilneHelper.GetLastKline(market, E_KlineType.min1);
-        List<Kline> klines = this.kilneHelper.GetKlineMin(market, end, last_kline);
+        DateTimeOffset start = this.system_init;
+        decimal last_price = 0;
+        if (last_kline != null)
+        {
+            last_price = last_kline.close;
+            start = last_kline.time_end.AddMilliseconds(1);
+        }
+        List<Deal> deals = KlineService.instance.dealHelper.GetDeals(market, start, end);
+        List<Kline> klines = GetKlineMin(market, start, end, last_price, deals);
         int min1_count = this.kilneHelper.SaveKline(market, E_KlineType.min1, klines);
+    }
+
+    /// <summary>
+    /// Deal 转1分钟K线
+    /// </summary>
+    /// <param name="market"></param>
+    /// <param name="end"></param>
+    /// <param name="last_kline"></param>
+    /// <returns></returns>
+    public List<Kline> GetKlineMin(string market, DateTimeOffset start, DateTimeOffset end, decimal last_price, List<Deal> deals)
+    {
+        List<Kline> result = new List<Kline>();
+        for (DateTimeOffset i = start; i <= end; i = i.AddMinutes(1))
+        {
+            DateTimeOffset end_time = i.AddMinutes(1).AddMilliseconds(-1);
+            List<Deal> deal = deals.Where(P => P.time >= i && P.time <= end_time).ToList();
+            if (deal.Count > 0)
+            {
+                last_price = deal.Last().price;
+            }
+            if (last_price == 0 && deal.Count == 0)
+            {
+                continue;
+            }
+            Kline? kline = DealToKline(market, E_KlineType.min1, i, end_time, last_price, deal);
+            if (kline != null)
+            {
+                result.Add(kline);
+            }
+        }
+        return result;
     }
 
     /// <summary>
@@ -195,7 +234,54 @@ public class KlineService
 
 
 
-
+    /// <summary>
+    /// 交易记录转换成K线
+    /// </summary>
+    /// <param name="market"></param>
+    /// <param name="klineType"></param>
+    /// <param name="start"></param>
+    /// <param name="end"></param>
+    /// <param name="last_price"></param>
+    /// <param name="deals"></param>
+    /// <returns></returns>
+    public Kline? DealToKline(string market, E_KlineType klineType, DateTimeOffset start, DateTimeOffset end, decimal last_price, List<Deal> deals)
+    {
+        Kline kline = new Kline();
+        if (last_price > 0 && deals.Count == 0)
+        {
+            kline.market = market;
+            kline.type = klineType;
+            kline.amount = 0;
+            kline.count = 0;
+            kline.total = 0;
+            kline.open = last_price;
+            kline.close = last_price;
+            kline.low = last_price;
+            kline.high = last_price;
+            kline.time_start = start;
+            kline.time_end = end;
+            kline.time = DateTimeOffset.UtcNow;
+            return kline;
+        }
+        else if (deals.Count > 0)
+        {
+            deals = deals.OrderBy(P => P.time).ToList();
+            kline.market = market;
+            kline.type = klineType;
+            kline.amount = deals.Sum(P => P.amount);
+            kline.count = deals.Count;
+            kline.total = deals.Sum(P => P.amount * P.price);
+            kline.open = deals[0].price;
+            kline.close = deals[deals.Count - 1].price;
+            kline.low = deals.Min(P => P.price);
+            kline.high = deals.Max(P => P.price);
+            kline.time_start = start;
+            kline.time_end = end;
+            kline.time = DateTimeOffset.UtcNow;
+            return kline;
+        }
+        return null;
+    }
 
 
 

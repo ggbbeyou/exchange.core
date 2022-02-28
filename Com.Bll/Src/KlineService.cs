@@ -114,25 +114,6 @@ public class KlineService
         int min1_count = this.kilneHelper.SaveKline(market, E_KlineType.min1, klines);
     }
 
-    #endregion
-
-
-    #region 未确定K线
-    /// <summary>
-    /// 缓存预热(未确定K线)
-    /// </summary>
-    /// <param name="market"></param>
-    /// <param name="end">同步到结束时间</param>
-    public void DBtoRedising(List<string> markets, DateTimeOffset end)
-    {
-
-    }
-
-    #endregion
-
-
-
-
     /// <summary>
     /// 在DB里保存低频K线
     /// </summary>
@@ -189,6 +170,36 @@ public class KlineService
         }
     }
 
+    #endregion
+
+
+    #region 未确定K线
+    /// <summary>
+    /// 缓存预热(未确定K线)
+    /// </summary>
+    /// <param name="market"></param>
+    /// <param name="end">同步到结束时间</param>
+    public void DBtoRedising(List<string> markets, DateTimeOffset end)
+    {
+
+    }
+
+    #endregion
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     /// <summary>
     /// 从redis获取最大的K线时间
     /// </summary>
@@ -205,9 +216,57 @@ public class KlineService
         return null;
     }
 
-
-
-
+    /// <summary>
+    /// 合并K线
+    /// </summary>
+    /// <param name="market"></param>
+    /// <param name="klineType"></param>
+    /// <param name="start"></param>
+    /// <param name="end"></param>
+    /// <param name="last_price"></param>
+    /// <param name="span"></param>
+    /// <param name="klines"></param>
+    /// <returns></returns>
+    public List<Kline> MergeKline(string market, E_KlineType klineType, DateTimeOffset start, DateTimeOffset end, decimal last_price, TimeSpan span, List<Kline> klines)
+    {
+        List<Kline> resutl = new List<Kline>();
+        klines = klines.OrderBy(P => P.time_start).ToList();
+        for (DateTimeOffset i = start; i <= end; i = i.Add(span))
+        {
+            DateTimeOffset end_time = i.Add(span).AddMilliseconds(-1);
+            List<Kline> deal = klines.Where(P => P.time_start >= i && P.time_end <= end_time).ToList();
+            if (last_price == 0 && deal.Count == 0)
+            {
+                continue;
+            }
+            Kline baseKline = new Kline();
+            baseKline.market = market;
+            baseKline.type = klineType;
+            baseKline.amount = 0;
+            baseKline.count = 0;
+            baseKline.total = 0;
+            baseKline.open = last_price;
+            baseKline.close = last_price;
+            baseKline.high = last_price;
+            baseKline.low = last_price;
+            baseKline.time_start = i;
+            baseKline.time_end = end_time;
+            baseKline.time = DateTimeOffset.UtcNow;
+            if (deal.Count > 0)
+            {
+                baseKline.amount = deal.Sum(P => P.amount);
+                baseKline.count = deal.Sum(P => P.count);
+                baseKline.total = deal.Sum(P => P.total);
+                baseKline.open = deal.First().open;
+                baseKline.close = deal.Last().close;
+                baseKline.high = deal.Max(P => P.high);
+                baseKline.low = deal.Min(P => P.low);
+            }
+            last_price = baseKline.close;
+            resutl.Add(baseKline);
+        }
+        return resutl;
+    }
 
 
 
@@ -362,56 +421,6 @@ public class KlineService
         }
     }
 
-    /// <summary>
-    /// 合并K线
-    /// </summary>
-    /// <param name="market"></param>
-    /// <param name="klineType"></param>
-    /// <param name="start"></param>
-    /// <param name="end"></param>
-    /// <param name="last_price"></param>
-    /// <param name="span"></param>
-    /// <param name="klines"></param>
-    /// <returns></returns>
-    public List<Kline> MergeKline(string market, E_KlineType klineType, DateTimeOffset start, DateTimeOffset end, decimal last_price, TimeSpan span, List<Kline> klines)
-    {
-        List<Kline> resutl = new List<Kline>();
-        klines = klines.OrderBy(P => P.time_start).ToList();
-        for (DateTimeOffset i = start; i <= end; i = i.Add(span))
-        {
-            DateTimeOffset end_time = i.Add(span).AddMilliseconds(-1);
-            List<Kline> deal = klines.Where(P => P.time_start >= i && P.time_end <= end_time).ToList();
-            if (last_price == 0 && deal.Count == 0)
-            {
-                continue;
-            }
-            Kline baseKline = new Kline();
-            baseKline.market = market;
-            baseKline.type = klineType;
-            baseKline.amount = 0;
-            baseKline.count = 0;
-            baseKline.total = 0;
-            baseKline.open = last_price;
-            baseKline.close = last_price;
-            baseKline.high = last_price;
-            baseKline.low = last_price;
-            baseKline.time_start = i;
-            baseKline.time_end = end_time;
-            baseKline.time = DateTimeOffset.UtcNow;
-            if (deal.Count > 0)
-            {
-                baseKline.amount = deal.Sum(P => P.amount);
-                baseKline.count = deal.Sum(P => P.count);
-                baseKline.total = deal.Sum(P => P.total);
-                baseKline.open = deal.First().open;
-                baseKline.close = deal.Last().close;
-                baseKline.high = deal.Max(P => P.high);
-                baseKline.low = deal.Min(P => P.low);
-            }
-            last_price = baseKline.close;
-            resutl.Add(baseKline);
-        }
-        return resutl;
-    }
+
 
 }

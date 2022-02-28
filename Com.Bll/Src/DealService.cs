@@ -26,10 +26,6 @@ public class DealService
     /// </summary>
     private FactoryConstant constant = null!;
     /// <summary>
-    /// 系统初始化时间  初始化  注:2017-1-1 此时是一年第一天，一年第一月，一年第一个星期日(星期日是一个星期开始的第一天)
-    /// </summary>
-    public DateTimeOffset system_init;
-    /// <summary>
     /// redis(zset)键 已生成交易记录 deal:btc/usdt
     /// </summary>
     /// <value></value>
@@ -53,7 +49,6 @@ public class DealService
     /// <param name="logger">日志接口</param>
     public void Init(FactoryConstant constant, DateTimeOffset system_init)
     {
-        this.system_init = system_init;
         this.constant = constant;
         this.dealHelper = new DealHelper(constant);
 
@@ -88,7 +83,6 @@ public class DealService
         }
         return true;
     }
-
 
     /// <summary>
     /// 从redis获取最后一条交易记录

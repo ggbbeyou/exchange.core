@@ -85,7 +85,7 @@ public class KlineService
         this.kilneHelper = new KilneHelper(constant, system_init);
     }
 
-
+    #region 已确定K线
 
     /// <summary>
     /// 缓存预热(已确定K线)
@@ -102,9 +102,17 @@ public class KlineService
         }
     }
 
-
-    #region 已确定K线
-
+    /// <summary>
+    /// 在DB中,由Deal转成1分钟K线
+    /// </summary>
+    /// <param name="market"></param>
+    /// <param name="end"></param>
+    public void SyncDealToKlineMin1(string market, DateTimeOffset end)
+    {
+        Kline? last_kline = this.kilneHelper.GetLastKline(market, E_KlineType.min1);
+        List<Kline> klines = this.kilneHelper.GetKlineMin(market, end, last_kline);
+        int min1_count = this.kilneHelper.SaveKline(market, E_KlineType.min1, klines);
+    }
 
     #endregion
 
@@ -124,17 +132,6 @@ public class KlineService
 
 
 
-    /// <summary>
-    /// 在DB中,由Deal转成1分钟K线
-    /// </summary>
-    /// <param name="market"></param>
-    /// <param name="now"></param>
-    public void SyncDealToKlineMin1(string market, DateTimeOffset now)
-    {
-        Kline? last_kline = this.kilneHelper.GetLastKline(market, E_KlineType.min1);
-        List<Kline> klines = this.kilneHelper.GetKlineMin(market, now, last_kline);
-        int min1_count = this.kilneHelper.SaveKline(market, E_KlineType.min1, klines);
-    }
 
     /// <summary>
     /// 在DB里保存低频K线

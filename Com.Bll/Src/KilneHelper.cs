@@ -55,8 +55,7 @@ public class KilneHelper
     {
         List<Kline> result = new List<Kline>();
         DateTimeOffset start = this.system_init;
-        decimal last_price = 0;
-        Expression<Func<Deal, bool>> predicate = P => P.market == market && P.time <= end;
+        decimal last_price = 0;        
         if (last_kline != null)
         {
             last_price = last_kline.close;

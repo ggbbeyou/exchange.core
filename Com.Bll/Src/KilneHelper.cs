@@ -29,7 +29,7 @@ public class KilneHelper
     {
         this.constant = constant;
         this.system_init = system_init;
-        // AddTest();
+        AddTest();
     }
 
     /// <summary>
@@ -55,7 +55,7 @@ public class KilneHelper
     {
         List<Kline> result = new List<Kline>();
         DateTimeOffset start = this.system_init;
-        decimal last_price = 0;        
+        decimal last_price = 0;
         if (last_kline != null)
         {
             last_price = last_kline.close;

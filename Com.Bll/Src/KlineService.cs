@@ -185,7 +185,7 @@ public class KlineService
                 SortedSetEntry[] entries = new SortedSetEntry[klines.Count()];
                 for (int i = 0; i < klines.Count(); i++)
                 {
-                    entries[i] = new SortedSetEntry(JsonConvert.SerializeObject(klines[i]), klines[i].time_start.ToUnixTimeSeconds());
+                    entries[i] = new SortedSetEntry(JsonConvert.SerializeObject(klines[i]), klines[i].time_start.ToUnixTimeMilliseconds());
                 }
                 this.constant.redis.SortedSetAdd(string.Format(this.redis_key_kline, market, E_KlineType.min1), entries);
             }
@@ -269,7 +269,7 @@ public class KlineService
             SortedSetEntry[] entries = new SortedSetEntry[klines.Count()];
             for (int i = 0; i < klines.Count(); i++)
             {
-                entries[i] = new SortedSetEntry(JsonConvert.SerializeObject(klines[i]), klines[i].time_start.ToUnixTimeSeconds());
+                entries[i] = new SortedSetEntry(JsonConvert.SerializeObject(klines[i]), klines[i].time_start.ToUnixTimeMilliseconds());
             }
             this.constant.redis.SortedSetAdd(string.Format(this.redis_key_kline, market, E_KlineType.min1), entries);
             this.kilneHelper.SaveKline(market, E_KlineType.min1, klines);
@@ -301,7 +301,7 @@ public class KlineService
                 start = last_kline.time_start.Add(span);
                 last_price = last_kline.close;
             }
-            RedisValue[] value = this.constant.redis.SortedSetRangeByScore(string.Format(this.redis_key_kline, market, previous), start.ToUnixTimeSeconds(), double.PositiveInfinity, Exclude.Stop, StackExchange.Redis.Order.Ascending);
+            RedisValue[] value = this.constant.redis.SortedSetRangeByScore(string.Format(this.redis_key_kline, market, previous), start.ToUnixTimeMilliseconds(), double.PositiveInfinity, Exclude.Stop, StackExchange.Redis.Order.Ascending);
             previous = cycle;
             foreach (var item in value)
             {
@@ -323,7 +323,7 @@ public class KlineService
             SortedSetEntry[] entries = new SortedSetEntry[klines.Count()];
             for (int i = 0; i < klines.Count(); i++)
             {
-                entries[i] = new SortedSetEntry(JsonConvert.SerializeObject(klines[i]), klines[i].time_start.ToUnixTimeSeconds());
+                entries[i] = new SortedSetEntry(JsonConvert.SerializeObject(klines[i]), klines[i].time_start.ToUnixTimeMilliseconds());
             }
             this.constant.redis.SortedSetAdd(string.Format(this.redis_key_kline, market, cycle), entries);
             this.kilneHelper.SaveKline(market, cycle, klines);

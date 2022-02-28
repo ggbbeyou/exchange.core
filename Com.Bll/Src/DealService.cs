@@ -81,7 +81,7 @@ public class DealService
                 SortedSetEntry[] entries = new SortedSetEntry[deals.Count()];
                 for (int i = 0; i < deals.Count(); i++)
                 {
-                    entries[i] = new SortedSetEntry(JsonConvert.SerializeObject(deals[i]), deals[i].time.ToUnixTimeSeconds());
+                    entries[i] = new SortedSetEntry(JsonConvert.SerializeObject(deals[i]), deals[i].time.ToUnixTimeMilliseconds());
                 }
                 this.constant.redis.SortedSetAdd(string.Format(this.redis_key_deal, market), entries);
             }

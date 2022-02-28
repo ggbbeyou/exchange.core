@@ -43,10 +43,10 @@ public class KlineService
     /// <value></value>
     public string redis_key_kline = "kline:{0}:{1}";
     /// <summary>
-    /// redis(hash)键 正在生成K线
+    /// redis(hash)键 正在生成K线 klineing:btc/usdt
     /// </summary>
     /// <value></value>
-    public string redis_key_klineing = "klineing:{0}:{1}";
+    public string redis_key_klineing = "klineing:{0}";
     /// <summary>
     /// k线DB类
     /// </summary>
@@ -220,9 +220,28 @@ public class KlineService
     /// <param name="end">同步到结束时间</param>
     public void DBtoRedising(List<string> markets)
     {
-        foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
+        foreach (string market in markets)
         {
-
+            foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
+            {
+                DateTimeOffset start = this.system_init;
+                Kline? kline_last = this.kilneHelper.GetLastKline(market, cycle);
+                if (kline_last != null)
+                {
+                    start = kline_last.time_end.AddMilliseconds(1);
+                }
+                List<Deal> deals = this.dealHelper.GetDeals(market, start, null);
+                DateTimeOffset end = DateTimeOffset.UtcNow;
+                if (deals.Count > 0)
+                {
+                    end = deals.Last().time;
+                }
+                Kline? kline_new = DealToKline(market, cycle, start, end, 0, deals);
+                if (kline_new != null)
+                {
+                    this.constant.redis.HashSet(string.Format(this.redis_key_klineing, market), E_KlineType.min1.ToString(), JsonConvert.SerializeObject(kline_new));
+                }
+            }
         }
     }
 

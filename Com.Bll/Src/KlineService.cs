@@ -38,7 +38,7 @@ public class KlineService
     /// </summary>
     public FactoryConstant constant = null!;
     /// <summary>
-    /// redis(zset)键 已生成K线
+    /// redis(zset)键 已生成K线 kline:btc/usdt:main1
     /// </summary>
     /// <value></value>
     public string redis_key_kline = "kline:{0}:{1}";

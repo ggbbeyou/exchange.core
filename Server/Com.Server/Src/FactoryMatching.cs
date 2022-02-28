@@ -56,12 +56,12 @@ namespace Com.Server
         }
 
         /// <summary>
-        /// 交易记录数据从DB同步到Redis
+        /// 交易记录数据从DB同步到Redis 至少保存最近3个月记录
         /// </summary>
         public void DealDbToRedis()
         {
             DealService.instance.Init(constant, systemTime);
-            
+            DealService.instance.DealDbToRedis(new List<string>() { "btc/usdt" }, new TimeSpan(-30, 0, 0, 0));
         }
 
         /// <summary>

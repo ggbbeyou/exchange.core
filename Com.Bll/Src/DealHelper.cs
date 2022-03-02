@@ -16,6 +16,12 @@ public class DealHelper
     /// </summary>
     public FactoryConstant constant = null!;
     /// <summary>
+    /// 系统初始化时间
+    /// </summary>
+    public DateTimeOffset system_init = new DateTimeOffset(2017, 1, 1, 0, 0, 0, TimeSpan.Zero);
+
+
+    /// <summary>
     /// 
     /// </summary>
     /// <param name="constant"></param>
@@ -53,7 +59,6 @@ public class DealHelper
     {
         try
         {
-            var aaaaa = this.constant.db.Deal.ToList();
             Expression<Func<Deal, bool>> predicate = P => P.market == market;
             if (start != null)
             {
@@ -63,13 +68,67 @@ public class DealHelper
             {
                 predicate = predicate.And(P => P.time <= end);
             }
-            var deals = this.constant.db.Deal.Where(predicate).ToList();
+            Expression<Func<Deal, int>> lambda = P => EF.Functions.DateDiffMinute(this.system_init, P.time);
+            switch (klineType)
+            {
+                case E_KlineType.min1:
+                    lambda = P => EF.Functions.DateDiffMinute(this.system_init, P.time);
+                    break;
+                case E_KlineType.min5:
+                    lambda = P => EF.Functions.DateDiffMinute(this.system_init, P.time) / 5;
+                    break;
+                case E_KlineType.min15:
+                    lambda = P => EF.Functions.DateDiffMinute(this.system_init, P.time) / 15;
+                    break;
+                case E_KlineType.min30:
+                    lambda = P => EF.Functions.DateDiffMinute(this.system_init, P.time) / 30;
+                    break;
+                case E_KlineType.hour1:
+                    lambda = P => EF.Functions.DateDiffHour(this.system_init, P.time);
+                    break;
+                case E_KlineType.hour12:
+                    lambda = P => EF.Functions.DateDiffHour(this.system_init, P.time) / 12;
+                    break;
+                case E_KlineType.day1:
+                    lambda = P => EF.Functions.DateDiffDay(this.system_init, P.time);
+                    break;
+                case E_KlineType.week1:
+                    lambda = P => EF.Functions.DateDiffWeek(this.system_init, P.time);
+                    break;
+                case E_KlineType.month1:
+                    lambda = P => EF.Functions.DateDiffMonth(this.system_init, P.time);
+                    break;
+                default:
+                    lambda = P => EF.Functions.DateDiffMinute(this.system_init, P.time);
+                    break;
+            }
+            var deals = from deal in this.constant.db.Deal.Where(predicate)
+                        group deal by EF.Functions.DateDiffMinute(this.system_init, deal.time) / 5 into g
+                        select new Kline
+                        {
+                            market = market,
+                            amount = g.Sum(P => P.amount),
+                            count = g.Count(),
+                            total = g.Sum(P => P.total),
+                            open = g.OrderBy(P => P.time).First().price,
+                            close = g.OrderBy(P => P.time).Last().price,
+                            low = g.Min(P => P.price),
+                            high = g.Max(P => P.price),
+                            type = klineType,
+                            time_start = g.OrderBy(P => P.time).First().time,
+                            time_end = g.OrderBy(P => P.time).Last().time,
+                            time = DateTimeOffset.UtcNow,
+                        };
+
+
+            var bbb = deals.ToList();
+
 
         }
         catch (System.Exception ex)
         {
 
-            throw;
+
         }
         return null;
     }

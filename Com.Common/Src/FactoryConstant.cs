@@ -94,14 +94,10 @@ public class FactoryConstant
             if (db != null)
             {
                 this.db = db;
-                // db.Database.EnsureDeleted();
-                // db.Database.Migrate();
-                // db.Database.EnsureCreated();
-                // db.Database.InitialCreate();
-
             }
             else
             {
+                //下面可以创建数据库   Code First
                 string? dbConnection = config.GetConnectionString("Mssql");
                 if (!string.IsNullOrWhiteSpace(dbConnection))
                 {

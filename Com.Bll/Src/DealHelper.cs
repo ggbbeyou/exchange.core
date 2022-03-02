@@ -53,7 +53,7 @@ public class DealHelper
     {
         try
         {
-
+            var aaaaa = this.constant.db.Deal.ToList();
             Expression<Func<Deal, bool>> predicate = P => P.market == market;
             if (start != null)
             {

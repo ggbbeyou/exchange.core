@@ -34,11 +34,11 @@ public class DbContextEF : DbContext
 
     }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        // optionsBuilder.UseSqlServer(
-        //     @"server=192.168.0.37;database=EFCoreShardingDB;uid=sa;pwd=Abcd@123456;");
-    }
+    // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    // {
+    // optionsBuilder.UseSqlServer(
+    //     @"server=192.168.0.37;database=EFCoreShardingDB;uid=sa;pwd=Abcd@123456;");
+    // }
 
     /// <summary>
     /// 

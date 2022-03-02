@@ -94,8 +94,9 @@ public class FactoryConstant
             if (db != null)
             {
                 this.db = db;
-                db.Database.Migrate();
-                db.Database.EnsureCreated();
+                // db.Database.EnsureDeleted();
+                // db.Database.Migrate();
+                // db.Database.EnsureCreated();
                 // db.Database.InitialCreate();
 
             }
@@ -107,6 +108,7 @@ public class FactoryConstant
                     var options = new DbContextOptionsBuilder<DbContextEF>().UseSqlServer(dbConnection).Options;
                     var factorydb = new PooledDbContextFactory<DbContextEF>(options);
                     this.db = factorydb.CreateDbContext();
+                    this.db.Database.EnsureCreated();
                 }
             }
         }

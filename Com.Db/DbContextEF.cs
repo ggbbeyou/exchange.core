@@ -1,23 +1,14 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
-using ShardingCore.Core.VirtualRoutes.TableRoutes.RouteTails.Abstractions;
-using ShardingCore.Sharding;
-using ShardingCore.Sharding.Abstractions;
 
 namespace Com.Db;
 
 /// <summary>
 /// DB上下文
 /// </summary>
-public class DbContextEF : AbstractShardingDbContext, IShardingTableDbContext
-{
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <value></value>
-    public IRouteTail RouteTail { get; set; } = null!;
-
+public class DbContextEF :DbContext
+{ 
     /// <summary>
     /// K线
     /// </summary>

@@ -4,9 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using ShardingCore;
-using ShardingCore.Bootstrapers;
-using ShardingCore.TableExists;
+
 
 namespace Com.Server;
 
@@ -37,6 +35,7 @@ class Program
         .ConfigureServices((hostContext, services) =>
         {
             services.AddHostedService<MainService>();
+            services.AddDbContext<DbContextEF>();
         })
         .ConfigureLogging(logging =>
         {

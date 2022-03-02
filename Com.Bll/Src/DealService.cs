@@ -51,7 +51,6 @@ public class DealService
     {
         this.constant = constant;
         this.dealHelper = new DealHelper(constant);
-
     }
 
     /// <summary>
@@ -97,6 +96,20 @@ public class DealService
             return JsonConvert.DeserializeObject<Deal>(redisvalue[0]);
         }
         return null;
+    }
+
+    /// <summary>
+    /// 删除redis中的交易记录
+    /// </summary>
+    /// <param name="markets"></param>
+    /// <param name="start">start之前记录全部清除</param>
+    public void DeleteDeal(List<string> markets, DateTimeOffset start)
+    {
+        foreach (var market in markets)
+        {
+            this.constant.redis.SortedSetRemoveRangeByScore(string.Format(this.redis_key_deal, market), 0, start.ToUnixTimeMilliseconds());
+        }
+
     }
 
 

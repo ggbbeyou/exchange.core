@@ -60,8 +60,11 @@ namespace Com.Server
         /// </summary>
         public void DealDbToRedis()
         {
+            List<string> markets = new List<string>();
+            markets.Add("btc/usdt");
             DealService.instance.Init(constant, systemTime);
-            DealService.instance.DealDbToRedis(new List<string>() { "btc/usdt" }, new TimeSpan(-30, 0, 0, 0));
+            DealService.instance.DeleteDeal(markets, DateTimeOffset.UtcNow.AddMonths(-3));
+            DealService.instance.DealDbToRedis(markets, new TimeSpan(-30, 0, 0, 0));
         }
 
         /// <summary>
@@ -69,11 +72,13 @@ namespace Com.Server
         /// </summary>
         public void KlindDBtoRedis()
         {
+            List<string> markets = new List<string>();
+            markets.Add("btc/usdt");
             KlineService.instance.Init(constant, systemTime);
             DateTimeOffset now = DateTimeOffset.UtcNow;
             DateTimeOffset end = now.AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond - 1);
-            KlineService.instance.DBtoRedised(new List<string>() { "btc/usdt" }, end);
-            KlineService.instance.DBtoRedising(new List<string>() { "btc/usdt" });
+            KlineService.instance.DBtoRedised(markets, end);
+            KlineService.instance.DBtoRedising(markets);
         }
 
 

@@ -40,6 +40,7 @@ namespace Com.Server
             {
                 FactoryMatching.instance.Init(this.constant);
                 FactoryMatching.instance.DealDbToRedis();
+              
                 FactoryMatching.instance.KlindDBtoRedis();
                 this.constant.logger.LogInformation("启动业务后台服务成功");
             }

@@ -34,6 +34,13 @@ public class DbContextEF : AbstractShardingDbContext, IShardingTableDbContext
     /// <value></value>
     public DbSet<Order> Order { get; set; } = null!;
 
+
+    /// <summary>
+    /// 成交单
+    /// </summary>
+    /// <value></value>
+    public DbSet<Deal> Deal_202202 { get; set; } = null!;
+
     /// <summary>
     /// 构造函数
     /// </summary>

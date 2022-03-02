@@ -30,6 +30,6 @@ public class RouteKline : AbstractSimpleShardingMonthKeyDateTimeOffsetVirtualTab
 
     public override DateTimeOffset GetBeginTime()
     {
-        return new DateTimeOffset(2022, 1, 1, 0, 0, 0, TimeSpan.Zero);
+        return new DateTimeOffset(2017, 1, 1, 0, 0, 0, TimeSpan.Zero);
     }
 }

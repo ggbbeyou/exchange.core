@@ -238,6 +238,10 @@ public class KilneHelper
     /// <returns></returns>
     public List<Kline> GetKlines(string market, E_KlineType klineType_source, E_KlineType klineType_target, DateTimeOffset start, DateTimeOffset end)
     {
+
+
+        
+
         List<Kline> result = new List<Kline>();
         Expression<Func<Kline, int>> lambda = P => EF.Functions.DateDiffMinute(this.system_init, P.time_start);
         switch (klineType_target)

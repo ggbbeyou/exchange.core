@@ -22,40 +22,32 @@ class Program
     /// <returns></returns>
     static async Task Main(string[] args)
     {
-        // DateTimeOffset startTime = new DateTimeOffset(2022, 1, 1, 0, 0, 0, TimeSpan.Zero);
-        // for (int i = 0; i < 2000; i++)
-        // {
-        //     if (startTime.AddYears(-i).DayOfWeek == DayOfWeek.Sunday)
-        //     {
-
-        //     }
-        // }
         using IHost host = CreateHostBuilder(args).Build();
         await host.RunAsync();
     }
 
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="args"></param>
+    /// <returns></returns>
+    static IHostBuilder CreateHostBuilder(string[] args) =>
+        Host.CreateDefaultBuilder(args)
+        .ConfigureServices((hostContext, services) =>
+        {
+            services.AddHostedService<MainService>();
+        })
+        .ConfigureLogging(logging =>
+        {
+            logging.ClearProviders();
+#if (DEBUG)
+            logging.AddConsole();
+#endif
+        });
+
+
     /*
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="args"></param>
-        /// <returns></returns>
-        static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-            .ConfigureServices((hostContext, services) =>
-            {
-                services.AddHostedService<MainService>();
-            })
-            .ConfigureLogging(logging =>
-            {
-                logging.ClearProviders();
-
-                logging.AddConsole();
-
-            });
-            */
-
-
     static IHostBuilder CreateHostBuilder(string[] args) =>
         Host.CreateDefaultBuilder(args)
         .ConfigureServices((hostContext, services) =>
@@ -95,5 +87,7 @@ class Program
             logging.AddConsole();
 #endif
         });
+
+        */
 
 }

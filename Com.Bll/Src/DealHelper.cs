@@ -66,7 +66,7 @@ public class DealHelper
             var deals = this.constant.db.Deal.Where(predicate).ToList();
 
         }
-        catch (System.Exception)
+        catch (System.Exception ex)
         {
 
             throw;
@@ -108,8 +108,8 @@ public class DealHelper
 
 
             */
-            var eee = this.constant.db.Deal_202202.ToList();
-            var sql2 = from kline in this.constant.db.Deal_202202.OrderBy(P => P.time)
+            var eee = this.constant.db.Deal.ToList();
+            var sql2 = from kline in this.constant.db.Deal.OrderBy(P => P.time)
                        where kline.market == market && end >= kline.time && end > kline.time
 
                        group kline by new

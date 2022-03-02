@@ -7,8 +7,8 @@ namespace Com.Db;
 /// <summary>
 /// DB上下文
 /// </summary>
-public class DbContextEF :DbContext
-{ 
+public class DbContextEF : DbContext
+{
     /// <summary>
     /// K线
     /// </summary>
@@ -25,13 +25,6 @@ public class DbContextEF :DbContext
     /// <value></value>
     public DbSet<Order> Order { get; set; } = null!;
 
-
-    /// <summary>
-    /// 成交单
-    /// </summary>
-    /// <value></value>
-    public DbSet<Deal> Deal_202202 { get; set; } = null!;
-
     /// <summary>
     /// 构造函数
     /// </summary>
@@ -41,13 +34,18 @@ public class DbContextEF :DbContext
 
     }
 
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        // optionsBuilder.UseSqlServer(
+        //     @"server=192.168.0.37;database=EFCoreShardingDB;uid=sa;pwd=Abcd@123456;");
+    }
+
     /// <summary>
     /// 
     /// </summary>
     /// <param name="modelBuilder"></param>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(modelBuilder);
         modelBuilder.Entity<Kline>(o =>
         {
             o.HasKey(p => p.id);
@@ -67,6 +65,7 @@ public class DbContextEF :DbContext
             o.Property(P => P.time_end).IsRequired().HasColumnType("datetimeoffset").HasComment("变更开始时间");
             o.Property(P => P.time).IsRequired().HasColumnType("datetimeoffset").HasComment("更新时间");
             o.ToTable(nameof(Kline));
+
         });
         modelBuilder.Entity<Order>(o =>
         {
@@ -105,6 +104,7 @@ public class DbContextEF :DbContext
             o.Property(P => P.time).IsRequired().HasColumnType("datetimeoffset").HasMaxLength(50).HasComment("成交时间");
             o.ToTable(nameof(Deal));
         });
+        base.OnModelCreating(modelBuilder);
     }
 }
 

@@ -94,6 +94,10 @@ public class FactoryConstant
             if (db != null)
             {
                 this.db = db;
+                db.Database.Migrate();
+                db.Database.EnsureCreated();
+                // db.Database.InitialCreate();
+
             }
             else
             {

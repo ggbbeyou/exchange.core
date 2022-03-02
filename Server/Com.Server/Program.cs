@@ -34,8 +34,13 @@ class Program
         Host.CreateDefaultBuilder(args)
         .ConfigureServices((hostContext, services) =>
         {
+            services.AddDbContext<DbContextEF>(options =>
+            {
+                DbContextOptions options1 = options.UseSqlServer(hostContext.Configuration.GetConnectionString("Mssql")).Options;
+                options.EnableDetailedErrors();
+            });
             services.AddHostedService<MainService>();
-            services.AddDbContext<DbContextEF>();
+            services.BuildServiceProvider();
         })
         .ConfigureLogging(logging =>
         {

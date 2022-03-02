@@ -103,7 +103,7 @@ public class DealHelper
                     break;
             }
             var deals = from deal in this.constant.db.Deal.Where(predicate)
-                        group deal by EF.Functions.DateDiffMinute(this.system_init, deal.time) / 5 into g
+                        group deal by EF.Functions.DateDiffHour(this.system_init, deal.time) / 12 into g
                         select new Kline
                         {
                             market = market,

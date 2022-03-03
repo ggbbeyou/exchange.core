@@ -26,6 +26,7 @@ namespace Com.Server
         public MainService(IServiceProvider provider, IConfiguration configuration, IHostEnvironment environment, ILogger<MainService> logger)
         {
             this.constant = new FactoryConstant(provider, configuration, environment, logger);
+            FactoryMatching.instance.Init(this.constant);
         }
 
         /// <summary>
@@ -38,9 +39,7 @@ namespace Com.Server
             this.constant.logger.LogInformation("准备启动业务后台服务");
             try
             {
-                FactoryMatching.instance.Init(this.constant);
                 FactoryMatching.instance.DealDbToRedis();
-              
                 FactoryMatching.instance.KlindDBtoRedis();
                 this.constant.logger.LogInformation("启动业务后台服务成功");
             }

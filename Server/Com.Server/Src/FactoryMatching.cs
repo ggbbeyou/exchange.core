@@ -73,7 +73,7 @@ namespace Com.Server
             List<BaseMarketInfo> marketInfos = GetMarkets();
             foreach (var markets in marketInfos)
             {
-                DateTimeOffset now = DateTimeOffset.UtcNow;
+                DateTimeOffset now = DateTimeOffset.UtcNow.AddDays(-1);
                 DateTimeOffset end = now.AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond - 1);
                 KlineService.instance.DBtoRedised(markets.market, end);
                 KlineService.instance.DBtoRedising(markets.market);

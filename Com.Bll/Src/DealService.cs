@@ -53,26 +53,23 @@ public class DealService
     /// <param name="markets">交易对</param>
     /// <param name="span">最少同步多少时间数据</param>
     /// <returns></returns>
-    public bool DealDbToRedis(List<string> markets, TimeSpan span)
+    public bool DealDbToRedis(string market, TimeSpan span)
     {
-        foreach (var market in markets)
+        DateTimeOffset start = DateTimeOffset.UtcNow.Add(span);
+        Deal? deal = GetRedisLastDeal(market);
+        if (deal != null)
         {
-            DateTimeOffset start = DateTimeOffset.UtcNow.Add(span);
-            Deal? deal = GetRedisLastDeal(market);
-            if (deal != null)
+            start = deal.time;
+        }
+        List<Deal> deals = dealHelper.GetDeals(market, start, null);
+        if (deals.Count() > 0)
+        {
+            SortedSetEntry[] entries = new SortedSetEntry[deals.Count()];
+            for (int i = 0; i < deals.Count(); i++)
             {
-                start = deal.time;
+                entries[i] = new SortedSetEntry(JsonConvert.SerializeObject(deals[i]), deals[i].time.ToUnixTimeMilliseconds());
             }
-            List<Deal> deals = dealHelper.GetDeals(market, start, null);
-            if (deals.Count() > 0)
-            {
-                SortedSetEntry[] entries = new SortedSetEntry[deals.Count()];
-                for (int i = 0; i < deals.Count(); i++)
-                {
-                    entries[i] = new SortedSetEntry(JsonConvert.SerializeObject(deals[i]), deals[i].time.ToUnixTimeMilliseconds());
-                }
-                this.constant.redis.SortedSetAdd(string.Format(this.redis_key_deal, market), entries);
-            }
+            this.constant.redis.SortedSetAdd(string.Format(this.redis_key_deal, market), entries);
         }
         return true;
     }
@@ -97,13 +94,9 @@ public class DealService
     /// </summary>
     /// <param name="markets">交易对</param>
     /// <param name="start">start之前记录全部清除</param>
-    public void DeleteDeal(List<string> markets, DateTimeOffset start)
+    public void DeleteDeal(string market, DateTimeOffset start)
     {
-        foreach (var market in markets)
-        {
-            this.constant.redis.SortedSetRemoveRangeByScore(string.Format(this.redis_key_deal, market), 0, start.ToUnixTimeMilliseconds());
-        }
-
+        this.constant.redis.SortedSetRemoveRangeByScore(string.Format(this.redis_key_deal, market), 0, start.ToUnixTimeMilliseconds());
     }
 
 }

@@ -75,13 +75,10 @@ public class KlineService
     /// </summary>
     /// <param name="markets">交易对</param>
     /// <param name="end">结束时间</param>
-    public void DBtoRedised(List<string> markets, DateTimeOffset end)
+    public void DBtoRedised(string market, DateTimeOffset end)
     {
-        foreach (var market in markets)
-        {
-            SyncKlines(market, end);
-            DbSaveRedis(market);
-        }
+        SyncKlines(market, end);
+        DbSaveRedis(market);
     }
 
     /// <summary>
@@ -149,31 +146,28 @@ public class KlineService
     /// 缓存预热(未确定K线)
     /// </summary>
     /// <param name="market">交易对</param>
-    public void DBtoRedising(List<string> markets)
+    public void DBtoRedising(string market)
     {
-        foreach (string market in markets)
+        foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
         {
-            foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
+            DateTimeOffset start = this.system_init;
+            Kline? kline_last = this.kilneHelper.GetLastKline(market, cycle);
+            decimal last_price = 0;
+            if (kline_last != null)
             {
-                DateTimeOffset start = this.system_init;
-                Kline? kline_last = this.kilneHelper.GetLastKline(market, cycle);
-                decimal last_price = 0;
-                if (kline_last != null)
-                {
-                    start = kline_last.time_end.AddMilliseconds(1);
-                    last_price = kline_last.close;
-                }
-                List<Deal> deals = DealService.instance.dealHelper.GetDeals(market, start, null);
-                DateTimeOffset end = DateTimeOffset.UtcNow;
-                if (deals.Count > 0)
-                {
-                    end = deals.Last().time;
-                }
-                Kline? kline_new = DealToKline(market, cycle, start, end, last_price, deals);
-                if (kline_new != null)
-                {
-                    this.constant.redis.HashSet(string.Format(this.redis_key_klineing, market), cycle.ToString(), JsonConvert.SerializeObject(kline_new));
-                }
+                start = kline_last.time_end.AddMilliseconds(1);
+                last_price = kline_last.close;
+            }
+            List<Deal> deals = DealService.instance.dealHelper.GetDeals(market, start, null);
+            DateTimeOffset end = DateTimeOffset.UtcNow;
+            if (deals.Count > 0)
+            {
+                end = deals.Last().time;
+            }
+            Kline? kline_new = DealToKline(market, cycle, start, end, last_price, deals);
+            if (kline_new != null)
+            {
+                this.constant.redis.HashSet(string.Format(this.redis_key_klineing, market), cycle.ToString(), JsonConvert.SerializeObject(kline_new));
             }
         }
     }

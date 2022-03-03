@@ -139,7 +139,7 @@ public class DealHelper
     public void AddTest()
     {
         Random r = new Random();
-        for (int i = 0; i < 20; i++)
+        for (int i = 0; i < 2000; i++)
         {
             decimal price = r.NextInt64(1, 10);
             decimal amount = r.NextInt64(1, 10);
@@ -153,7 +153,7 @@ public class DealHelper
                 trigger_side = E_OrderSide.buy,
                 bid_id = this.constant.worker.NextId(),
                 ask_id = this.constant.worker.NextId(),
-                time = DateTimeOffset.UtcNow.AddMinutes(-r.NextInt64(0, 10)),
+                time = DateTimeOffset.UtcNow.AddMinutes(-r.NextInt64(0, 100)),
             });
         }
         this.constant.db.SaveChanges();

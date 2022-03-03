@@ -18,7 +18,7 @@ public class DealHelper
     public FactoryConstant constant = null!;
 
     /// <summary>
-    /// 
+    /// 初始化方法
     /// </summary>
     /// <param name="constant"></param>
     public DealHelper(FactoryConstant constant)
@@ -30,9 +30,9 @@ public class DealHelper
     /// <summary>
     /// 获取交易记录
     /// </summary>
-    /// <param name="market"></param>
-    /// <param name="start"></param>
-    /// <param name="end"></param>
+    /// <param name="market">交易对</param>
+    /// <param name="start">开始时间</param>
+    /// <param name="end">结束时间</param>
     /// <returns></returns>
     public List<Deal> GetDeals(string market, DateTimeOffset? start, DateTimeOffset? end)
     {
@@ -51,10 +51,9 @@ public class DealHelper
     /// <summary>
     /// 交易记录转换成一分钟K线
     /// </summary>
-    /// <param name="market"></param>
-    /// <param name="klineType"></param>
-    /// <param name="start"></param>
-    /// <param name="end"></param>
+    /// <param name="market">交易对</param>
+    /// <param name="start">开始时间</param>
+    /// <param name="end">结束时间</param>
     /// <returns></returns>
     public List<Kline>? GetKlinesMin1ByDeal(string market, DateTimeOffset? start, DateTimeOffset? end)
     {
@@ -94,8 +93,6 @@ public class DealHelper
         }
         return null;
     }
-
-
 
     public void AddTest()
     {

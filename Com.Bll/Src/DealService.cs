@@ -38,7 +38,7 @@ public class DealService
     }
 
     /// <summary>
-    /// 
+    /// 初始化方法
     /// </summary>
     /// <param name="constant"></param>
     public void Init(FactoryConstant constant)
@@ -50,7 +50,7 @@ public class DealService
     /// <summary>
     /// 同步交易记录
     /// </summary>
-    /// <param name="market"></param>
+    /// <param name="markets">交易对</param>
     /// <param name="span">最少同步多少时间数据</param>
     /// <returns></returns>
     public bool DealDbToRedis(List<string> markets, TimeSpan span)
@@ -95,7 +95,7 @@ public class DealService
     /// <summary>
     /// 删除redis中的交易记录
     /// </summary>
-    /// <param name="markets"></param>
+    /// <param name="markets">交易对</param>
     /// <param name="start">start之前记录全部清除</param>
     public void DeleteDeal(List<string> markets, DateTimeOffset start)
     {

@@ -75,5 +75,8 @@ namespace Com.Server
             KlineService.instance.DBtoRedising(markets);
         }
 
+
+        
+
     }
 }

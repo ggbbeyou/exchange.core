@@ -14,14 +14,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Newtonsoft.Json;
 using StackExchange;
 using StackExchange.Redis;
-
 namespace Com.Bll;
-
-/*
-
-
-*/
-
 
 /// <summary>
 /// K线逻辑
@@ -51,7 +44,7 @@ public class KlineService
     /// k线DB类
     /// </summary>
     public KilneHelper kilneHelper = null!;
- 
+
     /// <summary>
     /// 系统初始化时间  初始化  注:2017-1-1 此时是一年第一天，一年第一月，一年第一个星期日(星期日是一个星期开始的第一天)
     /// </summary>   
@@ -66,13 +59,12 @@ public class KlineService
     }
 
     /// <summary>
-    /// 
+    /// 初始化方法
     /// </summary>
     /// <param name="constant"></param>
     public void Init(FactoryConstant constant)
     {
         this.constant = constant;
-       
         this.kilneHelper = new KilneHelper(constant);
     }
 
@@ -81,8 +73,8 @@ public class KlineService
     /// <summary>
     /// 缓存预热(已确定K线)
     /// </summary>
-    /// <param name="market"></param>
-    /// <param name="end">同步到结束时间</param>
+    /// <param name="markets">交易对</param>
+    /// <param name="end">结束时间</param>
     public void DBtoRedised(List<string> markets, DateTimeOffset end)
     {
         foreach (var market in markets)
@@ -95,8 +87,8 @@ public class KlineService
     /// <summary>
     /// 将K线保存到Db中
     /// </summary>
-    /// <param name="market"></param>
-    /// <param name="end"></param>
+    /// <param name="market">交易对</param>
+    /// <param name="end">结束时间</param>
     public void SyncKlines(string market, DateTimeOffset end)
     {
         foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
@@ -113,7 +105,7 @@ public class KlineService
     /// <summary>
     /// 将DB中的K线数据保存到Redis
     /// </summary>
-    /// <param name="market"></param>
+    /// <param name="market">交易对</param>
     public void DbSaveRedis(string market)
     {
         foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
@@ -156,8 +148,7 @@ public class KlineService
     /// <summary>
     /// 缓存预热(未确定K线)
     /// </summary>
-    /// <param name="market"></param>
-    /// <param name="end">同步到结束时间</param>
+    /// <param name="market">交易对</param>
     public void DBtoRedising(List<string> markets)
     {
         foreach (string market in markets)
@@ -190,12 +181,12 @@ public class KlineService
     /// <summary>
     /// 交易记录转换成K线
     /// </summary>
-    /// <param name="market"></param>
-    /// <param name="type"></param>
-    /// <param name="start"></param>
-    /// <param name="end"></param>
-    /// <param name="last_price"></param>
-    /// <param name="deals"></param>
+    /// <param name="market">交易对</param>
+    /// <param name="type">k线类型</param>
+    /// <param name="start">开始时间</param>
+    /// <param name="end">结束时间</param>
+    /// <param name="last_price">最后价格</param>
+    /// <param name="deals">成交记录</param>
     /// <returns></returns>
     public Kline? DealToKline(string market, E_KlineType type, DateTimeOffset start, DateTimeOffset end, decimal last_price, List<Deal> deals)
     {

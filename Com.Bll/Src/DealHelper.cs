@@ -24,7 +24,7 @@ public class DealHelper
     public DealHelper(FactoryConstant constant)
     {
         this.constant = constant;
-        // AddTest();
+        AddTest();
     }
 
     /// <summary>
@@ -56,9 +56,8 @@ public class DealHelper
     /// <param name="start"></param>
     /// <param name="end"></param>
     /// <returns></returns>
-    public List<Kline>? GetKlinesMin1ByDeal(string market, E_KlineType klineType, DateTimeOffset? start, DateTimeOffset? end)
+    public List<Kline>? GetKlinesMin1ByDeal(string market, DateTimeOffset? start, DateTimeOffset? end)
     {
-        List<Kline> klines = new List<Kline>();
         Expression<Func<Deal, bool>> predicate = P => P.market == market;
         if (start != null)
         {
@@ -70,7 +69,7 @@ public class DealHelper
         }
         try
         {
-            var deals = from deal in this.constant.db.Deal.Where(predicate)
+            var sql = from deal in this.constant.db.Deal.Where(predicate)
                         group deal by EF.Functions.DateDiffMinute(KlineService.instance.system_init, deal.time) into g
                         select new Kline
                         {
@@ -82,19 +81,18 @@ public class DealHelper
                             close = g.OrderBy(P => P.time).Last().price,
                             low = g.Min(P => P.price),
                             high = g.Max(P => P.price),
-                            type = klineType,
-                            time_start = g.OrderBy(P => P.time).First().time,
-                            time_end = g.OrderBy(P => P.time).Last().time,
+                            type = E_KlineType.min1,
+                            time_start = KlineService.instance.system_init.AddMinutes(g.Key),
+                            time_end = KlineService.instance.system_init.AddMinutes(g.Key + 1).AddMilliseconds(-1),
                             time = DateTimeOffset.UtcNow,
                         };
-            klines = deals.ToList();
+            return sql.ToList();
         }
         catch (Exception ex)
         {
             this.constant.logger.LogError(ex, "交易记录转换成一分钟K线失败");
-            return null;
         }
-        return klines;
+        return null;
     }
 
 

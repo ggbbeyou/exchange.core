@@ -96,69 +96,39 @@ public class KlineService
     {
         foreach (var market in markets)
         {
-            SyncDealToKlineMin1(market, end);
             SyncKlines(market, end);
             DbSaveRedis(market);
         }
     }
 
     /// <summary>
-    /// 在DB中,由Deal转成1分钟K线
+    /// 同步K线min1(已确定K线)
     /// </summary>
     /// <param name="market"></param>
     /// <param name="end"></param>
-    public void SyncDealToKlineMin1(string market, DateTimeOffset end)
+    public void SyncKlineMin1(string market, DateTimeOffset end)
     {
-        Kline? last_kline = this.kilneHelper.GetLastKline(market, E_KlineType.min1);
         DateTimeOffset start = this.system_init;
-        decimal last_price = 0;
+        Kline? last_kline = this.kilneHelper.GetLastKline(market, E_KlineType.min1);
         if (last_kline != null)
         {
-            last_price = last_kline.close;
             start = last_kline.time_end.AddMilliseconds(1);
         }
-        List<Deal> deals = KlineService.instance.dealHelper.GetDeals(market, start, end);
-        List<Kline> klines = GetKlineMin(market, start, end, last_price, deals);
-        int min1_count = this.kilneHelper.SaveKline(market, E_KlineType.min1, klines);
+        List<Kline>? klines = DealService.instance.dealHelper.GetKlinesMin1ByDeal(market, start, end);
+        if (klines != null && klines.Count > 0)
+        {
+            this.kilneHelper.SaveKline(market, E_KlineType.min1, klines);
+        }
     }
 
-    /// <summary>
-    /// Deal 转1分钟K线
-    /// </summary>
-    /// <param name="market"></param>
-    /// <param name="end"></param>
-    /// <param name="last_kline"></param>
-    /// <returns></returns>
-    public List<Kline> GetKlineMin(string market, DateTimeOffset start, DateTimeOffset end, decimal last_price, List<Deal> deals)
-    {
-        List<Kline> result = new List<Kline>();
-        for (DateTimeOffset i = start; i <= end; i = i.AddMinutes(1))
-        {
-            DateTimeOffset end_time = i.AddMinutes(1).AddMilliseconds(-1);
-            List<Deal> deal = deals.Where(P => P.time >= i && P.time <= end_time).ToList();
-            if (deal.Count > 0)
-            {
-                last_price = deal.Last().price;
-            }
-            if (last_price == 0 && deal.Count == 0)
-            {
-                continue;
-            }
-            Kline? kline = DealToKline(market, E_KlineType.min1, i, end_time, last_price, deal);
-            if (kline != null)
-            {
-                result.Add(kline);
-            }
-        }
-        return result;
-    }
+
 
     /// <summary>
     /// 在DB里保存低频K线
     /// </summary>
     /// <param name="market"></param>
-    /// <param name="now"></param>
-    public void SyncKlines(string market, DateTimeOffset now)
+    /// <param name="end"></param>
+    public void SyncKlines(string market, DateTimeOffset end)
     {
         E_KlineType previous_type = E_KlineType.min1;
         Kline? last_kline = null;
@@ -166,11 +136,12 @@ public class KlineService
         {
             if (cycle == E_KlineType.min1)
             {
+                SyncKlineMin1(market, end);
                 previous_type = E_KlineType.min1;
                 continue;
             }
             last_kline = this.kilneHelper.GetLastKline(market, cycle);
-            List<Kline> klines = this.kilneHelper.GetKlines(market, previous_type, cycle, last_kline?.time_end ?? this.system_init, now);
+            List<Kline> klines = this.kilneHelper.GetKlines(market, cycle, last_kline?.time_end ?? this.system_init, end);
             int count = this.kilneHelper.SaveKline(market, cycle, klines);
             if (cycle == E_KlineType.month1)
             {

@@ -103,11 +103,7 @@ public class DealHelper
     /// <returns></returns>
     public Kline? GetKlinesByDeal(string market, E_KlineType type, DateTimeOffset start, DateTimeOffset? end)
     {
-        Expression<Func<Deal, bool>> predicate = P => P.market == market;
-        if (start != null)
-        {
-            predicate = predicate.And(P => start <= P.time);
-        }
+        Expression<Func<Deal, bool>> predicate = P => P.market == market && start <= P.time;
         if (end != null)
         {
             predicate = predicate.And(P => P.time <= end);

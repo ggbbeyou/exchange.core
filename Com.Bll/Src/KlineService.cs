@@ -152,73 +152,16 @@ public class KlineService
         {
             DateTimeOffset start = this.system_init;
             Kline? kline_last = this.kilneHelper.GetLastKline(market, cycle);
-            decimal last_price = 0;
             if (kline_last != null)
             {
                 start = kline_last.time_end.AddMilliseconds(1);
-                last_price = kline_last.close;
             }
-            List<Deal> deals = DealService.instance.dealHelper.GetDeals(market, start, null);
-            DateTimeOffset end = DateTimeOffset.UtcNow;
-            if (deals.Count > 0)
-            {
-                end = deals.Last().time;
-            }
-            Kline? kline_new = DealToKline(market, cycle, start, end, last_price, deals);
+            Kline? kline_new = DealService.instance.dealHelper.GetKlinesByDeal(market, cycle, start, null);
             if (kline_new != null)
             {
                 this.constant.redis.HashSet(string.Format(this.redis_key_klineing, market), cycle.ToString(), JsonConvert.SerializeObject(kline_new));
             }
         }
-    }
-
-    /// <summary>
-    /// 交易记录转换成K线
-    /// </summary>
-    /// <param name="market">交易对</param>
-    /// <param name="type">k线类型</param>
-    /// <param name="start">开始时间</param>
-    /// <param name="end">结束时间</param>
-    /// <param name="last_price">最后价格</param>
-    /// <param name="deals">成交记录</param>
-    /// <returns></returns>
-    public Kline? DealToKline(string market, E_KlineType type, DateTimeOffset start, DateTimeOffset end, decimal last_price, List<Deal> deals)
-    {
-        Kline kline = new Kline();
-        if (deals.Count > 0)
-        {
-            deals = deals.OrderBy(P => P.time).ToList();
-            kline.market = market;
-            kline.type = type;
-            kline.amount = deals.Sum(P => P.amount);
-            kline.count = deals.Count;
-            kline.total = deals.Sum(P => P.amount * P.price);
-            kline.open = deals[0].price;
-            kline.close = deals[deals.Count - 1].price;
-            kline.low = deals.Min(P => P.price);
-            kline.high = deals.Max(P => P.price);
-            kline.time_start = start;
-            kline.time_end = end;
-            kline.time = DateTimeOffset.UtcNow;
-            return kline;
-        }
-        else if (last_price > 0)
-        {
-            kline.market = market;
-            kline.type = type;
-            kline.amount = 0;
-            kline.count = 0;
-            kline.total = 0;
-            kline.open = last_price;
-            kline.close = last_price;
-            kline.low = last_price;
-            kline.high = last_price;
-            kline.time_start = start;
-            kline.time_end = end;
-            kline.time = DateTimeOffset.UtcNow;
-            return kline;
-        }
-        return null;
     }
 
     #endregion

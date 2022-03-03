@@ -94,6 +94,52 @@ public class DealHelper
         return null;
     }
 
+    /// <summary>
+    /// 交易记录转换成K线
+    /// </summary>
+    /// <param name="market">交易对</param>
+    /// <param name="start">开始时间</param>
+    /// <param name="end">结束时间</param>
+    /// <returns></returns>
+    public Kline? GetKlinesByDeal(string market, E_KlineType type, DateTimeOffset start, DateTimeOffset? end)
+    {
+        Expression<Func<Deal, bool>> predicate = P => P.market == market;
+        if (start != null)
+        {
+            predicate = predicate.And(P => start <= P.time);
+        }
+        if (end != null)
+        {
+            predicate = predicate.And(P => P.time <= end);
+        }
+        try
+        {
+            var sql = from deal in this.constant.db.Deal.Where(predicate)
+                      group deal by deal.market into g
+                      select new Kline
+                      {
+                          market = market,
+                          amount = g.Sum(P => P.amount),
+                          count = g.Count(),
+                          total = g.Sum(P => P.total),
+                          open = g.OrderBy(P => P.time).First().price,
+                          close = g.OrderBy(P => P.time).Last().price,
+                          low = g.Min(P => P.price),
+                          high = g.Max(P => P.price),
+                          type = type,
+                          time_start = start,
+                          time_end = g.OrderBy(P => P.time).Last().time,
+                          time = DateTimeOffset.UtcNow,
+                      };
+            return sql.FirstOrDefault();
+        }
+        catch (Exception ex)
+        {
+            this.constant.logger.LogError(ex, "交易记录转换成一分钟K线失败");
+        }
+        return null;
+    }
+
     public void AddTest()
     {
         Random r = new Random();

@@ -102,57 +102,23 @@ public class KlineService
     }
 
     /// <summary>
-    /// 同步K线min1(已确定K线)
-    /// </summary>
-    /// <param name="market"></param>
-    /// <param name="end"></param>
-    public void SyncKlineMin1(string market, DateTimeOffset end)
-    {
-        DateTimeOffset start = this.system_init;
-        Kline? last_kline = this.kilneHelper.GetLastKline(market, E_KlineType.min1);
-        if (last_kline != null)
-        {
-            start = last_kline.time_end.AddMilliseconds(1);
-        }
-        List<Kline>? klines = DealService.instance.dealHelper.GetKlinesMin1ByDeal(market, start, end);
-        if (klines != null && klines.Count > 0)
-        {
-            this.kilneHelper.SaveKline(market, E_KlineType.min1, klines);
-        }
-    }
-
-
-
-    /// <summary>
     /// 在DB里保存低频K线
     /// </summary>
     /// <param name="market"></param>
     /// <param name="end"></param>
     public void SyncKlines(string market, DateTimeOffset end)
     {
-        E_KlineType previous_type = E_KlineType.min1;
-        Kline? last_kline = null;
         foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
-        {
-            if (cycle == E_KlineType.min1)
+        {          
+            Kline? last_kline = this.kilneHelper.GetLastKline(market, cycle);
+            List<Kline>? klines = this.kilneHelper.CalcKlines(market, cycle, last_kline?.time_end ?? this.system_init, end);
+            if (klines != null)
             {
-                SyncKlineMin1(market, end);
-                previous_type = E_KlineType.min1;
-                continue;
-            }
-            last_kline = this.kilneHelper.GetLastKline(market, cycle);
-            List<Kline> klines = this.kilneHelper.GetKlines(market, cycle, last_kline?.time_end ?? this.system_init, end);
-            int count = this.kilneHelper.SaveKline(market, cycle, klines);
-            if (cycle == E_KlineType.month1)
-            {
-                previous_type = E_KlineType.day1;
-            }
-            else
-            {
-                previous_type = cycle;
+                int count = this.kilneHelper.SaveKline(market, cycle, klines);
             }
         }
-    }
+    }   
+
 
     /// <summary>
     /// 将DB中的K线数据保存到Redis

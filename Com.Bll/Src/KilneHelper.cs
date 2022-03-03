@@ -231,13 +231,9 @@ public class KilneHelper
     /// <param name="start"></param>
     /// <param name="end"></param>
     /// <returns></returns>
-    public List<Kline>? GetKlines(string market, E_KlineType type, DateTimeOffset? start, DateTimeOffset? end)
+    public List<Kline>? CalcKlines(string market, E_KlineType type, DateTimeOffset? start, DateTimeOffset? end)
     {
-        if (type == E_KlineType.min1)
-        {
-            return null;
-        }
-        Expression<Func<Kline, bool>> predicate = P => P.market == market && P.type == E_KlineType.min1;
+        Expression<Func<Kline, bool>> predicate = P => P.market == market;
         if (start != null)
         {
             predicate = predicate.And(P => start <= P.time_start);
@@ -250,7 +246,10 @@ public class KilneHelper
         {
             switch (type)
             {
+                case E_KlineType.min1:
+                    return DealService.instance.dealHelper.GetKlinesMin1ByDeal(market, start, end);
                 case E_KlineType.min5:
+                    predicate = predicate.And(P => P.type <= E_KlineType.min1);
                     var sql5 = from kline in this.constant.db.Kline.Where(predicate)
                                orderby kline.time_start
                                group kline by EF.Functions.DateDiffMinute(KlineService.instance.system_init, kline.time_start) / 5 into g
@@ -271,9 +270,10 @@ public class KilneHelper
                                };
                     return sql5.ToList();
                 case E_KlineType.min15:
+                    predicate = predicate.And(P => P.type <= E_KlineType.min5);
                     var sql15 = from kline in this.constant.db.Kline.Where(predicate)
                                 orderby kline.time_start
-                                group kline by EF.Functions.DateDiffMinute(KlineService.instance.system_init, kline.time_start) into g
+                                group kline by EF.Functions.DateDiffMinute(KlineService.instance.system_init, kline.time_start) / 15 into g
                                 select new Kline
                                 {
                                     market = market,
@@ -285,8 +285,8 @@ public class KilneHelper
                                     low = g.Min(P => P.low),
                                     high = g.Max(P => P.high),
                                     type = type,
-                                    time_start = KlineService.instance.system_init.AddMinutes(g.Key),
-                                    time_end = KlineService.instance.system_init.AddMinutes(g.Key + 1).AddMilliseconds(-1),
+                                    time_start = KlineService.instance.system_init.AddMinutes(g.Key * 15),
+                                    time_end = KlineService.instance.system_init.AddMinutes((g.Key + 1) * 15).AddMilliseconds(-1),
                                     time = DateTimeOffset.UtcNow,
                                 };
                     return sql15.ToList();

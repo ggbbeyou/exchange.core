@@ -102,14 +102,14 @@ public class KlineService
     }
 
     /// <summary>
-    /// 在DB里保存低频K线
+    /// 将K线保存到Db中
     /// </summary>
     /// <param name="market"></param>
     /// <param name="end"></param>
     public void SyncKlines(string market, DateTimeOffset end)
     {
         foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
-        {          
+        {
             Kline? last_kline = this.kilneHelper.GetLastKline(market, cycle);
             List<Kline>? klines = this.kilneHelper.CalcKlines(market, cycle, last_kline?.time_end ?? this.system_init, end);
             if (klines != null)
@@ -117,7 +117,7 @@ public class KlineService
                 int count = this.kilneHelper.SaveKline(market, cycle, klines);
             }
         }
-    }   
+    }
 
 
     /// <summary>
@@ -128,10 +128,6 @@ public class KlineService
     {
         foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
         {
-            if (cycle == E_KlineType.min1)
-            {
-                continue;
-            }
             Kline? Last_kline = GetRedisLastKline(market, cycle);
             List<Kline> klines = this.kilneHelper.GetKlines(market, cycle, Last_kline?.time_end ?? this.system_init, DateTimeOffset.Now);
             if (klines.Count() > 0)
@@ -141,7 +137,7 @@ public class KlineService
                 {
                     entries[i] = new SortedSetEntry(JsonConvert.SerializeObject(klines[i]), klines[i].time_start.ToUnixTimeMilliseconds());
                 }
-                this.constant.redis.SortedSetAdd(string.Format(this.redis_key_kline, market, E_KlineType.min1), entries);
+                this.constant.redis.SortedSetAdd(string.Format(this.redis_key_kline, market, cycle), entries);
             }
         }
     }

@@ -249,7 +249,7 @@ public class KilneHelper
                 case E_KlineType.min1:
                     return DealService.instance.dealHelper.GetKlinesMin1ByDeal(market, start, end);
                 case E_KlineType.min5:
-                    predicate = predicate.And(P => P.type <= E_KlineType.min1);
+                    predicate = predicate.And(P => P.type == E_KlineType.min1);
                     var sql5 = from kline in this.constant.db.Kline.Where(predicate)
                                orderby kline.time_start
                                group kline by EF.Functions.DateDiffMinute(KlineService.instance.system_init, kline.time_start) / 5 into g
@@ -270,7 +270,7 @@ public class KilneHelper
                                };
                     return sql5.ToList();
                 case E_KlineType.min15:
-                    predicate = predicate.And(P => P.type <= E_KlineType.min5);
+                    predicate = predicate.And(P => P.type == E_KlineType.min5);
                     var sql15 = from kline in this.constant.db.Kline.Where(predicate)
                                 orderby kline.time_start
                                 group kline by EF.Functions.DateDiffMinute(KlineService.instance.system_init, kline.time_start) / 15 into g
@@ -291,7 +291,7 @@ public class KilneHelper
                                 };
                     return sql15.ToList();
                 case E_KlineType.min30:
-                    predicate = predicate.And(P => P.type <= E_KlineType.min15);
+                    predicate = predicate.And(P => P.type == E_KlineType.min15);
                     var sql30 = from kline in this.constant.db.Kline.Where(predicate)
                                 orderby kline.time_start
                                 group kline by EF.Functions.DateDiffMinute(KlineService.instance.system_init, kline.time_start) / 30 into g
@@ -312,7 +312,7 @@ public class KilneHelper
                                 };
                     return sql30.ToList();
                 case E_KlineType.hour1:
-                    predicate = predicate.And(P => P.type <= E_KlineType.min30);
+                    predicate = predicate.And(P => P.type == E_KlineType.min30);
                     var sqlhour1 = from kline in this.constant.db.Kline.Where(predicate)
                                    orderby kline.time_start
                                    group kline by EF.Functions.DateDiffHour(KlineService.instance.system_init, kline.time_start) into g
@@ -333,7 +333,7 @@ public class KilneHelper
                                    };
                     return sqlhour1.ToList();
                 case E_KlineType.hour6:
-                    predicate = predicate.And(P => P.type <= E_KlineType.hour1);
+                    predicate = predicate.And(P => P.type == E_KlineType.hour1);
                     var sqlhour6 = from kline in this.constant.db.Kline.Where(predicate)
                                    orderby kline.time_start
                                    group kline by EF.Functions.DateDiffHour(KlineService.instance.system_init, kline.time_start) / 6 into g
@@ -354,7 +354,7 @@ public class KilneHelper
                                    };
                     return sqlhour6.ToList();
                 case E_KlineType.hour12:
-                    predicate = predicate.And(P => P.type <= E_KlineType.hour6);
+                    predicate = predicate.And(P => P.type == E_KlineType.hour6);
                     var sqlhour12 = from kline in this.constant.db.Kline.Where(predicate)
                                     orderby kline.time_start
                                     group kline by EF.Functions.DateDiffHour(KlineService.instance.system_init, kline.time_start) / 12 into g
@@ -375,7 +375,7 @@ public class KilneHelper
                                     };
                     return sqlhour12.ToList();
                 case E_KlineType.day1:
-                    predicate = predicate.And(P => P.type <= E_KlineType.hour12);
+                    predicate = predicate.And(P => P.type == E_KlineType.hour12);
                     var sqlday1 = from kline in this.constant.db.Kline.Where(predicate)
                                   orderby kline.time_start
                                   group kline by EF.Functions.DateDiffDay(KlineService.instance.system_init, kline.time_start) into g
@@ -396,7 +396,7 @@ public class KilneHelper
                                   };
                     return sqlday1.ToList();
                 case E_KlineType.week1:
-                    predicate = predicate.And(P => P.type <= E_KlineType.day1);
+                    predicate = predicate.And(P => P.type == E_KlineType.day1);
                     var sqlweek1 = from kline in this.constant.db.Kline.Where(predicate)
                                    orderby kline.time_start
                                    group kline by EF.Functions.DateDiffWeek(KlineService.instance.system_init, kline.time_start) into g
@@ -417,7 +417,7 @@ public class KilneHelper
                                    };
                     return sqlweek1.ToList();
                 case E_KlineType.month1:
-                    predicate = predicate.And(P => P.type <= E_KlineType.day1);
+                    predicate = predicate.And(P => P.type == E_KlineType.day1);
                     var sqlmonth1 = from kline in this.constant.db.Kline.Where(predicate)
                                     orderby kline.time_start
                                     group kline by EF.Functions.DateDiffMonth(KlineService.instance.system_init, kline.time_start) into g

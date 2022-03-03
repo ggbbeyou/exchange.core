@@ -162,7 +162,7 @@ public class Core
                 if (deals != null)
                 {
                     Dealing? deal = deals.FirstOrDefault();
-                    BaseOrder order = deal!.trigger_side == E_OrderSide.buy ? deal.bid : deal.ask;
+                    MatchOrder order = deal!.trigger_side == E_OrderSide.buy ? deal.bid : deal.ask;
                     List<BaseOrderBook> orderBooks = GetOrderBooks(order, deals);
                     // this.mq.SendOrderBook(orderBooks);
                     BaseKline? kline = SetKlink(deals);
@@ -222,7 +222,7 @@ public class Core
     /// <param name="order">订单</param>
     /// <param name="deals">成交记录</param>
     /// <returns>变更的orderbook</returns>
-    public List<BaseOrderBook> GetOrderBooks(BaseOrder order, List<Dealing> deals)
+    public List<BaseOrderBook> GetOrderBooks(MatchOrder order, List<Dealing> deals)
     {
         List<BaseOrderBook> orderBooks = new List<BaseOrderBook>();
         if (order == null || deals == null || deals.Count == 0)

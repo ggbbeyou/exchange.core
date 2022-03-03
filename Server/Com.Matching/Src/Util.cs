@@ -52,7 +52,7 @@ public static class Util
     /// <param name="trigger_side">触发方向</param>
     /// <param name="now">成交时间</param>
     /// <returns></returns>
-    public static Dealing AmountBidAsk(string market, BaseOrder bid, BaseOrder ask, decimal price, E_OrderSide trigger_side, DateTimeOffset now)
+    public static Dealing AmountBidAsk(string market, MatchOrder bid, MatchOrder ask, decimal price, E_OrderSide trigger_side, DateTimeOffset now)
     {
         decimal ask_amount = ask.amount_unsold;
         ask.amount_unsold = 0;
@@ -97,7 +97,7 @@ public static class Util
     /// <param name="trigger_side">触发方向</param>
     /// <param name="now">成交时间</param>
     /// <returns></returns>
-    public static Dealing AmountAskBid(string market, BaseOrder bid, BaseOrder ask, decimal price, E_OrderSide trigger_side, DateTimeOffset now)
+    public static Dealing AmountAskBid(string market, MatchOrder bid, MatchOrder ask, decimal price, E_OrderSide trigger_side, DateTimeOffset now)
     {
         decimal bid_amount = bid.amount_unsold;
         ask.amount_unsold -= bid_amount;

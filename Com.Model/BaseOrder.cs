@@ -34,11 +34,6 @@ public class BaseOrder
     /// <value></value>
     public decimal price { get; set; }
     /// <summary>
-    /// 触发撤单价格
-    /// </summary>
-    /// <value></value>
-    public decimal trigger_cancel_price { get; set; }
-    /// <summary>
     /// 挂单量
     /// </summary>
     /// <value></value>

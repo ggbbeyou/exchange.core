@@ -27,7 +27,7 @@ namespace Com.Matching
         public void TestOrder()
         {
             Console.WriteLine("Hello World!");
-            List<BaseOrder> orders = GetOrder();
+            List<MatchOrder> orders = GetOrder();
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
             List<Dealing> deals = AddOrder(orders);
@@ -40,7 +40,7 @@ namespace Com.Matching
         /// <summary>
         /// 
         /// </summary>
-        public List<Dealing> AddOrder(List<BaseOrder> orders)
+        public List<Dealing> AddOrder(List<MatchOrder> orders)
         {
             List<Dealing> deals = new List<Dealing>();
             for (int i = 0; i < orders.Count; i++)
@@ -54,9 +54,9 @@ namespace Com.Matching
         /// 
         /// </summary>
         /// <returns></returns>
-        public List<BaseOrder> GetOrder()
+        public List<MatchOrder> GetOrder()
         {
-            List<BaseOrder> orders = new List<BaseOrder>();
+            List<MatchOrder> orders = new List<MatchOrder>();
             for (int i = 0; i < 500_000; i++)
             {
                 E_OrderSide direction = random.Next(1, 3) == 1 ? E_OrderSide.buy : E_OrderSide.sell;
@@ -68,7 +68,7 @@ namespace Com.Matching
                 {
                     price = 0;
                 }
-                BaseOrder order = new BaseOrder()
+                MatchOrder order = new MatchOrder()
                 {
                     order_id = i,
                     market = this.name,

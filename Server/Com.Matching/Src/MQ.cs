@@ -93,7 +93,7 @@ public class MQ
             else
             {
                 string json = Encoding.UTF8.GetString(ea.Body.ToArray());
-                List<BaseOrder>? order = JsonConvert.DeserializeObject<List<BaseOrder>>(json);
+                List<MatchOrder>? order = JsonConvert.DeserializeObject<List<MatchOrder>>(json);
                 if (order != null)
                 {
                     foreach (var item in order)
@@ -135,7 +135,7 @@ public class MQ
                 if (order != null)
                 {
                     this.mutex.WaitOne();
-                    List<BaseOrder> cancel = this.core.CancelOrder(order);
+                    List<MatchOrder> cancel = this.core.CancelOrder(order);
                     if (cancel != null && cancel.Count > 0)
                     {
                         FactoryMatching.instance.constant.i_model.BasicPublish(exchange: this.key_order_cancel_success, routingKey: this.core.market, basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(cancel)));

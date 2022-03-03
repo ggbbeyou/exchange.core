@@ -12,10 +12,10 @@ public class Dealing : BaseDeal
     /// 买订单
     /// </summary>
     /// <value></value>
-    public BaseOrder bid { get; set; } = null!;
+    public MatchOrder bid { get; set; } = null!;
     /// <summary>
     /// 卖订单
     /// </summary>
     /// <value></value>
-    public BaseOrder ask { get; set; } = null!;
+    public MatchOrder ask { get; set; } = null!;
 }

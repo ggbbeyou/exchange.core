@@ -33,10 +33,6 @@ namespace Com.Server
         /// </summary>
         public FactoryConstant constant = null!;
 
-
-       
-
-
         /// <summary>
         /// 私有构造方法
         /// </summary>
@@ -47,8 +43,7 @@ namespace Com.Server
         /// <summary>
         /// 初始化方法
         /// </summary>
-        /// <param name="configuration">配置接口</param>
-        /// <param name="logger">日志接口</param>
+        /// <param name="constant"></param>
         public void Init(FactoryConstant constant)
         {
             this.constant = constant;

@@ -5,12 +5,6 @@ using StackExchange.Redis;
 
 namespace Com.Bll;
 
-/*
-
-
-*/
-
-
 /// <summary>
 /// 交易记录
 /// </summary>
@@ -35,18 +29,18 @@ public class DealService
     /// </summary>
     public DealHelper dealHelper = null!;
 
+    /// <summary>
+    /// private构造方法
+    /// </summary>
     private DealService()
     {
 
     }
 
-
     /// <summary>
-    ///
+    /// 
     /// </summary>
-    /// <param name="configuration">配置接口</param>
-    /// <param name="environment">环境接口</param>
-    /// <param name="logger">日志接口</param>
+    /// <param name="constant"></param>
     public void Init(FactoryConstant constant)
     {
         this.constant = constant;
@@ -111,9 +105,5 @@ public class DealService
         }
 
     }
-
-
-
-
 
 }

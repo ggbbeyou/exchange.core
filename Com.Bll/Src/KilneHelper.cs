@@ -56,7 +56,7 @@ public class KilneHelper
             last_price = last_kline.close;
             start = last_kline.time_end.AddMilliseconds(1);
         }
-        List<Deal> deals = KlineService.instance.dealHelper.GetDeals(market, start, end);
+        List<Deal> deals = DealService.instance.dealHelper.GetDeals(market, start, end);
         if (last_kline == null && deals.Count > 0)
         {
             DateTimeOffset first_time = deals.First().time;

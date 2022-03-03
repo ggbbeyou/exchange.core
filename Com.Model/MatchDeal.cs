@@ -6,7 +6,7 @@ namespace Com.Model;
 /// <summary>
 /// 成交单
 /// </summary>
-public class Dealing : BaseDeal
+public class MatchDeal : BaseDeal
 {
     /// <summary>
     /// 买订单

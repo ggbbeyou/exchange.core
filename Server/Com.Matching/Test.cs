@@ -30,7 +30,7 @@ namespace Com.Matching
             List<MatchOrder> orders = GetOrder();
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
-            List<Dealing> deals = AddOrder(orders);
+            List<MatchDeal> deals = AddOrder(orders);
             stopwatch.Stop();
             int count = deals.Count;
             Console.WriteLine($"order:{orders.Count},deals:{count},time:{stopwatch.Elapsed.TotalSeconds}秒,avg:{(stopwatch.Elapsed.TotalSeconds / count)}");
@@ -40,9 +40,9 @@ namespace Com.Matching
         /// <summary>
         /// 
         /// </summary>
-        public List<Dealing> AddOrder(List<MatchOrder> orders)
+        public List<MatchDeal> AddOrder(List<MatchOrder> orders)
         {
-            List<Dealing> deals = new List<Dealing>();
+            List<MatchDeal> deals = new List<MatchDeal>();
             for (int i = 0; i < orders.Count; i++)
             {
                 deals.AddRange(core.Match(orders[i]));

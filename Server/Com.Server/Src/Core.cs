@@ -158,10 +158,10 @@ public class Core
             {
                 string json = Encoding.UTF8.GetString(ea.Body.ToArray());
                 this.constant.logger.LogInformation($"接收撮合传过来的成交订单:{json}");
-                List<Dealing>? deals = JsonConvert.DeserializeObject<List<Dealing>>(json);
+                List<MatchDeal>? deals = JsonConvert.DeserializeObject<List<MatchDeal>>(json);
                 if (deals != null)
                 {
-                    Dealing? deal = deals.FirstOrDefault();
+                    MatchDeal? deal = deals.FirstOrDefault();
                     MatchOrder order = deal!.trigger_side == E_OrderSide.buy ? deal.bid : deal.ask;
                     List<BaseOrderBook> orderBooks = GetOrderBooks(order, deals);
                     // this.mq.SendOrderBook(orderBooks);
@@ -222,7 +222,7 @@ public class Core
     /// <param name="order">订单</param>
     /// <param name="deals">成交记录</param>
     /// <returns>变更的orderbook</returns>
-    public List<BaseOrderBook> GetOrderBooks(MatchOrder order, List<Dealing> deals)
+    public List<BaseOrderBook> GetOrderBooks(MatchOrder order, List<MatchDeal> deals)
     {
         List<BaseOrderBook> orderBooks = new List<BaseOrderBook>();
         if (order == null || deals == null || deals.Count == 0)
@@ -376,16 +376,16 @@ public class Core
     /// </summary>
     /// <param name="deals">成交记录</param>
     /// <returns>当前一分钟K线</returns>
-    public BaseKline? SetKlink(List<Dealing> deals)
+    public BaseKline? SetKlink(List<MatchDeal> deals)
     {
         if (deals == null || deals.Count == 0)
         {
             return null;
         }
-        IEnumerable<IGrouping<double, Dealing>> deals_minutes = deals.GroupBy(P => (DateTimeOffset.UtcNow - P.time).TotalMinutes);
+        IEnumerable<IGrouping<double, MatchDeal>> deals_minutes = deals.GroupBy(P => (DateTimeOffset.UtcNow - P.time).TotalMinutes);
         foreach (var item in deals_minutes)
         {
-            List<Dealing> deal = item.ToList();
+            List<MatchDeal> deal = item.ToList();
             if (deal == null || deal.Count == 0)
             {
                 return null;

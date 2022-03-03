@@ -47,7 +47,7 @@ public class DealService
     /// <param name="configuration">配置接口</param>
     /// <param name="environment">环境接口</param>
     /// <param name="logger">日志接口</param>
-    public void Init(FactoryConstant constant, DateTimeOffset system_init)
+    public void Init(FactoryConstant constant)
     {
         this.constant = constant;
         this.dealHelper = new DealHelper(constant);

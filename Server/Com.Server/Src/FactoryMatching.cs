@@ -34,7 +34,7 @@ namespace Com.Server
         public FactoryConstant constant = null!;
 
 
-        DateTimeOffset systemTime = DateTimeOffset.Now;
+       
 
 
         /// <summary>
@@ -52,7 +52,6 @@ namespace Com.Server
         public void Init(FactoryConstant constant)
         {
             this.constant = constant;
-            this.systemTime = new DateTimeOffset(2017, 1, 1, 0, 0, 0, TimeSpan.Zero);
         }
 
         /// <summary>
@@ -62,7 +61,7 @@ namespace Com.Server
         {
             List<string> markets = new List<string>();
             markets.Add("btc/usdt");
-            DealService.instance.Init(constant, systemTime);
+            DealService.instance.Init(constant);
             DealService.instance.DeleteDeal(markets, DateTimeOffset.UtcNow.AddMonths(-3));
             DealService.instance.DealDbToRedis(markets, new TimeSpan(-30, 0, 0, 0));
         }
@@ -74,7 +73,7 @@ namespace Com.Server
         {
             List<string> markets = new List<string>();
             markets.Add("btc/usdt");
-            KlineService.instance.Init(constant, systemTime);
+            KlineService.instance.Init(constant);
             DateTimeOffset now = DateTimeOffset.UtcNow;
             DateTimeOffset end = now.AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond - 1);
             KlineService.instance.DBtoRedised(markets, end);

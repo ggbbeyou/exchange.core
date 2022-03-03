@@ -16,20 +16,14 @@ public class KilneHelper
     /// 常用接口
     /// </summary>
     public FactoryConstant constant = null!;
-    /// <summary>
-    /// 系统初始化时间
-    /// </summary>
-    public DateTimeOffset system_init;
 
     /// <summary>
     /// 
     /// </summary>
     /// <param name="constant"></param>
-    public KilneHelper(FactoryConstant constant, DateTimeOffset system_init)
+    public KilneHelper(FactoryConstant constant)
     {
         this.constant = constant;
-        this.system_init = system_init;
-        AddTest();
     }
 
     /// <summary>
@@ -54,7 +48,7 @@ public class KilneHelper
     public List<Kline> GetKlineMin(string market, DateTimeOffset end, Kline? last_kline)
     {
         List<Kline> result = new List<Kline>();
-        DateTimeOffset start = this.system_init;
+        DateTimeOffset start = KlineService.instance.system_init;
         decimal last_price = 0;
         if (last_kline != null)
         {
@@ -100,7 +94,7 @@ public class KilneHelper
     public List<Kline> GetKlines(string market, E_KlineType klineType, Kline? last_kline, DateTimeOffset end, TimeSpan span)
     {
         List<Kline> result = new List<Kline>();
-        DateTimeOffset start = system_init;
+        DateTimeOffset start = KlineService.instance.system_init;
         decimal last_price = 0;
         if (last_kline != null)
         {
@@ -240,41 +234,41 @@ public class KilneHelper
     {
 
 
-        
+
 
         List<Kline> result = new List<Kline>();
-        Expression<Func<Kline, int>> lambda = P => EF.Functions.DateDiffMinute(this.system_init, P.time_start);
+        Expression<Func<Kline, int>> lambda = P => EF.Functions.DateDiffMinute(KlineService.instance.system_init, P.time_start);
         switch (klineType_target)
         {
             case E_KlineType.min1:
-                lambda = P => EF.Functions.DateDiffMinute(this.system_init, P.time_start);
+                lambda = P => EF.Functions.DateDiffMinute(KlineService.instance.system_init, P.time_start);
                 break;
             case E_KlineType.min5:
-                lambda = P => EF.Functions.DateDiffMinute(this.system_init, P.time_start) / 5;
+                lambda = P => EF.Functions.DateDiffMinute(KlineService.instance.system_init, P.time_start) / 5;
                 break;
             case E_KlineType.min15:
-                lambda = P => EF.Functions.DateDiffMinute(this.system_init, P.time_start) / 15;
+                lambda = P => EF.Functions.DateDiffMinute(KlineService.instance.system_init, P.time_start) / 15;
                 break;
             case E_KlineType.min30:
-                lambda = P => EF.Functions.DateDiffMinute(this.system_init, P.time_start) / 30;
+                lambda = P => EF.Functions.DateDiffMinute(KlineService.instance.system_init, P.time_start) / 30;
                 break;
             case E_KlineType.hour1:
-                lambda = P => EF.Functions.DateDiffHour(this.system_init, P.time_start);
+                lambda = P => EF.Functions.DateDiffHour(KlineService.instance.system_init, P.time_start);
                 break;
             case E_KlineType.hour12:
-                lambda = P => EF.Functions.DateDiffHour(this.system_init, P.time_start) / 12;
+                lambda = P => EF.Functions.DateDiffHour(KlineService.instance.system_init, P.time_start) / 12;
                 break;
             case E_KlineType.day1:
-                lambda = P => EF.Functions.DateDiffDay(this.system_init, P.time_start);
+                lambda = P => EF.Functions.DateDiffDay(KlineService.instance.system_init, P.time_start);
                 break;
             case E_KlineType.week1:
-                lambda = P => EF.Functions.DateDiffWeek(this.system_init, P.time_start);
+                lambda = P => EF.Functions.DateDiffWeek(KlineService.instance.system_init, P.time_start);
                 break;
             case E_KlineType.month1:
-                lambda = P => EF.Functions.DateDiffMonth(this.system_init, P.time_start);
+                lambda = P => EF.Functions.DateDiffMonth(KlineService.instance.system_init, P.time_start);
                 break;
             default:
-                lambda = P => EF.Functions.DateDiffMinute(this.system_init, P.time_start);
+                lambda = P => EF.Functions.DateDiffMinute(KlineService.instance.system_init, P.time_start);
                 break;
         }
         // var sql = from kline in this.constant.db.Kline
@@ -305,7 +299,7 @@ public class KilneHelper
                       //   where kline.market == market && kline.type == klineType_source && end >= kline.time && end > kline.time
                   orderby kline.open
                   //   group kline by lambda into g
-                  group kline by EF.Functions.DateDiffMinute(this.system_init, kline.time_end) into g
+                  group kline by EF.Functions.DateDiffMinute(KlineService.instance.system_init, kline.time_end) into g
                   //   group kline by kline.open into g
                   //   select new
                   //   {
@@ -354,27 +348,6 @@ public class KilneHelper
         return this.constant.db.Kline.Where(P => P.market == market && P.type == klineType && P.time_start >= start && P.time_start <= end).OrderBy(P => P.time_start).ToList();
     }
 
-    public void AddTest()
-    {
-        Random r = new Random();
-        for (int i = 0; i < 5000; i++)
-        {
-            decimal price = r.NextInt64(2000, 4000);
-            decimal amount = r.NextInt64(1, 25);
-            this.constant.db.Set<Deal>().Add(new Deal
-            {
-                trade_id = this.constant.worker.NextId(),
-                market = "btc/usdt",
-                amount = amount,
-                price = price,
-                total = amount * price,
-                trigger_side = E_OrderSide.buy,
-                bid_id = this.constant.worker.NextId(),
-                ask_id = this.constant.worker.NextId(),
-                time = DateTimeOffset.UtcNow.AddMinutes(-i),
-            });
-        }
-        this.constant.db.SaveChanges();
-    }
+
 
 }

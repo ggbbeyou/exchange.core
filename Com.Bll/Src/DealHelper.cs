@@ -24,7 +24,7 @@ public class DealHelper
     public DealHelper(FactoryConstant constant)
     {
         this.constant = constant;
-        AddTest();
+        // AddTest();
     }
 
     /// <summary>
@@ -70,22 +70,22 @@ public class DealHelper
         try
         {
             var sql = from deal in this.constant.db.Deal.Where(predicate)
-                        group deal by EF.Functions.DateDiffMinute(KlineService.instance.system_init, deal.time) into g
-                        select new Kline
-                        {
-                            market = market,
-                            amount = g.Sum(P => P.amount),
-                            count = g.Count(),
-                            total = g.Sum(P => P.total),
-                            open = g.OrderBy(P => P.time).First().price,
-                            close = g.OrderBy(P => P.time).Last().price,
-                            low = g.Min(P => P.price),
-                            high = g.Max(P => P.price),
-                            type = E_KlineType.min1,
-                            time_start = KlineService.instance.system_init.AddMinutes(g.Key),
-                            time_end = KlineService.instance.system_init.AddMinutes(g.Key + 1).AddMilliseconds(-1),
-                            time = DateTimeOffset.UtcNow,
-                        };
+                      group deal by EF.Functions.DateDiffMinute(KlineService.instance.system_init, deal.time) into g
+                      select new Kline
+                      {
+                          market = market,
+                          amount = g.Sum(P => P.amount),
+                          count = g.Count(),
+                          total = g.Sum(P => P.total),
+                          open = g.OrderBy(P => P.time).First().price,
+                          close = g.OrderBy(P => P.time).Last().price,
+                          low = g.Min(P => P.price),
+                          high = g.Max(P => P.price),
+                          type = E_KlineType.min1,
+                          time_start = KlineService.instance.system_init.AddMinutes(g.Key),
+                          time_end = KlineService.instance.system_init.AddMinutes(g.Key + 1).AddMilliseconds(-1),
+                          time = DateTimeOffset.UtcNow,
+                      };
             return sql.ToList();
         }
         catch (Exception ex)
@@ -100,10 +100,10 @@ public class DealHelper
     public void AddTest()
     {
         Random r = new Random();
-        for (int i = 0; i < 5000; i++)
+        for (int i = 0; i < 20; i++)
         {
-            decimal price = r.NextInt64(2000, 4000);
-            decimal amount = r.NextInt64(1, 25);
+            decimal price = r.NextInt64(1, 10);
+            decimal amount = r.NextInt64(1, 10);
             this.constant.db.Set<Deal>().Add(new Deal
             {
                 trade_id = this.constant.worker.NextId(),
@@ -114,7 +114,7 @@ public class DealHelper
                 trigger_side = E_OrderSide.buy,
                 bid_id = this.constant.worker.NextId(),
                 ask_id = this.constant.worker.NextId(),
-                time = DateTimeOffset.UtcNow.AddMinutes(-i),
+                time = DateTimeOffset.UtcNow.AddMinutes(-r.NextInt64(0, 10)),
             });
         }
         this.constant.db.SaveChanges();

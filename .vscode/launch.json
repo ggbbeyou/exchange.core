@@ -8,7 +8,7 @@
             "preLaunchTask": "build-Service",
             "program": "${workspaceFolder}/Com.Service/bin/Debug/net6.0/Com.Service.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/Com.Service/Com.Service",
+            "cwd": "${workspaceFolder}/Com.Service",
             "console": "internalConsole",
             "stopAtEntry": false,
             "env": {

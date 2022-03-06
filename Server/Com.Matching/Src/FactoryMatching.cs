@@ -60,46 +60,47 @@ public class FactoryMatching
     /// </summary>
     public void ServiceStatus()
     {
-        string match_name = this.constant.config.GetValue<string>("match_name");
-        this.constant.i_model.QueueDeclare(queue: match_name, durable: false, exclusive: false, autoDelete: true, arguments: null);
-        var consumer = new EventingBasicConsumer(this.constant.i_model);
-        consumer.Received += (model, ea) =>
-        {
-            var message = Encoding.UTF8.GetString(ea.Body.ToArray());
-            if (!string.IsNullOrWhiteSpace(message))
-            {
-                string[] status = message.Split(':', StringSplitOptions.RemoveEmptyEntries);
-                string name = status[1].ToLower();
-                switch (status[0])
-                {
-                    case "open":
-                        decimal price = decimal.Parse(status[2]);
-                        if (!this.cores.ContainsKey(name))
-                        {
-                            Core core = new Core(name);
-                            core.Start(price);
-                            this.cores.Add(name, core);
-                        }
-                        else
-                        {
-                            Core core = this.cores[name];
-                            core.Start(price);
-                        }
-                        break;
-                    case "close":
-                        if (this.cores.ContainsKey(name))
-                        {
-                            Core core = this.cores[name];
-                            core.Stop();
-                        }
-                        break;
-                    default:
-                        break;
-                }
-            }
-            this.constant.i_model.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
-        };
-        this.constant.i_model.BasicConsume(queue: match_name, autoAck: false, consumer: consumer);
+
+        // string match_name = this.constant.config.GetValue<string>("match_name");
+        // this.constant.i_model.QueueDeclare(queue: match_name, durable: false, exclusive: false, autoDelete: true, arguments: null);
+        // var consumer = new EventingBasicConsumer(this.constant.i_model);
+        // consumer.Received += (model, ea) =>
+        // {
+        //     var message = Encoding.UTF8.GetString(ea.Body.ToArray());
+        //     if (!string.IsNullOrWhiteSpace(message))
+        //     {
+        //         string[] status = message.Split(':', StringSplitOptions.RemoveEmptyEntries);
+        //         string name = status[1].ToLower();
+        //         switch (status[0])
+        //         {
+        //             case "open":
+        //                 decimal price = decimal.Parse(status[2]);
+        //                 if (!this.cores.ContainsKey(name))
+        //                 {
+        //                     Core core = new Core(name);
+        //                     core.Start(price);
+        //                     this.cores.Add(name, core);
+        //                 }
+        //                 else
+        //                 {
+        //                     Core core = this.cores[name];
+        //                     core.Start(price);
+        //                 }
+        //                 break;
+        //             case "close":
+        //                 if (this.cores.ContainsKey(name))
+        //                 {
+        //                     Core core = this.cores[name];
+        //                     core.Stop();
+        //                 }
+        //                 break;
+        //             default:
+        //                 break;
+        //         }
+        //     }
+        //     this.constant.i_model.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
+        // };
+        // this.constant.i_model.BasicConsume(queue: match_name, autoAck: false, consumer: consumer);
     }
 
 }

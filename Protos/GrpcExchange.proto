@@ -2,7 +2,10 @@ syntax = "proto3";
 option csharp_namespace = "GrpcExchange";
 package Exchange;
 service ExchangeService { 
-  rpc gRPC_Call (Request) returns (Reply);
+  rpc UnaryCall (Request) returns (Reply);
+  rpc StreamingFromServer (Request) returns (stream Reply);
+  rpc StreamingFromClient (stream Request) returns (Reply);
+  rpc StreamingBothWays (stream Request) returns (stream Reply);
 }
 message Request {
     string json = 1;

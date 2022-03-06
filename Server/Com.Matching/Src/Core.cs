@@ -564,10 +564,10 @@ public class Core
             //触发市价撤单价格
             decimal total_price = deals.Last().price;
             List<MatchOrder> bid = this.market_bid.Where(P => P.trigger_cancel_price >= total_price).ToList();
-            bid.ForEach(P => { P.state = E_OrderState.cancel; P.remarks = "市价买单已高于触发价,自动撤单"; });
+            bid.ForEach(P => { P.state = E_OrderState.cancel; P.deal_last_time = DateTimeOffset.UtcNow; P.remarks = "市价买单已高于触发价,自动撤单"; });
             cancel.AddRange(bid);
             List<MatchOrder> ask = this.market_ask.Where(P => P.trigger_cancel_price <= total_price).ToList();
-            ask.ForEach(P => { P.state = E_OrderState.cancel; P.remarks = "市价卖单已低于触发价,自动撤单"; });
+            ask.ForEach(P => { P.state = E_OrderState.cancel; P.deal_last_time = DateTimeOffset.UtcNow; P.remarks = "市价卖单已低于触发价,自动撤单"; });
             cancel.AddRange(ask);
         }
         return (deals, cancel);

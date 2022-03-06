@@ -162,19 +162,6 @@ public class MQ
                     }
                     this.mutex.ReleaseMutex();
                     FactoryMatching.instance.constant.i_model.BasicAck(ea.DeliveryTag, false);
-
-                }
-                List<long>? order = JsonConvert.DeserializeObject<List<long>>(Encoding.UTF8.GetString(ea.Body.ToArray()));
-                if (order != null)
-                {
-                    this.mutex.WaitOne();
-                    List<MatchOrder> cancel = this.core.CancelOrder(order);
-                    if (cancel != null && cancel.Count > 0)
-                    {
-                        FactoryMatching.instance.constant.i_model.BasicPublish(exchange: this.key_order_cancel_success, routingKey: this.core.market, basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(cancel)));
-                    }
-                    this.mutex.ReleaseMutex();
-                    FactoryMatching.instance.constant.i_model.BasicAck(ea.DeliveryTag, false);
                 }
             }
         };

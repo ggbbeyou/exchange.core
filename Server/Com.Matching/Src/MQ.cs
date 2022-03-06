@@ -21,7 +21,7 @@ public class MQ
     /// </summary>
     private Core core;
     /// <summary>
-    /// (Direct)发送订单队列名称
+    /// (Direct)接收挂单订单队列名称
     /// </summary>
     /// <value></value>
     public string key_order_send = "order_send";
@@ -31,12 +31,12 @@ public class MQ
     /// <value></value>
     public string key_deal = "deal";
     /// <summary>
-    /// (Direct)取消订单队列名称
+    /// (Direct)接收取消订单队列名称
     /// </summary>
     /// <value></value>
     public string key_order_cancel = "order_cancel";
     /// <summary>
-    /// (Direct)取消订单成功队列名称
+    /// (Direct)发送撤单订单成功队列名称
     /// </summary>
     /// <value></value>
     public string key_order_cancel_success = "order_cancel_success";
@@ -69,9 +69,10 @@ public class MQ
     {
         this.core = core;
         props.DeliveryMode = 2;
-        // FactoryMatching.instance.constant.i_model.ExchangeDeclare(exchange: this.key_exchange_deal, type: ExchangeType.Direct, durable: true, autoDelete: false, arguments: null);
-        // FactoryMatching.instance.constant.i_model.ExchangeDeclare(exchange: this.key_exchange_orderbook, type: ExchangeType.Direct, durable: true, autoDelete: false, arguments: null);
-        // FactoryMatching.instance.constant.i_model.ExchangeDeclare(exchange: this.key_exchange_kline, type: ExchangeType.Direct, durable: true, autoDelete: false, arguments: null);
+        FactoryMatching.instance.constant.i_model.ExchangeDeclare(exchange: this.key_deal, type: ExchangeType.Direct, durable: true, autoDelete: false, arguments: null);
+        FactoryMatching.instance.constant.i_model.ExchangeDeclare(exchange: this.key_order_cancel, type: ExchangeType.Direct, durable: true, autoDelete: false, arguments: null);
+        FactoryMatching.instance.constant.i_model.ExchangeDeclare(exchange: this.key_order_send, type: ExchangeType.Direct, durable: true, autoDelete: false, arguments: null);
+        FactoryMatching.instance.constant.i_model.ExchangeDeclare(exchange: this.key_order_cancel_success, type: ExchangeType.Direct, durable: true, autoDelete: false, arguments: null);
         OrderReceive();
         OrderCancel();
     }
@@ -81,7 +82,6 @@ public class MQ
     /// </summary>
     public void OrderReceive()
     {
-        FactoryMatching.instance.constant.i_model.ExchangeDeclare(exchange: this.key_order_send, type: ExchangeType.Direct, durable: true, autoDelete: false, arguments: null);
         string queueName = FactoryMatching.instance.constant.i_model.QueueDeclare().QueueName;
         FactoryMatching.instance.constant.i_model.QueueBind(queue: queueName, exchange: this.key_order_send, routingKey: this.core.market);
         EventingBasicConsumer consumer = new EventingBasicConsumer(FactoryMatching.instance.constant.i_model);
@@ -100,11 +100,14 @@ public class MQ
                     foreach (MatchOrder item in req.data)
                     {
                         this.mutex.WaitOne();
-                        List<MatchDeal> deals = this.core.Match(item);
-                        if (deals != null && deals.Count > 0)
+                        (List<MatchDeal> deal, List<MatchOrder> cancel) deals = this.core.Match(item);
+                        if (deals.deal != null && deals.deal.Count > 0)
                         {
-                            FactoryMatching.instance.constant.i_model.BasicPublish(exchange: this.key_deal, routingKey: this.core.market, basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(deals)));
-                            
+                            FactoryMatching.instance.constant.i_model.BasicPublish(exchange: this.key_deal, routingKey: this.core.market, basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(deals.deal)));
+                        }
+                        if (deals.cancel != null && deals.cancel.Count > 0)
+                        {
+                            FactoryMatching.instance.constant.i_model.BasicPublish(exchange: this.key_order_cancel_success, routingKey: this.core.market, basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(deals.cancel)));
                         }
                         this.mutex.ReleaseMutex();
                     }
@@ -120,8 +123,6 @@ public class MQ
     /// </summary>
     public void OrderCancel()
     {
-        FactoryMatching.instance.constant.i_model.ExchangeDeclare(exchange: this.key_order_cancel_success, type: ExchangeType.Direct, durable: true, autoDelete: false, arguments: null);
-        FactoryMatching.instance.constant.i_model.ExchangeDeclare(exchange: this.key_order_cancel, type: ExchangeType.Direct, durable: true, autoDelete: false, arguments: null);
         string queueName = FactoryMatching.instance.constant.i_model.QueueDeclare().QueueName;
         FactoryMatching.instance.constant.i_model.QueueBind(queue: queueName, exchange: this.key_order_cancel, routingKey: this.core.market);
         EventingBasicConsumer consumer = new EventingBasicConsumer(FactoryMatching.instance.constant.i_model);
@@ -133,6 +134,8 @@ public class MQ
             }
             else
             {
+                string json = Encoding.UTF8.GetString(ea.Body.ToArray());
+                Req<List<long>>? req = JsonConvert.DeserializeObject<Req<List<long>>>(json);
                 List<long>? order = JsonConvert.DeserializeObject<List<long>>(Encoding.UTF8.GetString(ea.Body.ToArray()));
                 if (order != null)
                 {

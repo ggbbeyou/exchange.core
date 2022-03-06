@@ -169,12 +169,13 @@ public class Core
     /// </summary>
     /// <param name="order">挂单订单(手续费问题在推送到撮合之前扣除)</param>
     /// <returns>成交情况</returns>
-    public List<MatchDeal> Match(MatchOrder order)
+    public (List<MatchDeal> deal, List<MatchOrder> cancel) Match(MatchOrder order)
     {
         List<MatchDeal> deals = new List<MatchDeal>();
+        List<MatchOrder> cancel = new List<MatchOrder>();
         if (order.market != this.market || order.amount <= 0 || order.amount_unsold <= 0)
         {
-            return deals;
+            return (deals, cancel);
         }
         DateTimeOffset now = DateTimeOffset.UtcNow;
         if (order.side == E_OrderSide.buy)
@@ -495,7 +496,18 @@ public class Core
                 }
             }
         }
-        return deals;
+        if (deals.Count > 0)
+        {
+            //触发市价撤单价格
+            decimal total_price = deals.Last().price;
+            List<MatchOrder> bid = this.market_bid.Where(P => P.trigger_cancel_price >= total_price).ToList();
+            bid.ForEach(P => { P.state = E_OrderState.cancel; P.remarks = "市价买单已高于触发价,自动撤单"; });
+            cancel.AddRange(bid);
+            List<MatchOrder> ask = this.market_ask.Where(P => P.trigger_cancel_price <= total_price).ToList();
+            ask.ForEach(P => { P.state = E_OrderState.cancel; P.remarks = "市价卖单已低于触发价,自动撤单"; });
+            cancel.AddRange(ask);
+        }
+        return (deals, cancel);
     }
 
 }

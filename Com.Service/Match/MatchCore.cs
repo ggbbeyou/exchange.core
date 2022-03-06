@@ -70,8 +70,7 @@ public class MatchCore
     /// <summary>
     /// 初始化
     /// </summary>
-    /// <param name="market"></param>
-    /// <param name="constant"></param>
+    /// <param name="model">撮合服务对象</param>
     public MatchCore(MatchModel model)
     {
         this.model = model;

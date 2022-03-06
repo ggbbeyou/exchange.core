@@ -20,15 +20,8 @@ public class BaseMarketInfo
     /// <value></value>
     public decimal last_price { get; set; }
     /// <summary>
-    /// 服务地址
+    /// 管理服务地址
     /// </summary>
     /// <value></value>
-    public string? service_url { get; set; }
-    /// <summary>
-    /// 撮合地址
-    /// </summary>
-    /// <value></value>
-    public string? match_url { get; set; }
-
-
+    public string? manage_url { get; set; }
 }

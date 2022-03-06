@@ -26,7 +26,6 @@ class Program
         await host.RunAsync();
     }
 
-
     /// <summary>
     /// 
     /// </summary>

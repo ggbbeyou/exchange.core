@@ -14,7 +14,7 @@ public class MatchModel
     /// 是否运行
     /// </summary>
     /// <value></value>
-    public virtual bool run { get; set; }
+    public bool run { get; set; }
     /// <summary>
     /// 交易对基本信息
     /// </summary>

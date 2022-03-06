@@ -136,6 +136,34 @@ public class MQ
             {
                 string json = Encoding.UTF8.GetString(ea.Body.ToArray());
                 Req<List<long>>? req = JsonConvert.DeserializeObject<Req<List<long>>>(json);
+                if (req != null && req.op == E_Op.place && req.data != null)
+                {
+                    this.mutex.WaitOne();
+                    List<MatchOrder> cancel = new List<MatchOrder>();
+                    if (req.op == E_Op.cancel_by_id)
+                    {
+                        cancel.AddRange(this.core.CancelOrder(req.data));
+                    }
+                    else if (req.op == E_Op.cancel_by_uid)
+                    {
+                        cancel.AddRange(this.core.CancelOrder(req.data.First()));
+                    }
+                    else if (req.op == E_Op.cancel_by_clientid)
+                    {
+                        cancel.AddRange(this.core.CancelOrder(req.data.ToArray()));
+                    }
+                    else if (req.op == E_Op.cancel_by_all)
+                    {
+                        cancel.AddRange(this.core.CancelOrder());
+                    }
+                    if (cancel.Count > 0)
+                    {
+                        FactoryMatching.instance.constant.i_model.BasicPublish(exchange: this.key_order_cancel_success, routingKey: this.core.market, basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(cancel)));
+                    }
+                    this.mutex.ReleaseMutex();
+                    FactoryMatching.instance.constant.i_model.BasicAck(ea.DeliveryTag, false);
+
+                }
                 List<long>? order = JsonConvert.DeserializeObject<List<long>>(Encoding.UTF8.GetString(ea.Body.ToArray()));
                 if (order != null)
                 {

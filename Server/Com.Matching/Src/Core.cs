@@ -165,6 +165,69 @@ public class Core
     }
 
     /// <summary>
+    /// 撤消订单
+    /// </summary>
+    /// <param name="uid">用户ID</param>
+    /// <returns>orderbook变更</returns>
+    public List<MatchOrder> CancelOrder(long uid)
+    {
+        List<MatchOrder> cancel_market_bid = this.market_bid.Where(P => P.uid == uid).ToList();
+        this.market_bid.RemoveAll(P => cancel_market_bid.Select(P => P.order_id).Contains(P.order_id));
+        List<MatchOrder> cancel_market_ask = this.market_ask.Where(P => P.uid == uid).ToList();
+        this.market_ask.RemoveAll(P => cancel_market_ask.Select(P => P.order_id).Contains(P.order_id));
+        List<MatchOrder> cancel_fixed_bid = this.fixed_bid.Where(P => P.uid == uid).ToList();
+        this.fixed_bid.RemoveAll(P => cancel_fixed_bid.Select(P => P.order_id).Contains(P.order_id));
+        List<MatchOrder> cancel_fixed_ask = this.fixed_ask.Where(P => P.uid == uid).ToList();
+        this.fixed_ask.RemoveAll(P => cancel_fixed_ask.Select(P => P.order_id).Contains(P.order_id));
+        List<MatchOrder> cancel = new List<MatchOrder>();
+        cancel.AddRange(cancel_market_bid);
+        cancel.AddRange(cancel_market_ask);
+        cancel.AddRange(cancel_fixed_bid);
+        cancel.AddRange(cancel_fixed_ask);
+        cancel.ForEach(P => P.state = E_OrderState.cancel);
+        return cancel;
+    }
+
+    /// <summary>
+    /// 撤消订单
+    /// </summary>
+    /// <param name="client_id">客户订单ID</param>
+    /// <returns>orderbook变更</returns>
+    public List<MatchOrder> CancelOrder(long[] client_id)
+    {
+        List<MatchOrder> cancel_market_bid = this.market_bid.Where(P => client_id.Contains(P.order_id)).ToList();
+        this.market_bid.RemoveAll(P => cancel_market_bid.Select(P => P.order_id).Contains(P.order_id));
+        List<MatchOrder> cancel_market_ask = this.market_ask.Where(P => client_id.Contains(P.order_id)).ToList();
+        this.market_ask.RemoveAll(P => cancel_market_ask.Select(P => P.order_id).Contains(P.order_id));
+        List<MatchOrder> cancel_fixed_bid = this.fixed_bid.Where(P => client_id.Contains(P.order_id)).ToList();
+        this.fixed_bid.RemoveAll(P => cancel_fixed_bid.Select(P => P.order_id).Contains(P.order_id));
+        List<MatchOrder> cancel_fixed_ask = this.fixed_ask.Where(P => client_id.Contains(P.order_id)).ToList();
+        this.fixed_ask.RemoveAll(P => cancel_fixed_ask.Select(P => P.order_id).Contains(P.order_id));
+        List<MatchOrder> cancel = new List<MatchOrder>();
+        cancel.AddRange(cancel_market_bid);
+        cancel.AddRange(cancel_market_ask);
+        cancel.AddRange(cancel_fixed_bid);
+        cancel.AddRange(cancel_fixed_ask);
+        cancel.ForEach(P => P.state = E_OrderState.cancel);
+        return cancel;
+    }
+
+    /// <summary>
+    /// 撤消订单(该交易对所有订单)
+    /// </summary>
+    /// <returns>orderbook变更</returns>
+    public List<MatchOrder> CancelOrder()
+    {
+        List<MatchOrder> cancel = new List<MatchOrder>();
+        cancel.AddRange(this.market_bid);
+        cancel.AddRange(this.market_ask);
+        cancel.AddRange(this.fixed_bid);
+        cancel.AddRange(this.fixed_ask);
+        cancel.ForEach(P => P.state = E_OrderState.cancel);
+        return cancel;
+    }
+
+    /// <summary>
     ///  撮合算法(不考虑手续费问题)
     /// </summary>
     /// <param name="order">挂单订单(手续费问题在推送到撮合之前扣除)</param>

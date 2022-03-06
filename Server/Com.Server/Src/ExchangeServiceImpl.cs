@@ -85,7 +85,19 @@ public class GreeterImpl : ExchangeService.ExchangeServiceBase
         }
         else if (req.op == E_Op.service_stop)
         {
-
+            BaseMarketInfo? marketInfo = JsonConvert.DeserializeObject<BaseMarketInfo>(req.data);
+            if (marketInfo == null)
+            {
+                res.success = false;
+                res.code = E_Res_Code.fail;
+                res.message = $"服务停止失败,未获取到请求参数:{request.Json}";
+                this.logger.LogError($"服务停止失败, 未获取到请求参数:{request.Json}");
+                reply.Message = JsonConvert.SerializeObject(res);
+                return Task.FromResult(reply);
+            }
+            FactoryMatching.instance.StopService(marketInfo);
+            res.message = $"服务停止成功:{marketInfo.market}";
+            this.logger.LogInformation($"服务停止成功:{marketInfo.market}");
         }
         else
         {

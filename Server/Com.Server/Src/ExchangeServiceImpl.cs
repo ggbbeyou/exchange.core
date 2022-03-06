@@ -17,10 +17,15 @@ namespace Com.Server;
 public class GreeterImpl : ExchangeService.ExchangeServiceBase
 {
 
-    private readonly ILogger<GreeterImpl> _logger;
+    private readonly ILogger<GreeterImpl> logger;
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="logger"></param>
     public GreeterImpl(ILogger<GreeterImpl> logger)
     {
-        _logger = logger;
+        this.logger = logger;
     }
 
     /// <summary>
@@ -39,6 +44,7 @@ public class GreeterImpl : ExchangeService.ExchangeServiceBase
             res.success = false;
             res.code = E_Res_Code.fail;
             res.message = $"初始化失败,未获取到请求参数";
+            this.logger.LogError($"初始化失败, 未获取到请求参数");
             reply.Message = JsonConvert.SerializeObject(res);
             return Task.FromResult(reply);
         }
@@ -48,6 +54,7 @@ public class GreeterImpl : ExchangeService.ExchangeServiceBase
             FactoryMatching.instance.DealDbToRedis(req.data);
             FactoryMatching.instance.KlindDBtoRedis(req.data);
             res.message = $"初始化成功:{req.data.market}";
+            this.logger.LogInformation($"初始化成功:{req.data.market}");
         }
         else
         {

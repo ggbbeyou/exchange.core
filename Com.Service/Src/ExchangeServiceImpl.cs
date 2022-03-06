@@ -37,8 +37,8 @@ public class GreeterImpl : ExchangeService.ExchangeServiceBase
     /// <summary>
     /// 一元方法
     /// </summary>
-    /// <param name="request"></param>
-    /// <param name="context"></param>
+    /// <param name="request">请求参数</param>
+    /// <param name="context">上下文</param>
     /// <returns></returns>
     public override Task<Reply> UnaryCall(Request request, ServerCallContext context)
     {

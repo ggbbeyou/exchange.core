@@ -45,7 +45,7 @@ class Program
             {
                 options.Address = new Uri(hostContext.Configuration.GetValue<string>("manage_url"));
             });
-            services.AddHostedService<MainService>();
+            // services.AddHostedService<MainService>();
             services.BuildServiceProvider();
         })
         .ConfigureLogging(logging =>

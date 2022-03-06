@@ -79,7 +79,7 @@ public class FactoryMatching
             model.core = new Core(model);
             this.service.Add(market.market, model);
         }
-        // this.service[market.market].Start();
+        this.service[market.market].run = true;
         return res;
     }
 
@@ -96,7 +96,7 @@ public class FactoryMatching
             res.code = E_Res_Code.fail;
             return res;
         }
-        // this.service[market.market].Stop();
+        this.service[market.market].run = false;
         return res;
     }
 

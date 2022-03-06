@@ -101,6 +101,10 @@ public class FactoryMatching
         //     this.constant.i_model.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
         // };
         // this.constant.i_model.BasicConsume(queue: match_name, autoAck: false, consumer: consumer);
+
+        int manage_port = this.constant.config.GetValue<int>("manage_port");
+        
+
     }
 
 }

@@ -73,7 +73,11 @@ public class FactoryMatching
         Res<BaseMarketInfo> res = new Res<BaseMarketInfo>();
         if (!this.service.ContainsKey(market.market))
         {
-            // this.service.Add(market.market, new Core(market, new MatchCore(market.market)));
+            MatchModel model = new MatchModel(market);
+            model.match_core = new MatchCore(model);
+            model.mq = new MQ(model);
+            model.core = new Core(model);
+            this.service.Add(market.market, model);
         }
         // this.service[market.market].Start();
         return res;

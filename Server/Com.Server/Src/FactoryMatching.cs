@@ -8,6 +8,7 @@ using Com.Bll;
 using Com.Common;
 using Com.Model;
 using Com.Model.Enum;
+using Grpc.Net.Client;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -50,6 +51,7 @@ namespace Com.Server
             this.constant = constant;
             DealService.instance.Init(constant);
             KlineService.instance.Init(constant);
+            gRPCServer();
         }
 
         /// <summary>
@@ -90,6 +92,14 @@ namespace Com.Server
             result.Add(new BaseMarketInfo { market = "btc/usdt" });
             result.Add(new BaseMarketInfo { market = "eth/usdt" });
             return result;
+        }
+
+        private void gRPCServer()
+        {
+            var channel = GrpcChannel.ForAddress("https://localhost:7042");
+            var client = new Exchange.ExchangeService(channel);
+            var reply = await client.gRPC_Call(
+                              new HelloRequest { Name = "GreeterClient" });
         }
 
 

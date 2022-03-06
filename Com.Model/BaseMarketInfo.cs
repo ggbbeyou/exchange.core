@@ -19,9 +19,9 @@ public class BaseMarketInfo
     /// </summary>
     /// <value></value>
     public decimal last_price { get; set; }
-    /// <summary>
-    /// 管理服务地址
-    /// </summary>
-    /// <value></value>
-    public string? manage_url { get; set; }
+    // /// <summary>
+    // /// 管理服务地址
+    // /// </summary>
+    // /// <value></value>
+    // public string? manage_url { get; set; }
 }

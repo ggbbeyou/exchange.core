@@ -69,7 +69,7 @@ public class BaseOrder
     /// <value></value>
     public E_OrderSide side { get; set; }
     /// <summary>
-    /// 成交状态
+    /// 订单状态
     /// </summary>
     /// <value></value>
     public E_OrderState state { get; set; }
@@ -83,5 +83,10 @@ public class BaseOrder
     /// </summary>
     /// <value></value>
     public string? data { get; set; }
+    /// <summary>
+    /// 备注
+    /// </summary>
+    /// <value></value>
+    public string? remarks { get; set; }
 
 }

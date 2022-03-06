@@ -57,20 +57,4 @@ public class FactoryMatching
         KlineService.instance.DBtoRedising(markets.market);
     }
 
-    // /// <summary>
-    // /// 获取交易对基本信息
-    // /// </summary>
-    // /// <returns></returns>
-    // public List<BaseMarketInfo> GetMarkets()
-    // {
-    //     List<BaseMarketInfo> result = new List<BaseMarketInfo>();
-    //     result.Add(new BaseMarketInfo { market = "btc/usdt" });
-    //     result.Add(new BaseMarketInfo { market = "eth/usdt" });
-    //     return result;
-    // }
-
-
-
-
-
 }

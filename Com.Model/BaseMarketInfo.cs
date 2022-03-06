@@ -18,7 +18,7 @@ public class BaseMarketInfo
     /// 最后的成交价
     /// </summary>
     /// <value></value>
-    public decimal deal_last_time { get; set; }
+    public decimal last_price { get; set; }
     /// <summary>
     /// 服务地址
     /// </summary>

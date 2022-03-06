@@ -16,7 +16,7 @@ public class MatchModel
     /// <value></value>
     public virtual bool run { get; set; }
     /// <summary>
-    /// 交易对名称
+    /// 交易对基本信息
     /// </summary>
     /// <value></value>
     public BaseMarketInfo info { get; set; } = null!;

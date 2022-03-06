@@ -55,6 +55,7 @@ public class GreeterImpl : ExchangeService.ExchangeServiceBase
             return Task.FromResult(reply);
         }
         res.op = req.op;
+        res.market = req.market;
         res.data = req.data;
         if (req.op == E_Op.service_init)
         {

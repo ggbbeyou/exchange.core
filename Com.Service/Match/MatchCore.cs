@@ -26,16 +26,9 @@
 
 
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Com.Common;
 using Com.Model;
 using Com.Model.Enum;
 using Com.Service.Models;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 
 namespace Com.Service.Match;
 

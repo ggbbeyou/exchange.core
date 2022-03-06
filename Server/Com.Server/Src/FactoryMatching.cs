@@ -9,6 +9,7 @@ using Com.Common;
 using Com.Model;
 using Com.Model.Enum;
 using Grpc.Net.Client;
+using GrpcExchange;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -51,7 +52,7 @@ namespace Com.Server
             this.constant = constant;
             DealService.instance.Init(constant);
             KlineService.instance.Init(constant);
-            gRPCServer();
+            // gRPCServer();
         }
 
         /// <summary>
@@ -94,13 +95,30 @@ namespace Com.Server
             return result;
         }
 
-        private void gRPCServer()
-        {
-            var channel = GrpcChannel.ForAddress("https://localhost:7042");
-            var client = new Exchange.ExchangeService(channel);
-            var reply = await client.gRPC_Call(
-                              new HelloRequest { Name = "GreeterClient" });
-        }
+        // private void gRPCServer()
+        // {
+        //     // ExchangeService server = new ExchangeService
+        //     // {
+        //     //     Services = { Greeter.BindService(new GreeterImpl()) },
+        //     //     Ports = { new ServerPort("localhost", Port, ServerCredentials.Insecure) }
+        //     // };
+
+
+
+
+
+
+        //     var channel = GrpcChannel.ForAddress("https://localhost:7042");
+        //     // channel.ShutdownAsync();
+        //     var exchange_client = new ExchangeService.ExchangeServiceClient(channel);
+        //     // var reply = exchange_client.gRPC_Call(Request request, ServerCallContext context)
+        //     // {
+
+        //     // }
+
+        //     // var reply = await client.gRPC_Call(
+        //     //                   new HelloRequest { Name = "GreeterClient" });
+        // }
 
 
 

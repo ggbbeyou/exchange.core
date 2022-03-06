@@ -1,9 +1,11 @@
 ﻿using Com.Db;
+using GrpcExchange;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Grpc.Net.Client;
 
 
 namespace Com.Server;
@@ -41,6 +43,10 @@ class Program
                 DbContextOptions options1 = options.UseSqlServer(hostContext.Configuration.GetConnectionString("Mssql")).Options;
             });
             services.AddHostedService<MainService>();
+            services.AddGrpcClient<GreeterImpl>(options =>
+            {
+                options.Address = new Uri(hostContext.Configuration.GetValue<string>("manage_url"));
+            });
             services.BuildServiceProvider();
         })
         .ConfigureLogging(logging =>

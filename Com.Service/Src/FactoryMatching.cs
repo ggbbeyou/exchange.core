@@ -50,54 +50,49 @@ public class FactoryMatching
     /// <summary>
     /// 初始化服务
     /// </summary>
-    public Res<BaseMarketInfo> ServiceInit(BaseMarketInfo market)
+    public BaseMarketInfo ServiceInit(BaseMarketInfo info)
     {
-        Res<BaseMarketInfo> res = new Res<BaseMarketInfo>();
         //交易记录数据从DB同步到Redis 至少保存最近3个月记录
-        DealService.instance.DeleteDeal(market.market, DateTimeOffset.UtcNow.AddMonths(-3));
-        DealService.instance.DealDbToRedis(market.market, new TimeSpan(-30, 0, 0, 0));
+        DealService.instance.DeleteDeal(info.market, DateTimeOffset.UtcNow.AddMonths(-3));
+        DealService.instance.DealDbToRedis(info.market, new TimeSpan(-30, 0, 0, 0));
         // K线数据从DB同步到Redis
         DateTimeOffset now = DateTimeOffset.UtcNow;
         DateTimeOffset end = now.AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond - 1);
-        KlineService.instance.DBtoRedised(market.market, end);
-        KlineService.instance.DBtoRedising(market.market);
-        return res;
+        KlineService.instance.DBtoRedised(info.market, end);
+        KlineService.instance.DBtoRedising(info.market);
+        return info;
     }
 
     /// <summary>
     /// 启动服务
     /// </summary>
-    /// <param name="market"></param>
-    public Res<BaseMarketInfo> ServiceStart(BaseMarketInfo market)
+    /// <param name="info"></param>
+    public BaseMarketInfo ServiceStart(BaseMarketInfo info)
     {
-        Res<BaseMarketInfo> res = new Res<BaseMarketInfo>();
-        if (!this.service.ContainsKey(market.market))
+        if (!this.service.ContainsKey(info.market))
         {
-            MatchModel model = new MatchModel(market);
+            MatchModel model = new MatchModel(info);
             model.match_core = new MatchCore(model);
             model.mq = new MQ(model);
             model.core = new Core(model);
-            this.service.Add(market.market, model);
+            this.service.Add(info.market, model);
         }
-        this.service[market.market].run = true;
-        return res;
+        this.service[info.market].run = true;
+        return info;
     }
 
     /// <summary>
     /// 关闭服务
     /// </summary>
-    /// <param name="market"></param>
-    public Res<BaseMarketInfo> ServiceStop(BaseMarketInfo market)
+    /// <param name="info"></param>
+    public BaseMarketInfo ServiceStop(BaseMarketInfo info)
     {
-        Res<BaseMarketInfo> res = new Res<BaseMarketInfo>();
-        if (!this.service.ContainsKey(market.market))
+        if (!this.service.ContainsKey(info.market))
         {
-            res.message = "未找到该服务";
-            res.code = E_Res_Code.fail;
-            return res;
+            throw new Exception("未找到该服务");
         }
-        this.service[market.market].run = false;
-        return res;
+        this.service[info.market].run = false;
+        return info;
     }
 
 

@@ -69,7 +69,8 @@ public class GreeterImpl : ExchangeService.ExchangeServiceBase
                 reply.Message = JsonConvert.SerializeObject(res);
                 return Task.FromResult(reply);
             }
-            FactoryMatching.instance.ServiceInit(marketInfo);
+            BaseMarketInfo result = FactoryMatching.instance.ServiceInit(marketInfo);
+
             res.message = $"初始化成功:{marketInfo.market}";
             FactoryMatching.instance.constant.logger.LogInformation($"初始化成功:{marketInfo.market}");
         }
@@ -101,9 +102,20 @@ public class GreeterImpl : ExchangeService.ExchangeServiceBase
                 reply.Message = JsonConvert.SerializeObject(res);
                 return Task.FromResult(reply);
             }
-            FactoryMatching.instance.ServiceStop(marketInfo);
-            res.message = $"服务停止成功:{marketInfo.market}";
-            FactoryMatching.instance.constant.logger.LogInformation($"服务停止成功:{marketInfo.market}");
+            try
+            {
+                BaseMarketInfo result = FactoryMatching.instance.ServiceStop(marketInfo);
+                res.message = $"服务停止成功:{marketInfo.market}";
+                FactoryMatching.instance.constant.logger.LogInformation($"服务停止成功:{marketInfo.market}");
+            }
+            catch (System.Exception ex)
+            {
+                res.success = false;
+                res.code = E_Res_Code.fail;
+                res.message = ex.Message;
+                reply.Message = JsonConvert.SerializeObject(res);
+                return Task.FromResult(reply);
+            }
         }
         else
         {

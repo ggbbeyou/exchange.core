@@ -14,7 +14,21 @@ public class BaseMarketInfo
     /// </summary>
     /// <value></value>
     public string market { get; set; } = null!;
-    
-    
-  
+    /// <summary>
+    /// 最后的成交价
+    /// </summary>
+    /// <value></value>
+    public decimal deal_last_time { get; set; }
+    /// <summary>
+    /// 服务地址
+    /// </summary>
+    /// <value></value>
+    public string? service_url { get; set; }
+    /// <summary>
+    /// 撮合地址
+    /// </summary>
+    /// <value></value>
+    public string? match_url { get; set; }
+
+
 }

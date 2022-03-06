@@ -12,6 +12,14 @@ public static class Util
 {
     /// <summary>
     /// 获取最新成交价
+    /// 撮合价格
+    /// 买入价:A,卖出价:B,前一价:C,最新价:D
+    /// 前提:A>=B
+    /// 规则:
+    /// A<=C    D=A
+    /// B>=C    D=B
+    /// B<C<A   D=C
+    ///价格优先,时间优先
     /// </summary>
     /// <param name="bid">买入价</param>
     /// <param name="ask">卖出价</param>
@@ -76,7 +84,7 @@ public static class Util
             market = market,
             price = price,
             amount = ask_amount,
-           
+
             trigger_side = trigger_side,
             time = now,
             bid = bid,
@@ -121,7 +129,7 @@ public static class Util
             market = market,
             price = price,
             amount = bid_amount,
-            
+
             trigger_side = trigger_side,
             time = now,
             bid = bid,

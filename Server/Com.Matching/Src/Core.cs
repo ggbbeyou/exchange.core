@@ -24,20 +24,7 @@
  */
 
 
-/*
-撮合价格
 
-买入价:A,卖出价:B,前一价:C,最新价:D
-
-前提:A>=B
-
-规则:
-A<=C    D=A
-B>=C    D=B
-B<C<A   D=C
-
-价格优先,时间优先
-*/
 
 using System;
 using System.Collections.Generic;

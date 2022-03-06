@@ -60,63 +60,16 @@ public class Core
     public Core(BaseMarketInfo market, MatchCore match)
     {
         this.market = market;
-        this.kline_minute = new BaseKline()
+        foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
         {
-            market = this.market.market,
-            type = E_KlineType.min1,
-        };
-        this.kline.Add(E_KlineType.min1, new BaseKline()
-        {
-            market = this.market.market,
-            type = E_KlineType.min1,
-        });
-        this.kline.Add(E_KlineType.min5, new BaseKline()
-        {
-            market = this.market.market,
-            type = E_KlineType.min5,
-        });
-        this.kline.Add(E_KlineType.min15, new BaseKline()
-        {
-            market = this.market.market,
-            type = E_KlineType.min15,
-        });
-        this.kline.Add(E_KlineType.min30, new BaseKline()
-        {
-            market = this.market.market,
-            type = E_KlineType.min30,
-        });
-        this.kline.Add(E_KlineType.hour1, new BaseKline()
-        {
-            market = this.market.market,
-            type = E_KlineType.hour1,
-        });
-        this.kline.Add(E_KlineType.hour6, new BaseKline()
-        {
-            market = this.market.market,
-            type = E_KlineType.hour6,
-        });
-        this.kline.Add(E_KlineType.hour12, new BaseKline()
-        {
-            market = this.market.market,
-            type = E_KlineType.hour12,
-        });
-        this.kline.Add(E_KlineType.day1, new BaseKline()
-        {
-            market = this.market.market,
-            type = E_KlineType.day1,
-        });
-        this.kline.Add(E_KlineType.week1, new BaseKline()
-        {
-            market = this.market.market,
-            type = E_KlineType.week1,
-        });
-        this.kline.Add(E_KlineType.month1, new BaseKline()
-        {
-            market = this.market.market,
-            type = E_KlineType.month1,
-        });
-
+            this.kline.Add(cycle, new BaseKline()
+            {
+                market = this.market.market,
+                type = cycle,
+            });
+        }
         ReceiveMatchOrder();
+        ReceiveMatchCancelOrder();
     }
 
     /// <summary>

@@ -153,46 +153,4 @@ public class MQ
         FactoryMatching.instance.constant.i_model.BasicConsume(queue: queueName, autoAck: false, consumer: consumer);
     }
 
-    /*
-
-    /// <summary>
-    /// 发送历史成交记录
-    /// </summary>
-    /// <param name="deals">成交记录</param>
-    public void SendDeal(List<Deal> deals)
-    {
-        if (deals == null || deals.Count == 0)
-        {
-            return;
-        }
-        FactoryMatching.instance.constant.i_model.BasicPublish(exchange: this.key_exchange_deal, routingKey: this.core.name, basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(deals)));
-    }
-
-    /// <summary>
-    /// 发送OrderBook
-    /// </summary>
-    /// <param name="orderBooks">OrderBook</param>
-    public void SendOrderBook(List<OrderBook> orderBooks)
-    {
-        if (orderBooks == null || orderBooks.Count == 0)
-        {
-            return;
-        }
-        FactoryMatching.instance.constant.i_model.BasicPublish(exchange: this.key_exchange_orderbook, routingKey: this.core.name, basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(orderBooks)));
-    }
-
-    /// <summary>
-    /// 发送K线
-    /// </summary>
-    /// <param name="kline">K线</param>
-    public void SendKline(Kline? kline)
-    {
-        if (kline == null)
-        {
-            return;
-        }
-        FactoryMatching.instance.constant.i_model.BasicPublish(exchange: this.key_exchange_kline, routingKey: this.core.name, basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(kline)));
-    }
-    */
-
 }

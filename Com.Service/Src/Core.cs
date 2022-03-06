@@ -3,6 +3,7 @@ using Com.Common;
 using Com.Model;
 using Com.Model.Enum;
 using Com.Service.Match;
+using Com.Service.Models;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
@@ -13,15 +14,10 @@ namespace Com.Service;
 public class Core
 {
     /// <summary>
-    /// 是否运行
-    /// </summary>
-    public bool run;
-    /// <summary>
-    /// 交易对名称
+    /// 撮合服务对象
     /// </summary>
     /// <value></value>
-    public BaseMarketInfo market { get; set; }
-
+    public MatchModel model { get; set; } = null!;
     /// <summary>
     /// 买盘 高->低
     /// </summary>
@@ -57,36 +53,19 @@ public class Core
     /// </summary>
     /// <param name="market"></param>
     /// <param name="constant"></param>
-    public Core(BaseMarketInfo market, MatchCore match)
+    public Core(MatchModel model)
     {
-        this.market = market;
+        this.model = model;
         foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
         {
             this.kline.Add(cycle, new BaseKline()
             {
-                market = this.market.market,
+                market = this.model.info.market,
                 type = cycle,
             });
         }
         ReceiveMatchOrder();
         ReceiveMatchCancelOrder();
-    }
-
-    /// <summary>
-    /// 开启撮合服务
-    /// </summary>
-    /// <param name="price_last">最后价格</param>
-    public void Start()
-    {
-        this.run = true;
-    }
-
-    /// <summary>
-    /// 关闭撮合服务
-    /// </summary>
-    public void Stop()
-    {
-        this.run = false;
     }
 
     /// <summary>
@@ -96,11 +75,11 @@ public class Core
     {
         FactoryMatching.instance.constant.i_model.ExchangeDeclare(exchange: this.key_exchange_deal, type: ExchangeType.Direct, durable: true, autoDelete: false, arguments: null);
         string queueName = FactoryMatching.instance.constant.i_model.QueueDeclare().QueueName;
-        FactoryMatching.instance.constant.i_model.QueueBind(queue: queueName, exchange: this.key_exchange_deal, routingKey: this.market.market);
+        FactoryMatching.instance.constant.i_model.QueueBind(queue: queueName, exchange: this.key_exchange_deal, routingKey: this.model.info.market);
         EventingBasicConsumer consumer = new EventingBasicConsumer(FactoryMatching.instance.constant.i_model);
         consumer.Received += (model, ea) =>
         {
-            if (!this.run)
+            if (!this.model.run)
             {
                 FactoryMatching.instance.constant.i_model.BasicNack(deliveryTag: ea.DeliveryTag, multiple: true, requeue: true);
             }
@@ -135,11 +114,11 @@ public class Core
     {
         FactoryMatching.instance.constant.i_model.ExchangeDeclare(exchange: this.key_exchange_deal, type: ExchangeType.Direct, durable: true, autoDelete: false, arguments: null);
         string queueName = FactoryMatching.instance.constant.i_model.QueueDeclare().QueueName;
-        FactoryMatching.instance.constant.i_model.QueueBind(queue: queueName, exchange: this.key_exchange_deal, routingKey: this.market.market);
+        FactoryMatching.instance.constant.i_model.QueueBind(queue: queueName, exchange: this.key_exchange_deal, routingKey: this.model.info.market);
         EventingBasicConsumer consumer = new EventingBasicConsumer(FactoryMatching.instance.constant.i_model);
         consumer.Received += (model, ea) =>
         {
-            if (!this.run)
+            if (!this.model.run)
             {
                 FactoryMatching.instance.constant.i_model.BasicNack(deliveryTag: ea.DeliveryTag, multiple: true, requeue: true);
             }
@@ -191,7 +170,7 @@ public class Core
                 {
                     orderBook = new BaseOrderBook()
                     {
-                        market = this.market.market,
+                        market = this.model.info.market,
                         price = order.price,
                         amount = 0,
                         count = 0,
@@ -225,7 +204,7 @@ public class Core
                 {
                     orderBook = new BaseOrderBook()
                     {
-                        market = this.market.market,
+                        market = this.model.info.market,
                         price = order.price,
                         amount = 0,
                         count = 0,

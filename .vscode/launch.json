@@ -2,13 +2,13 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Server",
+            "name": "Service",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build",
-            "program": "${workspaceFolder}/Server/Com.Server/bin/Debug/net6.0/Com.Server.dll",
+            "preLaunchTask": "build-Service",
+            "program": "${workspaceFolder}/Com.Service/bin/Debug/net6.0/Com.Service.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/Server/Com.Server",
+            "cwd": "${workspaceFolder}/Com.Service/Com.Service",
             "console": "internalConsole",
             "stopAtEntry": false,
             "env": {

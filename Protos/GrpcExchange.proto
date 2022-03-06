@@ -1,6 +1,6 @@
 syntax = "proto3";
 option csharp_namespace = "GrpcExchange";
-service ExampleService { 
+service ExchangeService { 
   rpc gRPC_Call (Request) returns (Reply);
 }
 message Request {

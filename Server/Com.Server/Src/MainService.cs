@@ -38,9 +38,7 @@ namespace Com.Server
         {
             this.constant.logger.LogInformation("准备启动业务后台服务");
             try
-            {
-                FactoryMatching.instance.DealDbToRedis();
-                FactoryMatching.instance.KlindDBtoRedis();
+            {           
                 this.constant.logger.LogInformation("启动业务后台服务成功");
             }
             catch (Exception ex)

@@ -19,6 +19,11 @@ public class Res<T>
     /// <value></value>
     public bool success { get; set; }
     /// <summary>
+    /// 返回编号
+    /// </summary>
+    /// <value></value>
+    public E_Res_Code code { get; set; }
+    /// <summary>
     /// 交易对
     /// </summary>
     /// <value></value>

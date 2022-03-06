@@ -44,6 +44,8 @@ public class GreeterImpl : ExchangeService.ExchangeServiceBase
     {
         Reply reply = new Reply();
         Res<string> res = new Res<string>();
+        res.success = true;
+        res.code = E_Res_Code.ok;
         Req<string>? req = JsonConvert.DeserializeObject<Req<string>>(request.Json);
         if (req == null)
         {
@@ -99,12 +101,12 @@ public class GreeterImpl : ExchangeService.ExchangeServiceBase
                 res.code = E_Res_Code.fail;
                 res.message = $"服务停止失败,未获取到请求参数:{request.Json}";
                 FactoryMatching.instance.constant.logger.LogError($"服务停止失败, 未获取到请求参数:{request.Json}");
-                reply.Message = JsonConvert.SerializeObject(res);
                 return Task.FromResult(reply);
             }
             try
             {
                 BaseMarketInfo result = FactoryMatching.instance.ServiceStop(marketInfo);
+                res.data = JsonConvert.SerializeObject(result);
                 res.message = $"服务停止成功:{marketInfo.market}";
                 FactoryMatching.instance.constant.logger.LogInformation($"服务停止成功:{marketInfo.market}");
             }
@@ -113,7 +115,6 @@ public class GreeterImpl : ExchangeService.ExchangeServiceBase
                 res.success = false;
                 res.code = E_Res_Code.fail;
                 res.message = ex.Message;
-                reply.Message = JsonConvert.SerializeObject(res);
                 return Task.FromResult(reply);
             }
         }
@@ -121,8 +122,6 @@ public class GreeterImpl : ExchangeService.ExchangeServiceBase
         {
             //其它操作
         }
-        res.success = true;
-        res.code = E_Res_Code.ok;
         reply.Message = JsonConvert.SerializeObject(res);
         return Task.FromResult(reply);
     }

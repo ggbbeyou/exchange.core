@@ -3,10 +3,14 @@ using System;
 namespace Com.Model.Enum;
 
 /// <summary>
-/// 订单买卖方向
+/// 请求操作动作
 /// </summary>
 public enum E_Op
 {
+    /// <summary>
+    /// 系统初始化服务
+    /// </summary>
+    init = 0,
     /// <summary>
     /// 启动交易对撮合
     /// </summary>

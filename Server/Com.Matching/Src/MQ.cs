@@ -104,14 +104,15 @@ public class MQ
                         if (deals != null && deals.Count > 0)
                         {
                             FactoryMatching.instance.constant.i_model.BasicPublish(exchange: this.key_deal, routingKey: this.core.market, basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(deals)));
+                            
                         }
                         this.mutex.ReleaseMutex();
                     }
                 };
                 FactoryMatching.instance.constant.i_model.BasicAck(ea.DeliveryTag, true);
-                FactoryMatching.instance.constant.i_model.BasicConsume(queue: queueName, autoAck: false, consumer: consumer);
             }
         };
+        FactoryMatching.instance.constant.i_model.BasicConsume(queue: queueName, autoAck: false, consumer: consumer);
     }
 
     /// <summary>

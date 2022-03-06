@@ -59,7 +59,7 @@ public class BaseOrder
     /// <value></value>
     public decimal amount_done { get; set; }
     /// <summary>
-    /// 最后成交时间
+    /// 最后成交时间或撤单时间
     /// </summary>
     /// <value></value>
     public DateTimeOffset? deal_last_time { get; set; }

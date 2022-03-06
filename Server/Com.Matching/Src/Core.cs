@@ -160,7 +160,7 @@ public class Core
         cancel.AddRange(cancel_market_ask);
         cancel.AddRange(cancel_fixed_bid);
         cancel.AddRange(cancel_fixed_ask);
-        cancel.ForEach(P => P.state = E_OrderState.cancel);
+        cancel.ForEach(P => { P.state = E_OrderState.cancel; P.deal_last_time = DateTimeOffset.UtcNow; });
         return cancel;
     }
 
@@ -184,7 +184,7 @@ public class Core
         cancel.AddRange(cancel_market_ask);
         cancel.AddRange(cancel_fixed_bid);
         cancel.AddRange(cancel_fixed_ask);
-        cancel.ForEach(P => P.state = E_OrderState.cancel);
+        cancel.ForEach(P => { P.state = E_OrderState.cancel; P.deal_last_time = DateTimeOffset.UtcNow; });
         return cancel;
     }
 
@@ -208,7 +208,7 @@ public class Core
         cancel.AddRange(cancel_market_ask);
         cancel.AddRange(cancel_fixed_bid);
         cancel.AddRange(cancel_fixed_ask);
-        cancel.ForEach(P => P.state = E_OrderState.cancel);
+        cancel.ForEach(P => { P.state = E_OrderState.cancel; P.deal_last_time = DateTimeOffset.UtcNow; });
         return cancel;
     }
 
@@ -223,7 +223,7 @@ public class Core
         cancel.AddRange(this.market_ask);
         cancel.AddRange(this.fixed_bid);
         cancel.AddRange(this.fixed_ask);
-        cancel.ForEach(P => P.state = E_OrderState.cancel);
+        cancel.ForEach(P => { P.state = E_OrderState.cancel; P.deal_last_time = DateTimeOffset.UtcNow; });
         return cancel;
     }
 

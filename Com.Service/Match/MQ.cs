@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Com.Model;
 using Com.Model.Enum;
+using Com.Service.Models;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
@@ -17,9 +18,9 @@ namespace Com.Service.Match;
 public class MQ
 {
     /// <summary>
-    /// 撮合核心
+    /// 撮合服务对象
     /// </summary>
-    private MatchCore core;
+    private MatchModel model;
     /// <summary>
     /// (Direct)接收挂单订单队列名称
     /// </summary>
@@ -64,10 +65,10 @@ public class MQ
     /// <summary>
     /// 初始化
     /// </summary>
-    /// <param name="core">撮合核心</param>
-    public MQ(MatchCore core)
+    /// <param name="model">撮合核心</param>
+    public MQ(MatchModel model)
     {
-        this.core = core;
+        this.model = model;
         props.DeliveryMode = 2;
         FactoryMatching.instance.constant.i_model.ExchangeDeclare(exchange: this.key_deal, type: ExchangeType.Direct, durable: true, autoDelete: false, arguments: null);
         FactoryMatching.instance.constant.i_model.ExchangeDeclare(exchange: this.key_order_cancel, type: ExchangeType.Direct, durable: true, autoDelete: false, arguments: null);
@@ -83,11 +84,11 @@ public class MQ
     public void OrderReceive()
     {
         string queueName = FactoryMatching.instance.constant.i_model.QueueDeclare().QueueName;
-        FactoryMatching.instance.constant.i_model.QueueBind(queue: queueName, exchange: this.key_order_send, routingKey: this.core.market);
+        FactoryMatching.instance.constant.i_model.QueueBind(queue: queueName, exchange: this.key_order_send, routingKey: this.model.info.market);
         EventingBasicConsumer consumer = new EventingBasicConsumer(FactoryMatching.instance.constant.i_model);
         consumer.Received += (model, ea) =>
         {
-            if (!this.core.run)
+            if (!this.model.run)
             {
                 FactoryMatching.instance.constant.i_model.BasicNack(deliveryTag: ea.DeliveryTag, multiple: true, requeue: true);
             }
@@ -100,14 +101,14 @@ public class MQ
                     foreach (MatchOrder item in req.data)
                     {
                         this.mutex.WaitOne();
-                        (List<MatchDeal> deal, List<MatchOrder> cancel) deals = this.core.Match(item);
+                        (List<MatchDeal> deal, List<MatchOrder> cancel) deals = this.model.match_core.Match(item);
                         if (deals.deal != null && deals.deal.Count > 0)
                         {
-                            FactoryMatching.instance.constant.i_model.BasicPublish(exchange: this.key_deal, routingKey: this.core.market, basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(deals.deal)));
+                            FactoryMatching.instance.constant.i_model.BasicPublish(exchange: this.key_deal, routingKey: this.model.info.market, basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(deals.deal)));
                         }
                         if (deals.cancel != null && deals.cancel.Count > 0)
                         {
-                            FactoryMatching.instance.constant.i_model.BasicPublish(exchange: this.key_order_cancel_success, routingKey: this.core.market, basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(deals.cancel)));
+                            FactoryMatching.instance.constant.i_model.BasicPublish(exchange: this.key_order_cancel_success, routingKey: this.model.info.market, basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(deals.cancel)));
                         }
                         this.mutex.ReleaseMutex();
                     }
@@ -124,11 +125,11 @@ public class MQ
     public void OrderCancel()
     {
         string queueName = FactoryMatching.instance.constant.i_model.QueueDeclare().QueueName;
-        FactoryMatching.instance.constant.i_model.QueueBind(queue: queueName, exchange: this.key_order_cancel, routingKey: this.core.market);
+        FactoryMatching.instance.constant.i_model.QueueBind(queue: queueName, exchange: this.key_order_cancel, routingKey: this.model.info.market);
         EventingBasicConsumer consumer = new EventingBasicConsumer(FactoryMatching.instance.constant.i_model);
         consumer.Received += (model, ea) =>
         {
-            if (!this.core.run)
+            if (!this.model.run)
             {
                 FactoryMatching.instance.constant.i_model.BasicNack(deliveryTag: ea.DeliveryTag, multiple: true, requeue: true);
             }
@@ -142,23 +143,23 @@ public class MQ
                     List<MatchOrder> cancel = new List<MatchOrder>();
                     if (req.op == E_Op.cancel_by_id)
                     {
-                        cancel.AddRange(this.core.CancelOrder(req.data));
+                        cancel.AddRange(this.model.match_core.CancelOrder(req.data));
                     }
                     else if (req.op == E_Op.cancel_by_uid)
                     {
-                        cancel.AddRange(this.core.CancelOrder(req.data.First()));
+                        cancel.AddRange(this.model.match_core.CancelOrder(req.data.First()));
                     }
                     else if (req.op == E_Op.cancel_by_clientid)
                     {
-                        cancel.AddRange(this.core.CancelOrder(req.data.ToArray()));
+                        cancel.AddRange(this.model.match_core.CancelOrder(req.data.ToArray()));
                     }
                     else if (req.op == E_Op.cancel_by_all)
                     {
-                        cancel.AddRange(this.core.CancelOrder());
+                        cancel.AddRange(this.model.match_core.CancelOrder());
                     }
                     if (cancel.Count > 0)
                     {
-                        FactoryMatching.instance.constant.i_model.BasicPublish(exchange: this.key_order_cancel_success, routingKey: this.core.market, basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(cancel)));
+                        FactoryMatching.instance.constant.i_model.BasicPublish(exchange: this.key_order_cancel_success, routingKey: this.model.info.market, basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(cancel)));
                     }
                     this.mutex.ReleaseMutex();
                     FactoryMatching.instance.constant.i_model.BasicAck(ea.DeliveryTag, false);

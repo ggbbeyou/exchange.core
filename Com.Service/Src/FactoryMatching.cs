@@ -3,6 +3,7 @@ using Com.Common;
 using Com.Model;
 using Com.Model.Enum;
 using Com.Service.Match;
+using Com.Service.Models;
 
 namespace Com.Service;
 
@@ -26,7 +27,7 @@ public class FactoryMatching
     /// <typeparam name="string">交易对</typeparam>
     /// <typeparam name="Core">服务</typeparam>
     /// <returns></returns>
-    public Dictionary<string, Core> service = new Dictionary<string, Core>();
+    public Dictionary<string, MatchModel> service = new Dictionary<string, MatchModel>();
 
     /// <summary>
     /// 私有构造方法
@@ -72,9 +73,9 @@ public class FactoryMatching
         Res<BaseMarketInfo> res = new Res<BaseMarketInfo>();
         if (!this.service.ContainsKey(market.market))
         {
-            this.service.Add(market.market, new Core(market, new MatchCore(market.market)));
+            // this.service.Add(market.market, new Core(market, new MatchCore(market.market)));
         }
-        this.service[market.market].Start();
+        // this.service[market.market].Start();
         return res;
     }
 
@@ -91,7 +92,7 @@ public class FactoryMatching
             res.code = E_Res_Code.fail;
             return res;
         }
-        this.service[market.market].Stop();
+        // this.service[market.market].Stop();
         return res;
     }
 

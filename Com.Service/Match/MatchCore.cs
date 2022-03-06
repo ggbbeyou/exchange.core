@@ -33,6 +33,7 @@ using System.Text;
 using Com.Common;
 using Com.Model;
 using Com.Model.Enum;
+using Com.Service.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -44,18 +45,10 @@ namespace Com.Service.Match;
 public class MatchCore
 {
     /// <summary>
-    /// 是否运行
-    /// </summary>
-    public bool run;
-    /// <summary>
-    /// 交易对名称
+    /// 撮合服务对象
     /// </summary>
     /// <value></value>
-    public string market { get; set; }
-    /// <summary>
-    /// 上一次成交价
-    /// </summary>
-    public decimal price_last;
+    public MatchModel model { get; set; } = null!;
     /// <summary>
     /// 市价买单
     /// </summary>
@@ -80,38 +73,15 @@ public class MatchCore
     /// <typeparam name="Order">订单</typeparam>
     /// <returns></returns>
     public List<MatchOrder> fixed_ask = new List<MatchOrder>();
-    /// <summary>
-    /// 消息队列
-    /// </summary>
-    private MQ mq;
 
     /// <summary>
     /// 初始化
     /// </summary>
     /// <param name="market"></param>
     /// <param name="constant"></param>
-    public MatchCore(string market)
+    public MatchCore(MatchModel model)
     {
-        this.market = market;
-        this.mq = new MQ(this);
-    }
-
-    /// <summary>
-    /// 开启撮合服务
-    /// </summary>
-    /// <param name="price_last">最后价格</param>
-    public void Start(decimal price_last)
-    {
-        this.price_last = price_last;
-        this.run = true;
-    }
-
-    /// <summary>
-    /// 关闭撮合服务
-    /// </summary>
-    public void Stop()
-    {
-        this.run = false;
+        this.model = model;
     }
 
     /// <summary>
@@ -223,7 +193,7 @@ public class MatchCore
     {
         List<MatchDeal> deals = new List<MatchDeal>();
         List<MatchOrder> cancel = new List<MatchOrder>();
-        if (order.market != this.market || order.amount <= 0 || order.amount_unsold <= 0)
+        if (order.market != this.model.info.market || order.amount <= 0 || order.amount_unsold <= 0)
         {
             return (deals, cancel);
         }
@@ -238,7 +208,7 @@ public class MatchCore
                 {
                     if (market_ask[i].amount_unsold >= order.amount_unsold)
                     {
-                        MatchDeal deal = Util.AmountAskBid(this.market, order, market_ask[i], this.price_last, E_OrderSide.buy, now);
+                        MatchDeal deal = Util.AmountAskBid(this.model.info.market, order, market_ask[i], this.model.info.deal_last_time, E_OrderSide.buy, now);
                         deals.Add(deal);
                         if (market_ask[i].amount_unsold == order.amount_unsold)
                         {
@@ -248,7 +218,7 @@ public class MatchCore
                     }
                     else if (market_ask[i].amount_unsold < order.amount_unsold)
                     {
-                        MatchDeal deal = Util.AmountBidAsk(this.market, order, market_ask[i], this.price_last, E_OrderSide.buy, now);
+                        MatchDeal deal = Util.AmountBidAsk(this.model.info.market, order, market_ask[i], this.model.info.deal_last_time, E_OrderSide.buy, now);
                         deals.Add(deal);
                         //市价卖单完成,从市价卖单移除
                         market_ask.Remove(market_ask[i]);
@@ -265,14 +235,14 @@ public class MatchCore
                     for (int i = 0; i < fixed_ask.Count; i++)
                     {
                         //使用撮合价规则
-                        decimal new_price = Util.GetNewPrice(fixed_ask[i].price, fixed_ask[i].price, this.price_last);
+                        decimal new_price = Util.GetNewPrice(fixed_ask[i].price, fixed_ask[i].price, this.model.info.deal_last_time);
                         if (new_price <= 0)
                         {
                             break;
                         }
                         if (fixed_ask[i].amount_unsold >= order.amount_unsold)
                         {
-                            MatchDeal deal = Util.AmountAskBid(this.market, order, fixed_ask[i], this.price_last, E_OrderSide.buy, now);
+                            MatchDeal deal = Util.AmountAskBid(this.model.info.market, order, fixed_ask[i], this.model.info.deal_last_time, E_OrderSide.buy, now);
                             deals.Add(deal);
                             if (fixed_ask[i].amount_unsold == order.amount_unsold)
                             {
@@ -282,12 +252,12 @@ public class MatchCore
                         }
                         else if (fixed_ask[i].amount_unsold < order.amount_unsold)
                         {
-                            MatchDeal deal = Util.AmountBidAsk(this.market, order, fixed_ask[i], this.price_last, E_OrderSide.buy, now);
+                            MatchDeal deal = Util.AmountBidAsk(this.model.info.market, order, fixed_ask[i], this.model.info.deal_last_time, E_OrderSide.buy, now);
                             deals.Add(deal);
                             //市价卖单完成,从市价卖单移除
                             fixed_ask.Remove(fixed_ask[i]);
                         }
-                        this.price_last = new_price;
+                        this.model.info.deal_last_time = new_price;
                         //量全部处理完了
                         if (order.amount_unsold <= 0)
                         {
@@ -308,7 +278,7 @@ public class MatchCore
                 {
                     if (market_ask[i].amount_unsold >= order.amount_unsold)
                     {
-                        MatchDeal deal = Util.AmountAskBid(this.market, order, market_ask[i], order.price, E_OrderSide.buy, now);
+                        MatchDeal deal = Util.AmountAskBid(this.model.info.market, order, market_ask[i], order.price, E_OrderSide.buy, now);
                         deals.Add(deal);
                         if (market_ask[i].amount_unsold == order.amount_unsold)
                         {
@@ -318,7 +288,7 @@ public class MatchCore
                     }
                     else if (market_ask[i].amount_unsold < order.amount_unsold)
                     {
-                        MatchDeal deal = Util.AmountBidAsk(this.market, order, market_ask[i], order.price, E_OrderSide.buy, now);
+                        MatchDeal deal = Util.AmountBidAsk(this.model.info.market, order, market_ask[i], order.price, E_OrderSide.buy, now);
                         deals.Add(deal);
                         //市价卖单完成,从市价卖单移除
                         market_ask.Remove(market_ask[i]);
@@ -335,14 +305,14 @@ public class MatchCore
                     for (int i = 0; i < fixed_ask.Count; i++)
                     {
                         //使用撮合价规则
-                        decimal new_price = Util.GetNewPrice(order.price, fixed_ask[i].price, this.price_last);
+                        decimal new_price = Util.GetNewPrice(order.price, fixed_ask[i].price, this.model.info.deal_last_time);
                         if (new_price <= 0)
                         {
                             break;
                         }
                         if (fixed_ask[i].amount_unsold >= order.amount_unsold)
                         {
-                            MatchDeal deal = Util.AmountAskBid(this.market, order, fixed_ask[i], new_price, E_OrderSide.buy, now);
+                            MatchDeal deal = Util.AmountAskBid(this.model.info.market, order, fixed_ask[i], new_price, E_OrderSide.buy, now);
                             deals.Add(deal);
                             if (fixed_ask[i].amount_unsold == order.amount_unsold)
                             {
@@ -352,12 +322,12 @@ public class MatchCore
                         }
                         else if (fixed_ask[i].amount_unsold < order.amount_unsold)
                         {
-                            MatchDeal deal = Util.AmountBidAsk(this.market, order, fixed_ask[i], new_price, E_OrderSide.buy, now);
+                            MatchDeal deal = Util.AmountBidAsk(this.model.info.market, order, fixed_ask[i], new_price, E_OrderSide.buy, now);
                             deals.Add(deal);
                             //市价卖单完成,从市价卖单移除
                             fixed_ask.Remove(fixed_ask[i]);
                         }
-                        this.price_last = new_price;
+                        this.model.info.deal_last_time = new_price;
                         //量全部处理完了
                         if (order.amount_unsold <= 0)
                         {
@@ -397,7 +367,7 @@ public class MatchCore
                 {
                     if (market_bid[i].amount_unsold >= order.amount_unsold)
                     {
-                        MatchDeal deal = Util.AmountBidAsk(this.market, market_bid[i], order, this.price_last, E_OrderSide.sell, now);
+                        MatchDeal deal = Util.AmountBidAsk(this.model.info.market, market_bid[i], order, this.model.info.deal_last_time, E_OrderSide.sell, now);
                         deals.Add(deal);
                         if (deal.bid.state == E_OrderState.completed)
                         {
@@ -407,7 +377,7 @@ public class MatchCore
                     }
                     else if (market_bid[i].amount_unsold < order.amount_unsold)
                     {
-                        MatchDeal deal = Util.AmountAskBid(this.market, market_bid[i], order, this.price_last, E_OrderSide.sell, now);
+                        MatchDeal deal = Util.AmountAskBid(this.model.info.market, market_bid[i], order, this.model.info.deal_last_time, E_OrderSide.sell, now);
                         deals.Add(deal);
                         //市价买单完成,从市价买单移除
                         market_bid.Remove(market_bid[i]);
@@ -424,14 +394,14 @@ public class MatchCore
                     for (int i = 0; i < fixed_bid.Count; i++)
                     {
                         //使用撮合价规则
-                        decimal new_price = Util.GetNewPrice(fixed_bid[i].price, fixed_bid[i].price, this.price_last);
+                        decimal new_price = Util.GetNewPrice(fixed_bid[i].price, fixed_bid[i].price, this.model.info.deal_last_time);
                         if (new_price <= 0)
                         {
                             break;
                         }
                         if (fixed_bid[i].amount_unsold >= order.amount_unsold)
                         {
-                            MatchDeal deal = Util.AmountBidAsk(this.market, fixed_bid[i], order, new_price, E_OrderSide.sell, now);
+                            MatchDeal deal = Util.AmountBidAsk(this.model.info.market, fixed_bid[i], order, new_price, E_OrderSide.sell, now);
                             deals.Add(deal);
                             if (fixed_bid[i].amount_unsold == order.amount_unsold)
                             {
@@ -441,12 +411,12 @@ public class MatchCore
                         }
                         else if (fixed_bid[i].amount_unsold < order.amount_unsold)
                         {
-                            MatchDeal deal = Util.AmountAskBid(this.market, fixed_bid[i], order, new_price, E_OrderSide.sell, now);
+                            MatchDeal deal = Util.AmountAskBid(this.model.info.market, fixed_bid[i], order, new_price, E_OrderSide.sell, now);
                             deals.Add(deal);
                             //市价买单完成,从市价买单移除
                             fixed_bid.Remove(fixed_bid[i]);
                         }
-                        this.price_last = new_price;
+                        this.model.info.deal_last_time = new_price;
                         //量全部处理完了
                         if (order.amount_unsold <= 0)
                         {
@@ -467,7 +437,7 @@ public class MatchCore
                 {
                     if (market_bid[i].amount_unsold >= order.amount_unsold)
                     {
-                        MatchDeal deal = Util.AmountBidAsk(this.market, order, market_bid[i], order.price, E_OrderSide.sell, now);
+                        MatchDeal deal = Util.AmountBidAsk(this.model.info.market, order, market_bid[i], order.price, E_OrderSide.sell, now);
                         deals.Add(deal);
                         if (deal.bid.state == E_OrderState.completed)
                         {
@@ -477,7 +447,7 @@ public class MatchCore
                     }
                     else if (market_bid[i].amount_unsold < order.amount_unsold)
                     {
-                        MatchDeal deal = Util.AmountAskBid(this.market, market_bid[i], order, order.price, E_OrderSide.sell, now);
+                        MatchDeal deal = Util.AmountAskBid(this.model.info.market, market_bid[i], order, order.price, E_OrderSide.sell, now);
                         deals.Add(deal);
                         //市价买单完成,从市价买单移除
                         market_bid.Remove(market_bid[i]);
@@ -494,14 +464,14 @@ public class MatchCore
                     for (int i = 0; i < fixed_bid.Count; i++)
                     {
                         //使用撮合价规则
-                        decimal new_price = Util.GetNewPrice(fixed_bid[i].price, order.price, this.price_last);
+                        decimal new_price = Util.GetNewPrice(fixed_bid[i].price, order.price, this.model.info.deal_last_time);
                         if (new_price <= 0)
                         {
                             break;
                         }
                         if (fixed_bid[i].amount_unsold >= order.amount_unsold)
                         {
-                            MatchDeal deal = Util.AmountBidAsk(this.market, fixed_bid[i], order, new_price, E_OrderSide.sell, now);
+                            MatchDeal deal = Util.AmountBidAsk(this.model.info.market, fixed_bid[i], order, new_price, E_OrderSide.sell, now);
                             deals.Add(deal);
                             if (deal.bid.state == E_OrderState.completed)
                             {
@@ -511,12 +481,12 @@ public class MatchCore
                         }
                         else if (fixed_bid[i].amount_unsold < order.amount_unsold)
                         {
-                            MatchDeal deal = Util.AmountAskBid(this.market, fixed_bid[i], order, new_price, E_OrderSide.sell, now);
+                            MatchDeal deal = Util.AmountAskBid(this.model.info.market, fixed_bid[i], order, new_price, E_OrderSide.sell, now);
                             deals.Add(deal);
                             //市价买单完成,从市价买单移除
                             fixed_bid.Remove(fixed_bid[i]);
                         }
-                        this.price_last = new_price;
+                        this.model.info.deal_last_time = new_price;
                         //量全部处理完了
                         if (order.amount_unsold <= 0)
                         {

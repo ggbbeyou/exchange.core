@@ -50,10 +50,10 @@ public class FactoryMatching
     /// <summary>
     /// 初始化服务
     /// </summary>
-    public BaseMarketInfo ServiceInit(BaseMarketInfo info)
+    public async Task<BaseMarketInfo> ServiceInit(BaseMarketInfo info)
     {
         //交易记录数据从DB同步到Redis 至少保存最近3个月记录
-        DealService.instance.DeleteDeal(info.market, DateTimeOffset.UtcNow.AddMonths(-3));
+        long delete = await DealService.instance.DeleteDeal(info.market, DateTimeOffset.UtcNow.AddMonths(-3));
         DealService.instance.DealDbToRedis(info.market, new TimeSpan(-30, 0, 0, 0));
         // K线数据从DB同步到Redis
         DateTimeOffset now = DateTimeOffset.UtcNow;

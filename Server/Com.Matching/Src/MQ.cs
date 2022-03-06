@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Com.Model;
+using Com.Model.Enum;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
@@ -93,10 +94,10 @@ public class MQ
             else
             {
                 string json = Encoding.UTF8.GetString(ea.Body.ToArray());
-                List<MatchOrder>? order = JsonConvert.DeserializeObject<List<MatchOrder>>(json);
-                if (order != null)
+                Req<List<MatchOrder>>? req = JsonConvert.DeserializeObject<Req<List<MatchOrder>>>(json);
+                if (req != null && req.op == E_Op.place && req.data != null && req.data.Count > 0)
                 {
-                    foreach (var item in order)
+                    foreach (MatchOrder item in req.data)
                     {
                         this.mutex.WaitOne();
                         List<MatchDeal> deals = this.core.Match(item);
@@ -106,11 +107,11 @@ public class MQ
                         }
                         this.mutex.ReleaseMutex();
                     }
-                    FactoryMatching.instance.constant.i_model.BasicAck(ea.DeliveryTag, true);
-                }
+                };
+                FactoryMatching.instance.constant.i_model.BasicAck(ea.DeliveryTag, true);
+                FactoryMatching.instance.constant.i_model.BasicConsume(queue: queueName, autoAck: false, consumer: consumer);
             }
         };
-        FactoryMatching.instance.constant.i_model.BasicConsume(queue: queueName, autoAck: false, consumer: consumer);
     }
 
     /// <summary>

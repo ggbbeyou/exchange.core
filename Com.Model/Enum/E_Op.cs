@@ -18,7 +18,7 @@ public enum E_Op
     /// <summary>
     /// 挂单
     /// </summary>
-    Place = 3,
+    place = 3,
     /// <summary>
     /// 根据订单id撤单
     /// </summary>

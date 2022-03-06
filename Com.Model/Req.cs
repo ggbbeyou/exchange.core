@@ -22,5 +22,5 @@ public class Req<T>
     /// 数据
     /// </summary>
     /// <value></value>
-    public List<T> data { get; set; } = null!;
+    public T data { get; set; } = default!;
 }

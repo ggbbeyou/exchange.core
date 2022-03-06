@@ -50,7 +50,7 @@ public class GreeterImpl : ExchangeService.ExchangeServiceBase
             res.success = false;
             res.code = E_Res_Code.fail;
             res.message = $"grpc 请求参数为空:{request.Json}";
-            this.constant.logger.LogError($"grpc 请求参数为空:{request.Json}");
+            FactoryMatching.instance.constant.logger.LogError($"grpc 请求参数为空:{request.Json}");
             reply.Message = JsonConvert.SerializeObject(res);
             return Task.FromResult(reply);
         }
@@ -64,13 +64,13 @@ public class GreeterImpl : ExchangeService.ExchangeServiceBase
                 res.success = false;
                 res.code = E_Res_Code.fail;
                 res.message = $"初始化失败,未获取到请求参数:{request.Json}";
-                this.constant.logger.LogError($"初始化失败, 未获取到请求参数:{request.Json}");
+                FactoryMatching.instance.constant.logger.LogError($"初始化失败, 未获取到请求参数:{request.Json}");
                 reply.Message = JsonConvert.SerializeObject(res);
                 return Task.FromResult(reply);
             }
             FactoryMatching.instance.ServiceInit(marketInfo);
             res.message = $"初始化成功:{marketInfo.market}";
-            this.constant.logger.LogInformation($"初始化成功:{marketInfo.market}");
+            FactoryMatching.instance.constant.logger.LogInformation($"初始化成功:{marketInfo.market}");
         }
         else if (req.op == E_Op.service_start)
         {
@@ -80,13 +80,13 @@ public class GreeterImpl : ExchangeService.ExchangeServiceBase
                 res.success = false;
                 res.code = E_Res_Code.fail;
                 res.message = $"服务启动失败,未获取到请求参数:{request.Json}";
-                this.constant.logger.LogError($"服务启动失败, 未获取到请求参数:{request.Json}");
+                FactoryMatching.instance.constant.logger.LogError($"服务启动失败, 未获取到请求参数:{request.Json}");
                 reply.Message = JsonConvert.SerializeObject(res);
                 return Task.FromResult(reply);
             }
             FactoryMatching.instance.ServiceStart(marketInfo);
             res.message = $"服务启动成功:{marketInfo.market}";
-            this.constant.logger.LogInformation($"服务启动成功:{marketInfo.market}");
+            FactoryMatching.instance.constant.logger.LogInformation($"服务启动成功:{marketInfo.market}");
         }
         else if (req.op == E_Op.service_stop)
         {
@@ -96,13 +96,13 @@ public class GreeterImpl : ExchangeService.ExchangeServiceBase
                 res.success = false;
                 res.code = E_Res_Code.fail;
                 res.message = $"服务停止失败,未获取到请求参数:{request.Json}";
-                this.constant.logger.LogError($"服务停止失败, 未获取到请求参数:{request.Json}");
+                FactoryMatching.instance.constant.logger.LogError($"服务停止失败, 未获取到请求参数:{request.Json}");
                 reply.Message = JsonConvert.SerializeObject(res);
                 return Task.FromResult(reply);
             }
             FactoryMatching.instance.ServiceStop(marketInfo);
             res.message = $"服务停止成功:{marketInfo.market}";
-            this.constant.logger.LogInformation($"服务停止成功:{marketInfo.market}");
+            FactoryMatching.instance.constant.logger.LogInformation($"服务停止成功:{marketInfo.market}");
         }
         else
         {

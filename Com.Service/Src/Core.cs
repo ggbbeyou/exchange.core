@@ -2,6 +2,7 @@ using System.Text;
 using Com.Common;
 using Com.Model;
 using Com.Model.Enum;
+using Com.Service.Match;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
@@ -19,11 +20,8 @@ public class Core
     /// 交易对名称
     /// </summary>
     /// <value></value>
-    public string market { get; set; }
-    /// <summary>
-    /// 常用接口
-    /// </summary>
-    public FactoryConstant constant = null!;
+    public BaseMarketInfo market { get; set; }
+
     /// <summary>
     /// 买盘 高->低
     /// </summary>
@@ -59,63 +57,62 @@ public class Core
     /// </summary>
     /// <param name="market"></param>
     /// <param name="constant"></param>
-    public Core(string market, FactoryConstant constant)
+    public Core(BaseMarketInfo market, MatchCore match)
     {
         this.market = market;
-        this.constant = constant;
         this.kline_minute = new BaseKline()
         {
-            market = market,
+            market = this.market.market,
             type = E_KlineType.min1,
         };
         this.kline.Add(E_KlineType.min1, new BaseKline()
         {
-            market = market,
+            market = this.market.market,
             type = E_KlineType.min1,
         });
         this.kline.Add(E_KlineType.min5, new BaseKline()
         {
-            market = market,
+            market = this.market.market,
             type = E_KlineType.min5,
         });
         this.kline.Add(E_KlineType.min15, new BaseKline()
         {
-            market = market,
+            market = this.market.market,
             type = E_KlineType.min15,
         });
         this.kline.Add(E_KlineType.min30, new BaseKline()
         {
-            market = market,
+            market = this.market.market,
             type = E_KlineType.min30,
         });
         this.kline.Add(E_KlineType.hour1, new BaseKline()
         {
-            market = market,
+            market = this.market.market,
             type = E_KlineType.hour1,
-        });      
+        });
         this.kline.Add(E_KlineType.hour6, new BaseKline()
         {
-            market = market,
+            market = this.market.market,
             type = E_KlineType.hour6,
         });
         this.kline.Add(E_KlineType.hour12, new BaseKline()
         {
-            market = market,
+            market = this.market.market,
             type = E_KlineType.hour12,
         });
         this.kline.Add(E_KlineType.day1, new BaseKline()
         {
-            market = market,
+            market = this.market.market,
             type = E_KlineType.day1,
         });
         this.kline.Add(E_KlineType.week1, new BaseKline()
         {
-            market = market,
+            market = this.market.market,
             type = E_KlineType.week1,
         });
         this.kline.Add(E_KlineType.month1, new BaseKline()
         {
-            market = market,
+            market = this.market.market,
             type = E_KlineType.month1,
         });
 
@@ -146,7 +143,7 @@ public class Core
     {
         FactoryMatching.instance.constant.i_model.ExchangeDeclare(exchange: this.key_exchange_deal, type: ExchangeType.Direct, durable: true, autoDelete: false, arguments: null);
         string queueName = FactoryMatching.instance.constant.i_model.QueueDeclare().QueueName;
-        FactoryMatching.instance.constant.i_model.QueueBind(queue: queueName, exchange: this.key_exchange_deal, routingKey: this.market);
+        FactoryMatching.instance.constant.i_model.QueueBind(queue: queueName, exchange: this.key_exchange_deal, routingKey: this.market.market);
         EventingBasicConsumer consumer = new EventingBasicConsumer(FactoryMatching.instance.constant.i_model);
         consumer.Received += (model, ea) =>
         {
@@ -157,7 +154,7 @@ public class Core
             else
             {
                 string json = Encoding.UTF8.GetString(ea.Body.ToArray());
-                this.constant.logger.LogInformation($"接收撮合传过来的成交订单:{json}");
+                FactoryMatching.instance.constant.logger.LogInformation($"接收撮合传过来的成交订单:{json}");
                 List<MatchDeal>? deals = JsonConvert.DeserializeObject<List<MatchDeal>>(json);
                 if (deals != null)
                 {
@@ -185,7 +182,7 @@ public class Core
     {
         FactoryMatching.instance.constant.i_model.ExchangeDeclare(exchange: this.key_exchange_deal, type: ExchangeType.Direct, durable: true, autoDelete: false, arguments: null);
         string queueName = FactoryMatching.instance.constant.i_model.QueueDeclare().QueueName;
-        FactoryMatching.instance.constant.i_model.QueueBind(queue: queueName, exchange: this.key_exchange_deal, routingKey: this.market);
+        FactoryMatching.instance.constant.i_model.QueueBind(queue: queueName, exchange: this.key_exchange_deal, routingKey: this.market.market);
         EventingBasicConsumer consumer = new EventingBasicConsumer(FactoryMatching.instance.constant.i_model);
         consumer.Received += (model, ea) =>
         {
@@ -196,7 +193,7 @@ public class Core
             else
             {
                 string json = Encoding.UTF8.GetString(ea.Body.ToArray());
-                this.constant.logger.LogInformation($"接收撮合传过来的取消订单:{json}");
+                FactoryMatching.instance.constant.logger.LogInformation($"接收撮合传过来的取消订单:{json}");
                 List<string>? deals = JsonConvert.DeserializeObject<List<string>>(json);
                 if (deals != null)
                 {
@@ -241,7 +238,7 @@ public class Core
                 {
                     orderBook = new BaseOrderBook()
                     {
-                        market = this.market,
+                        market = this.market.market,
                         price = order.price,
                         amount = 0,
                         count = 0,
@@ -275,7 +272,7 @@ public class Core
                 {
                     orderBook = new BaseOrderBook()
                     {
-                        market = this.market,
+                        market = this.market.market,
                         price = order.price,
                         amount = 0,
                         count = 0,

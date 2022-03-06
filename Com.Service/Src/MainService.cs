@@ -26,7 +26,7 @@ public class MainService : BackgroundService
     public MainService(IServiceProvider provider, IConfiguration configuration, IHostEnvironment environment, ILogger<MainService> logger)
     {
         this.constant = new FactoryConstant(provider, configuration, environment, logger);
-        FactoryMatching.instance.Init(this.constant);
+        // FactoryMatching.instance.Init(this.constant);
     }
 
     /// <summary>

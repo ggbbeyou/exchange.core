@@ -6,7 +6,7 @@ using Com.Service.Match;
 namespace Com.Service.Models;
 
 /// <summary>
-/// 成交单
+/// 撮合服务
 /// </summary>
 public class MatchModel
 {
@@ -35,5 +35,12 @@ public class MatchModel
     /// </summary>
     /// <value></value>
     public Core core { get; set; } = null!;
-
+    /// <summary>
+    /// 初始化
+    /// </summary>
+    /// <param name="info"></param>
+    public MatchModel(BaseMarketInfo info)
+    {
+        this.info = info;
+    }
 }

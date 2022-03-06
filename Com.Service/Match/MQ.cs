@@ -162,8 +162,8 @@ public class MQ
                         FactoryMatching.instance.constant.i_model.BasicPublish(exchange: this.key_order_cancel_success, routingKey: this.model.info.market, basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(cancel)));
                     }
                     this.mutex.ReleaseMutex();
-                    FactoryMatching.instance.constant.i_model.BasicAck(ea.DeliveryTag, false);
                 }
+                FactoryMatching.instance.constant.i_model.BasicAck(ea.DeliveryTag, false);
             }
         };
         FactoryMatching.instance.constant.i_model.BasicConsume(queue: queueName, autoAck: false, consumer: consumer);

@@ -34,6 +34,13 @@ public class GreeterImpl : ExchangeService.ExchangeServiceBase
         FactoryMatching.instance.Init(this.constant);
     }
 
+    public GreeterImpl(FactoryConstant constant)
+    {
+        this.constant = constant;
+        // this.constant = new FactoryConstant(provider, configuration, environment, logger);
+        FactoryMatching.instance.Init(this.constant);
+    }
+
     /// <summary>
     /// 一元方法
     /// </summary>

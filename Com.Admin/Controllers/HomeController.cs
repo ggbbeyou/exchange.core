@@ -20,16 +20,26 @@ public class HomeController : Controller
 
     public async Task<IActionResult> Index()
     {
-        using var channel = GrpcChannel.ForAddress("http://localhost:8080");
+        GrpcChannel channel = GrpcChannel.ForAddress("http://localhost:8080");
         var client = new ExchangeService.ExchangeServiceClient(channel);
-        Req<BaseMarketInfo> req = new Req<BaseMarketInfo>();
+
+
+        // var client1 = new Health.HealthClient(channel);
+
+        // var response = client1.CheckAsync(new HealthCheckRequest());
+        // var status = response.Status;
+
+
+        Req<string> req = new Req<string>();
         req.op = E_Op.service_init;
         req.market = "btc/usdt";
-        req.data = new BaseMarketInfo();
-        req.data.market = "btc/usdt";
-        req.data.last_price = 38000;
+        BaseMarketInfo info = new BaseMarketInfo();
+        info.market = "btc/usdt";
+        info.last_price = 38000.123456789m;
+        req.data = JsonConvert.SerializeObject(info);
         string json = JsonConvert.SerializeObject(req);
         var reply = await client.UnaryCallAsync(new Request { Json = json });
+        channel.ShutdownAsync().Wait();
         _logger.LogInformation(reply.Message);
         return View();
     }

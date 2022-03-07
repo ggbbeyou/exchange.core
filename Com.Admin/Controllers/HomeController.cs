@@ -20,7 +20,7 @@ public class HomeController : Controller
 
     public async Task<IActionResult> Index()
     {
-        using var channel = GrpcChannel.ForAddress("https://localhost:5001");
+        using var channel = GrpcChannel.ForAddress("https://localhost:8080");
         var client = new ExchangeService.ExchangeServiceClient(channel);
         Req<BaseMarketInfo> req = new Req<BaseMarketInfo>();
         req.op = E_Op.service_init;

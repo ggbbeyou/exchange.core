@@ -1,6 +1,11 @@
 ﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Com.Admin.Models;
+using Grpc.Net.Client;
+using GrpcExchange;
+using Com.Model;
+using Newtonsoft.Json;
+using Com.Model.Enum;
 
 namespace Com.Admin.Controllers;
 
@@ -13,8 +18,19 @@ public class HomeController : Controller
         _logger = logger;
     }
 
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
+        using var channel = GrpcChannel.ForAddress("https://localhost:5001");
+        var client = new ExchangeService.ExchangeServiceClient(channel);
+        Req<BaseMarketInfo> req = new Req<BaseMarketInfo>();
+        req.op = E_Op.service_init;
+        req.market = "btc/usdt";
+        req.data = new BaseMarketInfo();
+        req.data.market = "btc/usdt";
+        req.data.last_price = 38000;
+        string json = JsonConvert.SerializeObject(req);
+        var reply = await client.UnaryCallAsync(new Request { Json = json });
+        _logger.LogInformation(reply.Message);
         return View();
     }
 

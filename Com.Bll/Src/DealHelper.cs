@@ -24,7 +24,7 @@ public class DealHelper
     public DealHelper(FactoryConstant constant)
     {
         this.constant = constant;
-        AddTest();
+        // AddTest();
     }
 
     /// <summary>

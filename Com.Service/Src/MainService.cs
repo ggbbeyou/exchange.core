@@ -27,9 +27,8 @@ public class MainService : BackgroundService
     /// <param name="logger"></param>
     public MainService(IServiceProvider provider, IConfiguration configuration, IHostEnvironment environment, ILogger<MainService> logger)
     {
-        // client.WithHost()
         this.constant = new FactoryConstant(provider, configuration, environment, logger);
-        // FactoryMatching.instance.Init(this.constant);
+        FactoryMatching.instance.Init(this.constant);
     }
 
     /// <summary>
@@ -44,7 +43,7 @@ public class MainService : BackgroundService
         {
             Grpc.Core.Server server = new Grpc.Core.Server
             {
-                Services = { ExchangeService.BindService(new GreeterImpl(this.constant)) },
+                Services = { ExchangeService.BindService(new GreeterImpl()) },
                 Ports = { new ServerPort("127.0.0.1", 8080, ServerCredentials.Insecure) }
             };
             server.Start();

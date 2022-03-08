@@ -35,18 +35,6 @@ public class Core
     /// </summary>
     /// <returns></returns>
     public BaseKline kline_minute = null!;
-    /// <summary>
-    /// 最近K线
-    /// </summary>
-    /// <typeparam name="E_KlineType">K线类型</typeparam>
-    /// <typeparam name="Kline">K线</typeparam>
-    /// <returns></returns>
-    public Dictionary<E_KlineType, BaseKline> kline = new Dictionary<E_KlineType, BaseKline>();
-    /// <summary>
-    /// (Direct)发送历史成交记录
-    /// </summary>
-    /// <value></value>
-    public string key_exchange_deal = "deal";
 
     /// <summary>
     /// 初始化
@@ -56,14 +44,6 @@ public class Core
     public Core(MatchModel model)
     {
         this.model = model;
-        foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
-        {
-            this.kline.Add(cycle, new BaseKline()
-            {
-                market = this.model.info.market,
-                type = cycle,
-            });
-        }
         ReceiveMatchOrder();
         ReceiveMatchCancelOrder();
     }
@@ -73,9 +53,9 @@ public class Core
     /// </summary>
     public void ReceiveMatchOrder()
     {
-        FactoryMatching.instance.constant.i_model.ExchangeDeclare(exchange: this.key_exchange_deal, type: ExchangeType.Direct, durable: true, autoDelete: false, arguments: null);
+        FactoryMatching.instance.constant.i_model.ExchangeDeclare(exchange: this.model.mq.key_deal, type: ExchangeType.Direct, durable: true, autoDelete: false, arguments: null);
         string queueName = FactoryMatching.instance.constant.i_model.QueueDeclare().QueueName;
-        FactoryMatching.instance.constant.i_model.QueueBind(queue: queueName, exchange: this.key_exchange_deal, routingKey: this.model.info.market);
+        FactoryMatching.instance.constant.i_model.QueueBind(queue: queueName, exchange: this.model.mq.key_deal, routingKey: this.model.info.market);
         EventingBasicConsumer consumer = new EventingBasicConsumer(FactoryMatching.instance.constant.i_model);
         consumer.Received += (model, ea) =>
         {
@@ -90,6 +70,7 @@ public class Core
                 List<MatchDeal>? deals = JsonConvert.DeserializeObject<List<MatchDeal>>(json);
                 if (deals != null)
                 {
+
                     MatchDeal? deal = deals.FirstOrDefault();
                     MatchOrder order = deal!.trigger_side == E_OrderSide.buy ? deal.bid : deal.ask;
                     List<BaseOrderBook> orderBooks = GetOrderBooks(order, deals);
@@ -112,9 +93,9 @@ public class Core
     /// </summary>
     public void ReceiveMatchCancelOrder()
     {
-        FactoryMatching.instance.constant.i_model.ExchangeDeclare(exchange: this.key_exchange_deal, type: ExchangeType.Direct, durable: true, autoDelete: false, arguments: null);
+        FactoryMatching.instance.constant.i_model.ExchangeDeclare(exchange: this.model.mq.key_order_cancel_success, type: ExchangeType.Direct, durable: true, autoDelete: false, arguments: null);
         string queueName = FactoryMatching.instance.constant.i_model.QueueDeclare().QueueName;
-        FactoryMatching.instance.constant.i_model.QueueBind(queue: queueName, exchange: this.key_exchange_deal, routingKey: this.model.info.market);
+        FactoryMatching.instance.constant.i_model.QueueBind(queue: queueName, exchange: this.model.mq.key_order_cancel_success, routingKey: this.model.info.market);
         EventingBasicConsumer consumer = new EventingBasicConsumer(FactoryMatching.instance.constant.i_model);
         consumer.Received += (model, ea) =>
         {

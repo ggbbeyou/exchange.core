@@ -1,5 +1,7 @@
 using System.Text;
+using Com.Bll;
 using Com.Common;
+using Com.Db;
 using Com.Model;
 using Com.Model.Enum;
 using Com.Service.Match;
@@ -8,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using StackExchange.Redis;
 
 namespace Com.Service;
 
@@ -119,16 +122,16 @@ public class Core
     /// <param name="deals"></param>
     private void ReceiveDealOrder(List<(MatchOrder order, List<MatchDeal> deal)> match)
     {
+        List<BaseOrderBook> orderBooks = new List<BaseOrderBook>();
+        List<Kline> klines = new List<Kline>();
+        List<MatchDeal> total = new List<MatchDeal>();
         foreach ((MatchOrder order, List<MatchDeal> deal) item in match)
         {
-            if (item.deal.Count == 0)
-            {
-
-                continue;
-            }
-            List<BaseOrderBook> orderBooks = GetOrderBooks(item.order, item.deal);
-            BaseKline? kline = SetKlink(item.deal);
+            orderBooks.AddRange(GetOrderBooks(item.order, item.deal));
+            total.AddRange(item.deal);
         }
+        klines.AddRange(SetKlink(total));
+        PullDepth(orderBooks);
     }
 
     /// <summary>
@@ -236,72 +239,27 @@ public class Core
         FactoryMatching.instance.constant.i_model.BasicPublish(exchange: "", routingKey: this.model.info.market, basicProperties: null, body: Encoding.UTF8.GetBytes(json));
     }
 
+    /// <summary>
+    /// K线往消息队列推送
+    /// </summary>
+    /// <param name="depth"></param>
+    private void PullKline(List<Kline> klines)
+    {
+        if (klines.Count == 0)
+        {
+            return;
+        }
+        string json = JsonConvert.SerializeObject(klines);
+        FactoryMatching.instance.constant.logger.LogInformation($"推送K线:{json}");
+        FactoryMatching.instance.constant.i_model.BasicPublish(exchange: "", routingKey: this.model.info.market, basicProperties: null, body: Encoding.UTF8.GetBytes(json));
+    }
+
 
     #endregion
 
 
 
-    /// <summary>
-    /// 撤消订单
-    /// </summary>
-    /// <param name="order_id">订单ID</param>
-    /// <returns>orderbook变更</returns>
-    public BaseOrderBook CancelOrder(List<string> order_id)
-    {
 
-        BaseOrderBook orderBook = new BaseOrderBook();
-        // if (this.market_bid.Exists(P => P.id == order_id))
-        // {
-        //     this.market_bid.RemoveAll(P => P.id == order_id);
-        // }
-        // else if (this.market_ask.Exists(P => P.id == order_id))
-        // {
-        //     this.market_ask.RemoveAll(P => P.id == order_id);
-        // }
-        // else if (this.fixed_bid.Exists(P => P.id == order_id))
-        // {
-        //     Order? order = this.fixed_bid.FirstOrDefault();
-        //     this.fixed_bid.RemoveAll(P => P.id == order_id);
-        //     if (order != null)
-        //     {
-        //         OrderBook? orderBook_bid = bid.FirstOrDefault(P => P.price == order.price);
-        //         if (orderBook_bid != null)
-        //         {
-        //             orderBook_bid.amount -= order.amount_unsold;
-        //             orderBook_bid.count -= 1;
-        //             orderBook_bid.last_time = DateTimeOffset.UtcNow;
-        //             orderBook.name = order.name;
-        //             orderBook.price = order.price;
-        //             orderBook.amount = orderBook_bid.amount;
-        //             orderBook.count = orderBook_bid.count;
-        //             orderBook.last_time = orderBook_bid.last_time;
-        //             orderBook.direction = orderBook_bid.direction;
-        //         }
-        //     }
-        // }
-        // else if (this.fixed_ask.Exists(P => P.id == order_id))
-        // {
-        //     Order? order = this.fixed_ask.FirstOrDefault();
-        //     this.fixed_ask.RemoveAll(P => P.id == order_id);
-        //     if (order != null)
-        //     {
-        //         OrderBook? orderBook_ask = ask.FirstOrDefault(P => P.price == order.price);
-        //         if (orderBook_ask != null)
-        //         {
-        //             orderBook_ask.amount -= order.amount_unsold;
-        //             orderBook_ask.count -= 1;
-        //             orderBook_ask.last_time = DateTimeOffset.UtcNow;
-        //             orderBook.name = order.name;
-        //             orderBook.price = order.price;
-        //             orderBook.amount = orderBook_ask.amount;
-        //             orderBook.count = orderBook_ask.count;
-        //             orderBook.last_time = orderBook_ask.last_time;
-        //             orderBook.direction = orderBook_ask.direction;
-        //         }
-        //     }
-        // }
-        return orderBook;
-    }
 
 
     /// <summary>
@@ -309,45 +267,67 @@ public class Core
     /// </summary>
     /// <param name="deals">成交记录</param>
     /// <returns>当前一分钟K线</returns>
-    public BaseKline? SetKlink(List<MatchDeal> deals)
+    public List<Kline> SetKlink(List<MatchDeal> deals)
     {
-        if (deals == null || deals.Count == 0)
+        List<Kline> klines = new List<Kline>();
+        foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
         {
-            return null;
-        }
-        IEnumerable<IGrouping<double, MatchDeal>> deals_minutes = deals.GroupBy(P => (DateTimeOffset.UtcNow - P.time).TotalMinutes);
-        foreach (var item in deals_minutes)
-        {
-            List<MatchDeal> deal = item.ToList();
-            if (deal == null || deal.Count == 0)
+            BaseKline kline = null!;
+            RedisValue redisValue = FactoryMatching.instance.constant.redis.HashGet(string.Format(KlineService.instance.redis_key_klineing, this.model.info.market), cycle.ToString());
+            if (redisValue.IsNull)
             {
-                return null;
+                kline = new BaseKline();
+                kline.market = this.model.info.market;
+                kline.type = cycle;
+                kline.amount = 0;
+                kline.count = 0;
+                kline.total = 0;
+                kline.open = 0;
+                kline.close = 0;
+                kline.low = 0;
+                kline.high = 0;
+                kline.time_start = DateTimeOffset.UtcNow;
+                kline.time_end = DateTimeOffset.UtcNow;
+                kline.time = DateTimeOffset.UtcNow;
             }
-            // if (kline_minute.minute != minute)
+            else
             {
-                kline_minute.amount = deal.Sum(P => P.amount);
-                kline_minute.count = 1;
-                kline_minute.total = deal.Sum(P => P.amount * P.price);
-                kline_minute.open = deal[0].price;
-                kline_minute.close = deal[deal.Count - 1].price;
-                kline_minute.low = deal.Min(P => P.price);
-                kline_minute.high = deal.Max(P => P.price);
-                // kline_minute.time_start = now.AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond);
-                kline_minute.time_end = deal[deal.Count - 1].time;
-                // kline_minute.minute = 1;
-            }
-            // else
-            {
-                kline_minute.amount += deal.Sum(P => P.amount);
-                kline_minute.count += 1;
-                kline_minute.total += deal.Sum(P => P.amount * P.price);
-                kline_minute.close = deal[deal.Count - 1].price;
-                kline_minute.low = deal.Min(P => P.price);
-                kline_minute.high = deal.Max(P => P.price);
-                kline_minute.time_end = deal[deal.Count - 1].time;
+
             }
         }
-        return kline_minute;
+        // IEnumerable<IGrouping<double, MatchDeal>> deals_minutes = deals.GroupBy(P => (DateTimeOffset.UtcNow - P.time).TotalMinutes);
+        // foreach (var item in deals_minutes)
+        // {
+        //     List<MatchDeal> deal = item.ToList();
+        //     if (deal == null || deal.Count == 0)
+        //     {
+        //         return null;
+        //     }
+        //     // if (kline_minute.minute != minute)
+        //     {
+        //         kline_minute.amount = deal.Sum(P => P.amount);
+        //         kline_minute.count = 1;
+        //         kline_minute.total = deal.Sum(P => P.amount * P.price);
+        //         kline_minute.open = deal[0].price;
+        //         kline_minute.close = deal[deal.Count - 1].price;
+        //         kline_minute.low = deal.Min(P => P.price);
+        //         kline_minute.high = deal.Max(P => P.price);
+        //         // kline_minute.time_start = now.AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond);
+        //         kline_minute.time_end = deal[deal.Count - 1].time;
+        //         // kline_minute.minute = 1;
+        //     }
+        //     // else
+        //     {
+        //         kline_minute.amount += deal.Sum(P => P.amount);
+        //         kline_minute.count += 1;
+        //         kline_minute.total += deal.Sum(P => P.amount * P.price);
+        //         kline_minute.close = deal[deal.Count - 1].price;
+        //         kline_minute.low = deal.Min(P => P.price);
+        //         kline_minute.high = deal.Max(P => P.price);
+        //         kline_minute.time_end = deal[deal.Count - 1].time;
+        //     }
+        // }
+        return klines;
     }
 
 }

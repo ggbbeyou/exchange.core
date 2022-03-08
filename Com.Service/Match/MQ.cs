@@ -61,6 +61,24 @@ public class MQ
     /// </summary>
     /// <returns></returns>
     private Mutex mutex = new Mutex(false);
+    /// <summary>
+    /// 临时变量
+    /// </summary>
+    /// <typeparam name="MatchDeal"></typeparam>
+    /// <returns></returns>
+    private List<MatchDeal> deal = new List<MatchDeal>();
+    /// <summary>
+    /// 临时变量
+    /// </summary>
+    /// <typeparam name="MatchOrder"></typeparam>
+    /// <returns></returns>
+    private List<MatchOrder> cancel_deal = new List<MatchOrder>();
+    /// <summary>
+    /// 临时变量
+    /// </summary>
+    /// <typeparam name="MatchOrder"></typeparam>
+    /// <returns></returns>
+    private List<MatchOrder> cancel = new List<MatchOrder>();
 
     /// <summary>
     /// 初始化
@@ -74,8 +92,8 @@ public class MQ
         FactoryMatching.instance.constant.i_model.ExchangeDeclare(exchange: this.key_order_cancel, type: ExchangeType.Direct, durable: true, autoDelete: false, arguments: null);
         FactoryMatching.instance.constant.i_model.ExchangeDeclare(exchange: this.key_order_send, type: ExchangeType.Direct, durable: true, autoDelete: false, arguments: null);
         FactoryMatching.instance.constant.i_model.ExchangeDeclare(exchange: this.key_order_cancel_success, type: ExchangeType.Direct, durable: true, autoDelete: false, arguments: null);
-        OrderReceive();
         OrderCancel();
+        OrderReceive();
     }
 
     /// <summary>
@@ -98,19 +116,29 @@ public class MQ
                 Req<List<MatchOrder>>? req = JsonConvert.DeserializeObject<Req<List<MatchOrder>>>(json);
                 if (req != null && req.op == E_Op.place && req.data != null && req.data.Count > 0)
                 {
+                    deal.Clear();
+                    cancel_deal.Clear();
                     foreach (MatchOrder item in req.data)
                     {
                         this.mutex.WaitOne();
                         (List<MatchDeal> deal, List<MatchOrder> cancel) deals = this.model.match_core.Match(item);
+                        this.mutex.ReleaseMutex();
                         if (deals.deal != null && deals.deal.Count > 0)
                         {
-                            FactoryMatching.instance.constant.i_model.BasicPublish(exchange: this.key_deal, routingKey: this.model.info.market, basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(deals.deal)));
+                            deal.AddRange(deals.deal);
                         }
                         if (deals.cancel != null && deals.cancel.Count > 0)
                         {
-                            FactoryMatching.instance.constant.i_model.BasicPublish(exchange: this.key_order_cancel_success, routingKey: this.model.info.market, basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(deals.cancel)));
+                            cancel_deal.AddRange(deals.cancel);
                         }
-                        this.mutex.ReleaseMutex();
+                    }
+                    if (deal.Count() > 0)
+                    {
+                        FactoryMatching.instance.constant.i_model.BasicPublish(exchange: this.key_deal, routingKey: this.model.info.market, basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(deal)));
+                    }
+                    if (cancel_deal.Count > 0)
+                    {
+                        FactoryMatching.instance.constant.i_model.BasicPublish(exchange: this.key_order_cancel_success, routingKey: this.model.info.market, basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(cancel_deal)));
                     }
                 };
                 FactoryMatching.instance.constant.i_model.BasicAck(ea.DeliveryTag, true);
@@ -139,8 +167,8 @@ public class MQ
                 Req<List<long>>? req = JsonConvert.DeserializeObject<Req<List<long>>>(json);
                 if (req != null && req.op == E_Op.place && req.data != null)
                 {
+                    cancel.Clear();
                     this.mutex.WaitOne();
-                    List<MatchOrder> cancel = new List<MatchOrder>();
                     if (req.op == E_Op.cancel_by_id)
                     {
                         cancel.AddRange(this.model.match_core.CancelOrder(req.data));
@@ -157,11 +185,11 @@ public class MQ
                     {
                         cancel.AddRange(this.model.match_core.CancelOrder());
                     }
+                    this.mutex.ReleaseMutex();
                     if (cancel.Count > 0)
                     {
                         FactoryMatching.instance.constant.i_model.BasicPublish(exchange: this.key_order_cancel_success, routingKey: this.model.info.market, basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(cancel)));
                     }
-                    this.mutex.ReleaseMutex();
                 }
                 FactoryMatching.instance.constant.i_model.BasicAck(ea.DeliveryTag, false);
             }

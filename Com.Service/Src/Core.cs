@@ -116,14 +116,8 @@ public class Core
     {
         MatchDeal? deal = deals.FirstOrDefault();
         MatchOrder order = deal!.trigger_side == E_OrderSide.buy ? deal.bid : deal.ask;
-        List<BaseOrderBook> orderBooks = GetOrderBooks(order, deals);
-        // this.mq.SendOrderBook(orderBooks);
-        BaseKline? kline = SetKlink(deals);
-        // this.mq.SendKline(kline);
-        // foreach (var item in deal)
-        // {
-            
-        // }
+        List<BaseOrderBook> orderBooks = GetOrderBooks(order, deals);     
+        BaseKline? kline = SetKlink(deals);     
     }
 
     /// <summary>

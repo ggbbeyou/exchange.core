@@ -17,7 +17,7 @@ public class OrderController : Controller
     public async Task<IActionResult> PlaceOrder(string market, List<PlaceOrder> order)
     {
         WebCallResult<string> result = new WebCallResult<string>();
-
+        
         return Json(result);
     }
 

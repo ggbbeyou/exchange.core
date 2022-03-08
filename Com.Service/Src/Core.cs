@@ -35,6 +35,11 @@ public class Core
     /// </summary>
     /// <returns></returns>
     public BaseKline kline_minute = null!;
+    /// <summary>
+    /// redis zset  depth:{market}:{bid/ask}
+    /// </summary>
+    /// <value></value>
+    public string key_redis_depth = "depth:{0}:{1}";
 
     /// <summary>
     /// 初始化
@@ -67,7 +72,7 @@ public class Core
             {
                 string json = Encoding.UTF8.GetString(ea.Body.ToArray());
                 FactoryMatching.instance.constant.logger.LogInformation($"接收撮合传过来的成交订单:{json}");
-                List<MatchDeal>? deals = JsonConvert.DeserializeObject<List<MatchDeal>>(json);
+                List<(MatchOrder order, List<MatchDeal> deal)>? deals = JsonConvert.DeserializeObject<List<(MatchOrder order, List<MatchDeal> deal)>>(json);
                 if (deals != null && deals.Count > 0)
                 {
                     ReceiveDealOrder(deals);
@@ -112,12 +117,18 @@ public class Core
     /// 接收到成交订单
     /// </summary>
     /// <param name="deals"></param>
-    private void ReceiveDealOrder(List<MatchDeal> deals)
+    private void ReceiveDealOrder(List<(MatchOrder order, List<MatchDeal> deal)> match)
     {
-        MatchDeal? deal = deals.FirstOrDefault();
-        MatchOrder order = deal!.trigger_side == E_OrderSide.buy ? deal.bid : deal.ask;
-        List<BaseOrderBook> orderBooks = GetOrderBooks(order, deals);     
-        BaseKline? kline = SetKlink(deals);     
+        foreach ((MatchOrder order, List<MatchDeal> deal) item in match)
+        {
+            if (item.deal.Count == 0)
+            {
+
+                continue;
+            }
+            List<BaseOrderBook> orderBooks = GetOrderBooks(item.order, item.deal);
+            BaseKline? kline = SetKlink(item.deal);
+        }
     }
 
     /// <summary>
@@ -136,96 +147,98 @@ public class Core
         // }
     }
 
+    #region Depth
+
     /// <summary>
-    /// 获取有变量的orderbook(增量)
+    /// 
     /// </summary>
-    /// <param name="order">订单</param>
-    /// <param name="deals">成交记录</param>
-    /// <returns>变更的orderbook</returns>
+    /// <param name="order">触发单</param>
+    /// <param name="deals">成交单</param>
+    /// <returns></returns>
     public List<BaseOrderBook> GetOrderBooks(MatchOrder order, List<MatchDeal> deals)
     {
-        List<BaseOrderBook> orderBooks = new List<BaseOrderBook>();
-        if (order == null || deals == null || deals.Count == 0)
+        List<BaseOrderBook> depth = new List<BaseOrderBook>();
+        if (order.type == E_OrderType.price_fixed)
         {
-            return orderBooks;
+            depth.Add(UpdateOrderBook(order.side, (double)order.price, order.amount, order.deal_last_time ?? DateTimeOffset.UtcNow, true));
         }
-        decimal amount_deal = deals.Sum(P => P.amount);
-        BaseOrderBook? orderBook;
-        if (order.type == E_OrderType.price_fixed && order.amount > amount_deal)
+        foreach (MatchDeal item in deals)
         {
-            //未完全成交,增加或修改orderBook
-            if (order.side == E_OrderSide.buy)
+            MatchOrder opponent = order.side == E_OrderSide.buy ? item.ask : item.bid;
+            if (opponent.type == E_OrderType.price_fixed)
             {
-                orderBook = this.bid.FirstOrDefault(P => P.price == order.price);
-                if (orderBook == null)
-                {
-                    orderBook = new BaseOrderBook()
-                    {
-                        market = this.model.info.market,
-                        price = order.price,
-                        amount = 0,
-                        count = 0,
-                        last_time = DateTimeOffset.UtcNow,
-                        direction = E_OrderSide.buy,
-                    };
-                    this.bid.Add(orderBook);
-                }
-                orderBook.amount += (order.amount - amount_deal);
-                orderBook.count += 1;
-                orderBook.last_time = DateTimeOffset.UtcNow;
-                orderBooks.Add(orderBook);
-                var fixed_ask = deals.Where(P => P.ask.type == E_OrderType.price_fixed).GroupBy(P => P.price).Select(P => new { price = P.Key, amount = P.Sum(T => T.amount), complet_count = P.Count(T => T.ask.state == E_OrderState.completed) }).ToList();
-                foreach (var item in fixed_ask)
-                {
-                    BaseOrderBook? orderBook_ask = this.ask.FirstOrDefault(P => P.price == item.price);
-                    if (orderBook_ask != null)
-                    {
-                        orderBook_ask.amount -= item.amount;
-                        orderBook_ask.count -= item.complet_count;
-                        orderBook_ask.last_time = DateTimeOffset.UtcNow;
-                        orderBooks.Add(orderBook_ask);
-                    }
-                    this.ask.RemoveAll(P => P.amount <= 0);
-                }
-            }
-            else if (order.side == E_OrderSide.sell)
-            {
-                orderBook = this.ask.FirstOrDefault(P => P.price == order.price);
-                if (orderBook == null)
-                {
-                    orderBook = new BaseOrderBook()
-                    {
-                        market = this.model.info.market,
-                        price = order.price,
-                        amount = 0,
-                        count = 0,
-                        last_time = DateTimeOffset.UtcNow,
-                        direction = E_OrderSide.sell,
-                    };
-                    this.ask.Add(orderBook);
-                }
-                orderBook.amount += (order.amount - amount_deal);
-                orderBook.count += 1;
-                orderBook.last_time = DateTimeOffset.UtcNow;
-                orderBooks.Add(orderBook);
-                //对手方，则减少orderBook
-                var fixed_bid = deals.Where(P => P.bid.type == E_OrderType.price_fixed).GroupBy(P => P.price).Select(P => new { price = P.Key, amount = P.Sum(T => T.amount), complet_count = P.Count(T => T.bid.state == E_OrderState.completed) }).ToList();
-                foreach (var item in fixed_bid)
-                {
-                    BaseOrderBook? orderBook_bid = this.bid.FirstOrDefault(P => P.price == item.price);
-                    if (orderBook_bid != null)
-                    {
-                        orderBook_bid.amount -= item.amount;
-                        orderBook_bid.count -= item.complet_count;
-                        orderBook_bid.last_time = DateTimeOffset.UtcNow;
-                        orderBooks.Add(orderBook_bid);
-                    }
-                    this.bid.RemoveAll(P => P.amount <= 0);
-                }
+                depth.Add(UpdateOrderBook(opponent.side, (double)opponent.price, opponent.amount, item.time, false));
             }
         }
-        return orderBooks;
+        return depth;
     }
+
+    /// <summary>
+    /// 更新Depth
+    /// </summary>
+    /// <param name="side"></param>
+    /// <param name="price"></param>
+    /// <param name="amount"></param>
+    /// <param name="is_add"></param>
+    /// <returns></returns>
+    public BaseOrderBook UpdateOrderBook(E_OrderSide side, double price, decimal amount, DateTimeOffset deal_time, bool is_add)
+    {
+        string key = string.Format(this.key_redis_depth, this.model.info.market, side.ToString());
+        BaseOrderBook orderBook = new BaseOrderBook();
+        StackExchange.Redis.RedisValue[] redisValues = FactoryMatching.instance.constant.redis.SortedSetRangeByScore(key, price);
+        if (redisValues.Count() == 0)
+        {
+            orderBook.market = this.model.info.market;
+            orderBook.price = (decimal)price;
+            orderBook.amount = amount;
+            orderBook.count = 1;
+            orderBook.direction = side;
+            orderBook.last_time = deal_time;
+            FactoryMatching.instance.constant.redis.SortedSetAdd(key, JsonConvert.SerializeObject(orderBook), price);
+        }
+        else
+        {
+            BaseOrderBook? temp = JsonConvert.DeserializeObject<BaseOrderBook>(redisValues.First());
+            if (temp == null)
+            {
+                orderBook.market = this.model.info.market;
+                orderBook.price = (decimal)price;
+                orderBook.amount = amount;
+                orderBook.count = 1;
+                orderBook.direction = side;
+                orderBook.last_time = deal_time;
+            }
+            else
+            {
+                orderBook.amount += temp.amount + amount;
+                orderBook.count = is_add ? temp.count + 1 : temp.count;
+                orderBook.last_time = deal_time;
+            }
+            FactoryMatching.instance.constant.redis.SortedSetAdd(key, JsonConvert.SerializeObject(orderBook), price);
+        }
+        return orderBook!;
+    }
+
+    /// <summary>
+    /// 深度往消息队列推送
+    /// </summary>
+    /// <param name="depth"></param>
+    private void PullDepth(List<BaseOrderBook> depth)
+    {
+        if (depth.Count == 0)
+        {
+            return;
+        }
+
+
+        string json = JsonConvert.SerializeObject(depth);
+        FactoryMatching.instance.constant.logger.LogInformation($"推送深度:{json}");
+        FactoryMatching.instance.constant.i_model.BasicPublish(exchange: "", routingKey: this.model.info.market, basicProperties: null, body: Encoding.UTF8.GetBytes(json));
+    }
+
+
+    #endregion
+
 
 
     /// <summary>

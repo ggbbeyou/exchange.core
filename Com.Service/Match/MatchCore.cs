@@ -181,13 +181,13 @@ public class MatchCore
     /// </summary>
     /// <param name="order">挂单订单(手续费问题在推送到撮合之前扣除)</param>
     /// <returns>成交情况</returns>
-    public (List<MatchDeal> deal, List<MatchOrder> cancel) Match(MatchOrder order)
+    public (MatchOrder? order, List<MatchDeal> deal, List<MatchOrder> cancel) Match(MatchOrder order)
     {
         List<MatchDeal> deals = new List<MatchDeal>();
         List<MatchOrder> cancel = new List<MatchOrder>();
         if (order.market != this.model.info.market || order.amount <= 0 || order.amount_unsold <= 0)
         {
-            return (deals, cancel);
+            return (null, deals, cancel);
         }
         DateTimeOffset now = DateTimeOffset.UtcNow;
         if (order.side == E_OrderSide.buy)
@@ -519,7 +519,7 @@ public class MatchCore
             ask.ForEach(P => { P.state = E_OrderState.cancel; P.deal_last_time = DateTimeOffset.UtcNow; P.remarks = "市价卖单已低于触发价,自动撤单"; });
             cancel.AddRange(ask);
         }
-        return (deals, cancel);
+        return (order, deals, cancel);
     }
 
 }

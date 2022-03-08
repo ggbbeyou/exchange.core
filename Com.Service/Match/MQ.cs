@@ -66,7 +66,7 @@ public class MQ
     /// </summary>
     /// <typeparam name="MatchDeal"></typeparam>
     /// <returns></returns>
-    private List<MatchDeal> deal = new List<MatchDeal>();
+    private List<(MatchOrder order, List<MatchDeal> deal)> deal = new List<(MatchOrder order, List<MatchDeal> deal)>();
     /// <summary>
     /// 临时变量
     /// </summary>
@@ -121,15 +121,16 @@ public class MQ
                     foreach (MatchOrder item in req.data)
                     {
                         this.mutex.WaitOne();
-                        (List<MatchDeal> deal, List<MatchOrder> cancel) deals = this.model.match_core.Match(item);
+                        (MatchOrder? order, List<MatchDeal> deal, List<MatchOrder> cancel) match = this.model.match_core.Match(item);
                         this.mutex.ReleaseMutex();
-                        if (deals.deal != null && deals.deal.Count > 0)
+                        if (match.order == null)
                         {
-                            deal.AddRange(deals.deal);
+                            continue;
                         }
-                        if (deals.cancel != null && deals.cancel.Count > 0)
+                        deal.Add((match.order, match.deal));
+                        if (match.cancel.Count > 0)
                         {
-                            cancel_deal.AddRange(deals.cancel);
+                            cancel_deal.AddRange(match.cancel);
                         }
                     }
                     if (deal.Count() > 0)

@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Com.Api.Models;
+using Com.Api.Model;
 
 namespace Com.Api.Controllers;
 
@@ -11,6 +12,13 @@ public class OrderController : Controller
     public OrderController(ILogger<HomeController> logger)
     {
         _logger = logger;
+    }
+
+    public async Task<IActionResult> PlaceOrder(string market, List<PlaceOrder> order)
+    {
+        WebCallResult<string> result = new WebCallResult<string>();
+
+        return Json(result);
     }
 
 

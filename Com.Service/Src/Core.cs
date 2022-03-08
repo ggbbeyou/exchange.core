@@ -68,21 +68,11 @@ public class Core
                 string json = Encoding.UTF8.GetString(ea.Body.ToArray());
                 FactoryMatching.instance.constant.logger.LogInformation($"接收撮合传过来的成交订单:{json}");
                 List<MatchDeal>? deals = JsonConvert.DeserializeObject<List<MatchDeal>>(json);
-                if (deals != null)
+                if (deals != null && deals.Count > 0)
                 {
-
-                    MatchDeal? deal = deals.FirstOrDefault();
-                    MatchOrder order = deal!.trigger_side == E_OrderSide.buy ? deal.bid : deal.ask;
-                    List<BaseOrderBook> orderBooks = GetOrderBooks(order, deals);
-                    // this.mq.SendOrderBook(orderBooks);
-                    BaseKline? kline = SetKlink(deals);
-                    // this.mq.SendKline(kline);
-                    // foreach (var item in deal)
-                    // {
-
-                    // }
-                    FactoryMatching.instance.constant.i_model.BasicAck(ea.DeliveryTag, true);
+                    ReceiveDealOrder(deals);
                 }
+                FactoryMatching.instance.constant.i_model.BasicAck(ea.DeliveryTag, true);
             }
         };
         FactoryMatching.instance.constant.i_model.BasicConsume(queue: queueName, autoAck: false, consumer: consumer);
@@ -107,24 +97,50 @@ public class Core
             {
                 string json = Encoding.UTF8.GetString(ea.Body.ToArray());
                 FactoryMatching.instance.constant.logger.LogInformation($"接收撮合传过来的取消订单:{json}");
-                List<string>? deals = JsonConvert.DeserializeObject<List<string>>(json);
-                if (deals != null)
+                List<MatchOrder>? deals = JsonConvert.DeserializeObject<List<MatchOrder>>(json);
+                if (deals != null && deals.Count > 0)
                 {
-                    // List<OrderBook> orderBooks = GetOrderBooks(null, deals);
-                    // this.mq.SendOrderBook(orderBooks);
-                    // Kline? kline = SetKlink(deals);
-                    // this.mq.SendKline(kline);
-                    // foreach (var item in deal)
-                    // {
-
-                    // }
-                    FactoryMatching.instance.constant.i_model.BasicAck(ea.DeliveryTag, true);
+                    ReceiveCancelOrder(deals);
                 }
+                FactoryMatching.instance.constant.i_model.BasicAck(ea.DeliveryTag, true);
             }
         };
         FactoryMatching.instance.constant.i_model.BasicConsume(queue: queueName, autoAck: false, consumer: consumer);
     }
 
+    /// <summary>
+    /// 接收到成交订单
+    /// </summary>
+    /// <param name="deals"></param>
+    private void ReceiveDealOrder(List<MatchDeal> deals)
+    {
+        MatchDeal? deal = deals.FirstOrDefault();
+        MatchOrder order = deal!.trigger_side == E_OrderSide.buy ? deal.bid : deal.ask;
+        List<BaseOrderBook> orderBooks = GetOrderBooks(order, deals);
+        // this.mq.SendOrderBook(orderBooks);
+        BaseKline? kline = SetKlink(deals);
+        // this.mq.SendKline(kline);
+        // foreach (var item in deal)
+        // {
+            
+        // }
+    }
+
+    /// <summary>
+    /// 接收到取消订单
+    /// </summary>
+    /// <param name="cancel"></param>
+    private void ReceiveCancelOrder(List<MatchOrder> cancel)
+    {
+        // List<OrderBook> orderBooks = GetOrderBooks(null, deals);
+        // this.mq.SendOrderBook(orderBooks);
+        // Kline? kline = SetKlink(deals);
+        // this.mq.SendKline(kline);
+        // foreach (var item in deal)
+        // {
+
+        // }
+    }
 
     /// <summary>
     /// 获取有变量的orderbook(增量)

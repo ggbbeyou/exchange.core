@@ -158,16 +158,16 @@ public class Core
     public List<BaseOrderBook> GetOrderBooks(MatchOrder order, List<MatchDeal> deals)
     {
         List<BaseOrderBook> depth = new List<BaseOrderBook>();
-        if (order.type == E_OrderType.price_fixed)
+        if (order.type == E_OrderType.price_fixed && order.amount_unsold > 0)
         {
-            depth.Add(UpdateOrderBook(order.side, (double)order.price, order.amount, order.deal_last_time ?? DateTimeOffset.UtcNow, true));
+            depth.Add(UpdateOrderBook(order.side, (double)order.price, order.amount_unsold, order.deal_last_time ?? DateTimeOffset.UtcNow, true));
         }
         foreach (MatchDeal item in deals)
         {
             MatchOrder opponent = order.side == E_OrderSide.buy ? item.ask : item.bid;
             if (opponent.type == E_OrderType.price_fixed)
             {
-                depth.Add(UpdateOrderBook(opponent.side, (double)opponent.price, opponent.amount, item.time, false));
+                depth.Add(UpdateOrderBook(opponent.side, (double)opponent.price, item.amount, item.time, false));
             }
         }
         return depth;

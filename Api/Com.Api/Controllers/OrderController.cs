@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Com.Api.Models;
 using Com.Api.Model;
+using Com.Bll;
+using Com.Model;
 
 namespace Com.Api.Controllers;
 
@@ -14,10 +16,17 @@ public class OrderController : Controller
         _logger = logger;
     }
 
-    public async Task<IActionResult> PlaceOrder(string market, List<PlaceOrder> order)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="market"></param>
+    /// <param name="orders"></param>
+    /// <returns></returns>
+    public async Task<IActionResult> PlaceOrder(string market, List<PlaceOrder> orders)
     {
-        WebCallResult<string> result = new WebCallResult<string>();
-        
+        WebCallResult<List<BaseOrder>> result = new WebCallResult<List<BaseOrder>>();
+        List<BaseOrder> order = new List<BaseOrder>();
+        result.data = await OrderService.instance.PlaceOrder(market, 1, order);
         return Json(result);
     }
 

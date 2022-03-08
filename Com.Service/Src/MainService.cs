@@ -1,8 +1,10 @@
 using Com.Common;
+using GrpcExchange;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Grpc.Core;
 
 namespace Com.Service;
 
@@ -26,7 +28,7 @@ public class MainService : BackgroundService
     public MainService(IServiceProvider provider, IConfiguration configuration, IHostEnvironment environment, ILogger<MainService> logger)
     {
         this.constant = new FactoryConstant(provider, configuration, environment, logger);
-        // FactoryMatching.instance.Init(this.constant);
+        FactoryMatching.instance.Init(this.constant);
     }
 
     /// <summary>
@@ -39,6 +41,12 @@ public class MainService : BackgroundService
         this.constant.logger.LogInformation("准备启动业务后台服务");
         try
         {
+            Grpc.Core.Server server = new Grpc.Core.Server
+            {
+                Services = { ExchangeService.BindService(new GreeterImpl()) },
+                Ports = { new ServerPort("127.0.0.1", 8080, ServerCredentials.Insecure) }
+            };
+            server.Start();
             this.constant.logger.LogInformation("启动业务后台服务成功");
         }
         catch (Exception ex)

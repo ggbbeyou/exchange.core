@@ -16,23 +16,6 @@ namespace Com.Service;
 /// </summary>
 public class GreeterImpl : ExchangeService.ExchangeServiceBase
 {
-    /// <summary>
-    /// 常用接口
-    /// </summary>
-    public FactoryConstant constant = null!;
-
-    /// <summary>
-    /// 初始化
-    /// </summary>
-    /// <param name="configuration">配置接口</param>
-    /// <param name="environment">环境接口</param>
-    /// <param name="provider">驱动</param>
-    /// <param name="logger">日志接口</param>
-    public GreeterImpl(IServiceProvider provider, IConfiguration configuration, IHostEnvironment environment, ILogger<MainService> logger)
-    {
-        this.constant = new FactoryConstant(provider, configuration, environment, logger);
-        FactoryMatching.instance.Init(this.constant);
-    }
 
     /// <summary>
     /// 一元方法

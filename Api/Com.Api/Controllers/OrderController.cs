@@ -61,7 +61,7 @@ public class OrderController : Controller
         Res<List<MatchOrder>> res = OrderService.instance.PlaceOrder(market, matchOrders);
         WebCallResult<List<BaseOrder>> result = new WebCallResult<List<BaseOrder>>();
         result.success = true;
-        result.code = 200;
+        result.code = 0;
         result.message = res.message;
         result.data = new List<BaseOrder>();
         foreach (var item in res.data)

@@ -15,6 +15,7 @@ public class WebCallResult<T>
     public bool success { get; set; }
     /// <summary>
     /// 返回编码
+    /// 0:成功
     /// </summary>
     /// <value></value>
     public int code { get; set; }

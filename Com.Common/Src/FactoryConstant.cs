@@ -37,6 +37,11 @@ public class FactoryConstant
     /// <returns></returns>
     public readonly IdWorker worker = new IdWorker(1, 1);
     /// <summary>
+    /// 随机数
+    /// </summary>
+    /// <returns></returns>
+    public readonly Random random = new Random();
+    /// <summary>
     /// 驱动接口
     /// </summary>
     public readonly IServiceProvider provider = null!;

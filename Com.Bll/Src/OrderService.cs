@@ -51,6 +51,7 @@ public class OrderService
     {
         this.constant = constant;
         this.props = constant.i_model.CreateBasicProperties();
+        this.props.DeliveryMode = 2;
     }
 
 

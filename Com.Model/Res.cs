@@ -32,7 +32,7 @@ public class Res<T>
     /// 响应消息
     /// </summary>
     /// <value></value>
-    public string message { get; set; } = null!;
+    public string? message { get; set; } = null;
     /// <summary>
     /// 数据
     /// </summary>

@@ -61,35 +61,21 @@ public class OrderService
     /// <param name="uid">用户id</param>
     /// <param name="order">订单列表</param>
     /// <returns></returns>
-    public List<MatchOrder> PlaceOrder(string market, long uid, List<PlaceOrder> order)
+    public Res<List<MatchOrder>> PlaceOrder(string market, List<MatchOrder> order)
     {
         Req<List<MatchOrder>> req = new Req<List<MatchOrder>>();
         req.op = E_Op.place;
         req.market = market;
-        req.data = new List<MatchOrder>();
-        foreach (var item in order)
-        {
-            MatchOrder orderResult = new MatchOrder();
-            orderResult.order_id = this.constant.worker.NextId();
-            orderResult.client_id = item.client_id;
-            orderResult.market = market;
-            orderResult.uid = uid;
-            orderResult.price = item.price ?? 0;
-            orderResult.amount = item.amount;
-            orderResult.total = item.price ?? 0 * item.amount;
-            orderResult.create_time = DateTimeOffset.UtcNow;
-            orderResult.amount_unsold = 0;
-            orderResult.amount_done = item.amount;
-            orderResult.deal_last_time = null;
-            orderResult.side = item.side;
-            orderResult.state = E_OrderState.unsold;
-            orderResult.type = item.type;
-            orderResult.data = null;
-            orderResult.remarks = null;
-            req.data.Add(orderResult);
-        }
+        req.data = order;
         this.constant.i_model.BasicPublish(exchange: this.key_order_send, routingKey: market, basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(req)));
-        return req.data;
+        Res<List<MatchOrder>> res = new Res<List<MatchOrder>>();
+        res.op = E_Op.place;
+        res.success = true;
+        res.code = E_Res_Code.ok;
+        res.market = market;
+        res.message = null;
+        res.data = order;
+        return res;
     }
 
 }

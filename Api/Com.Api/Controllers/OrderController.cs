@@ -4,16 +4,28 @@ using Com.Api.Models;
 using Com.Api.Model;
 using Com.Bll;
 using Com.Model;
+using Com.Common;
+using Com.Model.Enum;
 
 namespace Com.Api.Controllers;
 
 public class OrderController : Controller
 {
-    private readonly ILogger<HomeController> _logger;
+    /// <summary>
+    /// 常用接口
+    /// </summary>
+    private FactoryConstant constant = null!;
 
-    public OrderController(ILogger<HomeController> logger)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="configuration"></param>
+    /// <param name="environment"></param>
+    /// <param name="provider"></param>
+    /// <param name="logger"></param>
+    public OrderController(IServiceProvider provider, IConfiguration configuration, IHostEnvironment environment, ILogger<OrderController> logger)
     {
-        _logger = logger;
+        this.constant = new FactoryConstant(provider, configuration, environment, logger);
     }
 
     /// <summary>
@@ -22,11 +34,40 @@ public class OrderController : Controller
     /// <param name="market"></param>
     /// <param name="orders"></param>
     /// <returns></returns>
-    public async Task<IActionResult> PlaceOrder(string market, List<PlaceOrder> orders)
+    public IActionResult PlaceOrder(string market, List<PlaceOrder> orders)
     {
+        List<MatchOrder> matchOrders = new List<MatchOrder>();
+        foreach (var item in orders)
+        {
+            MatchOrder orderResult = new MatchOrder();
+            orderResult.order_id = this.constant.worker.NextId();
+            orderResult.client_id = item.client_id;
+            orderResult.market = market;
+            orderResult.uid = 1;
+            orderResult.price = item.price ?? 0;
+            orderResult.amount = item.amount;
+            orderResult.total = item.price ?? 0 * item.amount;
+            orderResult.create_time = DateTimeOffset.UtcNow;
+            orderResult.amount_unsold = 0;
+            orderResult.amount_done = item.amount;
+            orderResult.deal_last_time = null;
+            orderResult.side = item.side;
+            orderResult.state = E_OrderState.unsold;
+            orderResult.type = item.type;
+            orderResult.data = null;
+            orderResult.remarks = null;
+            matchOrders.Add(orderResult);
+        }
+        Res<List<MatchOrder>> res = OrderService.instance.PlaceOrder(market, matchOrders);
         WebCallResult<List<BaseOrder>> result = new WebCallResult<List<BaseOrder>>();
-        List<BaseOrder> order = new List<BaseOrder>();
-        result.data = await OrderService.instance.PlaceOrder(market, 1, order);
+        result.success = true;
+        result.code = 200;
+        result.message = res.message;
+        result.data = new List<BaseOrder>();
+        foreach (var item in res.data)
+        {
+            result.data.Add(item);
+        }
         return Json(result);
     }
 

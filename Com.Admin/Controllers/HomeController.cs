@@ -20,7 +20,7 @@ public class HomeController : Controller
 
     public async Task<IActionResult> Index()
     {
-        GrpcChannel channel = GrpcChannel.ForAddress("http://localhost:8080");
+        GrpcChannel channel = GrpcChannel.ForAddress("http://192.168.2.5:8080");
         var client = new ExchangeService.ExchangeServiceClient(channel);
 
 
@@ -29,7 +29,7 @@ public class HomeController : Controller
         // var response = client1.CheckAsync(new HealthCheckRequest());
         // var status = response.Status;
 
-
+        // inti
         Req<string> req = new Req<string>();
         req.op = E_Op.service_init;
         req.market = "btc/usdt";
@@ -39,6 +39,17 @@ public class HomeController : Controller
         req.data = JsonConvert.SerializeObject(info);
         string json = JsonConvert.SerializeObject(req);
         var reply = await client.UnaryCallAsync(new Request { Json = json });
+
+        //start
+
+        req.op = E_Op.service_start;
+        req.market = "btc/usdt";      
+        req.data = JsonConvert.SerializeObject(info);
+        json = JsonConvert.SerializeObject(req);
+        var reply2 = await client.UnaryCallAsync(new Request { Json = json });
+
+
+
         channel.ShutdownAsync().Wait();
         _logger.LogInformation(reply.Message);
         return View();

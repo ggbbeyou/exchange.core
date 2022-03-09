@@ -4,6 +4,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Grpc.Core;
+using Com.Bll;
 
 namespace Com.Tests;
 
@@ -39,7 +40,8 @@ public class MainService : BackgroundService
         this.constant.logger.LogInformation("准备启动业务后台服务");
         try
         {
-
+            OrderService.instance.Init(this.constant);
+            Order.instance.PlaceOrder();
             this.constant.logger.LogInformation("启动业务后台服务成功");
         }
         catch (Exception ex)

@@ -15,6 +15,12 @@ namespace Com.Tests;
 /// </summary>
 public class Order
 {
+
+    /// <summary>
+    /// 单例类的实例
+    /// </summary>
+    /// <returns></returns>
+    public static readonly Order instance = new Order();
     /// <summary>
     /// 雪花算法
     /// </summary>

@@ -1,13 +1,18 @@
-using System;
-using System.Collections.Generic;
 using Com.Bll;
+using Com.Common;
 using Com.Model;
 using Com.Model.Enum;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Snowflake;
-using Xunit;
 
-namespace Com.Test;
+namespace Com.Tests;
 
+/// <summary>
+/// 网站后台服务
+/// </summary>
 public class Order
 {
     /// <summary>
@@ -17,7 +22,7 @@ public class Order
     public readonly IdWorker worker = new IdWorker(1, 1);
     public readonly Random random = new Random();
 
-    [Fact]
+
     public void PlaceOrder()
     {
         string market = "btc/usdt";
@@ -46,4 +51,5 @@ public class Order
         }
         Res<List<MatchOrder>> res = OrderService.instance.PlaceOrder(market, orders);
     }
+
 }

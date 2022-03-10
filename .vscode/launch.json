@@ -12,9 +12,9 @@
             "console": "internalConsole",
             "stopAtEntry": false,
             "env": {
-                // "DOTNET_ENVIRONMENT": "Development"
+                "DOTNET_ENVIRONMENT": "Development"
+                // "DOTNET_ENVIRONMENT": "Staging"
                 // "DOTNET_ENVIRONMENT": "Production"
-                "DOTNET_ENVIRONMENT": "Staging"
             }
         },
         {
@@ -32,6 +32,8 @@
             },
             "env": {
                 "ASPNETCORE_ENVIRONMENT": "Development"
+                // "ASPNETCORE_ENVIRONMENT": "Staging"
+                // "ASPNETCORE_ENVIRONMENT": "Production"
             },
             "sourceFileMap": {
                 "/Views": "${workspaceFolder}/Views"
@@ -52,80 +54,12 @@
             },
             "env": {
                 "ASPNETCORE_ENVIRONMENT": "Development"
+                // "ASPNETCORE_ENVIRONMENT": "Staging"
+                // "ASPNETCORE_ENVIRONMENT": "Production"
             },
             "sourceFileMap": {
                 "/Views": "${workspaceFolder}/Views"
             }
-        },
-        {
-            "name": "MarketMaking",
-            "type": "coreclr",
-            "request": "launch",
-            "preLaunchTask": "build-MarketMaking",
-            "program": "${workspaceFolder}/Com.MarketMaking/bin/Debug/net6.0/Com.MarketMaking.dll",
-            "args": [],
-            "cwd": "${workspaceFolder}/Com.MarketMaking",
-            "stopAtEntry": false,
-            "serverReadyAction": {
-                "action": "openExternally",
-                "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
-            },
-            "env": {
-                "ASPNETCORE_ENVIRONMENT": "Development"
-            },
-            "sourceFileMap": {
-                "/Views": "${workspaceFolder}/Views"
-            }
-        },
-        {
-            "name": "Web",
-            "type": "coreclr",
-            "request": "launch",
-            "preLaunchTask": "build-Web",
-            "program": "${workspaceFolder}/Com.Web/bin/Debug/net6.0/Com.Web.dll",
-            "args": [],
-            "cwd": "${workspaceFolder}/Com.Web",
-            "stopAtEntry": false,
-            "serverReadyAction": {
-                "action": "openExternally",
-                "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
-            },
-            "env": {
-                "ASPNETCORE_ENVIRONMENT": "Development"
-            },
-            "sourceFileMap": {
-                "/Views": "${workspaceFolder}/Views"
-            }
-        },
-        {
-            "name": "Matching",
-            "type": "coreclr",
-            "request": "launch",
-            "preLaunchTask": "build-Matching",
-            "program": "${workspaceFolder}/Server/Com.Matching/bin/Debug/net6.0/Com.Matching.dll",
-            "args": [],
-            "cwd": "${workspaceFolder}",
-            "console": "internalConsole",
-            "stopAtEntry": false,
-            "env": {
-                "DOTNET_ENVIRONMENT": "Development"
-            },
-        },
-        {
-            "name": "test",
-            "type": "coreclr",
-            "request": "launch",
-            "preLaunchTask": "build-test",
-            "program": "${workspaceFolder}/Com.Tests/bin/Debug/net6.0/Com.Tests.dll",
-            "args": [],
-            "cwd": "${workspaceFolder}/Com.Tests",
-            "console": "internalConsole",
-            "stopAtEntry": false,
-            "env": {
-                // "DOTNET_ENVIRONMENT": "Development"
-                // "DOTNET_ENVIRONMENT": "Production"
-                "DOTNET_ENVIRONMENT": "Staging"
-            }
-        },
+        }
     ]
 }

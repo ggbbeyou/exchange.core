@@ -16,46 +16,6 @@ namespace Com.Bll;
 public class OrderService
 {
     /// <summary>
-    /// 单例类的实例
-    /// </summary>
-    /// <returns></returns>
-    public static readonly OrderService instance = new OrderService();
-    /// <summary>
-    /// 常用接口
-    /// </summary>
-    private FactoryConstant constant = null!;
-    /// <summary>
-    /// (Direct)接收挂单订单队列名称
-    /// </summary>
-    /// <value></value>
-    public string key_order_send = "order_send";
-    /// <summary>
-    /// MQ基本属性
-    /// </summary>
-    /// <returns></returns>
-    private IBasicProperties props = null!;
-
-    /// <summary>
-    /// private构造方法
-    /// </summary>
-    private OrderService()
-    {
-
-    }
-
-    /// <summary>
-    /// 初始化方法
-    /// </summary>
-    /// <param name="constant"></param>
-    public void Init(FactoryConstant constant)
-    {
-        this.constant = constant;
-        this.props = constant.i_model.CreateBasicProperties();
-        this.props.DeliveryMode = 2;
-    }
-
-
-    /// <summary>
     /// 挂单总入口
     /// </summary>
     /// <param name="market">交易对</param>
@@ -68,7 +28,7 @@ public class OrderService
         req.op = E_Op.place;
         req.market = market;
         req.data = order;
-        this.constant.i_model.BasicPublish(exchange: this.key_order_send, routingKey: market, basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(req)));
+        FactoryService.instance.constant.i_model.BasicPublish(exchange: FactoryService.instance.GetMqOrderPlace(market), routingKey: "", basicProperties: FactoryService.instance.props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(req)));
         Res<List<MatchOrder>> res = new Res<List<MatchOrder>>();
         res.op = E_Op.place;
         res.success = true;

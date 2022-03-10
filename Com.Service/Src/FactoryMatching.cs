@@ -43,8 +43,6 @@ public class FactoryMatching
     public void Init(FactoryConstant constant)
     {
         this.constant = constant;
-        DealService.instance.Init(constant);
-        KlineService.instance.Init(constant);
     }
 
     /// <summary>
@@ -53,13 +51,13 @@ public class FactoryMatching
     public BaseMarketInfo ServiceInit(BaseMarketInfo info)
     {
         //交易记录数据从DB同步到Redis 至少保存最近3个月记录
-        long delete =  DealService.instance.DeleteDeal(info.market, DateTimeOffset.UtcNow.AddMonths(-3));
-        DealService.instance.DealDbToRedis(info.market, new TimeSpan(-30, 0, 0, 0));
+        long delete = FactoryService.instance.deal_service.DeleteDeal(info.market, DateTimeOffset.UtcNow.AddMonths(-3));
+        FactoryService.instance.deal_service.DealDbToRedis(info.market, new TimeSpan(-30, 0, 0, 0));
         // K线数据从DB同步到Redis
         DateTimeOffset now = DateTimeOffset.UtcNow;
         DateTimeOffset end = now.AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond - 1);
-        KlineService.instance.DBtoRedised(info.market, end);
-        KlineService.instance.DBtoRedising(info.market);
+        FactoryService.instance.kline_service.DBtoRedised(info.market, end);
+        FactoryService.instance.kline_service.DBtoRedising(info.market);
         return info;
     }
 

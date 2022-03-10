@@ -1,32 +1,17 @@
 using System.Linq.Expressions;
-using Com.Common;
 using Com.Db;
-using Com.Model;
 using Com.Model.Enum;
 using LinqKit;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace Com.Bll;
-public class DealHelper
+
+/// <summary>
+/// Db:交易记录
+/// </summary>
+public class DealDb
 {
-    /// <summary>
-    /// 常用接口
-    /// </summary>
-    public FactoryConstant constant = null!;
-
-    /// <summary>
-    /// 初始化方法
-    /// </summary>
-    /// <param name="constant"></param>
-    public DealHelper(FactoryConstant constant)
-    {
-        this.constant = constant;
-        // AddTest();
-    }
-
     /// <summary>
     /// 获取交易记录
     /// </summary>
@@ -45,7 +30,7 @@ public class DealHelper
         {
             predicate = predicate.And(P => P.time <= end);
         }
-        return this.constant.db.Deal.Where(predicate).OrderBy(P => P.time).ToList();
+        return FactoryService.instance.constant.db.Deal.Where(predicate).OrderBy(P => P.time).ToList();
     }
 
     /// <summary>
@@ -68,8 +53,8 @@ public class DealHelper
         }
         try
         {
-            var sql = from deal in this.constant.db.Deal.Where(predicate)
-                      group deal by EF.Functions.DateDiffMinute(KlineService.instance.system_init, deal.time) into g
+            var sql = from deal in FactoryService.instance.constant.db.Deal.Where(predicate)
+                      group deal by EF.Functions.DateDiffMinute(FactoryService.instance.system_init, deal.time) into g
                       select new Kline
                       {
                           market = market,
@@ -81,15 +66,15 @@ public class DealHelper
                           low = g.Min(P => P.price),
                           high = g.Max(P => P.price),
                           type = E_KlineType.min1,
-                          time_start = KlineService.instance.system_init.AddMinutes(g.Key),
-                          time_end = KlineService.instance.system_init.AddMinutes(g.Key + 1).AddMilliseconds(-1),
+                          time_start = FactoryService.instance.system_init.AddMinutes(g.Key),
+                          time_end = FactoryService.instance.system_init.AddMinutes(g.Key + 1).AddMilliseconds(-1),
                           time = DateTimeOffset.UtcNow,
                       };
             return sql.ToList();
         }
         catch (Exception ex)
         {
-            this.constant.logger.LogError(ex, "交易记录转换成一分钟K线失败");
+            FactoryService.instance.constant.logger.LogError(ex, "交易记录转换成一分钟K线失败");
         }
         return null;
     }
@@ -110,7 +95,7 @@ public class DealHelper
         }
         try
         {
-            var sql = from deal in this.constant.db.Deal.Where(predicate)
+            var sql = from deal in FactoryService.instance.constant.db.Deal.Where(predicate)
                       group deal by deal.market into g
                       select new Kline
                       {
@@ -131,7 +116,7 @@ public class DealHelper
         }
         catch (Exception ex)
         {
-            this.constant.logger.LogError(ex, "交易记录转换成一分钟K线失败");
+            FactoryService.instance.constant.logger.LogError(ex, "交易记录转换成一分钟K线失败");
         }
         return null;
     }
@@ -142,7 +127,7 @@ public class DealHelper
     /// <param name="deals"></param>
     public int AddOrUpdateDeal(List<Deal> deals)
     {
-        List<Deal> temp = this.constant.db.Deal.Where(P => deals.Select(Q => Q.trade_id).Contains(P.trade_id)).ToList();
+        List<Deal> temp = FactoryService.instance.constant.db.Deal.Where(P => deals.Select(Q => Q.trade_id).Contains(P.trade_id)).ToList();
         foreach (var deal in deals)
         {
             var temp_deal = temp.FirstOrDefault(P => P.trade_id == deal.trade_id);
@@ -155,32 +140,10 @@ public class DealHelper
             }
             else
             {
-                this.constant.db.Deal.Add(deal);
+                FactoryService.instance.constant.db.Deal.Add(deal);
             }
         }
-        return this.constant.db.SaveChanges();
-    }
+        return FactoryService.instance.constant.db.SaveChanges();
+    } 
 
-    public void AddTest()
-    {
-        Random r = new Random();
-        for (int i = 0; i < 2000; i++)
-        {
-            decimal price = r.NextInt64(1, 10);
-            decimal amount = r.NextInt64(1, 10);
-            this.constant.db.Set<Deal>().Add(new Deal
-            {
-                trade_id = this.constant.worker.NextId(),
-                market = "btc/usdt",
-                amount = amount,
-                price = price,
-                total = amount * price,
-                trigger_side = E_OrderSide.buy,
-                bid_id = this.constant.worker.NextId(),
-                ask_id = this.constant.worker.NextId(),
-                time = DateTimeOffset.UtcNow.AddMinutes(-r.NextInt64(0, 100)),
-            });
-        }
-        this.constant.db.SaveChanges();
-    }
 }

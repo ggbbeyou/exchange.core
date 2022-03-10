@@ -58,7 +58,7 @@ public class OrderController : Controller
             orderResult.remarks = null;
             matchOrders.Add(orderResult);
         }
-        Res<List<MatchOrder>> res = OrderService.instance.PlaceOrder(market, matchOrders);
+        Res<List<MatchOrder>> res = FactoryService.instance.order_service.PlaceOrder(market, matchOrders);
         WebCallResult<List<BaseOrder>> result = new WebCallResult<List<BaseOrder>>();
         result.success = true;
         result.code = 0;

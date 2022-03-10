@@ -54,7 +54,7 @@ public class GreeterImpl : ExchangeService.ExchangeServiceBase
                 reply.Message = JsonConvert.SerializeObject(res);
                 return reply;
             }
-            BaseMarketInfo result = await FactoryMatching.instance.ServiceInit(marketInfo);
+            BaseMarketInfo result = FactoryMatching.instance.ServiceInit(marketInfo);
 
             res.message = $"初始化成功:{marketInfo.market}";
             FactoryMatching.instance.constant.logger.LogInformation($"初始化成功:{marketInfo.market}");

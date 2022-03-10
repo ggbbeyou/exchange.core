@@ -11,43 +11,6 @@ namespace Com.Bll;
 public class DealService
 {
     /// <summary>
-    /// 单例类的实例
-    /// </summary>
-    /// <returns></returns>
-    public static readonly DealService instance = new DealService();
-    /// <summary>
-    /// 常用接口
-    /// </summary>
-    private FactoryConstant constant = null!;
-    /// <summary>
-    /// redis(zset)键 已生成交易记录 deal:btc/usdt
-    /// </summary>
-    /// <value></value>
-    public string redis_key_deal = "deal:{0}";
-    /// <summary>
-    /// 交易记录Db类
-    /// </summary>
-    public DealHelper dealHelper = null!;
-
-    /// <summary>
-    /// private构造方法
-    /// </summary>
-    private DealService()
-    {
-
-    }
-
-    /// <summary>
-    /// 初始化方法
-    /// </summary>
-    /// <param name="constant"></param>
-    public void Init(FactoryConstant constant)
-    {
-        this.constant = constant;
-        this.dealHelper = new DealHelper(constant);
-    }
-
-    /// <summary>
     /// 同步交易记录
     /// </summary>
     /// <param name="markets">交易对</param>
@@ -61,7 +24,7 @@ public class DealService
         {
             start = deal.time;
         }
-        List<Deal> deals = dealHelper.GetDeals(market, start, null);
+        List<Deal> deals = FactoryService.instance.deal_db.GetDeals(market, start, null);
         if (deals.Count() > 0)
         {
             SortedSetEntry[] entries = new SortedSetEntry[deals.Count()];
@@ -69,7 +32,7 @@ public class DealService
             {
                 entries[i] = new SortedSetEntry(JsonConvert.SerializeObject(deals[i]), deals[i].time.ToUnixTimeMilliseconds());
             }
-            this.constant.redis.SortedSetAdd(string.Format(this.redis_key_deal, market), entries);
+            FactoryService.instance.constant.redis.SortedSetAdd(FactoryService.instance.GetRedisDeal(market), entries);
         }
         return true;
     }
@@ -81,7 +44,7 @@ public class DealService
     /// <returns></returns>
     public Deal? GetRedisLastDeal(string market)
     {
-        RedisValue[] redisvalue = this.constant.redis.SortedSetRangeByRank(string.Format(this.redis_key_deal, market), 0, 1, StackExchange.Redis.Order.Descending);
+        RedisValue[] redisvalue = FactoryService.instance.constant.redis.SortedSetRangeByRank(FactoryService.instance.GetRedisDeal(market), 0, 1, StackExchange.Redis.Order.Descending);
         if (redisvalue.Length > 0)
         {
             return JsonConvert.DeserializeObject<Deal>(redisvalue[0]);
@@ -96,7 +59,7 @@ public class DealService
     /// <param name="start">start之前记录全部清除</param>
     public long DeleteDeal(string market, DateTimeOffset start)
     {
-        return this.constant.redis.SortedSetRemoveRangeByScore(string.Format(this.redis_key_deal, market), 0, start.ToUnixTimeMilliseconds());
+        return FactoryService.instance.constant.redis.SortedSetRemoveRangeByScore(FactoryService.instance.GetRedisDeal(market), 0, start.ToUnixTimeMilliseconds());
     }
 
 }

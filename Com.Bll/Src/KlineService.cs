@@ -21,52 +21,6 @@ namespace Com.Bll;
 /// </summary>
 public class KlineService
 {
-    /// <summary>
-    /// 单例类的实例
-    /// </summary>
-    /// <returns></returns>
-    public static readonly KlineService instance = new KlineService();
-    /// <summary>
-    /// 常用接口
-    /// </summary>
-    public FactoryConstant constant = null!;
-    /// <summary>
-    /// redis(zset)键 已生成K线 kline:btc/usdt:main1
-    /// </summary>
-    /// <value></value>
-    public string redis_key_kline = "kline:{0}:{1}";
-    /// <summary>
-    /// redis(hash)键 正在生成K线 klineing:btc/usdt
-    /// </summary>
-    /// <value></value>
-    public string redis_key_klineing = "klineing:{0}";
-    /// <summary>
-    /// k线DB类
-    /// </summary>
-    public KilneHelper kilneHelper = null!;
-
-    /// <summary>
-    /// 系统初始化时间  初始化  注:2017-1-1 此时是一年第一天，一年第一月，一年第一个星期日(星期日是一个星期开始的第一天)
-    /// </summary>   
-    public DateTimeOffset system_init = new DateTimeOffset(2017, 1, 1, 0, 0, 0, TimeSpan.Zero);
-
-    /// <summary>
-    /// private构造方法
-    /// </summary>
-    private KlineService()
-    {
-
-    }
-
-    /// <summary>
-    /// 初始化方法
-    /// </summary>
-    /// <param name="constant"></param>
-    public void Init(FactoryConstant constant)
-    {
-        this.constant = constant;
-        this.kilneHelper = new KilneHelper(constant);
-    }
 
     #region 已确定K线
 
@@ -90,11 +44,11 @@ public class KlineService
     {
         foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
         {
-            Kline? last_kline = this.kilneHelper.GetLastKline(market, cycle);
-            List<Kline>? klines = this.kilneHelper.CalcKlines(market, cycle, last_kline?.time_end ?? this.system_init, end);
+            Kline? last_kline = FactoryService.instance.kilne_db.GetLastKline(market, cycle);
+            List<Kline>? klines = FactoryService.instance.kilne_db.CalcKlines(market, cycle, last_kline?.time_end ?? FactoryService.instance.system_init, end);
             if (klines != null)
             {
-                int count = this.kilneHelper.SaveKline(market, cycle, klines);
+                int count = FactoryService.instance.kilne_db.SaveKline(market, cycle, klines);
             }
         }
     }
@@ -108,7 +62,7 @@ public class KlineService
         foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
         {
             Kline? Last_kline = GetRedisLastKline(market, cycle);
-            List<Kline> klines = this.kilneHelper.GetKlines(market, cycle, Last_kline?.time_end ?? this.system_init, DateTimeOffset.Now);
+            List<Kline> klines = FactoryService.instance.kilne_db.GetKlines(market, cycle, Last_kline?.time_end ?? FactoryService.instance.system_init, DateTimeOffset.Now);
             if (klines.Count() > 0)
             {
                 SortedSetEntry[] entries = new SortedSetEntry[klines.Count()];
@@ -116,7 +70,7 @@ public class KlineService
                 {
                     entries[i] = new SortedSetEntry(JsonConvert.SerializeObject(klines[i]), klines[i].time_start.ToUnixTimeMilliseconds());
                 }
-                this.constant.redis.SortedSetAdd(string.Format(this.redis_key_kline, market, cycle), entries);
+                FactoryService.instance.constant.redis.SortedSetAdd(FactoryService.instance.GetRedisKline(market, cycle), entries);
             }
         }
     }
@@ -129,7 +83,7 @@ public class KlineService
     /// <returns></returns>
     public Kline? GetRedisLastKline(string market, E_KlineType klineType)
     {
-        RedisValue[] redisvalue = this.constant.redis.SortedSetRangeByRank(string.Format(this.redis_key_kline, market, klineType), 0, 1, StackExchange.Redis.Order.Descending);
+        RedisValue[] redisvalue = FactoryService.instance.constant.redis.SortedSetRangeByRank(FactoryService.instance.GetRedisKline(market, klineType), 0, 1, StackExchange.Redis.Order.Descending);
         if (redisvalue.Length > 0)
         {
             return JsonConvert.DeserializeObject<Kline>(redisvalue[0]);
@@ -150,16 +104,16 @@ public class KlineService
     {
         foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
         {
-            DateTimeOffset start = this.system_init;
-            Kline? kline_last = this.kilneHelper.GetLastKline(market, cycle);
+            DateTimeOffset start = FactoryService.instance.system_init;
+            Kline? kline_last = FactoryService.instance.kilne_db.GetLastKline(market, cycle);
             if (kline_last != null)
             {
                 start = kline_last.time_end.AddMilliseconds(1);
             }
-            Kline? kline_new = DealService.instance.dealHelper.GetKlinesByDeal(market, cycle, start, null);
+            Kline? kline_new = FactoryService.instance.deal_db.GetKlinesByDeal(market, cycle, start, null);
             if (kline_new != null)
             {
-                this.constant.redis.HashSet(string.Format(this.redis_key_klineing, market), cycle.ToString(), JsonConvert.SerializeObject(kline_new));
+                FactoryService.instance.constant.redis.HashSet(FactoryService.instance.GetRedisKlineing(market), cycle.ToString(), JsonConvert.SerializeObject(kline_new));
             }
         }
     }

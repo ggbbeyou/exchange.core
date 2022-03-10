@@ -6,7 +6,7 @@ using GrpcExchange;
 using Com.Model;
 using Newtonsoft.Json;
 using Com.Model.Enum;
-using Snowflake;
+using Snowflake.Core;
 using Com.Bll;
 
 namespace Com.Admin.Controllers;

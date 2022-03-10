@@ -2,12 +2,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Com.Api.Model\Com.Api.Model.csproj" />
-    <ProjectReference Include="..\..\Com.Common\Com.Common.csproj" />
     <ProjectReference Include="..\..\Com.Bll\Com.Bll.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="RabbitMQ.Client" Version="6.2.3" />
+   
     <PackageReference Include="StackExchange.Redis.Extensions.AspNetCore" Version="7.0.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="NLog.Web.AspNetCore" Version="4.14.0" />

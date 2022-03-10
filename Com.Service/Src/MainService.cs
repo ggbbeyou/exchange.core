@@ -1,4 +1,3 @@
-using Com.Common;
 using GrpcExchange;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;

@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
-using Snowflake;
+using Snowflake.Core;
 using StackExchange.Redis;
 
 namespace Com.Bll;

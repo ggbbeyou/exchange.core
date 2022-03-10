@@ -9,6 +9,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace Com.Bll;
+
+/// <summary>
+/// Db:K线
+/// </summary>
 public class KilneDb
 {
 

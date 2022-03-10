@@ -16,7 +16,7 @@ using StackExchange.Redis;
 namespace Com.Bll;
 
 /// <summary>
-/// K线逻辑
+/// Service:K线
 /// </summary>
 public class KlineService
 {

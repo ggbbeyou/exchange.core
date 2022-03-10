@@ -10,7 +10,7 @@ using StackExchange.Redis;
 namespace Com.Bll;
 
 /// <summary>
-/// 订单服务
+/// Service:订单
 /// </summary>
 public class OrderService
 {

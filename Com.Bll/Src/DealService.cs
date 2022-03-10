@@ -5,7 +5,7 @@ using StackExchange.Redis;
 namespace Com.Bll;
 
 /// <summary>
-/// 交易记录
+/// Service:交易记录
 /// </summary>
 public class DealService
 {

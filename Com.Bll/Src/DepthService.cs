@@ -5,11 +5,11 @@ using StackExchange.Redis;
 namespace Com.Bll;
 
 /// <summary>
-/// 交易记录
+/// Service:深度行情
 /// </summary>
 public class DepthService
 {
-  
+
 
     /// <summary>
     /// private构造方法
@@ -19,8 +19,8 @@ public class DepthService
 
     }
 
-   
 
-  
+
+
 
 }

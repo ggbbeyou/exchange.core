@@ -23,23 +23,23 @@ public class FactoryService
     /// <summary>
     /// DB:交易记录
     /// </summary>
-    public DealDb deal_db = null!;
+    public DealDb deal_db = new DealDb();
     /// <summary>
     /// DB:K线
     /// </summary>
-    public KilneDb kilne_db = null!;
+    public KilneDb kilne_db = new KilneDb();
     /// <summary>
     /// Service:订单
     /// </summary>
-    public OrderService order_service = null!;
+    public OrderService order_service = new OrderService();
     /// <summary>
     /// Service:交易记录
     /// </summary>
-    public DealService deal_service = null!;
+    public DealService deal_service = new DealService();
     /// <summary>
     /// Service:K线
     /// </summary>
-    public KlineService kline_service = null!;
+    public KlineService kline_service = new KlineService();
     /// <summary>
     /// 系统初始化时间  初始化  注:2017-1-1 此时是一年第一天，一年第一月，一年第一个星期日(星期日是一个星期开始的第一天)
     /// </summary>   
@@ -49,7 +49,6 @@ public class FactoryService
     /// </summary>
     /// <returns></returns>
     public IBasicProperties props = null!;
-
 
     /// <summary>
     /// private构造方法
@@ -68,11 +67,6 @@ public class FactoryService
         this.constant = constant;
         this.props = constant.i_model.CreateBasicProperties();
         this.props.DeliveryMode = 2;
-        this.deal_db = new DealDb();
-        this.kilne_db = new KilneDb();
-        this.order_service = new OrderService();
-        this.deal_service = new DealService();
-        this.kline_service = new KlineService();
     }
 
     /// <summary>

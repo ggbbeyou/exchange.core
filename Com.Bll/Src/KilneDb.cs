@@ -16,7 +16,6 @@ namespace Com.Bll;
 public class KilneDb
 {
 
-
     /// <summary>
     /// 获取最后一条K线
     /// </summary>

@@ -13,6 +13,9 @@ using StackExchange.Redis;
 
 namespace Com.Service;
 
+/// <summary>
+/// Service:核心服务
+/// </summary>
 public class Core
 {
     /// <summary>

@@ -5,6 +5,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Grpc.Core;
+using Com.Bll;
 
 namespace Com.Service;
 
@@ -28,6 +29,7 @@ public class MainService : BackgroundService
     public MainService(IServiceProvider provider, IConfiguration configuration, IHostEnvironment environment, ILogger<MainService> logger)
     {
         this.constant = new FactoryConstant(provider, configuration, environment, logger);
+        FactoryService.instance.Init(this.constant);
         FactoryMatching.instance.Init(this.constant);
     }
 

@@ -6,7 +6,6 @@ Com.Api                 api         api接口
 Com.Api.Model           dll         api模型
 Com.Api.Sdk             dll         api接口SDK
 Com.Bll                 dll         业务逻辑
-Com.Common              dll         帮助通用类
 Com.Service             console     撮合引擎    RabbitMQ
 Com.Model               dll         基本模型
 Com.Admin               web         后台管理网站

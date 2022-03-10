@@ -4,7 +4,6 @@ using Com.Api.Models;
 using Com.Api.Model;
 using Com.Bll;
 using Com.Model;
-using Com.Common;
 using Com.Model.Enum;
 
 namespace Com.Api.Controllers;

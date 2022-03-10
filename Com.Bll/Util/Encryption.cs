@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Com.Common;
+namespace Com.Bll;
 
 public class Encryption
 {

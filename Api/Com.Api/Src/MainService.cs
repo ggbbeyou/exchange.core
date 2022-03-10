@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
 using StackExchange.Redis.Extensions.Core.Abstractions;
-using Com.Common;
+using Com.Bll;
 
 namespace Com.Api
 {

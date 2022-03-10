@@ -12,7 +12,7 @@ using RabbitMQ.Client;
 using Snowflake;
 using StackExchange.Redis;
 
-namespace Com.Common;
+namespace Com.Bll;
 
 /// <summary>
 /// 常用接口工厂类

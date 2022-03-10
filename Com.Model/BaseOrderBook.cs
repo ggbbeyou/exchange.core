@@ -12,7 +12,7 @@ public class BaseOrderBook
     /// 交易对
     /// </summary>
     /// <value></value>
-    public string market { get; set; } = null!;
+    public long market { get; set; }
     /// <summary>
     /// 挂单价
     /// </summary>

@@ -74,7 +74,7 @@ public class FactoryService
     /// </summary>
     /// <param name="market"></param>
     /// <returns></returns>
-    public string GetRedisDeal(string market)
+    public string GetRedisDeal(long market)
     {
         return string.Format("deal:{0}", market);
     }
@@ -84,7 +84,7 @@ public class FactoryService
     /// </summary>
     /// <param name="market"></param>
     /// <returns></returns>
-    public string GetRedisKline(string market, E_KlineType type)
+    public string GetRedisKline(long market, E_KlineType type)
     {
         return string.Format("kline:{0}:{1}", market, type.ToString());
     }
@@ -94,7 +94,7 @@ public class FactoryService
     /// </summary>
     /// <param name="market"></param>
     /// <returns></returns>
-    public string GetRedisKlineing(string market)
+    public string GetRedisKlineing(long market)
     {
         return string.Format("klineing:{0}", market);
     }
@@ -104,7 +104,7 @@ public class FactoryService
     /// </summary>
     /// <param name="market"></param>
     /// <returns></returns>
-    public string GetMqOrderPlace(string market)
+    public string GetMqOrderPlace(long market)
     {
         return string.Format("order_place_{0}", market);
     }
@@ -114,7 +114,7 @@ public class FactoryService
     /// </summary>
     /// <param name="market"></param>
     /// <returns></returns>
-    public string GetMqSubscribeDepth(string market)
+    public string GetMqSubscribeDepth(long market)
     {
         return string.Format("subscribe_depth_{0}", market);
     }
@@ -124,7 +124,7 @@ public class FactoryService
     /// </summary>
     /// <param name="market"></param>
     /// <returns></returns>
-    public string GetMqSubscribeKline(string market)
+    public string GetMqSubscribeKline(long market)
     {
         return string.Format("subscribe_kline_{0}", market);
     }

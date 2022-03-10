@@ -65,7 +65,7 @@ public class Core
     {
         FactoryMatching.instance.constant.i_model.ExchangeDeclare(exchange: this.model.mq.key_deal, type: ExchangeType.Direct, durable: true, autoDelete: false, arguments: null);
         string queueName = FactoryMatching.instance.constant.i_model.QueueDeclare().QueueName;
-        FactoryMatching.instance.constant.i_model.QueueBind(queue: queueName, exchange: this.model.mq.key_deal, routingKey: this.model.info.market);
+        FactoryMatching.instance.constant.i_model.QueueBind(queue: queueName, exchange: this.model.mq.key_deal, routingKey: this.model.info.market.ToString());
         EventingBasicConsumer consumer = new EventingBasicConsumer(FactoryMatching.instance.constant.i_model);
         consumer.Received += (model, ea) =>
         {
@@ -95,7 +95,7 @@ public class Core
     {
         FactoryMatching.instance.constant.i_model.ExchangeDeclare(exchange: this.model.mq.key_order_cancel_success, type: ExchangeType.Direct, durable: true, autoDelete: false, arguments: null);
         string queueName = FactoryMatching.instance.constant.i_model.QueueDeclare().QueueName;
-        FactoryMatching.instance.constant.i_model.QueueBind(queue: queueName, exchange: this.model.mq.key_order_cancel_success, routingKey: this.model.info.market);
+        FactoryMatching.instance.constant.i_model.QueueBind(queue: queueName, exchange: this.model.mq.key_order_cancel_success, routingKey: this.model.info.market.ToString());
         EventingBasicConsumer consumer = new EventingBasicConsumer(FactoryMatching.instance.constant.i_model);
         consumer.Received += (model, ea) =>
         {

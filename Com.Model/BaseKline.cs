@@ -12,7 +12,7 @@ public class BaseKline
     /// 交易对
     /// </summary>
     /// <value></value>
-    public string market { get; set; } = null!;
+    public long market { get; set; } 
     /// <summary>
     /// K线类型
     /// </summary>

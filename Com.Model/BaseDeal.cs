@@ -17,7 +17,7 @@ public class BaseDeal
     /// 交易对
     /// </summary>
     /// <value></value>
-    public string market { get; set; } = null!;
+    public long market { get; set; } 
     /// <summary>
     /// 成交价
     /// </summary>

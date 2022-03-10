@@ -22,7 +22,7 @@ public class KilneDb
     /// <param name="market">交易对</param>
     /// <param name="type">K线类型</param>
     /// <returns></returns>
-    public Kline? GetLastKline(string market, E_KlineType type)
+    public Kline? GetLastKline(long market, E_KlineType type)
     {
         return FactoryService.instance.constant.db.Kline.Where(P => P.market == market && P.type == type).OrderByDescending(P => P.time_start).FirstOrDefault();
     }
@@ -35,7 +35,7 @@ public class KilneDb
     /// <param name="start">开始时间</param>
     /// <param name="end">结束时间</param>
     /// <returns></returns>
-    public List<Kline> GetKlines(string market, E_KlineType type, DateTimeOffset start, DateTimeOffset end)
+    public List<Kline> GetKlines(long market, E_KlineType type, DateTimeOffset start, DateTimeOffset end)
     {
         return FactoryService.instance.constant.db.Kline.Where(P => P.market == market && P.type == type && P.time_start >= start && P.time_start <= end).OrderBy(P => P.time_start).ToList();
     }
@@ -47,7 +47,7 @@ public class KilneDb
     /// <param name="klineType"></param>
     /// <param name="klines"></param>
     /// <returns></returns>
-    public int SaveKline(string market, E_KlineType klineType, List<Kline> klines)
+    public int SaveKline(long market, E_KlineType klineType, List<Kline> klines)
     {
         if (klines == null || klines.Count == 0)
         {
@@ -90,7 +90,7 @@ public class KilneDb
     /// <param name="start">开始时间</param>
     /// <param name="end">结束时间</param>
     /// <returns></returns>
-    public List<Kline>? CalcKlines(string market, E_KlineType type, DateTimeOffset? start, DateTimeOffset? end)
+    public List<Kline>? CalcKlines(long market, E_KlineType type, DateTimeOffset? start, DateTimeOffset? end)
     {
         Expression<Func<Kline, bool>> predicate = P => P.market == market;
         if (start != null)

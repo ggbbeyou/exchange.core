@@ -15,7 +15,7 @@ public class DealService
     /// <param name="markets">交易对</param>
     /// <param name="span">最少同步多少时间数据</param>
     /// <returns></returns>
-    public bool DealDbToRedis(string market, TimeSpan span)
+    public bool DealDbToRedis(long market, TimeSpan span)
     {
         DateTimeOffset start = DateTimeOffset.UtcNow.Add(span);
         Deal? deal = GetRedisLastDeal(market);
@@ -41,7 +41,7 @@ public class DealService
     /// </summary>
     /// <param name="market">交易对</param>
     /// <returns></returns>
-    public Deal? GetRedisLastDeal(string market)
+    public Deal? GetRedisLastDeal(long market)
     {
         RedisValue[] redisvalue = FactoryService.instance.constant.redis.SortedSetRangeByRank(FactoryService.instance.GetRedisDeal(market), 0, 1, StackExchange.Redis.Order.Descending);
         if (redisvalue.Length > 0)
@@ -56,7 +56,7 @@ public class DealService
     /// </summary>
     /// <param name="markets">交易对</param>
     /// <param name="start">start之前记录全部清除</param>
-    public long DeleteDeal(string market, DateTimeOffset start)
+    public long DeleteDeal(long market, DateTimeOffset start)
     {
         return FactoryService.instance.constant.redis.SortedSetRemoveRangeByScore(FactoryService.instance.GetRedisDeal(market), 0, start.ToUnixTimeMilliseconds());
     }

@@ -19,7 +19,7 @@ public class DealDb
     /// <param name="start">开始时间</param>
     /// <param name="end">结束时间</param>
     /// <returns></returns>
-    public List<Deal> GetDeals(string market, DateTimeOffset? start, DateTimeOffset? end)
+    public List<Deal> GetDeals(long market, DateTimeOffset? start, DateTimeOffset? end)
     {
         Expression<Func<Deal, bool>> predicate = P => P.market == market;
         if (start != null)
@@ -40,7 +40,7 @@ public class DealDb
     /// <param name="start">开始时间</param>
     /// <param name="end">结束时间</param>
     /// <returns></returns>
-    public List<Kline>? GetKlinesMin1ByDeal(string market, DateTimeOffset? start, DateTimeOffset? end)
+    public List<Kline>? GetKlinesMin1ByDeal(long market, DateTimeOffset? start, DateTimeOffset? end)
     {
         Expression<Func<Deal, bool>> predicate = P => P.market == market;
         if (start != null)
@@ -86,7 +86,7 @@ public class DealDb
     /// <param name="start">开始时间</param>
     /// <param name="end">结束时间</param>
     /// <returns></returns>
-    public Kline? GetKlinesByDeal(string market, E_KlineType type, DateTimeOffset start, DateTimeOffset? end)
+    public Kline? GetKlinesByDeal(long market, E_KlineType type, DateTimeOffset start, DateTimeOffset? end)
     {
         Expression<Func<Deal, bool>> predicate = P => P.market == market && start <= P.time;
         if (end != null)

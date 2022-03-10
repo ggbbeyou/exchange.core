@@ -29,7 +29,7 @@ public class KlineService
     /// </summary>
     /// <param name="markets">交易对</param>
     /// <param name="end">结束时间</param>
-    public void DBtoRedised(string market, DateTimeOffset end)
+    public void DBtoRedised(long market, DateTimeOffset end)
     {
         SyncKlines(market, end);
         DbSaveRedis(market);
@@ -40,7 +40,7 @@ public class KlineService
     /// </summary>
     /// <param name="market">交易对</param>
     /// <param name="end">结束时间</param>
-    public void SyncKlines(string market, DateTimeOffset end)
+    public void SyncKlines(long market, DateTimeOffset end)
     {
         foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
         {
@@ -57,7 +57,7 @@ public class KlineService
     /// 将DB中的K线数据保存到Redis
     /// </summary>
     /// <param name="market">交易对</param>
-    public void DbSaveRedis(string market)
+    public void DbSaveRedis(long market)
     {
         foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
         {
@@ -81,7 +81,7 @@ public class KlineService
     /// <param name="market">交易对</param>
     /// <param name="klineType">K线类型</param>
     /// <returns></returns>
-    public Kline? GetRedisLastKline(string market, E_KlineType klineType)
+    public Kline? GetRedisLastKline(long market, E_KlineType klineType)
     {
         RedisValue[] redisvalue = FactoryService.instance.constant.redis.SortedSetRangeByRank(FactoryService.instance.GetRedisKline(market, klineType), 0, 1, StackExchange.Redis.Order.Descending);
         if (redisvalue.Length > 0)
@@ -100,7 +100,7 @@ public class KlineService
     /// 缓存预热(未确定K线)
     /// </summary>
     /// <param name="market">交易对</param>
-    public void DBtoRedising(string market)
+    public void DBtoRedising(long market)
     {
         foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
         {

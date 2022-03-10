@@ -33,7 +33,7 @@ public class OrderController : Controller
     /// <param name="market"></param>
     /// <param name="orders"></param>
     /// <returns></returns>
-    public IActionResult PlaceOrder(string market, List<PlaceOrder> orders)
+    public IActionResult PlaceOrder(long market, List<PlaceOrder> orders)
     {
         List<MatchOrder> matchOrders = new List<MatchOrder>();
         foreach (var item in orders)

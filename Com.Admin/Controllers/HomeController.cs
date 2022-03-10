@@ -52,9 +52,9 @@ public class HomeController : Controller
         // inti
         Req<string> req = new Req<string>();
         req.op = E_Op.service_init;
-        req.market = "btc/usdt";
+        req.market = 1;
         BaseMarketInfo info = new BaseMarketInfo();
-        info.market = "btc/usdt";
+        info.market = 1;
         info.last_price = 38000.123456789m;
         req.data = JsonConvert.SerializeObject(info);
         string json = JsonConvert.SerializeObject(req);
@@ -63,7 +63,7 @@ public class HomeController : Controller
         //start
 
         req.op = E_Op.service_start;
-        req.market = "btc/usdt";
+        req.market = 1;
         req.data = JsonConvert.SerializeObject(info);
         json = JsonConvert.SerializeObject(req);
         var reply2 = await client.UnaryCallAsync(new Request { Json = json });
@@ -79,7 +79,7 @@ public class HomeController : Controller
     {
 
 
-        string market = "btc/usdt";
+        long market = 1;
         List<MatchOrder> orders = new List<MatchOrder>();
         for (int i = 0; i < 10; i++)
         {

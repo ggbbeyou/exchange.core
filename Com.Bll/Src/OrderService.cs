@@ -21,7 +21,7 @@ public class OrderService
     /// <param name="uid">用户id</param>
     /// <param name="order">订单列表</param>
     /// <returns></returns>
-    public Res<List<MatchOrder>> PlaceOrder(string market, List<MatchOrder> order)
+    public Res<List<MatchOrder>> PlaceOrder(long market, List<MatchOrder> order)
     {
         Req<List<MatchOrder>> req = new Req<List<MatchOrder>>();
         req.op = E_Op.place;

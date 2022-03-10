@@ -27,7 +27,7 @@ public class Res<T>
     /// 交易对
     /// </summary>
     /// <value></value>
-    public string market { get; set; } = null!;
+    public long market { get; set; }
     /// <summary>
     /// 响应消息
     /// </summary>

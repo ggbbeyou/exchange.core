@@ -26,7 +26,7 @@ public class FactoryMatching
     /// <typeparam name="string">交易对</typeparam>
     /// <typeparam name="Core">服务</typeparam>
     /// <returns></returns>
-    public Dictionary<string, MatchModel> service = new Dictionary<string, MatchModel>();
+    public Dictionary<long, MatchModel> service = new Dictionary<long, MatchModel>();
 
     /// <summary>
     /// 私有构造方法

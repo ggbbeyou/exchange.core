@@ -17,7 +17,7 @@ public class Req<T>
     /// 交易对
     /// </summary>
     /// <value></value>
-    public string market { get; set; } = null!;
+    public long market { get; set; } 
     /// <summary>
     /// 数据
     /// </summary>

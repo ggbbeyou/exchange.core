@@ -7,8 +7,6 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-
-
   <ItemGroup>
     <PackageReference Include="Grpc.Tools" Version="2.44.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

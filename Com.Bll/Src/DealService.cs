@@ -94,9 +94,9 @@ public class DealService
     /// </summary>
     /// <param name="markets">交易对</param>
     /// <param name="start">start之前记录全部清除</param>
-    public Task<long> DeleteDeal(string market, DateTimeOffset start)
+    public long DeleteDeal(string market, DateTimeOffset start)
     {
-        return this.constant.redis.SortedSetRemoveRangeByScoreAsync(string.Format(this.redis_key_deal, market), 0, start.ToUnixTimeMilliseconds());
+        return this.constant.redis.SortedSetRemoveRangeByScore(string.Format(this.redis_key_deal, market), 0, start.ToUnixTimeMilliseconds());
     }
 
 }

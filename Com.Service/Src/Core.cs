@@ -119,18 +119,36 @@ public class Core
     /// <summary>
     /// 接收到成交订单
     /// </summary>
-    /// <param name="deals"></param>
+    /// <param name="match"></param>
     private void ReceiveDealOrder(List<(MatchOrder order, List<MatchDeal> deal)> match)
     {
         List<BaseOrderBook> orderBooks = new List<BaseOrderBook>();
         List<Kline> klines = new List<Kline>();
-        List<MatchDeal> total = new List<MatchDeal>();
+        List<Deal> total = new List<Deal>();
         foreach ((MatchOrder order, List<MatchDeal> deal) item in match)
         {
             orderBooks.AddRange(GetOrderBooks(item.order, item.deal));
-            total.AddRange(item.deal);
+            foreach (var item1 in item.deal)
+            {
+                total.Add(new Deal()
+                {
+                    trade_id = item1.trade_id,
+                    market = item1.market,
+                    price = item1.price,
+                    amount = item1.amount,
+                    total = item1.total,
+                    trigger_side = item1.trigger_side,
+                    bid_id = item1.bid_id,
+                    ask_id = item1.ask_id,
+                    time = item1.time
+                });
+            }
         }
-        klines.AddRange(SetKlink(total));
+        if (DealService.instance.dealHelper.AddOrUpdateDeal(total) > 0)
+        {
+            FactoryMatching.instance.ServiceInit(new BaseMarketInfo() { market = this.model.info.market });
+        }
+        PushKline();
         PullDepth(orderBooks);
     }
 
@@ -232,9 +250,8 @@ public class Core
         {
             return;
         }
-
-
         string json = JsonConvert.SerializeObject(depth);
+        FactoryMatching.instance.constant.i_model.BasicPublish(exchange: string.Format(KlineService.instance.redis_key_klineing, this.model.info.market), routingKey: item.Name, basicProperties: null, body: Encoding.UTF8.GetBytes(item.Value));
         FactoryMatching.instance.constant.logger.LogInformation($"推送深度:{json}");
         FactoryMatching.instance.constant.i_model.BasicPublish(exchange: "", routingKey: this.model.info.market, basicProperties: null, body: Encoding.UTF8.GetBytes(json));
     }
@@ -243,15 +260,14 @@ public class Core
     /// K线往消息队列推送
     /// </summary>
     /// <param name="depth"></param>
-    private void PullKline(List<Kline> klines)
+    private void PushKline()
     {
-        if (klines.Count == 0)
+        HashEntry[] hashes = FactoryMatching.instance.constant.redis.HashGetAll(string.Format(KlineService.instance.redis_key_klineing, this.model.info.market));
+        foreach (var item in hashes)
         {
-            return;
+            FactoryMatching.instance.constant.i_model.BasicPublish(exchange: string.Format(KlineService.instance.redis_key_klineing, this.model.info.market), routingKey: item.Name, basicProperties: null, body: Encoding.UTF8.GetBytes(item.Value));
+            FactoryMatching.instance.constant.logger.LogInformation($"推送K线:{item.Value}");
         }
-        string json = JsonConvert.SerializeObject(klines);
-        FactoryMatching.instance.constant.logger.LogInformation($"推送K线:{json}");
-        FactoryMatching.instance.constant.i_model.BasicPublish(exchange: "", routingKey: this.model.info.market, basicProperties: null, body: Encoding.UTF8.GetBytes(json));
     }
 
 

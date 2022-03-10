@@ -136,6 +136,31 @@ public class DealHelper
         return null;
     }
 
+    /// <summary>
+    /// 添加或保存交易记录
+    /// </summary>
+    /// <param name="deals"></param>
+    public int AddOrUpdateDeal(List<Deal> deals)
+    {
+        List<Deal> temp = this.constant.db.Deal.Where(P => deals.Select(Q => Q.trade_id).Contains(P.trade_id)).ToList();
+        foreach (var deal in deals)
+        {
+            var temp_deal = temp.FirstOrDefault(P => P.trade_id == deal.trade_id);
+            if (temp_deal != null)
+            {
+                temp_deal.price = deal.price;
+                temp_deal.amount = deal.amount;
+                temp_deal.total = deal.total;
+                temp_deal.time = deal.time;
+            }
+            else
+            {
+                this.constant.db.Deal.Add(deal);
+            }
+        }
+        return this.constant.db.SaveChanges();
+    }
+
     public void AddTest()
     {
         Random r = new Random();

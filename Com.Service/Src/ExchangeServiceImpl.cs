@@ -106,6 +106,7 @@ public class GreeterImpl : ExchangeService.ExchangeServiceBase
             //其它操作
         }
         reply.Message = JsonConvert.SerializeObject(res);
+        await Task.Delay(TimeSpan.FromSeconds(1));
         return reply;
     }
 

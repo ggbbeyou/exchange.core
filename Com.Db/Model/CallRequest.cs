@@ -1,28 +1,24 @@
-using System;
+
+
 using Com.Db.Enum;
 
 namespace Com.Db.Model;
 
 /// <summary>
-/// 响应操作动作
+/// 请求操作动作
 /// </summary>
-public class Res<T> 
+public class CallRequest<T> : Req<T>
 {
     /// <summary>
-    /// 是否成功
+    /// 操作   
     /// </summary>
     /// <value></value>
-    public bool success { get; set; }
+    public E_Op op { get; set; }
     /// <summary>
-    /// 返回编号
+    /// 交易对
     /// </summary>
     /// <value></value>
-    public E_Res_Code code { get; set; }  
-    /// <summary>
-    /// 响应消息
-    /// </summary>
-    /// <value></value>
-    public string? message { get; set; } = null;
+    public long market { get; set; }
     /// <summary>
     /// 数据
     /// </summary>

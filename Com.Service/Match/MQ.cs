@@ -114,7 +114,7 @@ public class MQ
             else
             {
                 string json = Encoding.UTF8.GetString(ea.Body.ToArray());
-                Req<List<Orders>>? req = JsonConvert.DeserializeObject<Req<List<Orders>>>(json);
+                CallRequest<List<Orders>>? req = JsonConvert.DeserializeObject<CallRequest<List<Orders>>>(json);
                 if (req != null && req.op == E_Op.place && req.data != null && req.data.Count > 0)
                 {
                     deal.Clear();
@@ -166,7 +166,7 @@ public class MQ
             else
             {
                 string json = Encoding.UTF8.GetString(ea.Body.ToArray());
-                Req<List<long>>? req = JsonConvert.DeserializeObject<Req<List<long>>>(json);
+                CallRequest<List<long>>? req = JsonConvert.DeserializeObject<CallRequest<List<long>>>(json);
                 if (req != null && req.op == E_Op.place && req.data != null)
                 {
                     cancel.Clear();

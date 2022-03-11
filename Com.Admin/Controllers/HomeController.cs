@@ -51,7 +51,7 @@ public class HomeController : Controller
         // var status = response.Status;
 
         // inti
-        Req<string> req = new Req<string>();
+        CallRequest<string> req = new CallRequest<string>();
         req.op = E_Op.service_init;
         req.market = 1;
         BaseMarketInfo info = new BaseMarketInfo();

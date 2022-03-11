@@ -58,10 +58,7 @@ public class OrderController : Controller
             matchOrders.Add(orderResult);
         }
         Res<List<Orders>> res = FactoryService.instance.order_service.PlaceOrder(market, matchOrders);
-        WebCallResult<List<Orders>> result = new WebCallResult<List<Orders>>();
-        result.success = true;
-        result.code = 0;
-        result.message = res.message;
+        CallRequest<List<Orders>> result = new CallRequest<List<Orders>>();
         result.data = new List<Orders>();
         foreach (var item in res.data)
         {

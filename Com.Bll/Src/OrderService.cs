@@ -22,12 +22,12 @@ public class OrderService
     /// <returns></returns>
     public Res<List<Orders>> PlaceOrder(long market, List<Orders> order)
     {
-        Req<List<Orders>> req = new Req<List<Orders>>();
+        CallRequest<List<Orders>> req = new CallRequest<List<Orders>>();
         req.op = E_Op.place;
         req.market = market;
         req.data = order;
         FactoryService.instance.constant.i_model.BasicPublish(exchange: FactoryService.instance.GetMqOrderPlace(market), routingKey: "", basicProperties: FactoryService.instance.props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(req)));
-        Res<List<Orders>> res = new Res<List<Orders>>();
+        CallResponse<List<Orders>> res = new CallResponse<List<Orders>>();
         res.op = E_Op.place;
         res.success = true;
         res.code = E_Res_Code.ok;

@@ -26,10 +26,10 @@ public class GreeterImpl : ExchangeService.ExchangeServiceBase
     public override async Task<Reply> UnaryCall(Request request, ServerCallContext context)
     {
         Reply reply = new Reply();
-        Res<string> res = new Res<string>();
+        CallResponse<string> res = new CallResponse<string>();
         res.success = true;
         res.code = E_Res_Code.ok;
-        Req<string>? req = JsonConvert.DeserializeObject<Req<string>>(request.Json);
+        CallRequest<string>? req = JsonConvert.DeserializeObject<CallRequest<string>>(request.Json);
         if (req == null)
         {
             res.success = false;

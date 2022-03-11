@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Com.Db;
 
@@ -6,7 +7,7 @@ namespace Com.Db;
 /// 交易对基础信息
 /// </summary>
 public class MarketInfo
-{    
+{
     /// <summary>
     /// 交易对
     /// </summary>
@@ -21,5 +22,6 @@ public class MarketInfo
     /// 最后的成交价
     /// </summary>
     /// <value></value>
+    [NotMapped]
     public decimal last_price { get; set; }
 }

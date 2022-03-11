@@ -148,7 +148,7 @@ public class Core
         }
         if (FactoryService.instance.deal_db.AddOrUpdateDeal(total) > 0)
         {
-            FactoryMatching.instance.ServiceInit(new BaseMarketInfo() { market = this.model.info.market });
+            FactoryMatching.instance.ServiceInit(new MarketInfo() { market = this.model.info.market });
         }
         PushKline();
         PullDepth(orderBooks);

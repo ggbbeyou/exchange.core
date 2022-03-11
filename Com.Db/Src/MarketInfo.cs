@@ -3,11 +3,10 @@ using System;
 namespace Com.Db;
 
 /// <summary>
-/// K线
+/// 交易对基础信息
 /// </summary>
-public class BaseMarketInfo
-{
-    public long id { get; set; }
+public class MarketInfo
+{    
     /// <summary>
     /// 交易对
     /// </summary>

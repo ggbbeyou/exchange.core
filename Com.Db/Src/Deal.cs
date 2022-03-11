@@ -65,13 +65,11 @@ public class Deal
     /// </summary>
     /// <value></value>
     [NotMapped]
-    [JsonIgnore]
     public Orders bid { get; set; } = null!;
     /// <summary>
     /// 卖订单
     /// </summary>
     /// <value></value>
     [NotMapped]
-    [JsonIgnore]
     public Orders ask { get; set; } = null!;
 }

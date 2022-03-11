@@ -44,7 +44,7 @@ public class GreeterImpl : ExchangeService.ExchangeServiceBase
         res.data = req.data;
         if (req.op == E_Op.service_init)
         {
-            BaseMarketInfo? marketInfo = JsonConvert.DeserializeObject<BaseMarketInfo>(req.data);
+            MarketInfo? marketInfo = JsonConvert.DeserializeObject<MarketInfo>(req.data);
             if (marketInfo == null)
             {
                 res.success = false;
@@ -54,14 +54,14 @@ public class GreeterImpl : ExchangeService.ExchangeServiceBase
                 reply.Message = JsonConvert.SerializeObject(res);
                 return reply;
             }
-            BaseMarketInfo result = FactoryMatching.instance.ServiceInit(marketInfo);
+            MarketInfo result = FactoryMatching.instance.ServiceInit(marketInfo);
 
             res.message = $"初始化成功:{marketInfo.market}";
             FactoryMatching.instance.constant.logger.LogInformation($"初始化成功:{marketInfo.market}");
         }
         else if (req.op == E_Op.service_start)
         {
-            BaseMarketInfo? marketInfo = JsonConvert.DeserializeObject<BaseMarketInfo>(req.data);
+            MarketInfo? marketInfo = JsonConvert.DeserializeObject<MarketInfo>(req.data);
             if (marketInfo == null)
             {
                 res.success = false;
@@ -77,7 +77,7 @@ public class GreeterImpl : ExchangeService.ExchangeServiceBase
         }
         else if (req.op == E_Op.service_stop)
         {
-            BaseMarketInfo? marketInfo = JsonConvert.DeserializeObject<BaseMarketInfo>(req.data);
+            MarketInfo? marketInfo = JsonConvert.DeserializeObject<MarketInfo>(req.data);
             if (marketInfo == null)
             {
                 res.success = false;
@@ -88,7 +88,7 @@ public class GreeterImpl : ExchangeService.ExchangeServiceBase
             }
             try
             {
-                BaseMarketInfo result = FactoryMatching.instance.ServiceStop(marketInfo);
+                MarketInfo result = FactoryMatching.instance.ServiceStop(marketInfo);
                 res.data = JsonConvert.SerializeObject(result);
                 res.message = $"服务停止成功:{marketInfo.market}";
                 FactoryMatching.instance.constant.logger.LogInformation($"服务停止成功:{marketInfo.market}");

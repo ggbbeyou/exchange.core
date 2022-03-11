@@ -46,7 +46,7 @@ public class FactoryMatching
     /// <summary>
     /// 初始化服务
     /// </summary>
-    public BaseMarketInfo ServiceInit(BaseMarketInfo info)
+    public MarketInfo ServiceInit(MarketInfo info)
     {
         //交易记录数据从DB同步到Redis 至少保存最近3个月记录
         long delete = FactoryService.instance.deal_service.DeleteDeal(info.market, DateTimeOffset.UtcNow.AddMonths(-3));
@@ -63,7 +63,7 @@ public class FactoryMatching
     /// 启动服务
     /// </summary>
     /// <param name="info"></param>
-    public BaseMarketInfo ServiceStart(BaseMarketInfo info)
+    public MarketInfo ServiceStart(MarketInfo info)
     {
         if (!this.service.ContainsKey(info.market))
         {
@@ -81,7 +81,7 @@ public class FactoryMatching
     /// 关闭服务
     /// </summary>
     /// <param name="info"></param>
-    public BaseMarketInfo ServiceStop(BaseMarketInfo info)
+    public MarketInfo ServiceStop(MarketInfo info)
     {
         if (!this.service.ContainsKey(info.market))
         {

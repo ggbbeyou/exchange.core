@@ -54,7 +54,7 @@ public class HomeController : Controller
         CallRequest<string> req = new CallRequest<string>();
         req.op = E_Op.service_init;
         req.market = 1;
-        BaseMarketInfo info = new BaseMarketInfo();
+        MarketInfo info = new MarketInfo();
         info.market = 1;
         info.last_price = 38000.123456789m;
         req.data = JsonConvert.SerializeObject(info);

@@ -20,7 +20,7 @@ public class MatchModel
     /// 交易对基本信息
     /// </summary>
     /// <value></value>
-    public BaseMarketInfo info { get; set; } = null!;
+    public MarketInfo info { get; set; } = null!;
     /// <summary>
     /// 撮合服务
     /// </summary>
@@ -59,7 +59,7 @@ public class MatchModel
     /// 初始化
     /// </summary>
     /// <param name="info"></param>
-    public MatchModel(BaseMarketInfo info)
+    public MatchModel(MarketInfo info)
     {
         this.info = info;
         this.deal_queue = new ConcurrentQueue<List<Deal>>();

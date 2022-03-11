@@ -75,20 +75,7 @@ public class MatchCore
     {
         this.model = model;
     }
-
-    /// <summary>
-    /// 主要流程
-    /// </summary>
-    // public void SendOrder(Order order)
-    // {
-    //     List<Deal> deals = Match(order);
-    // this.mq.SendDeal(deals);
-    // List<OrderBook> orderBooks = GetOrderBooks(order, deals);
-    // this.mq.SendOrderBook(orderBooks);
-    // Kline? kline = SetKlink(deals);
-    // this.mq.SendKline(kline);
-    // }
-
+    
     /// <summary>
     /// 撤消订单
     /// </summary>

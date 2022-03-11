@@ -35,10 +35,10 @@ public class OrderController : Controller
     /// <returns></returns>
     public IActionResult PlaceOrder(long market, List<PlaceOrder> orders)
     {
-        List<MatchOrder> matchOrders = new List<MatchOrder>();
+        List<BaseOrder> matchOrders = new List<BaseOrder>();
         foreach (var item in orders)
         {
-            MatchOrder orderResult = new MatchOrder();
+            BaseOrder orderResult = new BaseOrder();
             orderResult.order_id = this.constant.worker.NextId();
             orderResult.client_id = item.client_id;
             orderResult.market = market;
@@ -57,7 +57,7 @@ public class OrderController : Controller
             orderResult.remarks = null;
             matchOrders.Add(orderResult);
         }
-        Res<List<MatchOrder>> res = FactoryService.instance.order_service.PlaceOrder(market, matchOrders);
+        Res<List<BaseOrder>> res = FactoryService.instance.order_service.PlaceOrder(market, matchOrders);
         WebCallResult<List<BaseOrder>> result = new WebCallResult<List<BaseOrder>>();
         result.success = true;
         result.code = 0;

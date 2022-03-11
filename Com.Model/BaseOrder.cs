@@ -1,4 +1,6 @@
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 using Com.Model.Enum;
 
 namespace Com.Model;
@@ -88,5 +90,13 @@ public class BaseOrder
     /// </summary>
     /// <value></value>
     public string? remarks { get; set; }
+
+    /// <summary>
+    /// 触发撤单价格
+    /// </summary>
+    /// <value></value>
+    [NotMapped]
+    [JsonIgnore]
+    public decimal trigger_cancel_price { get; set; }
 
 }

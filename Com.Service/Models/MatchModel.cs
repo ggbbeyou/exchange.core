@@ -46,7 +46,7 @@ public class MatchModel
     /// 撤单记录队列
     /// </summary>
     /// <value></value>
-    public ConcurrentQueue<List<MatchOrder>> cancel_queue { get; set; } = null!;
+    public ConcurrentQueue<List<BaseOrder>> cancel_queue { get; set; } = null!;
     /// <summary>
     /// 最近K线
     /// </summary>
@@ -63,7 +63,7 @@ public class MatchModel
     {
         this.info = info;
         this.deal_queue = new ConcurrentQueue<List<MatchDeal>>();
-        this.cancel_queue = new ConcurrentQueue<List<MatchOrder>>();
+        this.cancel_queue = new ConcurrentQueue<List<BaseOrder>>();
         foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
         {
             this.kline.Add(cycle, new BaseKline()

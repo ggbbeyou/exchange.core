@@ -77,7 +77,7 @@ public class Core
             {
                 string json = Encoding.UTF8.GetString(ea.Body.ToArray());
                 FactoryMatching.instance.constant.logger.LogInformation($"接收撮合传过来的成交订单:{json}");
-                List<(MatchOrder order, List<MatchDeal> deal)>? deals = JsonConvert.DeserializeObject<List<(MatchOrder order, List<MatchDeal> deal)>>(json);
+                List<(BaseOrder order, List<MatchDeal> deal)>? deals = JsonConvert.DeserializeObject<List<(BaseOrder order, List<MatchDeal> deal)>>(json);
                 if (deals != null && deals.Count > 0)
                 {
                     ReceiveDealOrder(deals);
@@ -107,7 +107,7 @@ public class Core
             {
                 string json = Encoding.UTF8.GetString(ea.Body.ToArray());
                 FactoryMatching.instance.constant.logger.LogInformation($"接收撮合传过来的取消订单:{json}");
-                List<MatchOrder>? deals = JsonConvert.DeserializeObject<List<MatchOrder>>(json);
+                List<BaseOrder>? deals = JsonConvert.DeserializeObject<List<BaseOrder>>(json);
                 if (deals != null && deals.Count > 0)
                 {
                     ReceiveCancelOrder(deals);
@@ -122,12 +122,12 @@ public class Core
     /// 接收到成交订单
     /// </summary>
     /// <param name="match"></param>
-    private void ReceiveDealOrder(List<(MatchOrder order, List<MatchDeal> deal)> match)
+    private void ReceiveDealOrder(List<(BaseOrder order, List<MatchDeal> deal)> match)
     {
         List<BaseOrderBook> orderBooks = new List<BaseOrderBook>();
         List<Kline> klines = new List<Kline>();
         List<Deal> total = new List<Deal>();
-        foreach ((MatchOrder order, List<MatchDeal> deal) item in match)
+        foreach ((BaseOrder order, List<MatchDeal> deal) item in match)
         {
             orderBooks.AddRange(GetOrderBooks(item.order, item.deal));
             foreach (var item1 in item.deal)
@@ -158,7 +158,7 @@ public class Core
     /// 接收到取消订单
     /// </summary>
     /// <param name="cancel"></param>
-    private void ReceiveCancelOrder(List<MatchOrder> cancel)
+    private void ReceiveCancelOrder(List<BaseOrder> cancel)
     {
         // List<OrderBook> orderBooks = GetOrderBooks(null, deals);
         // this.mq.SendOrderBook(orderBooks);
@@ -178,7 +178,7 @@ public class Core
     /// <param name="order">触发单</param>
     /// <param name="deals">成交单</param>
     /// <returns></returns>
-    public List<BaseOrderBook> GetOrderBooks(MatchOrder order, List<MatchDeal> deals)
+    public List<BaseOrderBook> GetOrderBooks(BaseOrder order, List<MatchDeal> deals)
     {
         List<BaseOrderBook> depth = new List<BaseOrderBook>();
         if (order.type == E_OrderType.price_fixed && order.amount_unsold > 0)
@@ -187,7 +187,7 @@ public class Core
         }
         foreach (MatchDeal item in deals)
         {
-            MatchOrder opponent = order.side == E_OrderSide.buy ? item.ask : item.bid;
+            BaseOrder opponent = order.side == E_OrderSide.buy ? item.ask : item.bid;
             if (opponent.type == E_OrderType.price_fixed)
             {
                 depth.Add(UpdateOrderBook(opponent.side, (double)opponent.price, item.amount, item.time, false));

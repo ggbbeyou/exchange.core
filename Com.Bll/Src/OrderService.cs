@@ -21,14 +21,14 @@ public class OrderService
     /// <param name="uid">用户id</param>
     /// <param name="order">订单列表</param>
     /// <returns></returns>
-    public Res<List<MatchOrder>> PlaceOrder(long market, List<MatchOrder> order)
+    public Res<List<BaseOrder>> PlaceOrder(long market, List<BaseOrder> order)
     {
-        Req<List<MatchOrder>> req = new Req<List<MatchOrder>>();
+        Req<List<BaseOrder>> req = new Req<List<BaseOrder>>();
         req.op = E_Op.place;
         req.market = market;
         req.data = order;
         FactoryService.instance.constant.i_model.BasicPublish(exchange: FactoryService.instance.GetMqOrderPlace(market), routingKey: "", basicProperties: FactoryService.instance.props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(req)));
-        Res<List<MatchOrder>> res = new Res<List<MatchOrder>>();
+        Res<List<BaseOrder>> res = new Res<List<BaseOrder>>();
         res.op = E_Op.place;
         res.success = true;
         res.code = E_Res_Code.ok;

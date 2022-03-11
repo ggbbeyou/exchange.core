@@ -80,11 +80,11 @@ public class HomeController : Controller
 
 
         long market = 1;
-        List<MatchOrder> orders = new List<MatchOrder>();
+        List<BaseOrder> orders = new List<BaseOrder>();
         for (int i = 0; i < 10; i++)
         {
-            MatchOrder order = new MatchOrder();
-            MatchOrder orderResult = new MatchOrder();
+            BaseOrder order = new BaseOrder();
+            BaseOrder orderResult = new BaseOrder();
             orderResult.order_id = worker.NextId();
             orderResult.client_id = null;
             orderResult.market = market;
@@ -103,7 +103,7 @@ public class HomeController : Controller
             orderResult.remarks = null;
             orders.Add(order);
         }
-        Res<List<MatchOrder>> res = FactoryService.instance.order_service.PlaceOrder(market, orders);
+        Res<List<BaseOrder>> res = FactoryService.instance.order_service.PlaceOrder(market, orders);
 
         return View();
     }

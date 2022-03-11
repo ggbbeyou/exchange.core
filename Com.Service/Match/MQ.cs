@@ -66,19 +66,19 @@ public class MQ
     /// </summary>
     /// <typeparam name="MatchDeal"></typeparam>
     /// <returns></returns>
-    private List<(MatchOrder order, List<MatchDeal> deal)> deal = new List<(MatchOrder order, List<MatchDeal> deal)>();
+    private List<(BaseOrder order, List<MatchDeal> deal)> deal = new List<(BaseOrder order, List<MatchDeal> deal)>();
     /// <summary>
     /// 临时变量
     /// </summary>
     /// <typeparam name="MatchOrder"></typeparam>
     /// <returns></returns>
-    private List<MatchOrder> cancel_deal = new List<MatchOrder>();
+    private List<BaseOrder> cancel_deal = new List<BaseOrder>();
     /// <summary>
     /// 临时变量
     /// </summary>
     /// <typeparam name="MatchOrder"></typeparam>
     /// <returns></returns>
-    private List<MatchOrder> cancel = new List<MatchOrder>();
+    private List<BaseOrder> cancel = new List<BaseOrder>();
 
     /// <summary>
     /// 初始化
@@ -113,15 +113,15 @@ public class MQ
             else
             {
                 string json = Encoding.UTF8.GetString(ea.Body.ToArray());
-                Req<List<MatchOrder>>? req = JsonConvert.DeserializeObject<Req<List<MatchOrder>>>(json);
+                Req<List<BaseOrder>>? req = JsonConvert.DeserializeObject<Req<List<BaseOrder>>>(json);
                 if (req != null && req.op == E_Op.place && req.data != null && req.data.Count > 0)
                 {
                     deal.Clear();
                     cancel_deal.Clear();
-                    foreach (MatchOrder item in req.data)
+                    foreach (BaseOrder item in req.data)
                     {
                         this.mutex.WaitOne();
-                        (MatchOrder? order, List<MatchDeal> deal, List<MatchOrder> cancel) match = this.model.match_core.Match(item);
+                        (BaseOrder? order, List<MatchDeal> deal, List<BaseOrder> cancel) match = this.model.match_core.Match(item);
                         this.mutex.ReleaseMutex();
                         if (match.order == null)
                         {

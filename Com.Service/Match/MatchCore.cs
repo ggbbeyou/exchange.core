@@ -47,25 +47,25 @@ public class MatchCore
     /// </summary>
     /// <typeparam name="Order">订单</typeparam>
     /// <returns></returns>
-    public List<MatchOrder> market_bid = new List<MatchOrder>();
+    public List<BaseOrder> market_bid = new List<BaseOrder>();
     /// <summary>
     /// 市价卖单
     /// </summary>
     /// <typeparam name="Order">订单</typeparam>
     /// <returns></returns>
-    public List<MatchOrder> market_ask = new List<MatchOrder>();
+    public List<BaseOrder> market_ask = new List<BaseOrder>();
     /// <summary>
     /// 限价买单 高->低
     /// </summary>
     /// <typeparam name="Order">订单</typeparam>
     /// <returns></returns>
-    public List<MatchOrder> fixed_bid = new List<MatchOrder>();
+    public List<BaseOrder> fixed_bid = new List<BaseOrder>();
     /// <summary>
     /// 限价卖单 低->高
     /// </summary>
     /// <typeparam name="Order">订单</typeparam>
     /// <returns></returns>
-    public List<MatchOrder> fixed_ask = new List<MatchOrder>();
+    public List<BaseOrder> fixed_ask = new List<BaseOrder>();
 
     /// <summary>
     /// 初始化
@@ -94,17 +94,17 @@ public class MatchCore
     /// </summary>
     /// <param name="order_id">订单ID</param>
     /// <returns>orderbook变更</returns>
-    public List<MatchOrder> CancelOrder(List<long> order_id)
+    public List<BaseOrder> CancelOrder(List<long> order_id)
     {
-        List<MatchOrder> cancel_market_bid = this.market_bid.Where(P => order_id.Contains(P.order_id)).ToList();
+        List<BaseOrder> cancel_market_bid = this.market_bid.Where(P => order_id.Contains(P.order_id)).ToList();
         this.market_bid.RemoveAll(P => cancel_market_bid.Select(P => P.order_id).Contains(P.order_id));
-        List<MatchOrder> cancel_market_ask = this.market_ask.Where(P => order_id.Contains(P.order_id)).ToList();
+        List<BaseOrder> cancel_market_ask = this.market_ask.Where(P => order_id.Contains(P.order_id)).ToList();
         this.market_ask.RemoveAll(P => cancel_market_ask.Select(P => P.order_id).Contains(P.order_id));
-        List<MatchOrder> cancel_fixed_bid = this.fixed_bid.Where(P => order_id.Contains(P.order_id)).ToList();
+        List<BaseOrder> cancel_fixed_bid = this.fixed_bid.Where(P => order_id.Contains(P.order_id)).ToList();
         this.fixed_bid.RemoveAll(P => cancel_fixed_bid.Select(P => P.order_id).Contains(P.order_id));
-        List<MatchOrder> cancel_fixed_ask = this.fixed_ask.Where(P => order_id.Contains(P.order_id)).ToList();
+        List<BaseOrder> cancel_fixed_ask = this.fixed_ask.Where(P => order_id.Contains(P.order_id)).ToList();
         this.fixed_ask.RemoveAll(P => cancel_fixed_ask.Select(P => P.order_id).Contains(P.order_id));
-        List<MatchOrder> cancel = new List<MatchOrder>();
+        List<BaseOrder> cancel = new List<BaseOrder>();
         cancel.AddRange(cancel_market_bid);
         cancel.AddRange(cancel_market_ask);
         cancel.AddRange(cancel_fixed_bid);
@@ -118,17 +118,17 @@ public class MatchCore
     /// </summary>
     /// <param name="uid">用户ID</param>
     /// <returns>orderbook变更</returns>
-    public List<MatchOrder> CancelOrder(long uid)
+    public List<BaseOrder> CancelOrder(long uid)
     {
-        List<MatchOrder> cancel_market_bid = this.market_bid.Where(P => P.uid == uid).ToList();
+        List<BaseOrder> cancel_market_bid = this.market_bid.Where(P => P.uid == uid).ToList();
         this.market_bid.RemoveAll(P => cancel_market_bid.Select(P => P.order_id).Contains(P.order_id));
-        List<MatchOrder> cancel_market_ask = this.market_ask.Where(P => P.uid == uid).ToList();
+        List<BaseOrder> cancel_market_ask = this.market_ask.Where(P => P.uid == uid).ToList();
         this.market_ask.RemoveAll(P => cancel_market_ask.Select(P => P.order_id).Contains(P.order_id));
-        List<MatchOrder> cancel_fixed_bid = this.fixed_bid.Where(P => P.uid == uid).ToList();
+        List<BaseOrder> cancel_fixed_bid = this.fixed_bid.Where(P => P.uid == uid).ToList();
         this.fixed_bid.RemoveAll(P => cancel_fixed_bid.Select(P => P.order_id).Contains(P.order_id));
-        List<MatchOrder> cancel_fixed_ask = this.fixed_ask.Where(P => P.uid == uid).ToList();
+        List<BaseOrder> cancel_fixed_ask = this.fixed_ask.Where(P => P.uid == uid).ToList();
         this.fixed_ask.RemoveAll(P => cancel_fixed_ask.Select(P => P.order_id).Contains(P.order_id));
-        List<MatchOrder> cancel = new List<MatchOrder>();
+        List<BaseOrder> cancel = new List<BaseOrder>();
         cancel.AddRange(cancel_market_bid);
         cancel.AddRange(cancel_market_ask);
         cancel.AddRange(cancel_fixed_bid);
@@ -142,17 +142,17 @@ public class MatchCore
     /// </summary>
     /// <param name="client_id">客户订单ID</param>
     /// <returns>orderbook变更</returns>
-    public List<MatchOrder> CancelOrder(long[] client_id)
+    public List<BaseOrder> CancelOrder(long[] client_id)
     {
-        List<MatchOrder> cancel_market_bid = this.market_bid.Where(P => client_id.Contains(P.order_id)).ToList();
+        List<BaseOrder> cancel_market_bid = this.market_bid.Where(P => client_id.Contains(P.order_id)).ToList();
         this.market_bid.RemoveAll(P => cancel_market_bid.Select(P => P.order_id).Contains(P.order_id));
-        List<MatchOrder> cancel_market_ask = this.market_ask.Where(P => client_id.Contains(P.order_id)).ToList();
+        List<BaseOrder> cancel_market_ask = this.market_ask.Where(P => client_id.Contains(P.order_id)).ToList();
         this.market_ask.RemoveAll(P => cancel_market_ask.Select(P => P.order_id).Contains(P.order_id));
-        List<MatchOrder> cancel_fixed_bid = this.fixed_bid.Where(P => client_id.Contains(P.order_id)).ToList();
+        List<BaseOrder> cancel_fixed_bid = this.fixed_bid.Where(P => client_id.Contains(P.order_id)).ToList();
         this.fixed_bid.RemoveAll(P => cancel_fixed_bid.Select(P => P.order_id).Contains(P.order_id));
-        List<MatchOrder> cancel_fixed_ask = this.fixed_ask.Where(P => client_id.Contains(P.order_id)).ToList();
+        List<BaseOrder> cancel_fixed_ask = this.fixed_ask.Where(P => client_id.Contains(P.order_id)).ToList();
         this.fixed_ask.RemoveAll(P => cancel_fixed_ask.Select(P => P.order_id).Contains(P.order_id));
-        List<MatchOrder> cancel = new List<MatchOrder>();
+        List<BaseOrder> cancel = new List<BaseOrder>();
         cancel.AddRange(cancel_market_bid);
         cancel.AddRange(cancel_market_ask);
         cancel.AddRange(cancel_fixed_bid);
@@ -165,9 +165,9 @@ public class MatchCore
     /// 撤消订单(该交易对所有订单)
     /// </summary>
     /// <returns>orderbook变更</returns>
-    public List<MatchOrder> CancelOrder()
+    public List<BaseOrder> CancelOrder()
     {
-        List<MatchOrder> cancel = new List<MatchOrder>();
+        List<BaseOrder> cancel = new List<BaseOrder>();
         cancel.AddRange(this.market_bid);
         cancel.AddRange(this.market_ask);
         cancel.AddRange(this.fixed_bid);
@@ -181,10 +181,10 @@ public class MatchCore
     /// </summary>
     /// <param name="order">挂单订单(手续费问题在推送到撮合之前扣除)</param>
     /// <returns>成交情况</returns>
-    public (MatchOrder? order, List<MatchDeal> deal, List<MatchOrder> cancel) Match(MatchOrder order)
+    public (BaseOrder? order, List<MatchDeal> deal, List<BaseOrder> cancel) Match(BaseOrder order)
     {
         List<MatchDeal> deals = new List<MatchDeal>();
-        List<MatchOrder> cancel = new List<MatchOrder>();
+        List<BaseOrder> cancel = new List<BaseOrder>();
         if (order.market != this.model.info.market || order.amount <= 0 || order.amount_unsold <= 0)
         {
             return (null, deals, cancel);
@@ -512,10 +512,10 @@ public class MatchCore
         {
             //触发市价撤单价格
             decimal total_price = deals.Last().price;
-            List<MatchOrder> bid = this.market_bid.Where(P => P.trigger_cancel_price >= total_price).ToList();
+            List<BaseOrder> bid = this.market_bid.Where(P => P.trigger_cancel_price >= total_price).ToList();
             bid.ForEach(P => { P.state = E_OrderState.cancel; P.deal_last_time = DateTimeOffset.UtcNow; P.remarks = "市价买单已高于触发价,自动撤单"; });
             cancel.AddRange(bid);
-            List<MatchOrder> ask = this.market_ask.Where(P => P.trigger_cancel_price <= total_price).ToList();
+            List<BaseOrder> ask = this.market_ask.Where(P => P.trigger_cancel_price <= total_price).ToList();
             ask.ForEach(P => { P.state = E_OrderState.cancel; P.deal_last_time = DateTimeOffset.UtcNow; P.remarks = "市价卖单已低于触发价,自动撤单"; });
             cancel.AddRange(ask);
         }

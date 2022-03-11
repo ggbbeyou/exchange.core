@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
 using Com.Db;
-using Com.Model.Enum;
+using Com.Db.Enum;
 using LinqKit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;

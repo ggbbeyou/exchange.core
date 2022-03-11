@@ -1,10 +1,11 @@
 ﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Com.Api.Models;
-using Com.Api.Model;
 using Com.Bll;
-using Com.Model;
-using Com.Model.Enum;
+using Com.Db;
+using Com.Bll.ApiModel;
+using Com.Db.Enum;
+using Com.Db.Model;
 
 namespace Com.Api.Controllers;
 
@@ -35,10 +36,10 @@ public class OrderController : Controller
     /// <returns></returns>
     public IActionResult PlaceOrder(long market, List<PlaceOrder> orders)
     {
-        List<BaseOrder> matchOrders = new List<BaseOrder>();
+        List<Orders> matchOrders = new List<Orders>();
         foreach (var item in orders)
         {
-            BaseOrder orderResult = new BaseOrder();
+            Orders orderResult = new Orders();
             orderResult.order_id = this.constant.worker.NextId();
             orderResult.client_id = item.client_id;
             orderResult.market = market;
@@ -57,12 +58,12 @@ public class OrderController : Controller
             orderResult.remarks = null;
             matchOrders.Add(orderResult);
         }
-        Res<List<BaseOrder>> res = FactoryService.instance.order_service.PlaceOrder(market, matchOrders);
-        WebCallResult<List<BaseOrder>> result = new WebCallResult<List<BaseOrder>>();
+        Res<List<Orders>> res = FactoryService.instance.order_service.PlaceOrder(market, matchOrders);
+        WebCallResult<List<Orders>> result = new WebCallResult<List<Orders>>();
         result.success = true;
         result.code = 0;
         result.message = res.message;
-        result.data = new List<BaseOrder>();
+        result.data = new List<Orders>();
         foreach (var item in res.data)
         {
             result.data.Add(item);

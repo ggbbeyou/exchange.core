@@ -1,6 +1,5 @@
 using Com.Bll;
-using Com.Model;
-using Com.Model.Enum;
+using Com.Db;
 using Com.Service.Match;
 using Com.Service.Models;
 

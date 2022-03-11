@@ -1,7 +1,6 @@
 using System;
-using Com.Model.Enum;
 
-namespace Com.Model;
+namespace Com.Db;
 
 /// <summary>
 /// K线

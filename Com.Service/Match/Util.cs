@@ -1,6 +1,6 @@
 using System;
-using Com.Model;
-using Com.Model.Enum;
+using Com.Db;
+using Com.Db.Enum;
 using Snowflake;
 
 namespace Com.Service.Match;
@@ -60,7 +60,7 @@ public static class Util
     /// <param name="trigger_side">触发方向</param>
     /// <param name="now">成交时间</param>
     /// <returns></returns>
-    public static MatchDeal AmountBidAsk(long market, BaseOrder bid, BaseOrder ask, decimal price, E_OrderSide trigger_side, DateTimeOffset now)
+    public static Deal AmountBidAsk(long market, Orders bid, Orders ask, decimal price, E_OrderSide trigger_side, DateTimeOffset now)
     {
         decimal ask_amount = ask.amount_unsold;
         ask.amount_unsold = 0;
@@ -78,7 +78,7 @@ public static class Util
         {
             bid.state = E_OrderState.partial;
         }
-        MatchDeal deal = new MatchDeal()
+        Deal deal = new Deal()
         {
             trade_id = FactoryMatching.instance.constant.worker.NextId(),
             market = market,
@@ -105,7 +105,7 @@ public static class Util
     /// <param name="trigger_side">触发方向</param>
     /// <param name="now">成交时间</param>
     /// <returns></returns>
-    public static MatchDeal AmountAskBid(long market, BaseOrder bid, BaseOrder ask, decimal price, E_OrderSide trigger_side, DateTimeOffset now)
+    public static Deal AmountAskBid(long market, Orders bid, Orders ask, decimal price, E_OrderSide trigger_side, DateTimeOffset now)
     {
         decimal bid_amount = bid.amount_unsold;
         ask.amount_unsold -= bid_amount;
@@ -123,7 +123,7 @@ public static class Util
         bid.amount_done = bid_amount;
         bid.deal_last_time = now;
         bid.state = E_OrderState.completed;
-        MatchDeal deal = new MatchDeal()
+        Deal deal = new Deal()
         {
             trade_id = FactoryMatching.instance.constant.worker.NextId(),
             market = market,

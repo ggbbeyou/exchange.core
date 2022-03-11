@@ -1,5 +1,5 @@
 using Com.Db;
-using Com.Model.Enum;
+using Com.Db.Enum;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using StackExchange.Redis;

@@ -1,5 +1,6 @@
-using Com.Model;
-using Com.Model.Enum;
+using Com.Db;
+using Com.Db.Enum;
+using Com.Db.Model;
 using Grpc.Core;
 using GrpcExchange;
 using Microsoft.Extensions.Configuration;

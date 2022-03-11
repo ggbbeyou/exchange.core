@@ -23,7 +23,7 @@ public class DbContextEF : DbContext
     /// 订单表
     /// </summary>
     /// <value></value>
-    public DbSet<Order> Order { get; set; } = null!;
+    public DbSet<Orders> Order { get; set; } = null!;
 
     /// <summary>
     /// 构造函数
@@ -63,7 +63,7 @@ public class DbContextEF : DbContext
             o.ToTable(nameof(Kline));
 
         });
-        modelBuilder.Entity<Order>(o =>
+        modelBuilder.Entity<Orders>(o =>
         {
             o.HasKey(p => p.order_id);
             o.HasIndex(P => new { P.uid });

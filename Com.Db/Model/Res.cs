@@ -1,7 +1,7 @@
 using System;
-using Com.Model.Enum;
+using Com.Db.Enum;
 
-namespace Com.Model;
+namespace Com.Db.Model;
 
 /// <summary>
 /// 响应操作动作

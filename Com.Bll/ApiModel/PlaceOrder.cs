@@ -1,7 +1,7 @@
-﻿using Com.Model;
-using Com.Model.Enum;
+﻿
+using Com.Db.Enum;
 
-namespace Com.Api.Model;
+namespace Com.Bll.ApiModel;
 
 /// <summary>
 /// 下单

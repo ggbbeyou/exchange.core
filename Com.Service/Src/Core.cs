@@ -1,8 +1,8 @@
 using System.Text;
 using Com.Bll;
 using Com.Db;
-using Com.Model;
-using Com.Model.Enum;
+using Com.Db.Enum;
+using Com.Db.Model;
 using Com.Service.Match;
 using Com.Service.Models;
 using Microsoft.Extensions.Logging;
@@ -39,7 +39,7 @@ public class Core
     /// 最后一分钟K线
     /// </summary>
     /// <returns></returns>
-    public BaseKline kline_minute = null!;
+    public Kline kline_minute = null!;
     /// <summary>
     /// redis zset  depth:{market}:{bid/ask}
     /// </summary>
@@ -77,7 +77,7 @@ public class Core
             {
                 string json = Encoding.UTF8.GetString(ea.Body.ToArray());
                 FactoryMatching.instance.constant.logger.LogInformation($"接收撮合传过来的成交订单:{json}");
-                List<(BaseOrder order, List<MatchDeal> deal)>? deals = JsonConvert.DeserializeObject<List<(BaseOrder order, List<MatchDeal> deal)>>(json);
+                List<(Orders order, List<Deal> deal)>? deals = JsonConvert.DeserializeObject<List<(Orders order, List<Deal> deal)>>(json);
                 if (deals != null && deals.Count > 0)
                 {
                     ReceiveDealOrder(deals);
@@ -107,7 +107,7 @@ public class Core
             {
                 string json = Encoding.UTF8.GetString(ea.Body.ToArray());
                 FactoryMatching.instance.constant.logger.LogInformation($"接收撮合传过来的取消订单:{json}");
-                List<BaseOrder>? deals = JsonConvert.DeserializeObject<List<BaseOrder>>(json);
+                List<Orders>? deals = JsonConvert.DeserializeObject<List<Orders>>(json);
                 if (deals != null && deals.Count > 0)
                 {
                     ReceiveCancelOrder(deals);
@@ -122,17 +122,17 @@ public class Core
     /// 接收到成交订单
     /// </summary>
     /// <param name="match"></param>
-    private void ReceiveDealOrder(List<(BaseOrder order, List<MatchDeal> deal)> match)
+    private void ReceiveDealOrder(List<(Orders order, List<Deal> deal)> match)
     {
         List<BaseOrderBook> orderBooks = new List<BaseOrderBook>();
         List<Kline> klines = new List<Kline>();
-        List<Deal> total = new List<Deal>();
-        foreach ((BaseOrder order, List<MatchDeal> deal) item in match)
+        List<Db.Deal> total = new List<Db.Deal>();
+        foreach ((Orders order, List<Deal> deal) item in match)
         {
             orderBooks.AddRange(GetOrderBooks(item.order, item.deal));
             foreach (var item1 in item.deal)
             {
-                total.Add(new Deal()
+                total.Add(new Db.Deal()
                 {
                     trade_id = item1.trade_id,
                     market = item1.market,
@@ -158,7 +158,7 @@ public class Core
     /// 接收到取消订单
     /// </summary>
     /// <param name="cancel"></param>
-    private void ReceiveCancelOrder(List<BaseOrder> cancel)
+    private void ReceiveCancelOrder(List<Orders> cancel)
     {
         // List<OrderBook> orderBooks = GetOrderBooks(null, deals);
         // this.mq.SendOrderBook(orderBooks);
@@ -178,16 +178,16 @@ public class Core
     /// <param name="order">触发单</param>
     /// <param name="deals">成交单</param>
     /// <returns></returns>
-    public List<BaseOrderBook> GetOrderBooks(BaseOrder order, List<MatchDeal> deals)
+    public List<BaseOrderBook> GetOrderBooks(Orders order, List<Deal> deals)
     {
         List<BaseOrderBook> depth = new List<BaseOrderBook>();
         if (order.type == E_OrderType.price_fixed && order.amount_unsold > 0)
         {
             depth.Add(UpdateOrderBook(order.side, (double)order.price, order.amount_unsold, order.deal_last_time ?? DateTimeOffset.UtcNow, true));
         }
-        foreach (MatchDeal item in deals)
+        foreach (Deal item in deals)
         {
-            BaseOrder opponent = order.side == E_OrderSide.buy ? item.ask : item.bid;
+            Orders opponent = order.side == E_OrderSide.buy ? item.ask : item.bid;
             if (opponent.type == E_OrderType.price_fixed)
             {
                 depth.Add(UpdateOrderBook(opponent.side, (double)opponent.price, item.amount, item.time, false));

@@ -1,7 +1,6 @@
-using Com.Model;
-using Com.Model.Enum;
 
-namespace Com.Api.Model;
+
+namespace Com.Bll.ApiModel;
 
 /// <summary>
 /// web调用结果

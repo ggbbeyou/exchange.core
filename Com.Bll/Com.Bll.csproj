@@ -8,8 +8,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Com.Db\Com.Db.csproj" />
-    <ProjectReference Include="..\Com.Model\Com.Model.csproj" />
-    <ProjectReference Include="..\Api\Com.Api.Model\Com.Api.Model.csproj" />
   </ItemGroup>
 
   <ItemGroup>

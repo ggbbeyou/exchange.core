@@ -6,8 +6,5 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Com.Api.Model\Com.Api.Model.csproj" />
-  </ItemGroup>
 
 </Project>

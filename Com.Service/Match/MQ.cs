@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Com.Model;
-using Com.Model.Enum;
+using Com.Db;
+using Com.Db.Enum;
+using Com.Db.Model;
 using Com.Service.Models;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
@@ -66,19 +67,19 @@ public class MQ
     /// </summary>
     /// <typeparam name="MatchDeal"></typeparam>
     /// <returns></returns>
-    private List<(BaseOrder order, List<MatchDeal> deal)> deal = new List<(BaseOrder order, List<MatchDeal> deal)>();
+    private List<(Orders order, List<Deal> deal)> deal = new List<(Orders order, List<Deal> deal)>();
     /// <summary>
     /// 临时变量
     /// </summary>
     /// <typeparam name="MatchOrder"></typeparam>
     /// <returns></returns>
-    private List<BaseOrder> cancel_deal = new List<BaseOrder>();
+    private List<Orders> cancel_deal = new List<Orders>();
     /// <summary>
     /// 临时变量
     /// </summary>
     /// <typeparam name="MatchOrder"></typeparam>
     /// <returns></returns>
-    private List<BaseOrder> cancel = new List<BaseOrder>();
+    private List<Orders> cancel = new List<Orders>();
 
     /// <summary>
     /// 初始化
@@ -113,15 +114,15 @@ public class MQ
             else
             {
                 string json = Encoding.UTF8.GetString(ea.Body.ToArray());
-                Req<List<BaseOrder>>? req = JsonConvert.DeserializeObject<Req<List<BaseOrder>>>(json);
+                Req<List<Orders>>? req = JsonConvert.DeserializeObject<Req<List<Orders>>>(json);
                 if (req != null && req.op == E_Op.place && req.data != null && req.data.Count > 0)
                 {
                     deal.Clear();
                     cancel_deal.Clear();
-                    foreach (BaseOrder item in req.data)
+                    foreach (Orders item in req.data)
                     {
                         this.mutex.WaitOne();
-                        (BaseOrder? order, List<MatchDeal> deal, List<BaseOrder> cancel) match = this.model.match_core.Match(item);
+                        (Orders? order, List<Deal> deal, List<Orders> cancel) match = this.model.match_core.Match(item);
                         this.mutex.ReleaseMutex();
                         if (match.order == null)
                         {

@@ -1,6 +1,6 @@
 using System;
 
-namespace Com.Model.Enum;
+namespace Com.Db.Enum;
 
 /// <summary>
 /// 请求操作动作

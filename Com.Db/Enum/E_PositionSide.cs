@@ -1,6 +1,6 @@
 using System;
 
-namespace Com.Model.Enum;
+namespace Com.Db.Enum;
 
 /// <summary>
 /// 持仓方向

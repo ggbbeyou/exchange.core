@@ -1,9 +1,8 @@
-using System.Text;
-using Com.Api.Model;
 using Com.Db;
-using Com.Model;
-using Com.Model.Enum;
+using Com.Db.Enum;
+using Com.Db.Model;
 using Newtonsoft.Json;
+using System.Text;
 using RabbitMQ.Client;
 using StackExchange.Redis;
 
@@ -21,14 +20,14 @@ public class OrderService
     /// <param name="uid">用户id</param>
     /// <param name="order">订单列表</param>
     /// <returns></returns>
-    public Res<List<BaseOrder>> PlaceOrder(long market, List<BaseOrder> order)
+    public Res<List<Orders>> PlaceOrder(long market, List<Orders> order)
     {
-        Req<List<BaseOrder>> req = new Req<List<BaseOrder>>();
+        Req<List<Orders>> req = new Req<List<Orders>>();
         req.op = E_Op.place;
         req.market = market;
         req.data = order;
         FactoryService.instance.constant.i_model.BasicPublish(exchange: FactoryService.instance.GetMqOrderPlace(market), routingKey: "", basicProperties: FactoryService.instance.props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(req)));
-        Res<List<BaseOrder>> res = new Res<List<BaseOrder>>();
+        Res<List<Orders>> res = new Res<List<Orders>>();
         res.op = E_Op.place;
         res.success = true;
         res.code = E_Res_Code.ok;

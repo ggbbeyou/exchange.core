@@ -3,11 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 using Com.Admin.Models;
 using Grpc.Net.Client;
 using GrpcExchange;
-using Com.Model;
 using Newtonsoft.Json;
-using Com.Model.Enum;
 using Snowflake.Core;
 using Com.Bll;
+using Com.Db;
+using Com.Db.Enum;
+using Com.Db.Model;
 
 namespace Com.Admin.Controllers;
 
@@ -80,11 +81,11 @@ public class HomeController : Controller
 
 
         long market = 1;
-        List<BaseOrder> orders = new List<BaseOrder>();
+        List<Orders> orders = new List<Orders>();
         for (int i = 0; i < 10; i++)
         {
-            BaseOrder order = new BaseOrder();
-            BaseOrder orderResult = new BaseOrder();
+            Orders order = new Orders();
+            Orders orderResult = new Orders();
             orderResult.order_id = worker.NextId();
             orderResult.client_id = null;
             orderResult.market = market;
@@ -103,7 +104,7 @@ public class HomeController : Controller
             orderResult.remarks = null;
             orders.Add(order);
         }
-        Res<List<BaseOrder>> res = FactoryService.instance.order_service.PlaceOrder(market, orders);
+        Res<List<Orders>> res = FactoryService.instance.order_service.PlaceOrder(market, orders);
 
         return View();
     }

@@ -12,10 +12,15 @@ public class BaseMarketInfo
     /// 交易对
     /// </summary>
     /// <value></value>
-    public long market { get; set; } 
+    public long market { get; set; }
+    /// <summary>
+    /// 交易对名称
+    /// </summary>
+    /// <value></value>
+    public string symbol { get; set; } = null!;
     /// <summary>
     /// 最后的成交价
     /// </summary>
     /// <value></value>
-    public decimal last_price { get; set; }  
+    public decimal last_price { get; set; }
 }

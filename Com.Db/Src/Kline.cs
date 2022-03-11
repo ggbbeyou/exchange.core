@@ -19,6 +19,11 @@ public class Kline
     /// <value></value>
     public long market { get; set; }
     /// <summary>
+    /// 交易对名称
+    /// </summary>
+    /// <value></value>
+    public string symbol { get; set; } = null!;
+    /// <summary>
     /// K线类型
     /// </summary>
     /// <value></value>

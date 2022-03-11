@@ -16,15 +16,20 @@ public class Orders
     /// <value></value>
     public long order_id { get; set; }
     /// <summary>
-    /// 客户自定义订单id
-    /// </summary>
-    /// <value></value>
-    public string? client_id { get; set; } = null;
-    /// <summary>
     /// 交易对
     /// </summary>
     /// <value></value>
     public long market { get; set; }
+    /// <summary>
+    /// 交易对名称
+    /// </summary>
+    /// <value></value>
+    public string symbol { get; set; } = null!;
+    /// <summary>
+    /// 客户自定义订单id
+    /// </summary>
+    /// <value></value>
+    public string? client_id { get; set; } = null;
     /// <summary>
     /// 用户ID
     /// </summary>

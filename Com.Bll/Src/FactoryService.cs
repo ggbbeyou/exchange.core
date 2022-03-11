@@ -80,6 +80,16 @@ public class FactoryService
     }
 
     /// <summary>
+    /// redis zset 深度行情 depth:{market}:{bid/ask}
+    /// </summary>
+    /// <param name="market"></param>
+    /// <returns></returns>
+    public string GetRedisDepth(long market, E_OrderSide side)
+    {
+        return string.Format("depth:{0}:{1}", market, side);
+    }
+
+    /// <summary>
     /// redis(zset)键 已生成K线 K线开始时间=>kline:btc/usdt:main1
     /// </summary>
     /// <param name="market"></param>

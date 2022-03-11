@@ -40,11 +40,6 @@ public class Core
     /// </summary>
     /// <returns></returns>
     public Kline kline_minute = null!;
-    /// <summary>
-    /// redis zset  depth:{market}:{bid/ask}
-    /// </summary>
-    /// <value></value>
-    public string key_redis_depth = "depth:{0}:{1}";
 
     /// <summary>
     /// 初始化
@@ -206,7 +201,7 @@ public class Core
     /// <returns></returns>
     public BaseOrderBook UpdateOrderBook(E_OrderSide side, double price, decimal amount, DateTimeOffset deal_time, bool is_add)
     {
-        string key = string.Format(this.key_redis_depth, this.model.info.market, side.ToString());
+        string key = FactoryService.instance.GetRedisDepth(this.model.info.market, side);
         BaseOrderBook orderBook = new BaseOrderBook();
         StackExchange.Redis.RedisValue[] redisValues = FactoryMatching.instance.constant.redis.SortedSetRangeByScore(key, price);
         if (redisValues.Count() == 0)

@@ -19,6 +19,16 @@ public class MarketInfo
     /// <value></value>
     public string symbol { get; set; } = null!;
     /// <summary>
+    /// 价格小数位数
+    /// </summary>
+    /// <value></value>
+    public decimal price_places { get; set; }
+    /// <summary>
+    /// 量小数位数
+    /// </summary>
+    /// <value></value>
+    public decimal amount_places { get; set; }
+    /// <summary>
     /// 最后的成交价
     /// </summary>
     /// <value></value>

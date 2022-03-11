@@ -50,6 +50,8 @@ public class DbContextEF : DbContext
             o.HasKey(p => p.market);
             o.Property(P => P.market).IsRequired().HasColumnType("bigint").HasMaxLength(50).HasComment("交易对");
             o.Property(P => P.symbol).HasColumnType("nvarchar").HasMaxLength(20).HasComment("交易对名称");
+            o.Property(P => P.price_places).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("价格小数位数");
+            o.Property(P => P.amount_places).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("量小数位数");
             o.ToTable(nameof(MarketInfo));
         });
         modelBuilder.Entity<Kline>(o =>

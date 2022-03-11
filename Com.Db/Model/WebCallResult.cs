@@ -1,6 +1,6 @@
 
 
-namespace Com.Bll.ApiModel;
+namespace Com.Db.Model;
 
 /// <summary>
 /// web调用结果

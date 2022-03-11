@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Com.Api.Models;
 using Com.Bll;
 using Com.Db;
-using Com.Bll.ApiModel;
 using Com.Db.Enum;
 using Com.Db.Model;
 

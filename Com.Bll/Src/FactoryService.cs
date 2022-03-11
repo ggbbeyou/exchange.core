@@ -96,7 +96,7 @@ public class FactoryService
     /// <returns></returns>
     public string GetRedisKline(long market, E_KlineType type)
     {
-        return string.Format("kline:{0}:{1}", market, type.ToString());
+        return string.Format("kline:{0}:{1}", market, type);
     }
 
     /// <summary>

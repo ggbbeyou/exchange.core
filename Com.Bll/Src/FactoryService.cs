@@ -109,6 +109,32 @@ public class FactoryService
         return string.Format("klineing:{0}", market);
     }
 
+
+
+     /// <summary>
+    /// (Direct)接收挂单订单队列名称
+    /// </summary>
+    /// <value></value>
+    public string key_order_send = "order_send";
+    /// <summary>
+    /// (Direct)发送历史成交记录
+    /// </summary>
+    /// <value></value>
+    public string key_deal = "deal";
+    /// <summary>
+    /// (Direct)接收取消订单队列名称
+    /// </summary>
+    /// <value></value>
+    public string key_order_cancel = "order_cancel";
+    /// <summary>
+    /// (Direct)发送撤单订单成功队列名称
+    /// </summary>
+    /// <value></value>
+    public string key_order_cancel_success = "order_cancel_success";
+
+
+    
+
     /// <summary>
     /// MQ:下单队列
     /// </summary>

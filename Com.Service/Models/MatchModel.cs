@@ -47,13 +47,6 @@ public class MatchModel
     /// </summary>
     /// <value></value>
     public ConcurrentQueue<List<Orders>> cancel_queue { get; set; } = null!;
-    /// <summary>
-    /// 最近K线
-    /// </summary>
-    /// <typeparam name="E_KlineType">K线类型</typeparam>
-    /// <typeparam name="Kline">K线</typeparam>
-    /// <returns></returns>
-    public Dictionary<E_KlineType, Kline> kline = new Dictionary<E_KlineType, Kline>();
 
     /// <summary>
     /// 初始化
@@ -64,13 +57,5 @@ public class MatchModel
         this.info = info;
         this.deal_queue = new ConcurrentQueue<List<Deal>>();
         this.cancel_queue = new ConcurrentQueue<List<Orders>>();
-        foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
-        {
-            this.kline.Add(cycle, new Kline()
-            {
-                market = this.info.market,
-                type = cycle,
-            });
-        }
     }
 }

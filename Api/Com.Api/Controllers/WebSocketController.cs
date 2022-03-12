@@ -60,9 +60,20 @@ public class WebSocketController : Controller
 
                 var buffer = new byte[1024 * 1024];
                 WebSocketReceiveResult result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+                byte[] a = buffer;
                 while (!result.CloseStatus.HasValue)
                 {
-                    
+                    string str = System.Text.Encoding.UTF8.GetString(buffer, 0, result.Count);
+                    if (str == "ping")
+                    {
+                        byte[] b = System.Text.Encoding.UTF8.GetBytes("pong");
+                        await webSocket.SendAsync(new ArraySegment<byte>(b, 0, b.Length), WebSocketMessageType.Text, true, CancellationToken.None);
+                    }
+                    else
+                    {
+                        // byte[] b = System.Text.Encoding.UTF8.GetBytes("pong");
+                        await webSocket.SendAsync(new ArraySegment<byte>(buffer, 0, result.Count), WebSocketMessageType.Text, true, CancellationToken.None);
+                    }
                     result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
                 }
                 await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);

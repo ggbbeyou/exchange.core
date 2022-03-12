@@ -1,3 +1,4 @@
+using System.Text;
 using Com.Db;
 using Com.Db.Enum;
 using Newtonsoft.Json;
@@ -109,9 +110,43 @@ public class FactoryService
         return string.Format("klineing:{0}", market);
     }
 
+    //
+
+    /// <summary>
+    /// 聚合行情 MQ:Publish/Subscribe=>exchange:trades;routingKey:market
+    /// </summary>
+    /// <param name="market"></param>
+    /// <returns></returns>
+    public string GetMqTrades()
+    {
+        return string.Format("trades");
+    }
 
 
-     /// <summary>
+
+
+
+
+
+
+
+
+
+    //
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /// <summary>
     /// (Direct)接收挂单订单队列名称
     /// </summary>
     /// <value></value>
@@ -133,7 +168,7 @@ public class FactoryService
     public string key_order_cancel_success = "order_cancel_success";
 
 
-    
+
 
     /// <summary>
     /// MQ:下单队列

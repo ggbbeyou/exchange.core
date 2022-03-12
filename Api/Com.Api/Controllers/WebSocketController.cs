@@ -74,7 +74,8 @@ public class WebSocketController : Controller
                     else
                     {
                         // byte[] b = System.Text.Encoding.UTF8.GetBytes("pong");
-                        await AA(webSocket, result, str);
+
+                        AA(webSocket, result, JsonConvert.DeserializeObject<ReqWebsocker<ReqChannel>>(str));
                         // await webSocket.SendAsync(new ArraySegment<byte>(buffer, 0, result.Count), WebSocketMessageType.Text, true, CancellationToken.None);
                     }
                     result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
@@ -90,61 +91,95 @@ public class WebSocketController : Controller
     }
 
 
-    private async Task AA(WebSocket webSocket, WebSocketReceiveResult result, string json)
+    private void AA(WebSocket webSocket, WebSocketReceiveResult result, ReqWebsocker<ReqChannel>? req)
     {
-        byte[] b = System.Text.Encoding.UTF8.GetBytes(json);
-
-        string queueName = this.constant.i_model.QueueDeclare().QueueName;
-        this.constant.i_model.QueueBind(queue: queueName, exchange: this.key_order_send, routingKey: this.model.info.market.ToString());
-        EventingBasicConsumer consumer = new EventingBasicConsumer(this.constant.i_model);
-        consumer.Received += (model, ea) =>
+        if (req == null)
         {
-            if (!this.model.run)
+            return;
+        }
+        if (req.op == "subscribe")
+        {
+            foreach (ReqChannel item in req.args)
             {
-                this.constant.i_model.BasicNack(deliveryTag: ea.DeliveryTag, multiple: true, requeue: true);
-            }
-            else
-            {
-                string json = Encoding.UTF8.GetString(ea.Body.ToArray());
-                CallRequest<List<Orders>>? req = JsonConvert.DeserializeObject<CallRequest<List<Orders>>>(json);
-                if (req != null && req.op == E_Op.place && req.data != null && req.data.Count > 0)
+                string[] ConsumerTags = this.constant.MqSubscribe(item.channel, item.data ?? "", async (message) =>
                 {
-                    deal.Clear();
-                    cancel_deal.Clear();
-                    foreach (Orders item in req.data)
+                    try
                     {
-                        this.mutex.WaitOne();
-                        (Orders? order, List<Deal> deal, List<Orders> cancel) match = this.model.match_core.Match(item);
-                        this.mutex.ReleaseMutex();
-                        if (match.order == null)
+                        byte[] b = System.Text.Encoding.UTF8.GetBytes(message);
+                        if (webSocket.State == WebSocketState.Open)
                         {
-                            continue;
+                            await webSocket.SendAsync(new ArraySegment<byte>(b, 0, b.Length), WebSocketMessageType.Text, true, CancellationToken.None);
                         }
-                        deal.Add((match.order, match.deal));
-                        if (match.cancel.Count > 0)
+                        else
                         {
-                            cancel_deal.AddRange(match.cancel);
+                            //   break;
                         }
                     }
-                    if (deal.Count() > 0)
+                    catch (System.Exception ex)
                     {
-                        this.constant.i_model.BasicPublish(exchange: this.key_deal, routingKey: this.model.info.market.ToString(), basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(deal)));
+                        this.constant.logger.LogError(ex, "websocket_coin发送消息出错:");
                     }
-                    if (cancel_deal.Count > 0)
-                    {
-                        this.constant.i_model.BasicPublish(exchange: this.key_order_cancel_success, routingKey: this.model.info.market.ToString(), basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(cancel_deal)));
-                    }
-                };
-                this.constant.i_model.BasicAck(ea.DeliveryTag, true);
+                });
+
+                this.constant.i_model.BasicCancel(ConsumerTags.First());
             }
-        };
-        this.constant.i_model.BasicConsume(queue: queueName, autoAck: false, consumer: consumer);
+        }
+        else if (req.op == "unsubscribe")
+        {
+
+        }
+
+        // string queueName = this.constant.i_model.QueueDeclare().QueueName;
+        // this.constant.i_model.QueueBind(queue: queueName, exchange: this.key_order_send, routingKey: this.model.info.market.ToString());
+        // EventingBasicConsumer consumer = new EventingBasicConsumer(this.constant.i_model);
+        // consumer.Received += (model, ea) =>
+        // {
+        //     if (!this.model.run)
+        //     {
+        //         this.constant.i_model.BasicNack(deliveryTag: ea.DeliveryTag, multiple: true, requeue: true);
+        //     }
+        //     else
+        //     {
+        //         string json = Encoding.UTF8.GetString(ea.Body.ToArray());
+        //         CallRequest<List<Orders>>? req = JsonConvert.DeserializeObject<CallRequest<List<Orders>>>(json);
+        //         if (req != null && req.op == E_Op.place && req.data != null && req.data.Count > 0)
+        //         {
+        //             deal.Clear();
+        //             cancel_deal.Clear();
+        //             foreach (Orders item in req.data)
+        //             {
+        //                 this.mutex.WaitOne();
+        //                 (Orders? order, List<Deal> deal, List<Orders> cancel) match = this.model.match_core.Match(item);
+        //                 this.mutex.ReleaseMutex();
+        //                 if (match.order == null)
+        //                 {
+        //                     continue;
+        //                 }
+        //                 deal.Add((match.order, match.deal));
+        //                 if (match.cancel.Count > 0)
+        //                 {
+        //                     cancel_deal.AddRange(match.cancel);
+        //                 }
+        //             }
+        //             if (deal.Count() > 0)
+        //             {
+        //                 this.constant.i_model.BasicPublish(exchange: this.key_deal, routingKey: this.model.info.market.ToString(), basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(deal)));
+        //             }
+        //             if (cancel_deal.Count > 0)
+        //             {
+        //                 this.constant.i_model.BasicPublish(exchange: this.key_order_cancel_success, routingKey: this.model.info.market.ToString(), basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(cancel_deal)));
+        //             }
+        //         };
+        //         this.constant.i_model.BasicAck(ea.DeliveryTag, true);
+        //     }
+        // };
+        // this.constant.i_model.BasicConsume(queue: queueName, autoAck: false, consumer: consumer);
 
 
 
-        await webSocket.SendAsync(new ArraySegment<byte>(b, 0, result.Count), WebSocketMessageType.Text, true, CancellationToken.None);
+        // await webSocket.SendAsync(new ArraySegment<byte>(b, 0, result.Count), WebSocketMessageType.Text, true, CancellationToken.None);
     }
 
-  
+
 
 }

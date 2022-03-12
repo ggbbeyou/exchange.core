@@ -58,10 +58,11 @@ public class WebSocketController : Controller
                 //     this.logger.LogError(ex, "websocket_coin发送消息出错:");
                 // }
 
-                var buffer = new byte[1024 * 4];
+                var buffer = new byte[1024 * 10];
                 WebSocketReceiveResult result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
                 while (!result.CloseStatus.HasValue)
                 {
+                    
                     result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
                 }
                 await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);

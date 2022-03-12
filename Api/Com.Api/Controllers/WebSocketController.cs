@@ -7,6 +7,8 @@ using Com.Db.Enum;
 using Com.Db.Model;
 using System.Net.WebSockets;
 using Newtonsoft.Json;
+using RabbitMQ.Client;
+using RabbitMQ.Client.Events;
 
 namespace Com.Api.Controllers;
 
@@ -72,7 +74,8 @@ public class WebSocketController : Controller
                     else
                     {
                         // byte[] b = System.Text.Encoding.UTF8.GetBytes("pong");
-                        await webSocket.SendAsync(new ArraySegment<byte>(buffer, 0, result.Count), WebSocketMessageType.Text, true, CancellationToken.None);
+                        await AA(webSocket, result, str);
+                        // await webSocket.SendAsync(new ArraySegment<byte>(buffer, 0, result.Count), WebSocketMessageType.Text, true, CancellationToken.None);
                     }
                     result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
                 }
@@ -85,4 +88,63 @@ public class WebSocketController : Controller
         }
         return new EmptyResult();
     }
+
+
+    private async Task AA(WebSocket webSocket, WebSocketReceiveResult result, string json)
+    {
+        byte[] b = System.Text.Encoding.UTF8.GetBytes(json);
+
+        string queueName = this.constant.i_model.QueueDeclare().QueueName;
+        this.constant.i_model.QueueBind(queue: queueName, exchange: this.key_order_send, routingKey: this.model.info.market.ToString());
+        EventingBasicConsumer consumer = new EventingBasicConsumer(this.constant.i_model);
+        consumer.Received += (model, ea) =>
+        {
+            if (!this.model.run)
+            {
+                this.constant.i_model.BasicNack(deliveryTag: ea.DeliveryTag, multiple: true, requeue: true);
+            }
+            else
+            {
+                string json = Encoding.UTF8.GetString(ea.Body.ToArray());
+                CallRequest<List<Orders>>? req = JsonConvert.DeserializeObject<CallRequest<List<Orders>>>(json);
+                if (req != null && req.op == E_Op.place && req.data != null && req.data.Count > 0)
+                {
+                    deal.Clear();
+                    cancel_deal.Clear();
+                    foreach (Orders item in req.data)
+                    {
+                        this.mutex.WaitOne();
+                        (Orders? order, List<Deal> deal, List<Orders> cancel) match = this.model.match_core.Match(item);
+                        this.mutex.ReleaseMutex();
+                        if (match.order == null)
+                        {
+                            continue;
+                        }
+                        deal.Add((match.order, match.deal));
+                        if (match.cancel.Count > 0)
+                        {
+                            cancel_deal.AddRange(match.cancel);
+                        }
+                    }
+                    if (deal.Count() > 0)
+                    {
+                        this.constant.i_model.BasicPublish(exchange: this.key_deal, routingKey: this.model.info.market.ToString(), basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(deal)));
+                    }
+                    if (cancel_deal.Count > 0)
+                    {
+                        this.constant.i_model.BasicPublish(exchange: this.key_order_cancel_success, routingKey: this.model.info.market.ToString(), basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(cancel_deal)));
+                    }
+                };
+                this.constant.i_model.BasicAck(ea.DeliveryTag, true);
+            }
+        };
+        this.constant.i_model.BasicConsume(queue: queueName, autoAck: false, consumer: consumer);
+
+
+
+        await webSocket.SendAsync(new ArraySegment<byte>(b, 0, result.Count), WebSocketMessageType.Text, true, CancellationToken.None);
+    }
+
+  
+
 }

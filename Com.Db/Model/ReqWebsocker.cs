@@ -41,5 +41,5 @@ public class ReqChannel
     /// 数据
     /// </summary>
     /// <value></value>
-    public string? data { get; set; }
+    public string data { get; set; } = null!;
 }

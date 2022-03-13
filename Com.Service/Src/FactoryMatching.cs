@@ -44,9 +44,21 @@ public class FactoryMatching
     }
 
     /// <summary>
-    /// 初始化服务
+    /// 服务:清除所有缓存
     /// </summary>
-    public MarketInfo ServiceInit(MarketInfo info)
+    /// <param name="marketInfo"></param>
+    /// <returns></returns>
+    public MarketInfo ServiceClearCache(MarketInfo info)
+    {
+        long delete = FactoryService.instance.deal_service.DeleteDeal(info.market, FactoryService.instance.system_init);
+
+        return info;
+    }
+
+    /// <summary>
+    /// 服务:预热缓存
+    /// </summary>
+    public MarketInfo ServiceWarmCache(MarketInfo info)
     {
         //交易记录数据从DB同步到Redis 至少保存最近3个月记录
         long delete = FactoryService.instance.deal_service.DeleteDeal(info.market, DateTimeOffset.UtcNow.AddMonths(-3));
@@ -60,7 +72,7 @@ public class FactoryMatching
     }
 
     /// <summary>
-    /// 启动服务
+    /// 服务:启动服务
     /// </summary>
     /// <param name="info"></param>
     public MarketInfo ServiceStart(MarketInfo info)
@@ -78,7 +90,7 @@ public class FactoryMatching
     }
 
     /// <summary>
-    /// 关闭服务
+    /// 服务:关闭服务
     /// </summary>
     /// <param name="info"></param>
     public MarketInfo ServiceStop(MarketInfo info)

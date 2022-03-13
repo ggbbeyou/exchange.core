@@ -1,16 +1,21 @@
 using System;
 
-namespace  Com.Db.Enum;
+namespace Com.Db.Enum;
 
 /// <summary>
 /// 请求操作动作
 /// </summary>
 public enum E_Op
 {
+
+    /// <summary>
+    /// 服务初始化  动作:清除缓存
+    /// </summary>
+    service_clear_cache = 0,
     /// <summary>
     /// 服务初始化  动作:预热缓存,如同步K线或成交记录到redis
     /// </summary>
-    service_init = 0,
+    service_warm_cache = 0,
     /// <summary>
     /// 服务启动  动作:启动服务,如启动撮合成交后续动作
     /// </summary>

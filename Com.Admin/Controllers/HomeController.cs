@@ -52,7 +52,7 @@ public class HomeController : Controller
 
         // inti
         CallRequest<string> req = new CallRequest<string>();
-        req.op = E_Op.service_init;
+        req.op = E_Op.service_warm_cache;
         req.market = 1;
         MarketInfo info = new MarketInfo();
         info.market = 1;

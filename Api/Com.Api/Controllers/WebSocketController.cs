@@ -25,7 +25,7 @@ public class WebSocketController : Controller
     /// <typeparam name="string"></typeparam>
     /// <returns></returns>
     public List<string> login_channel = new List<string>() { "account", "orders", "trades", "books50-l2-tbt", "tickers", "order" };
-
+    byte[] pong = System.Text.Encoding.UTF8.GetBytes("pong");
     /// <summary>
     /// 
     /// </summary>
@@ -54,30 +54,29 @@ public class WebSocketController : Controller
             {
                 WebSocket webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
                 Dictionary<string, string> channel = new Dictionary<string, string>();
+                await new TaskFactory().StartNew(async () =>
+                {
+                    while (true)
+                    {
+                        // await Task.Delay(1000);
+                        await Task.Delay(1000 * 60 * 5);
+                        if (webSocket.State == WebSocketState.Closed)
+                        {
+                            foreach (var item in channel)
+                            {
+                                this.constant.i_model.BasicCancel(item.Value);
+                            }
+                            channel.Clear();
+                            break;
+                        }
+                    }
+                });
                 bool login = false;
                 var buffer = new byte[1024 * 1024];
                 WebSocketReceiveResult result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
                 while (!result.CloseStatus.HasValue)
                 {
-                    string str = System.Text.Encoding.UTF8.GetString(buffer, 0, result.Count);
-                    if (str.ToLower() == "ping")
-                    {
-                        byte[] b = System.Text.Encoding.UTF8.GetBytes("pong");
-                        await webSocket.SendAsync(new ArraySegment<byte>(b, 0, b.Length), WebSocketMessageType.Text, true, CancellationToken.None);
-                    }
-                    else
-                    {
-                        try
-                        {
-                            ReqWebsocker? req = JsonConvert.DeserializeObject<ReqWebsocker>(str);
-                            Subscribe(webSocket, result, JsonConvert.DeserializeObject<ReqWebsocker>(str), channel, ref login);
-                        }
-                        catch (System.Exception ex)
-                        {
-                            byte[] b = System.Text.Encoding.UTF8.GetBytes($"无法解析请求命令:{str},{ex.Message}");
-                            await webSocket.SendAsync(new ArraySegment<byte>(b, 0, b.Length), WebSocketMessageType.Text, true, CancellationToken.None);
-                        }
-                    }
+                    Subscribe(webSocket, result, System.Text.Encoding.UTF8.GetString(buffer, 0, result.Count), channel, ref login);
                     result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
                 }
                 foreach (var item in channel)
@@ -95,8 +94,6 @@ public class WebSocketController : Controller
         return new EmptyResult();
     }
 
-
-
     /// <summary>
     /// 订阅消息
     /// {"op":"login","args":[{"channel":"","data":"密文"}]}
@@ -108,8 +105,22 @@ public class WebSocketController : Controller
     /// <param name="result"></param>
     /// <param name="req"></param>
     /// <param name="channel"></param>
-    private void Subscribe(WebSocket webSocket, WebSocketReceiveResult result, ReqWebsocker? req, Dictionary<string, string> channel, ref bool login)
+    private void Subscribe(WebSocket webSocket, WebSocketReceiveResult result, string str, Dictionary<string, string> channel, ref bool login)
     {
+        if (str.ToLower() == "ping")
+        {
+            webSocket.SendAsync(new ArraySegment<byte>(pong, 0, pong.Length), WebSocketMessageType.Text, true, CancellationToken.None);
+        }
+        ReqWebsocker? req = null;
+        try
+        {
+            req = JsonConvert.DeserializeObject<ReqWebsocker>(str);
+        }
+        catch (System.Exception ex)
+        {
+            byte[] b = System.Text.Encoding.UTF8.GetBytes($"无法解析请求命令:{str},{ex.Message}");
+            webSocket.SendAsync(new ArraySegment<byte>(b, 0, b.Length), WebSocketMessageType.Text, true, CancellationToken.None);
+        }
         if (req == null || string.IsNullOrWhiteSpace(req.op))
         {
             return;
@@ -129,7 +140,7 @@ public class WebSocketController : Controller
                 byte[] b = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(resWebsocker));
                 if (webSocket.State == WebSocketState.Open)
                 {
-                    webSocket.SendAsync(new ArraySegment<byte>(b, 0, b.Length), WebSocketMessageType.Text, true, CancellationToken.None).Wait();
+                    webSocket.SendAsync(new ArraySegment<byte>(b, 0, b.Length), WebSocketMessageType.Text, true, CancellationToken.None);
                 }
             }
             req.args.RemoveAll(P => Logout.Contains(P));
@@ -143,7 +154,7 @@ public class WebSocketController : Controller
             byte[] b = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(resWebsocker));
             if (webSocket.State == WebSocketState.Open)
             {
-                webSocket.SendAsync(new ArraySegment<byte>(b, 0, b.Length), WebSocketMessageType.Text, true, CancellationToken.None).Wait();
+                webSocket.SendAsync(new ArraySegment<byte>(b, 0, b.Length), WebSocketMessageType.Text, true, CancellationToken.None);
             }
         }
         else if (req.op == "Logout")

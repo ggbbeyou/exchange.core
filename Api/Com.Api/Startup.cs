@@ -89,7 +89,7 @@ public class Startup
         //         }});
         // });
         services.AddControllersWithViews();
-        // services.AddHostedService<MainService>();
+        services.AddHostedService<MainService>();
         services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
         .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, o =>
         {

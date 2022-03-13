@@ -42,9 +42,9 @@ public class WebSocketController : Controller
     [AllowAnonymous]
     public async Task<IActionResult> WebSocketUI()
     {
-        try
+        if (HttpContext.WebSockets.IsWebSocketRequest)
         {
-            if (HttpContext.WebSockets.IsWebSocketRequest)
+            try
             {
                 WebSocket webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
                 Dictionary<string, string> channel = new Dictionary<string, string>();
@@ -53,14 +53,23 @@ public class WebSocketController : Controller
                 while (!result.CloseStatus.HasValue)
                 {
                     string str = System.Text.Encoding.UTF8.GetString(buffer, 0, result.Count);
-                    if (str == "ping")
+                    if (str.ToLower() == "ping")
                     {
                         byte[] b = System.Text.Encoding.UTF8.GetBytes("pong");
                         await webSocket.SendAsync(new ArraySegment<byte>(b, 0, b.Length), WebSocketMessageType.Text, true, CancellationToken.None);
                     }
                     else
                     {
-                        Subscribe(webSocket, result, JsonConvert.DeserializeObject<ReqWebsocker>(str), channel);
+                        try
+                        {
+                            ReqWebsocker? req = JsonConvert.DeserializeObject<ReqWebsocker>(str);
+                            Subscribe(webSocket, result, JsonConvert.DeserializeObject<ReqWebsocker>(str), channel);
+                        }
+                        catch (System.Exception ex)
+                        {
+                            byte[] b = System.Text.Encoding.UTF8.GetBytes($"无法解析请求命令:{str},{ex.Message}");
+                            await webSocket.SendAsync(new ArraySegment<byte>(b, 0, b.Length), WebSocketMessageType.Text, true, CancellationToken.None);
+                        }
                     }
                     result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
                 }
@@ -71,10 +80,10 @@ public class WebSocketController : Controller
                 channel.Clear();
                 await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
             }
-        }
-        catch (System.Exception ex)
-        {
-            this.constant.logger.LogInformation(ex, $"websocket报错");
+            catch (System.Exception ex)
+            {
+                this.constant.logger.LogInformation(ex, $"websocket报错");
+            }
         }
         return new EmptyResult();
     }

@@ -19,6 +19,12 @@ public class WebSocketController : Controller
     /// 常用接口
     /// </summary>
     private FactoryConstant constant = null!;
+    /// <summary>
+    /// 需要登录权限的订阅频道
+    /// </summary>
+    /// <typeparam name="string"></typeparam>
+    /// <returns></returns>
+    public List<string> login_channel = new List<string>() { "account", "orders", "trades", "books50-l2-tbt", "tickers", "order" };
 
     /// <summary>
     /// 
@@ -89,7 +95,7 @@ public class WebSocketController : Controller
         return new EmptyResult();
     }
 
-    public List<string> login_channel = new List<string>() { "", "account", "orders", "trades", "books50-l2-tbt", "tickers", "order" };
+
 
     /// <summary>
     /// 订阅消息
@@ -118,7 +124,7 @@ public class WebSocketController : Controller
             {
                 resWebsocker.channel = item.channel;
                 resWebsocker.data = item.data;
-                resWebsocker.message = "请订阅需要登录权限,请先登录!";
+                resWebsocker.message = "该订阅需要登录权限,请先登录!";
                 byte[] b = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(resWebsocker));
                 if (webSocket.State == WebSocketState.Open)
                 {
@@ -159,16 +165,9 @@ public class WebSocketController : Controller
                         }
                         string ConsumerTags = this.constant.MqSubscribe(key, async (b) =>
                         {
-                            try
+                            if (webSocket.State == WebSocketState.Open)
                             {
-                                if (webSocket.State == WebSocketState.Open)
-                                {
-                                    await webSocket.SendAsync(new ArraySegment<byte>(b, 0, b.Length), WebSocketMessageType.Text, true, CancellationToken.None);
-                                }
-                            }
-                            catch (System.Exception ex)
-                            {
-                                this.constant.logger.LogError(ex, "websocket报错:");
+                                await webSocket.SendAsync(new ArraySegment<byte>(b, 0, b.Length), WebSocketMessageType.Text, true, CancellationToken.None);
                             }
                         });
                         ResWebsocker res = new ResWebsocker();

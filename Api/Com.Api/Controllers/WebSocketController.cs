@@ -160,6 +160,14 @@ public class WebSocketController : Controller
         else if (req.op == "Logout")
         {
             login = false;
+            resWebsocker.channel = "";
+            resWebsocker.data = "";
+            resWebsocker.message = "登出成功!";
+            byte[] b = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(resWebsocker));
+            if (webSocket.State == WebSocketState.Open)
+            {
+                webSocket.SendAsync(new ArraySegment<byte>(b, 0, b.Length), WebSocketMessageType.Text, true, CancellationToken.None);
+            }
         }
         else if (req.op == "subscribe")
         {

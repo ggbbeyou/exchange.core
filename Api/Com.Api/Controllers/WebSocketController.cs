@@ -114,14 +114,15 @@ public class WebSocketController : Controller
         {
             return;
         }
+        ResWebsocker resWebsocker = new ResWebsocker();
+        resWebsocker.success = true;
+        resWebsocker.op = req.op;
         if (login == false && req.op == "subscribe")
         {
             List<ReqChannel> Logout = req.args.Where(P => login_channel.Contains(P.channel)).ToList();
-            ResWebsocker resWebsocker = new ResWebsocker();
-            resWebsocker.success = false;
-            resWebsocker.op = req.op;
             foreach (var item in Logout)
             {
+                resWebsocker.success = false;
                 resWebsocker.channel = item.channel;
                 resWebsocker.data = item.data;
                 resWebsocker.message = "该订阅需要登录权限,请先登录!";
@@ -136,6 +137,14 @@ public class WebSocketController : Controller
         if (req.op == "login")
         {
             login = true;
+            resWebsocker.channel = "";
+            resWebsocker.data = "";
+            resWebsocker.message = "登录成功!";
+            byte[] b = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(resWebsocker));
+            if (webSocket.State == WebSocketState.Open)
+            {
+                webSocket.SendAsync(new ArraySegment<byte>(b, 0, b.Length), WebSocketMessageType.Text, true, CancellationToken.None).Wait();
+            }
         }
         else if (req.op == "Logout")
         {
@@ -170,13 +179,10 @@ public class WebSocketController : Controller
                                 await webSocket.SendAsync(new ArraySegment<byte>(b, 0, b.Length), WebSocketMessageType.Text, true, CancellationToken.None);
                             }
                         });
-                        ResWebsocker res = new ResWebsocker();
-                        res.success = true;
-                        res.op = req.op;
-                        res.channel = item.channel;
-                        res.data = item.data;
-                        res.message = "订阅成功";
-                        string Json = JsonConvert.SerializeObject(res);
+                        resWebsocker.channel = item.channel;
+                        resWebsocker.data = item.data;
+                        resWebsocker.message = "订阅成功";
+                        string Json = JsonConvert.SerializeObject(resWebsocker);
                         byte[] bb = System.Text.Encoding.UTF8.GetBytes(Json);
                         if (webSocket.State == WebSocketState.Open)
                         {
@@ -209,13 +215,10 @@ public class WebSocketController : Controller
                         {
                             this.constant.i_model.BasicCancel(channel[key]);
                             channel.Remove(key);
-                            ResWebsocker res = new ResWebsocker();
-                            res.success = true;
-                            res.op = req.op;
-                            res.channel = item.channel;
-                            res.data = item.data;
-                            res.message = "取消订阅成功";
-                            string Json = JsonConvert.SerializeObject(res);
+                            resWebsocker.channel = item.channel;
+                            resWebsocker.data = item.data;
+                            resWebsocker.message = "取消订阅成功";
+                            string Json = JsonConvert.SerializeObject(resWebsocker);
                             byte[] bb = System.Text.Encoding.UTF8.GetBytes(Json);
                             if (webSocket.State == WebSocketState.Open)
                             {

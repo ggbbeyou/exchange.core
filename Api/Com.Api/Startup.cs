@@ -193,6 +193,7 @@ public class Startup
             //     c.RoutePrefix = string.Empty;
             // });
         }
+        app.UseWebSockets();
         //路由
         app.UseRouting();
         //跨域           

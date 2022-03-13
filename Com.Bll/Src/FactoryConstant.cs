@@ -153,7 +153,7 @@ public class FactoryConstant
     /// <param name="exchange"></param>
     /// <param name="routingKey"></param>
     /// <param name="action"></param>
-    public string[] MqSubscribe(string exchange, string routingKey, Action<string> action)
+    public string MqSubscribe(string exchange, string routingKey, Action<string> action)
     {
         this.i_model.ExchangeDeclare(exchange: exchange, type: ExchangeType.Fanout);
         string queueName = this.i_model.QueueDeclare().QueueName;
@@ -167,8 +167,8 @@ public class FactoryConstant
             action(message);
         };
         this.i_model.BasicConsume(queue: queueName, autoAck: true, consumer: consumer);
-        return consumer.ConsumerTags;
-      
+        return consumer.ConsumerTags.First();
+
     }
 
 

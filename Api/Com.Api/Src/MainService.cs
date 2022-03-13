@@ -26,7 +26,7 @@ namespace Com.Api
         /// <param name="configuration">配置接口</param>
         /// <param name="environment">环境接口</param>
         /// <param name="logger">日志接口</param>
-        public MainService(IServiceProvider provider,IConfiguration configuration, IHostEnvironment environment, ILogger<MainService> logger)
+        public MainService(IServiceProvider provider, IConfiguration configuration, IHostEnvironment environment, ILogger<MainService> logger)
         {
             this.constant = new FactoryConstant(provider, configuration, environment, logger ?? NullLogger<MainService>.Instance);
         }
@@ -41,7 +41,7 @@ namespace Com.Api
             this.constant.logger.LogInformation("准备启动Api后台服务");
             try
             {
-                
+                FactoryService.instance.Init(this.constant);
                 this.constant.logger.LogInformation("启动Api后台服务成功");
             }
             catch (Exception ex)

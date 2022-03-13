@@ -9,6 +9,7 @@ using System.Net.WebSockets;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Com.Api.Controllers;
 
@@ -29,6 +30,7 @@ public class WebSocketController : Controller
     public WebSocketController(IServiceProvider provider, IConfiguration configuration, IHostEnvironment environment, ILogger<OrderController> logger)
     {
         this.constant = new FactoryConstant(provider, configuration, environment, logger);
+        
     }
 
 
@@ -36,6 +38,7 @@ public class WebSocketController : Controller
     /// websocket处理
     /// </summary>
     /// <returns></returns>
+    [AllowAnonymous]
     public async Task<IActionResult> WebSocketUI()
     {
         try
@@ -103,18 +106,19 @@ public class WebSocketController : Controller
             {
                 if (item.data == null)
                 {
-
+                    continue;
                 }
                 else
                 {
-                    long? market = FactoryService.instance.market_info_db.GetMarketBySymbol(item.data);
-                    if (market == null)
+                    long market = FactoryService.instance.market_info_db.GetMarketBySymbol(item.data);
+                    if (market == 0)
                     {
-
+                        continue;
                     }
                     else
                     {
-                        string[] ConsumerTags = this.constant.MqSubscribe(item.channel, item.data ?? "", async (message) =>
+                        string ConsumerTags = "";
+                        ConsumerTags = this.constant.MqSubscribe(item.channel, market.ToString(), async (message) =>
                         {
                             try
                             {
@@ -125,7 +129,7 @@ public class WebSocketController : Controller
                                 }
                                 else
                                 {
-                                    //   break;
+                                    this.constant.i_model.BasicCancel(ConsumerTags);
                                 }
                             }
                             catch (System.Exception ex)
@@ -135,7 +139,6 @@ public class WebSocketController : Controller
                         });
                     }
                 }
-                // this.constant.i_model.BasicCancel(ConsumerTags.First());
             }
         }
         else if (req.op == "unsubscribe")

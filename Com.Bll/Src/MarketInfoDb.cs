@@ -38,13 +38,13 @@ public class MarketInfoDb
     /// </summary>
     /// <param name="symbol"></param>
     /// <returns></returns>
-    public long? GetMarketBySymbol(string symbol)
+    public long GetMarketBySymbol(string symbol)
     {
         if (market_info_list.ContainsKey(symbol))
         {
             return market_info_list[symbol].market;
         }
-        return null;
+        return 0;
     }
 
 }

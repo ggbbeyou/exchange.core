@@ -47,7 +47,7 @@ public class WebSocketController : Controller
             if (HttpContext.WebSockets.IsWebSocketRequest)
             {
                 WebSocket webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
-                Dictionary<string, string> dic = new Dictionary<string, string>();
+                Dictionary<string, string> channel = new Dictionary<string, string>();
                 var buffer = new byte[1024 * 1024];
                 WebSocketReceiveResult result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
                 while (!result.CloseStatus.HasValue)
@@ -60,14 +60,15 @@ public class WebSocketController : Controller
                     }
                     else
                     {
-                        Subscribe(webSocket, result, JsonConvert.DeserializeObject<ReqWebsocker>(str), dic);
+                        Subscribe(webSocket, result, JsonConvert.DeserializeObject<ReqWebsocker>(str), channel);
                     }
                     result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
                 }
-                foreach (var item in dic)
+                foreach (var item in channel)
                 {
                     this.constant.i_model.BasicCancel(item.Value);
                 }
+                channel.Clear();
                 await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
             }
         }
@@ -80,29 +81,24 @@ public class WebSocketController : Controller
 
     /// <summary>
     /// 订阅消息
-    /// {"op":"subscribe","args":[{"channel":"tickers","data":"eth/usdt"}]}
-    /// 
+    /// {"op":"subscribe","args":[{"channel":"tickers","data":"btc/usdt"},{"channel":"tickers","data":"eth/usdt"}]}
+    /// {"op":"unsubscribe","args":[{"channel":"tickers","data":"btc/usdt"},{"channel":"tickers","data":"eth/usdt"}]}
     /// </summary>
     /// <param name="webSocket"></param>
     /// <param name="result"></param>
     /// <param name="req"></param>
-    /// <param name="dic"></param>
-    private void Subscribe(WebSocket webSocket, WebSocketReceiveResult result, ReqWebsocker? req, Dictionary<string, string> dic)
+    /// <param name="channel"></param>
+    private void Subscribe(WebSocket webSocket, WebSocketReceiveResult result, ReqWebsocker? req, Dictionary<string, string> channel)
     {
-        if (req == null)
+        if (req == null || string.IsNullOrWhiteSpace(req.op))
         {
             return;
-        }
-
-        if (req.op == "")
-        {
-
         }
         else if (req.op == "subscribe")
         {
             foreach (ReqChannel item in req.args)
             {
-                if (item.data == null)
+                if (string.IsNullOrWhiteSpace(item.data))
                 {
                     continue;
                 }
@@ -116,7 +112,7 @@ public class WebSocketController : Controller
                     else
                     {
                         string key = FactoryService.instance.GetMqTickers(market);
-                        if (dic.ContainsKey(key))
+                        if (channel.ContainsKey(key))
                         {
                             continue;
                         }
@@ -135,8 +131,8 @@ public class WebSocketController : Controller
                             }
                         });
                         ResWebsocker res = new ResWebsocker();
-                        res.op = req.op;
                         res.success = true;
+                        res.op = req.op;
                         res.channel = item.channel;
                         res.data = item.data;
                         res.message = "订阅成功";
@@ -146,7 +142,7 @@ public class WebSocketController : Controller
                         {
                             webSocket.SendAsync(new ArraySegment<byte>(bb, 0, bb.Length), WebSocketMessageType.Text, true, CancellationToken.None);
                         }
-                        dic.Add(key, ConsumerTags);
+                        channel.Add(key, ConsumerTags);
                     }
                 }
             }
@@ -155,7 +151,7 @@ public class WebSocketController : Controller
         {
             foreach (ReqChannel item in req.args)
             {
-                if (item.data == null)
+                if (string.IsNullOrWhiteSpace(item.data))
                 {
                     continue;
                 }
@@ -169,13 +165,13 @@ public class WebSocketController : Controller
                     else
                     {
                         string key = FactoryService.instance.GetMqTickers(market);
-                        if (dic.ContainsKey(key))
+                        if (channel.ContainsKey(key))
                         {
-                            this.constant.i_model.BasicCancel(dic[key]);
-                            dic.Remove(key);
+                            this.constant.i_model.BasicCancel(channel[key]);
+                            channel.Remove(key);
                             ResWebsocker res = new ResWebsocker();
-                            res.op = req.op;
                             res.success = true;
+                            res.op = req.op;
                             res.channel = item.channel;
                             res.data = item.data;
                             res.message = "取消订阅成功";

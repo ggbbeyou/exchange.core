@@ -60,7 +60,7 @@ public class WebSocketController : Controller
                     }
                     else
                     {
-                        Subscribe(webSocket, result, JsonConvert.DeserializeObject<ReqWebsocker<ReqChannel>>(str), dic);
+                        Subscribe(webSocket, result, JsonConvert.DeserializeObject<ReqWebsocker>(str), dic);
                     }
                     result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
                 }
@@ -87,7 +87,7 @@ public class WebSocketController : Controller
     /// <param name="result"></param>
     /// <param name="req"></param>
     /// <param name="dic"></param>
-    private void Subscribe(WebSocket webSocket, WebSocketReceiveResult result, ReqWebsocker<ReqChannel>? req, Dictionary<string, string> dic)
+    private void Subscribe(WebSocket webSocket, WebSocketReceiveResult result, ReqWebsocker? req, Dictionary<string, string> dic)
     {
         if (req == null)
         {
@@ -98,7 +98,7 @@ public class WebSocketController : Controller
         {
 
         }
-        else if(req.op == "subscribe")
+        else if (req.op == "subscribe")
         {
             foreach (ReqChannel item in req.args)
             {
@@ -134,6 +134,18 @@ public class WebSocketController : Controller
                                 this.constant.logger.LogError(ex, "websocket报错:");
                             }
                         });
+                        ResWebsocker res = new ResWebsocker();
+                        res.op = req.op;
+                        res.args.success = true;
+                        res.args.channel = item.channel;
+                        res.args.data = item.data;
+                        res.args.message = "订阅成功";
+                        string Json = JsonConvert.SerializeObject(res);
+                        byte[] bb = System.Text.Encoding.UTF8.GetBytes(Json);
+                        if (webSocket.State == WebSocketState.Open)
+                        {
+                            webSocket.SendAsync(new ArraySegment<byte>(bb, 0, bb.Length), WebSocketMessageType.Text, true, CancellationToken.None);
+                        }
                         dic.Add(key, ConsumerTags);
                     }
                 }
@@ -161,6 +173,18 @@ public class WebSocketController : Controller
                         {
                             this.constant.i_model.BasicCancel(dic[key]);
                             dic.Remove(key);
+                            ResWebsocker res = new ResWebsocker();
+                            res.op = req.op;
+                            res.args.success = true;
+                            res.args.channel = item.channel;
+                            res.args.data = item.data;
+                            res.args.message = "取消订阅成功";
+                            string Json = JsonConvert.SerializeObject(res);
+                            byte[] bb = System.Text.Encoding.UTF8.GetBytes(Json);
+                            if (webSocket.State == WebSocketState.Open)
+                            {
+                                webSocket.SendAsync(new ArraySegment<byte>(bb, 0, bb.Length), WebSocketMessageType.Text, true, CancellationToken.None);
+                            }
                         }
                     }
                 }

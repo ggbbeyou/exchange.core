@@ -40,7 +40,7 @@ public class WebSocketController : Controller
     /// </summary>
     /// <returns></returns>
     [AllowAnonymous]
-    public async Task<IActionResult> WebSocketUI()
+    public async Task<IActionResult> WebSocket()
     {
         if (HttpContext.WebSockets.IsWebSocketRequest)
         {

@@ -24,7 +24,7 @@ public class WebSocketController : Controller
     /// </summary>
     /// <typeparam name="string"></typeparam>
     /// <returns></returns>
-    public List<string> login_channel = new List<string>() { "account", "orders", "trades", "books50-l2-tbt", "tickers", "order" };
+    public List<string> login_channel = new List<string>() { "account", "orders", "order" };
     byte[] pong = System.Text.Encoding.UTF8.GetBytes("pong");
     /// <summary>
     /// 

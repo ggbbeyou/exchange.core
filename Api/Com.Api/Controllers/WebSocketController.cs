@@ -136,10 +136,10 @@ public class WebSocketController : Controller
                         });
                         ResWebsocker res = new ResWebsocker();
                         res.op = req.op;
-                        res.args.success = true;
-                        res.args.channel = item.channel;
-                        res.args.data = item.data;
-                        res.args.message = "订阅成功";
+                        res.success = true;
+                        res.channel = item.channel;
+                        res.data = item.data;
+                        res.message = "订阅成功";
                         string Json = JsonConvert.SerializeObject(res);
                         byte[] bb = System.Text.Encoding.UTF8.GetBytes(Json);
                         if (webSocket.State == WebSocketState.Open)
@@ -175,10 +175,10 @@ public class WebSocketController : Controller
                             dic.Remove(key);
                             ResWebsocker res = new ResWebsocker();
                             res.op = req.op;
-                            res.args.success = true;
-                            res.args.channel = item.channel;
-                            res.args.data = item.data;
-                            res.args.message = "取消订阅成功";
+                            res.success = true;
+                            res.channel = item.channel;
+                            res.data = item.data;
+                            res.message = "取消订阅成功";
                             string Json = JsonConvert.SerializeObject(res);
                             byte[] bb = System.Text.Encoding.UTF8.GetBytes(Json);
                             if (webSocket.State == WebSocketState.Open)

@@ -118,13 +118,13 @@ public class FactoryService
     //
 
     /// <summary>
-    /// 聚合行情 MQ:Publish/Subscribe=>exchange:trades;routingKey:market
+    /// 聚合行情 MQ:Publish/Subscribe=>exchange:tickers_market;
     /// </summary>
     /// <param name="market"></param>
     /// <returns></returns>
-    public string GetMqTrades()
+    public string GetMqTickers(long market)
     {
-        return string.Format("trades");
+        return string.Format("tickers_{0}", market);
     }
 
 

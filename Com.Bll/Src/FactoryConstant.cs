@@ -140,11 +140,11 @@ public class FactoryConstant
     /// <param name="exchange"></param>
     /// <param name="routingKey"></param>
     /// <param name="message"></param>
-    public void MqPublish(string exchange, string routingKey, string message)
+    public void MqPublish(string exchange, string message)
     {
         this.i_model.ExchangeDeclare(exchange: exchange, type: ExchangeType.Fanout);
         var body = Encoding.UTF8.GetBytes(message);
-        this.i_model.BasicPublish(exchange: exchange, routingKey: routingKey, basicProperties: null, body);
+        this.i_model.BasicPublish(exchange: exchange, routingKey: "", basicProperties: null, body);
     }
 
     /// <summary>
@@ -153,22 +153,18 @@ public class FactoryConstant
     /// <param name="exchange"></param>
     /// <param name="routingKey"></param>
     /// <param name="action"></param>
-    public string MqSubscribe(string exchange, string routingKey, Action<string> action)
+    public string MqSubscribe(string exchange, Action<byte[]> action)
     {
         this.i_model.ExchangeDeclare(exchange: exchange, type: ExchangeType.Fanout);
+        // string queueName = this.i_model.QueueDeclare(durable: false, exclusive: false, autoDelete: false, arguments: null).QueueName;
         string queueName = this.i_model.QueueDeclare().QueueName;
-        this.i_model.QueueDeclare(queue: queueName, durable: false, exclusive: false, autoDelete: false, arguments: null);
-        this.i_model.QueueBind(queue: queueName, exchange: exchange, routingKey: routingKey);
+        this.i_model.QueueBind(queue: queueName, exchange: exchange, routingKey: "");
         EventingBasicConsumer consumer = new EventingBasicConsumer(this.i_model);
         consumer.Received += (model, ea) =>
-        {
-            byte[] body = ea.Body.ToArray();
-            string message = Encoding.UTF8.GetString(body);
-            action(message);
+        {         
+            action(ea.Body.ToArray());
         };
-        this.i_model.BasicConsume(queue: queueName, autoAck: true, consumer: consumer);
-        return consumer.ConsumerTags.First();
-
+        return this.i_model.BasicConsume(queue: queueName, autoAck: true, consumer: consumer);
     }
 
 

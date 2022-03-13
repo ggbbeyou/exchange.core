@@ -22,7 +22,7 @@ public class MarketInfoDb
 
     public MarketInfoDb()
     {
-        Update();
+        // Update();
     }
 
     /// <summary>
@@ -30,6 +30,7 @@ public class MarketInfoDb
     /// </summary>
     public void Update()
     {
+        var a = FactoryService.instance.constant.db.MarketInfo.ToList();
         market_info_list = FactoryService.instance.constant.db.MarketInfo.ToDictionary(x => x.symbol, x => x);
     }
 
@@ -40,6 +41,7 @@ public class MarketInfoDb
     /// <returns></returns>
     public long GetMarketBySymbol(string symbol)
     {
+        Update();
         if (market_info_list.ContainsKey(symbol))
         {
             return market_info_list[symbol].market;

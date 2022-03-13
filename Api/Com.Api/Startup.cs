@@ -1,9 +1,11 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Com.Db;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 // using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
@@ -43,6 +45,12 @@ public class Startup
                 builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
             });
         });
+        services.AddDbContextPool<DbContextEF>(options =>
+        {
+            options.UseLoggerFactory(LoggerFactory.Create(builder => { builder.AddConsole(); }));
+            options.EnableSensitiveDataLogging();
+            DbContextOptions options1 = options.UseSqlServer(Configuration.GetConnectionString("Mssql")).Options;
+        });
         services.AddResponseCompression();
         services.AddDistributedMemoryCache();
         services.AddControllers(options =>
@@ -81,7 +89,7 @@ public class Startup
         //         }});
         // });
         services.AddControllersWithViews();
-        services.AddHostedService<MainService>();
+        // services.AddHostedService<MainService>();
         services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
         .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, o =>
         {

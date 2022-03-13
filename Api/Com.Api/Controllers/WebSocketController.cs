@@ -30,7 +30,8 @@ public class WebSocketController : Controller
     public WebSocketController(IServiceProvider provider, IConfiguration configuration, IHostEnvironment environment, ILogger<OrderController> logger)
     {
         this.constant = new FactoryConstant(provider, configuration, environment, logger);
-        
+        FactoryService.instance.Init(this.constant);
+
     }
 
 
@@ -46,26 +47,9 @@ public class WebSocketController : Controller
             if (HttpContext.WebSockets.IsWebSocketRequest)
             {
                 WebSocket webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
-                // byte[] b = common.Compression(JsonConvert.SerializeObject(response));
-                // try
-                // {
-                //     if (webSocket.State == WebSocketState.Open)
-                //     {
-                //         webSocket.SendAsync(new ArraySegment<byte>(b, 0, b.Length), WebSocketMessageType.Binary, true, CancellationToken.None);
-                //     }
-                //     else
-                //     {
-                //         break;
-                //     }
-                // }
-                // catch (System.Exception ex)
-                // {
-                //     this.logger.LogError(ex, "websocket_coin发送消息出错:");
-                // }
-
+                Dictionary<string, string> dic = new Dictionary<string, string>();
                 var buffer = new byte[1024 * 1024];
                 WebSocketReceiveResult result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-                byte[] a = buffer;
                 while (!result.CloseStatus.HasValue)
                 {
                     string str = System.Text.Encoding.UTF8.GetString(buffer, 0, result.Count);
@@ -76,12 +60,13 @@ public class WebSocketController : Controller
                     }
                     else
                     {
-                        // byte[] b = System.Text.Encoding.UTF8.GetBytes("pong");
-
-                        AA(webSocket, result, JsonConvert.DeserializeObject<ReqWebsocker<ReqChannel>>(str));
-                        // await webSocket.SendAsync(new ArraySegment<byte>(buffer, 0, result.Count), WebSocketMessageType.Text, true, CancellationToken.None);
+                        Subscribe(webSocket, result, JsonConvert.DeserializeObject<ReqWebsocker<ReqChannel>>(str), dic);
                     }
                     result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+                }
+                foreach (var item in dic)
+                {
+                    this.constant.i_model.BasicCancel(item.Value);
                 }
                 await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
             }
@@ -93,8 +78,14 @@ public class WebSocketController : Controller
         return new EmptyResult();
     }
 
-
-    private void AA(WebSocket webSocket, WebSocketReceiveResult result, ReqWebsocker<ReqChannel>? req)
+    /// <summary>
+    /// 订阅消息
+    /// </summary>
+    /// <param name="webSocket"></param>
+    /// <param name="result"></param>
+    /// <param name="req"></param>
+    /// <param name="dic"></param>
+    private void Subscribe(WebSocket webSocket, WebSocketReceiveResult result, ReqWebsocker<ReqChannel>? req, Dictionary<string, string> dic)
     {
         if (req == null)
         {
@@ -117,84 +108,57 @@ public class WebSocketController : Controller
                     }
                     else
                     {
-                        string ConsumerTags = "";
-                        ConsumerTags = this.constant.MqSubscribe(item.channel, market.ToString(), async (message) =>
+                        string key = FactoryService.instance.GetMqTickers(market);
+                        if (dic.ContainsKey(key))
+                        {
+                            continue;
+                        }
+                        string ConsumerTags = this.constant.MqSubscribe(key, async (b) =>
                         {
                             try
                             {
-                                byte[] b = System.Text.Encoding.UTF8.GetBytes(message);
                                 if (webSocket.State == WebSocketState.Open)
                                 {
                                     await webSocket.SendAsync(new ArraySegment<byte>(b, 0, b.Length), WebSocketMessageType.Text, true, CancellationToken.None);
                                 }
-                                else
-                                {
-                                    this.constant.i_model.BasicCancel(ConsumerTags);
-                                }
                             }
                             catch (System.Exception ex)
                             {
-                                this.constant.logger.LogError(ex, "websocket_coin发送消息出错:");
+                                this.constant.logger.LogError(ex, "websocket报错:");
                             }
                         });
+                        dic.Add(key, ConsumerTags);
                     }
                 }
             }
         }
         else if (req.op == "unsubscribe")
         {
-
+            foreach (ReqChannel item in req.args)
+            {
+                if (item.data == null)
+                {
+                    continue;
+                }
+                else
+                {
+                    long market = FactoryService.instance.market_info_db.GetMarketBySymbol(item.data);
+                    if (market == 0)
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        string key = FactoryService.instance.GetMqTickers(market);
+                        if (dic.ContainsKey(key))
+                        {
+                            this.constant.i_model.BasicCancel(dic[key]);
+                            dic.Remove(key);
+                        }
+                    }
+                }
+            }
         }
-
-        // string queueName = this.constant.i_model.QueueDeclare().QueueName;
-        // this.constant.i_model.QueueBind(queue: queueName, exchange: this.key_order_send, routingKey: this.model.info.market.ToString());
-        // EventingBasicConsumer consumer = new EventingBasicConsumer(this.constant.i_model);
-        // consumer.Received += (model, ea) =>
-        // {
-        //     if (!this.model.run)
-        //     {
-        //         this.constant.i_model.BasicNack(deliveryTag: ea.DeliveryTag, multiple: true, requeue: true);
-        //     }
-        //     else
-        //     {
-        //         string json = Encoding.UTF8.GetString(ea.Body.ToArray());
-        //         CallRequest<List<Orders>>? req = JsonConvert.DeserializeObject<CallRequest<List<Orders>>>(json);
-        //         if (req != null && req.op == E_Op.place && req.data != null && req.data.Count > 0)
-        //         {
-        //             deal.Clear();
-        //             cancel_deal.Clear();
-        //             foreach (Orders item in req.data)
-        //             {
-        //                 this.mutex.WaitOne();
-        //                 (Orders? order, List<Deal> deal, List<Orders> cancel) match = this.model.match_core.Match(item);
-        //                 this.mutex.ReleaseMutex();
-        //                 if (match.order == null)
-        //                 {
-        //                     continue;
-        //                 }
-        //                 deal.Add((match.order, match.deal));
-        //                 if (match.cancel.Count > 0)
-        //                 {
-        //                     cancel_deal.AddRange(match.cancel);
-        //                 }
-        //             }
-        //             if (deal.Count() > 0)
-        //             {
-        //                 this.constant.i_model.BasicPublish(exchange: this.key_deal, routingKey: this.model.info.market.ToString(), basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(deal)));
-        //             }
-        //             if (cancel_deal.Count > 0)
-        //             {
-        //                 this.constant.i_model.BasicPublish(exchange: this.key_order_cancel_success, routingKey: this.model.info.market.ToString(), basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(cancel_deal)));
-        //             }
-        //         };
-        //         this.constant.i_model.BasicAck(ea.DeliveryTag, true);
-        //     }
-        // };
-        // this.constant.i_model.BasicConsume(queue: queueName, autoAck: false, consumer: consumer);
-
-
-
-        // await webSocket.SendAsync(new ArraySegment<byte>(b, 0, result.Count), WebSocketMessageType.Text, true, CancellationToken.None);
     }
 
 

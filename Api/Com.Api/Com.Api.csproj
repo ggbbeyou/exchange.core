@@ -4,7 +4,13 @@
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <!-- <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="6.3.0" /> -->
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.3" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\Com.Bll\Com.Bll.csproj" />

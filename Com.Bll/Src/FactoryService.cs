@@ -30,6 +30,11 @@ public class FactoryService
     /// </summary>
     public KilneDb kilne_db = new KilneDb();
     /// <summary>
+    /// 交易对基础信息
+    /// </summary>
+    /// <returns></returns>
+    public MarketInfoDb market_info_db = new MarketInfoDb();
+    /// <summary>
     /// Service:订单
     /// </summary>
     public OrderService order_service = new OrderService();

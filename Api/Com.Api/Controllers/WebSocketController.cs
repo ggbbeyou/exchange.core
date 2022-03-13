@@ -101,27 +101,41 @@ public class WebSocketController : Controller
         {
             foreach (ReqChannel item in req.args)
             {
-                string[] ConsumerTags = this.constant.MqSubscribe(item.channel, item.data ?? "", async (message) =>
+                if (item.data == null)
                 {
-                    try
-                    {
-                        byte[] b = System.Text.Encoding.UTF8.GetBytes(message);
-                        if (webSocket.State == WebSocketState.Open)
-                        {
-                            await webSocket.SendAsync(new ArraySegment<byte>(b, 0, b.Length), WebSocketMessageType.Text, true, CancellationToken.None);
-                        }
-                        else
-                        {
-                            //   break;
-                        }
-                    }
-                    catch (System.Exception ex)
-                    {
-                        this.constant.logger.LogError(ex, "websocket_coin发送消息出错:");
-                    }
-                });
 
-                this.constant.i_model.BasicCancel(ConsumerTags.First());
+                }
+                else
+                {
+                    long? market = FactoryService.instance.market_info_db.GetMarketBySymbol(item.data);
+                    if (market == null)
+                    {
+
+                    }
+                    else
+                    {
+                        string[] ConsumerTags = this.constant.MqSubscribe(item.channel, item.data ?? "", async (message) =>
+                        {
+                            try
+                            {
+                                byte[] b = System.Text.Encoding.UTF8.GetBytes(message);
+                                if (webSocket.State == WebSocketState.Open)
+                                {
+                                    await webSocket.SendAsync(new ArraySegment<byte>(b, 0, b.Length), WebSocketMessageType.Text, true, CancellationToken.None);
+                                }
+                                else
+                                {
+                                    //   break;
+                                }
+                            }
+                            catch (System.Exception ex)
+                            {
+                                this.constant.logger.LogError(ex, "websocket_coin发送消息出错:");
+                            }
+                        });
+                    }
+                }
+                // this.constant.i_model.BasicCancel(ConsumerTags.First());
             }
         }
         else if (req.op == "unsubscribe")

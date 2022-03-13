@@ -39,9 +39,9 @@ public class Program
     {
         logging.ClearProviders();
 #if (DEBUG)
-            logging.AddConsole();
+        logging.AddConsole();
 #endif
-        })
+    })
     .UseNLog();
 }
 

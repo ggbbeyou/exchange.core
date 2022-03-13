@@ -138,7 +138,6 @@ public class FactoryConstant
     /// MQ 发布消息
     /// </summary>
     /// <param name="exchange"></param>
-    /// <param name="routingKey"></param>
     /// <param name="message"></param>
     public void MqPublish(string exchange, string message)
     {
@@ -151,17 +150,15 @@ public class FactoryConstant
     /// MQ 订阅消息
     /// </summary>
     /// <param name="exchange"></param>
-    /// <param name="routingKey"></param>
     /// <param name="action"></param>
     public string MqSubscribe(string exchange, Action<byte[]> action)
     {
         this.i_model.ExchangeDeclare(exchange: exchange, type: ExchangeType.Fanout);
-        // string queueName = this.i_model.QueueDeclare(durable: false, exclusive: false, autoDelete: false, arguments: null).QueueName;
         string queueName = this.i_model.QueueDeclare().QueueName;
         this.i_model.QueueBind(queue: queueName, exchange: exchange, routingKey: "");
         EventingBasicConsumer consumer = new EventingBasicConsumer(this.i_model);
         consumer.Received += (model, ea) =>
-        {         
+        {
             action(ea.Body.ToArray());
         };
         return this.i_model.BasicConsume(queue: queueName, autoAck: true, consumer: consumer);

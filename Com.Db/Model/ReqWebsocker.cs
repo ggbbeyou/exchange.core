@@ -9,7 +9,7 @@ namespace Com.Db.Model;
 public class ReqWebsocker<ReqChannel>
 {
     // <summary>
-    /// 操作，subscribe unsubscribe
+    /// 操作，subscribe unsubscribe 
     /// </summary>
     /// <value></value>
     public string op { get; set; } = "subscribe";

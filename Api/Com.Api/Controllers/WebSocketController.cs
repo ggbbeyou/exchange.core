@@ -80,6 +80,8 @@ public class WebSocketController : Controller
 
     /// <summary>
     /// 订阅消息
+    /// {"op":"subscribe","args":[{"channel":"tickers","data":"eth/usdt"}]}
+    /// 
     /// </summary>
     /// <param name="webSocket"></param>
     /// <param name="result"></param>
@@ -91,7 +93,12 @@ public class WebSocketController : Controller
         {
             return;
         }
-        if (req.op == "subscribe")
+
+        if (req.op == "")
+        {
+
+        }
+        else if(req.op == "subscribe")
         {
             foreach (ReqChannel item in req.args)
             {
@@ -159,6 +166,7 @@ public class WebSocketController : Controller
                 }
             }
         }
+
     }
 
 

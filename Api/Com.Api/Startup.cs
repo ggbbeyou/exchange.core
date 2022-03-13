@@ -99,7 +99,7 @@ public class Startup
             o.AccessDeniedPath = new PathString("/home/privacy");
         });
         //添加jwt验证：
-        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(async options =>
         {
             options.TokenValidationParameters = new TokenValidationParameters
             {

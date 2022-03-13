@@ -36,7 +36,7 @@ public class WebSocketController : Controller
     public WebSocketController(IServiceProvider provider, IConfiguration configuration, IHostEnvironment environment, ILogger<OrderController> logger)
     {
         this.constant = new FactoryConstant(provider, configuration, environment, logger);
-        FactoryService.instance.Init(this.constant);
+        // FactoryService.instance.Init(this.constant);
 
     }
 

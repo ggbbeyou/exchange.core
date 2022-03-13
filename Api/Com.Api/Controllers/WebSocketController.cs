@@ -138,10 +138,7 @@ public class WebSocketController : Controller
                 resWebsocker.data = item.data;
                 resWebsocker.message = "该订阅需要登录权限,请先登录!";
                 byte[] b = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(resWebsocker));
-                if (webSocket.State == WebSocketState.Open)
-                {
-                    webSocket.SendAsync(new ArraySegment<byte>(b, 0, b.Length), WebSocketMessageType.Text, true, CancellationToken.None);
-                }
+                webSocket.SendAsync(new ArraySegment<byte>(b, 0, b.Length), WebSocketMessageType.Text, true, CancellationToken.None);
             }
             req.args.RemoveAll(P => Logout.Contains(P));
         }
@@ -152,10 +149,7 @@ public class WebSocketController : Controller
             resWebsocker.data = "";
             resWebsocker.message = "登录成功!";
             byte[] b = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(resWebsocker));
-            if (webSocket.State == WebSocketState.Open)
-            {
-                webSocket.SendAsync(new ArraySegment<byte>(b, 0, b.Length), WebSocketMessageType.Text, true, CancellationToken.None);
-            }
+            webSocket.SendAsync(new ArraySegment<byte>(b, 0, b.Length), WebSocketMessageType.Text, true, CancellationToken.None);
         }
         else if (req.op == "Logout")
         {
@@ -164,10 +158,7 @@ public class WebSocketController : Controller
             resWebsocker.data = "";
             resWebsocker.message = "登出成功!";
             byte[] b = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(resWebsocker));
-            if (webSocket.State == WebSocketState.Open)
-            {
-                webSocket.SendAsync(new ArraySegment<byte>(b, 0, b.Length), WebSocketMessageType.Text, true, CancellationToken.None);
-            }
+            webSocket.SendAsync(new ArraySegment<byte>(b, 0, b.Length), WebSocketMessageType.Text, true, CancellationToken.None);
         }
         else if (req.op == "subscribe")
         {
@@ -193,20 +184,14 @@ public class WebSocketController : Controller
                         }
                         string ConsumerTags = this.constant.MqSubscribe(key, async (b) =>
                         {
-                            if (webSocket.State == WebSocketState.Open)
-                            {
-                                await webSocket.SendAsync(new ArraySegment<byte>(b, 0, b.Length), WebSocketMessageType.Text, true, CancellationToken.None);
-                            }
+                            await webSocket.SendAsync(new ArraySegment<byte>(b, 0, b.Length), WebSocketMessageType.Text, true, CancellationToken.None);
                         });
                         resWebsocker.channel = item.channel;
                         resWebsocker.data = item.data;
                         resWebsocker.message = "订阅成功";
                         string Json = JsonConvert.SerializeObject(resWebsocker);
                         byte[] bb = System.Text.Encoding.UTF8.GetBytes(Json);
-                        if (webSocket.State == WebSocketState.Open)
-                        {
-                            webSocket.SendAsync(new ArraySegment<byte>(bb, 0, bb.Length), WebSocketMessageType.Text, true, CancellationToken.None);
-                        }
+                        webSocket.SendAsync(new ArraySegment<byte>(bb, 0, bb.Length), WebSocketMessageType.Text, true, CancellationToken.None);
                         channel.Add(key, ConsumerTags);
                     }
                 }
@@ -239,10 +224,7 @@ public class WebSocketController : Controller
                             resWebsocker.message = "取消订阅成功";
                             string Json = JsonConvert.SerializeObject(resWebsocker);
                             byte[] bb = System.Text.Encoding.UTF8.GetBytes(Json);
-                            if (webSocket.State == WebSocketState.Open)
-                            {
-                                webSocket.SendAsync(new ArraySegment<byte>(bb, 0, bb.Length), WebSocketMessageType.Text, true, CancellationToken.None);
-                            }
+                            webSocket.SendAsync(new ArraySegment<byte>(bb, 0, bb.Length), WebSocketMessageType.Text, true, CancellationToken.None);
                         }
                     }
                 }

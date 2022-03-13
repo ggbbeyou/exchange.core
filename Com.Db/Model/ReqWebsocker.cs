@@ -9,7 +9,7 @@ namespace Com.Db.Model;
 public class ReqWebsocker
 {
     // <summary>
-    /// 操作，subscribe unsubscribe 
+    /// 操作:login,Logout,subscribe unsubscribe 
     /// </summary>
     /// <value></value>
     public string op { get; set; } = "subscribe";
@@ -32,6 +32,7 @@ public class ReqChannel
     /// trades:symbol,
     /// books50-l2-tbt:symbol,
     /// tickers:symbol
+    /// order:uid
     /// 
     /// </summary>
     /// <value></value>

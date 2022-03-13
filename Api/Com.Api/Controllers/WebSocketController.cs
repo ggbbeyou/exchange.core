@@ -48,6 +48,7 @@ public class WebSocketController : Controller
             {
                 WebSocket webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
                 Dictionary<string, string> channel = new Dictionary<string, string>();
+                bool login = false;
                 var buffer = new byte[1024 * 1024];
                 WebSocketReceiveResult result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
                 while (!result.CloseStatus.HasValue)
@@ -63,7 +64,7 @@ public class WebSocketController : Controller
                         try
                         {
                             ReqWebsocker? req = JsonConvert.DeserializeObject<ReqWebsocker>(str);
-                            Subscribe(webSocket, result, JsonConvert.DeserializeObject<ReqWebsocker>(str), channel);
+                            Subscribe(webSocket, result, JsonConvert.DeserializeObject<ReqWebsocker>(str), channel, ref login);
                         }
                         catch (System.Exception ex)
                         {
@@ -88,8 +89,12 @@ public class WebSocketController : Controller
         return new EmptyResult();
     }
 
+    public List<string> login_channel = new List<string>() { "", "account", "orders", "trades", "books50-l2-tbt", "tickers", "order" };
+
     /// <summary>
     /// 订阅消息
+    /// {"op":"login","args":[{"channel":"","data":"密文"}]}
+    /// {"op":"Logout","args":[{"channel":"","data":""}]}
     /// {"op":"subscribe","args":[{"channel":"tickers","data":"btc/usdt"},{"channel":"tickers","data":"eth/usdt"}]}
     /// {"op":"unsubscribe","args":[{"channel":"tickers","data":"btc/usdt"},{"channel":"tickers","data":"eth/usdt"}]}
     /// </summary>
@@ -97,11 +102,38 @@ public class WebSocketController : Controller
     /// <param name="result"></param>
     /// <param name="req"></param>
     /// <param name="channel"></param>
-    private void Subscribe(WebSocket webSocket, WebSocketReceiveResult result, ReqWebsocker? req, Dictionary<string, string> channel)
+    private void Subscribe(WebSocket webSocket, WebSocketReceiveResult result, ReqWebsocker? req, Dictionary<string, string> channel, ref bool login)
     {
         if (req == null || string.IsNullOrWhiteSpace(req.op))
         {
             return;
+        }
+        if (login == false && req.op == "subscribe")
+        {
+            List<ReqChannel> Logout = req.args.Where(P => login_channel.Contains(P.channel)).ToList();
+            ResWebsocker resWebsocker = new ResWebsocker();
+            resWebsocker.success = false;
+            resWebsocker.op = req.op;
+            foreach (var item in Logout)
+            {
+                resWebsocker.channel = item.channel;
+                resWebsocker.data = item.data;
+                resWebsocker.message = "请订阅需要登录权限,请先登录!";
+                byte[] b = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(resWebsocker));
+                if (webSocket.State == WebSocketState.Open)
+                {
+                    webSocket.SendAsync(new ArraySegment<byte>(b, 0, b.Length), WebSocketMessageType.Text, true, CancellationToken.None).Wait();
+                }
+            }
+            req.args.RemoveAll(P => Logout.Contains(P));
+        }
+        if (req.op == "login")
+        {
+            login = true;
+        }
+        else if (req.op == "Logout")
+        {
+            login = false;
         }
         else if (req.op == "subscribe")
         {

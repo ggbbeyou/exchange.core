@@ -19,13 +19,7 @@ public class ResWebsocker
     /// <value></value>
     public string op { get; set; } = "subscribe";
     // <summary>
-    /// 频道  
-    /// account，
-    /// orders:symbol,
-    /// trades:symbol,
-    /// books50-l2-tbt:symbol,
-    /// tickers:symbol
-    /// 
+    /// 频道     
     /// </summary>
     /// <value></value>
     public string channel { get; set; } = null!;

@@ -75,6 +75,8 @@ public class FactoryService
         this.props.DeliveryMode = 2;
     }
 
+    
+
     /// <summary>
     /// redis(zset)键 已生成交易记录 交易时间=>deal:btc/usdt 
     /// </summary>

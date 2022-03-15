@@ -1,8 +1,89 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+ViewData["Title"] = "Home Page";
 }
 
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
 </div>
+
+<input id="btnupload" type="button" value="Click Me" />
+
+<input id="txtfile" type="file" hidden />
+
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $('#btnupload').click(function () {
+            $('#txtfile').click();
+        });
+
+        $('#txtfile').change(function () {
+            var file_data = $('#txtfile').prop('files')[0];
+            var form_data = new FormData();
+            form_data.append('file', file_data);
+            $.ajax({
+                url: '/home/Upload',
+                type: 'post',
+                processData: false,
+                contentType: false,
+                data: form_data,
+                success: function (data) {
+                    alert(data);
+                }
+            });
+            alert('33333');
+        });
+
+
+
+
+        // $('#btnupload').click(function () {
+        //     var file_data = $('#txtfile').prop('files')[0];
+        //     var form_data = new FormData();
+        //     form_data.append('file', file_data);
+        //     $.ajax({
+        //         url: '/Home/Upload',
+        //         dataType: 'text',
+        //         cache: false,
+        //         contentType: false,
+        //         processData: false,
+        //         data: form_data,
+        //         type: 'post',
+        //         success: function (data) {
+        //             alert(data);
+        //         }
+        //     });
+        // });
+
+
+
+        // $('#txtfile').change(function () {
+        //     var filename = $('#txtfile')[0].files[0].name;
+        //     $('#labFileName').html(filename);
+        //     var fd = new FormData();
+        //     fd.append("id", $('#txtfile')[0].files[0]);
+        //     $.ajax({
+        //         url: '/boms/importfile',
+        //         type: 'post',
+        //         processData: false,
+        //         contentType: false,
+        //         data: fd,
+        //         success: function (data) {
+        //             if (data.code == 0) {
+        //                 upload.funSetBOM(data.data);
+        //             } else if (data.code == 1) {
+        //                 layer.alert(data.message, function (index) {
+        //                     layer.close(index);
+        //                 });
+        //                 return;
+        //             }
+        //         }
+        //     });
+        // });
+
+    });
+
+
+</script>

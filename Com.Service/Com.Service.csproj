@@ -28,8 +28,8 @@
     <ProjectReference Include="..\Com.Bll\Com.Bll.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
+  <!-- <ItemGroup>
     <Protobuf Include="..\Protos\GrpcExchange.proto" />
-  </ItemGroup>
+  </ItemGroup> -->
 
 </Project>

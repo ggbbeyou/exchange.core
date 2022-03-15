@@ -14,9 +14,9 @@
     <PackageReference Include="NPOI" Version="2.5.5" />
   </ItemGroup>
 
-  <!-- <ItemGroup>
+  <ItemGroup>
     <Protobuf Include="..\Protos\GrpcExchange.proto" />
-  </ItemGroup> -->
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Com.Bll\Com.Bll.csproj" />

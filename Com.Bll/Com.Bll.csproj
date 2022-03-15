@@ -35,9 +35,4 @@
     </PackageReference>
   </ItemGroup>
 
-  <ItemGroup>
-    <Protobuf Include="..\Protos\GrpcExchange.proto" />
-  </ItemGroup>
-
-
 </Project>

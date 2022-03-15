@@ -41,7 +41,7 @@ public class HomeController : Controller
         this.constant = new FactoryConstant(provider, configuration, environment, logger);
     }
 
-    public async Task<IActionResult> Index()
+    public IActionResult Index()
     {
         // GrpcChannel channel = GrpcChannel.ForAddress("http://192.168.2.5:8080");
         // var client = new ExchangeService.ExchangeServiceClient(channel);
@@ -121,13 +121,16 @@ public class HomeController : Controller
         files.CopyTo(ms);
         byte[] a = ms.ToArray();
 
-        DataTable dt = ExcelHelper.OpenExcel(files.OpenReadStream(), Path.GetExtension(files.FileName));
+        DataTable? dt = ExcelHelper.OpenExcel(files.OpenReadStream(), Path.GetExtension(files.FileName));
         Dictionary<DateTimeOffset, decimal> dic = new Dictionary<DateTimeOffset, decimal>();
-        foreach (DataRow row in dt.Rows)
+        if (dt != null)
         {
-            dic.Add(DateTimeOffset.Parse(row[0].ToString()), decimal.Parse(row[1].ToString()));
+            foreach (DataRow row in dt.Rows)
+            {
+                // dic.Add(DateTimeOffset.Parse(row[0].ToString()), decimal.Parse(row[1].ToString()));
 
 
+            }
         }
         return Json(new { code = 0, msg = "ok" });
     }

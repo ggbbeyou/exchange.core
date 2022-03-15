@@ -15,14 +15,14 @@ public class ExcelHelper
     /// </summary>
     /// <param name="FileName"></param>
     /// <returns></returns>
-    public static DataTable OpenExcel(Stream ms, string fileExt)
+    public static DataTable? OpenExcel(Stream ms, string fileExt)
     {
-        DataTable dt = null;
+        DataTable? dt = null;
         // FileStream fs = new FileStream(FileName, FileMode.Open, FileAccess.Read);
         bool end = false;
         try
         {
-            IWorkbook book;
+            IWorkbook? book;
             // string fileExt = Path.GetExtension(FileName).ToLower();
             if (fileExt == ".xlsx")
             {
@@ -73,7 +73,7 @@ public class ExcelHelper
                                 if (sheet.GetRow(i).GetCell(j).CellType == CellType.String)
                                 {
                                     newRow[j] = sheet.GetRow(i).GetCell(j).StringCellValue;
-                                    newRow[j] = newRow[j].ToString().Trim('\ud8e9').Trim().Replace("\r", "").Replace("\n", "").Replace("\f", "").Replace("\t", "");
+                                    // newRow[j] = newRow[j].ToString().Trim('\ud8e9').Trim().Replace("\r", "").Replace("\n", "").Replace("\f", "").Replace("\t", "");
                                 }
                                 else if (sheet.GetRow(i).GetCell(j).CellType == CellType.Blank)
                                 {
@@ -103,6 +103,7 @@ public class ExcelHelper
                             }
                             catch (Exception ex)
                             {
+                                throw new Exception(ex.Message);
                             }
                         }
                     }

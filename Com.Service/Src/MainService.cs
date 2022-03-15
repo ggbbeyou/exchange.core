@@ -45,7 +45,7 @@ public class MainService : BackgroundService
             Grpc.Core.Server server = new Grpc.Core.Server
             {
                 Services = { ExchangeService.BindService(new GreeterImpl()) },
-                Ports = { new ServerPort("0.0.0.0", 8080, ServerCredentials.Insecure) }
+                Ports = { new ServerPort("0.0.0.0", this.constant.config.GetValue<int>("manage_port"), ServerCredentials.Insecure) }
             };
             server.Start();
             this.constant.logger.LogInformation("启动业务后台服务成功");

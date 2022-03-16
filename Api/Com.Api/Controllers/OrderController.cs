@@ -106,14 +106,8 @@ public class OrderController : Controller
     [HttpPost]
     public IActionResult OrderCancel(long market, int type, List<long> data)
     {
-        Res<List<Orders>> res = FactoryService.instance.order_service.CancelOrder(user_id, type, data);
-        CallRequest<List<Orders>> result = new CallRequest<List<Orders>>();
-        result.data = new List<Orders>();
-        foreach (var item in res.data)
-        {
-            result.data.Add(item);
-        }
-        return Json(result);
+        CallResponse<KeyValuePair<long, List<long>>> res = FactoryService.instance.order_service.CancelOrder(market, user_id, type, data);
+        return Json(res);
     }
 
 

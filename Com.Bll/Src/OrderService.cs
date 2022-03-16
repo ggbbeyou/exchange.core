@@ -40,17 +40,18 @@ public class OrderService
 
     /// <summary>
     /// 挂单总入口
-    /// </summary>
-    /// <param name="market">交易对</param>
+    /// </summary>  
     /// <param name="uid">用户id</param>
+    /// <param name="type">1:按交易对全部撤单,2:按交易对和用户全部撤单,3:按用户和订单id撤单,4:按用户和用户订单id撤单</param>
     /// <param name="order">订单列表</param>
     /// <returns></returns>
-    public Res<List<Orders>> CancelOrder(long uid, List<long> order)
+    public Res<List<Orders>> CancelOrder(long market, long uid, int type, List<long> order)
     {
         CallRequest<(long uid, List<long> order_id)> req = new CallRequest<(long uid, List<long> order_id)>();
         req.op = E_Op.place;
         req.market = market;
-        req.data = order;
+        req.data = new { (uid, order) };
+        req.data.order_id = order;
         FactoryService.instance.constant.MqSend(FactoryService.instance.GetMqOrderPlace(market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(req)));
         CallResponse<List<Orders>> res = new CallResponse<List<Orders>>();
         res.op = E_Op.place;

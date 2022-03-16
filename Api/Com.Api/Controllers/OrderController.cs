@@ -100,34 +100,13 @@ public class OrderController : Controller
     /// 撤单
     /// </summary>
     /// <param name="market"></param>
+    /// <param name="type">1:按交易对全部撤单,2:按交易对和用户全部撤单,3:按用户和订单id撤单,4:按用户和用户订单id撤单</param>
     /// <param name="orders"></param>
     /// <returns></returns>
     [HttpPost]
-    public IActionResult OrderCancel(long market, List<long> cancel)
+    public IActionResult OrderCancel(long market, int type, List<long> data)
     {
-        List<Orders> matchOrders = new List<Orders>();
-        foreach (var item in cancel)
-        {
-            Orders orderResult = new Orders();
-            orderResult.order_id = this.constant.worker.NextId();
-            orderResult.client_id = item.client_id;
-            orderResult.market = market;
-            orderResult.uid = user_id;
-            orderResult.price = item.price ?? 0;
-            orderResult.amount = item.amount;
-            orderResult.total = item.price ?? 0 * item.amount;
-            orderResult.create_time = DateTimeOffset.UtcNow;
-            orderResult.amount_unsold = 0;
-            orderResult.amount_done = item.amount;
-            orderResult.deal_last_time = null;
-            orderResult.side = item.side;
-            orderResult.state = E_OrderState.unsold;
-            orderResult.type = item.type;
-            orderResult.data = null;
-            orderResult.remarks = null;
-            matchOrders.Add(orderResult);
-        }
-        Res<List<Orders>> res = FactoryService.instance.order_service.PlaceOrder(market, matchOrders);
+        Res<List<Orders>> res = FactoryService.instance.order_service.CancelOrder(user_id, type, data);
         CallRequest<List<Orders>> result = new CallRequest<List<Orders>>();
         result.data = new List<Orders>();
         foreach (var item in res.data)

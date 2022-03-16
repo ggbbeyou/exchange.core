@@ -55,7 +55,7 @@ public class DealService
     /// 删除redis中的交易记录
     /// </summary>
     /// <param name="markets">交易对</param>
-    /// <param name="end">start之前记录全部清除</param>
+    /// <param name="end">end之前记录全部清除</param>
     public long DeleteDeal(long market, DateTimeOffset end)
     {
         return FactoryService.instance.constant.redis.SortedSetRemoveRangeByScore(FactoryService.instance.GetRedisDeal(market), 0, end.ToUnixTimeMilliseconds());

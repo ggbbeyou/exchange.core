@@ -61,8 +61,7 @@ public class FactoryMatching
     /// </summary>
     public MarketInfo ServiceWarmCache(MarketInfo info)
     {
-        FactoryService.instance.deal_service.DealDbToRedis(info.market, new TimeSpan(-30, 0, 0, 0));
-        // K线数据从DB同步到Redis
+        FactoryService.instance.deal_service.DealDbToRedis(info.market, new TimeSpan(-30, 0, 0, 0));        
         DateTimeOffset now = DateTimeOffset.UtcNow;
         DateTimeOffset end = now.AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond - 1);
         FactoryService.instance.kline_service.DBtoRedised(info.market, end);

@@ -1,9 +1,8 @@
 ###
+@baseUrl = http://localhost:5105
 
-POST http://localhost:5105:/Service/Manage HTTP/1.1
-content-type: application/json
+POST {{baseUrl}}/Service/Manage HTTP/1.1
+Content-Type: application/x-www-form-urlencoded
 
-{
-    "market": 1,
-    "status": 1
-}
+market=1
+&status=1

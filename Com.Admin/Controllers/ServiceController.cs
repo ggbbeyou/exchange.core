@@ -12,7 +12,7 @@ using System.IdentityModel.Tokens.Jwt;
 namespace Com.Api.Controllers;
 
 // [Route("api/[controller]/[action]")]
-[Authorize]
+// [Authorize]
 public class ServiceController : Controller
 {
     /// <summary>
@@ -36,17 +36,17 @@ public class ServiceController : Controller
         }
     }
 
-    // /// <summary>
-    // /// 
-    // /// </summary>
-    // /// <param name="configuration"></param>
-    // /// <param name="environment"></param>
-    // /// <param name="provider"></param>
-    // /// <param name="logger"></param>
-    // public ServiceController(IServiceProvider provider, IConfiguration configuration, IHostEnvironment environment, ILogger<OrderController> logger)
-    // {
-    //     this.constant = new FactoryConstant(provider, configuration, environment, logger);
-    // }
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="configuration"></param>
+    /// <param name="environment"></param>
+    /// <param name="provider"></param>
+    /// <param name="logger"></param>
+    public ServiceController(IServiceProvider provider, IConfiguration configuration, IHostEnvironment environment, ILogger<ServiceController> logger)
+    {
+        this.constant = new FactoryConstant(provider, configuration, environment, logger);
+    }
 
     /// <summary>
     /// 服务管理
@@ -57,7 +57,7 @@ public class ServiceController : Controller
     [HttpPost]
     public async Task<IActionResult> Manage(long market, int status)
     {
-        MarketInfo? marketInfo = FactoryAdmin.instance.constant.db.MarketInfo.FirstOrDefault(P => P.market == market);
+        MarketInfo? marketInfo = this.constant.db.MarketInfo.FirstOrDefault(P => P.market == market);
         if (marketInfo == null)
         {
             return Json(new { code = 1, msg = "交易对不存在" });

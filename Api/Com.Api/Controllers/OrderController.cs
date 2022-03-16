@@ -100,7 +100,7 @@ public class OrderController : Controller
     /// 撤单
     /// </summary>
     /// <param name="market"></param>
-    /// <param name="type">1:按交易对全部撤单,2:按交易对和用户全部撤单,3:按用户和订单id撤单,4:按用户和用户订单id撤单</param>
+    /// <param name="type">2:按交易对和用户全部撤单,3:按用户和订单id撤单,4:按用户和用户订单id撤单</param>
     /// <param name="orders"></param>
     /// <returns></returns>
     [HttpPost]

@@ -32,7 +32,7 @@ public class MarketInfo
     /// 交易量整数倍数
     /// </summary>
     /// <value></value>
-    public int amountMultiple { get; set; }
+    public int amount_multiple { get; set; }
     /// <summary>
     /// 手续费
     /// </summary>

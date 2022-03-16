@@ -63,6 +63,7 @@ public class DbContextEF : DbContext
         modelBuilder.Entity<Coin>(o =>
         {
             o.HasKey(p => p.coin_id);
+            o.HasIndex(P => new { P.coin_name }).IsUnique();
             o.Property(P => P.coin_id).IsRequired().ValueGeneratedNever().HasColumnType("bigint").HasComment("币id");
             o.Property(P => P.coin_name).HasColumnType("nvarchar").HasMaxLength(20).HasComment("币名称");
             o.Property(P => P.price_places).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("价格小数位数");
@@ -75,7 +76,7 @@ public class DbContextEF : DbContext
             o.HasKey(p => p.trade_id);
             o.HasIndex(P => new { P.market, P.time });
             o.Property(P => P.trade_id).IsRequired().ValueGeneratedNever().HasColumnType("bigint").HasComment("成交订单ID");
-            o.Property(P => P.market).IsRequired().HasColumnType("bigint").HasMaxLength(50).HasComment("交易对");
+            o.Property(P => P.market).IsRequired().HasColumnType("bigint").HasComment("交易对");
             o.Property(P => P.symbol).HasColumnType("nvarchar").HasMaxLength(20).HasComment("交易对名称");
             o.Property(P => P.price).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("成交价");
             o.Property(P => P.amount).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("成交量");
@@ -83,7 +84,7 @@ public class DbContextEF : DbContext
             o.Property(P => P.trigger_side).IsRequired().HasColumnType("tinyint").HasComment("成交触发方向");
             o.Property(P => P.bid_id).IsRequired().HasColumnType("bigint").HasComment("买单id");
             o.Property(P => P.ask_id).IsRequired().HasColumnType("bigint").HasComment("卖单id");
-            o.Property(P => P.time).IsRequired().HasColumnType("datetimeoffset").HasMaxLength(50).HasComment("成交时间");
+            o.Property(P => P.time).IsRequired().HasColumnType("datetimeoffset").HasComment("成交时间");
             o.ToTable(nameof(Deal));
         });
         modelBuilder.Entity<Kline>(o =>
@@ -92,7 +93,7 @@ public class DbContextEF : DbContext
             o.HasIndex(P => new { P.market, P.type, P.time_start, P.time_end });
             o.HasIndex(P => new { P.market, P.type, P.time_start });
             o.Property(P => P.id).IsRequired().ValueGeneratedNever().HasColumnType("bigint").HasComment("K线ID");
-            o.Property(P => P.market).IsRequired().HasColumnType("bigint").HasMaxLength(50).HasComment("交易对");
+            o.Property(P => P.market).IsRequired().HasColumnType("bigint").HasComment("交易对");
             o.Property(P => P.symbol).HasColumnType("nvarchar").HasMaxLength(20).HasComment("交易对名称");
             o.Property(P => P.type).IsRequired().HasColumnType("tinyint").HasComment("K线类型");
             o.Property(P => P.amount).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("成交量");
@@ -110,7 +111,8 @@ public class DbContextEF : DbContext
         modelBuilder.Entity<MarketInfo>(o =>
         {
             o.HasKey(p => p.market);
-            o.Property(P => P.market).IsRequired().ValueGeneratedNever().HasColumnType("bigint").HasMaxLength(50).HasComment("交易对");
+            o.HasIndex(P => new { P.symbol }).IsUnique();
+            o.Property(P => P.market).IsRequired().ValueGeneratedNever().HasColumnType("bigint").HasComment("交易对");
             o.Property(P => P.symbol).HasColumnType("nvarchar").HasMaxLength(20).HasComment("交易对名称");
             o.Property(P => P.price_places).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("价格小数位数");
             o.Property(P => P.amount_places).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("量小数位数");
@@ -125,7 +127,7 @@ public class DbContextEF : DbContext
             o.HasIndex(P => new { P.market, P.uid });
             o.HasIndex(P => new { P.create_time });
             o.Property(P => P.order_id).IsRequired().ValueGeneratedNever().HasColumnType("bigint").HasComment("订单ID");
-            o.Property(P => P.market).IsRequired().HasColumnType("bigint").HasMaxLength(50).HasComment("交易对");
+            o.Property(P => P.market).IsRequired().HasColumnType("bigint").HasComment("交易对");
             o.Property(P => P.symbol).HasColumnType("nvarchar").HasMaxLength(20).HasComment("交易对名称");
             o.Property(P => P.client_id).HasColumnType("nvarchar").HasMaxLength(50).HasComment("客户自定义订单id");
             o.Property(P => P.uid).IsRequired().HasColumnType("bigint").HasComment("用户ID");
@@ -142,6 +144,17 @@ public class DbContextEF : DbContext
             o.Property(P => P.data).HasColumnType("nvarchar").HasMaxLength(200).HasComment("附加数据");
             o.Property(P => P.remarks).HasColumnType("nvarchar").HasMaxLength(200).HasComment("备注");
             o.ToTable(nameof(Order));
+        });
+        modelBuilder.Entity<Users>(o =>
+        {
+            o.HasKey(p => p.user_id);
+            o.HasIndex(P => new { P.user_name }).IsUnique();
+            o.Property(P => P.user_id).IsRequired().ValueGeneratedNever().HasColumnType("bigint").HasComment("用户id");
+            o.Property(P => P.user_name).HasColumnType("nvarchar").HasMaxLength(50).HasComment("用户名");
+            o.Property(P => P.password).HasColumnType("nvarchar").HasMaxLength(500).HasComment("用户密码");
+            o.Property(P => P.phone).HasColumnType("nvarchar").HasMaxLength(500).HasComment("用户手机号码");
+            o.Property(P => P.email).HasColumnType("nvarchar").HasMaxLength(500).HasComment("邮箱");
+            o.ToTable(nameof(Users));
         });
 
 

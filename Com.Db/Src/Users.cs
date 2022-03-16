@@ -12,12 +12,12 @@ public class Users
     /// 用户id
     /// </summary>
     /// <value></value>
-    public long id { get; set; }
+    public long user_id { get; set; }
     /// <summary>
     /// 用户名
     /// </summary>
     /// <value></value>
-    public string name { get; set; } = null!;
+    public string user_name { get; set; } = null!;
     /// <summary>
     /// 用户密码
     /// </summary>

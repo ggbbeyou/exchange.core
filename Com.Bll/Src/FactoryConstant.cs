@@ -135,6 +135,43 @@ public class FactoryConstant
     }
 
     /// <summary>
+    /// 上分布式锁
+    /// </summary>
+    /// <param name="key">redis键</param>
+    /// <param name="value">redis值</param>
+    /// <param name="timeout">超时(毫秒)</param>
+    /// <param name="action">方法</param>
+    public void Look(string key, string value, long timeout = 5000, Action action = null!)
+    {
+        if (action == null)
+        {
+            return;
+        }
+        try
+        {
+            if (this.redis.StringSet(key, value, TimeSpan.FromMilliseconds(timeout), When.NotExists))
+            {
+                try
+                {
+                    action();
+                }
+                catch (Exception ex)
+                {
+                    this.logger.LogError(ex, "redis分布试锁错误(业务)");
+                }
+                finally
+                {
+                    this.redis.KeyDelete(key);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogError(ex, "redis分布试锁错误");
+        }
+    }
+
+    /// <summary>
     /// MQ 发布消息
     /// </summary>
     /// <param name="exchange"></param>

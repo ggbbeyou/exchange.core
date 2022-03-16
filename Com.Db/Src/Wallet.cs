@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Com.Db;
 
 /// <summary>
-/// 钱包基础信息
+/// 计账钱包基础信息
 /// </summary>
 public class Wallet
 {

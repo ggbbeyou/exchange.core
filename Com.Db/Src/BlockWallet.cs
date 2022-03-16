@@ -14,6 +14,21 @@ public class BlockWallet
     /// <value></value>
     public long block_wallet_id { get; set; }
     /// <summary>
+    /// 钱包地址
+    /// </summary>
+    /// <value></value>
+    public string address { get; set; } = null!;
+    /// <summary>
+    /// 钱包密钥
+    /// </summary>
+    /// <value></value>
+    public string secret { get; set; } = null!;
+    /// <summary>
+    /// 支付链id
+    /// </summary>
+    /// <value></value>
+    public long chain { get; set; }
+    /// <summary>
     /// 用户id
     /// </summary>
     /// <value></value>

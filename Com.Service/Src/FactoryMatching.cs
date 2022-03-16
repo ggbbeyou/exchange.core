@@ -52,7 +52,6 @@ public class FactoryMatching
     {
         //交易记录数据从DB同步到Redis 至少保存最近3个月记录
         long delete = FactoryService.instance.deal_service.DeleteDeal(info.market, DateTimeOffset.UtcNow.AddMonths(-3));
-        
         return info;
     }
 
@@ -61,8 +60,8 @@ public class FactoryMatching
     /// </summary>
     public MarketInfo ServiceWarmCache(MarketInfo info)
     {
-        FactoryService.instance.deal_service.DealDbToRedis(info.market, new TimeSpan(-30, 0, 0, 0));        
         DateTimeOffset now = DateTimeOffset.UtcNow;
+        FactoryService.instance.deal_service.DealDbToRedis(info.market, now.AddMonths(-3));
         DateTimeOffset end = now.AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond - 1);
         FactoryService.instance.kline_service.DBtoRedised(info.market, end);
         FactoryService.instance.kline_service.DBtoRedising(info.market);
@@ -95,9 +94,8 @@ public class FactoryMatching
     {
         if (!this.service.ContainsKey(info.market))
         {
-            throw new Exception("未找到该服务");
+            this.service[info.market].run = false;
         }
-        this.service[info.market].run = false;
         return info;
     }
 

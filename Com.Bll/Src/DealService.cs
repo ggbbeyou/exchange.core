@@ -13,11 +13,10 @@ public class DealService
     /// 同步交易记录
     /// </summary>
     /// <param name="markets">交易对</param>
-    /// <param name="span">最少同步多少时间数据</param>
+    /// <param name="start">start之后所有记录</param>
     /// <returns></returns>
-    public bool DealDbToRedis(long market, TimeSpan span)
+    public bool DealDbToRedis(long market, DateTimeOffset start)
     {
-        DateTimeOffset start = DateTimeOffset.UtcNow.Add(span);
         Deal? deal = GetRedisLastDeal(market);
         if (deal != null)
         {

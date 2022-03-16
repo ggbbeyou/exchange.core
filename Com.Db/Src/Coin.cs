@@ -4,20 +4,20 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Com.Db;
 
 /// <summary>
-/// 交易对基础信息
+/// 币的基础信息
 /// </summary>
-public class MarketInfo
+public class Coin
 {
     /// <summary>
-    /// 交易对
+    /// 币id
     /// </summary>
     /// <value></value>
-    public long market { get; set; }
+    public long coin_id { get; set; }
     /// <summary>
-    /// 交易对名称
+    /// 币名称
     /// </summary>
     /// <value></value>
-    public string symbol { get; set; } = null!;
+    public string coin_name { get; set; } = null!;
     /// <summary>
     /// 价格小数位数
     /// </summary>
@@ -29,19 +29,8 @@ public class MarketInfo
     /// <value></value>
     public decimal amount_places { get; set; }
     /// <summary>
-    /// 交易量整数倍数
+    /// 合约地址
     /// </summary>
     /// <value></value>
-    public int amountMultiple { get; set; }
-    /// <summary>
-    /// 手续费
-    /// </summary>
-    /// <value></value>
-    public decimal fee { get; set; }
-    /// <summary>
-    /// 最后的成交价
-    /// </summary>
-    /// <value></value>
-    [NotMapped]
-    public decimal last_price { get; set; }
+    public string? contract { get; set; }
 }

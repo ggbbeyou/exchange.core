@@ -96,13 +96,13 @@ public class FactoryConstant
         }
         try
         {
-            // var scope = provider.CreateScope();
-            // DbContextEF? db = scope.ServiceProvider.GetService<DbContextEF>();
-            // if (db != null)
-            // {
-            //     this.db = db;               
-            // }
-            // else
+            var scope = provider.CreateScope();
+            DbContextEF? db = scope.ServiceProvider.GetService<DbContextEF>();
+            if (db != null)
+            {
+                this.db = db;
+            }
+            else
             {
                 //下面可以创建数据库   Code First
                 string? dbConnection = config.GetConnectionString("Mssql");

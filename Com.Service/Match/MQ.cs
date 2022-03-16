@@ -29,6 +29,11 @@ public class MQ
     /// <value></value>
     public string? consumerTags_order_send;
     /// <summary>
+    /// 接收撤单订单队列标记
+    /// </summary>
+    /// <value></value>
+    public string? consumerTags_order_cancel;
+    /// <summary>
     /// (Direct)发送历史成交记录
     /// </summary>
     /// <value></value>
@@ -201,7 +206,7 @@ public class MQ
     /// </summary>
     public void OrderCancel()
     {
-        this.consumerTags_order_send = FactoryMatching.instance.constant.MqReceive(FactoryService.instance.GetMqOrderCancel(this.model.info.market), (e) =>
+        this.consumerTags_order_cancel = FactoryMatching.instance.constant.MqReceive(FactoryService.instance.GetMqOrderCancel(this.model.info.market), (e) =>
         {
             if (!this.model.run)
             {
@@ -210,22 +215,22 @@ public class MQ
             else
             {
                 string json = Encoding.UTF8.GetString(e);
-                CallRequest<List<long>>? req = JsonConvert.DeserializeObject<CallRequest<List<long>>>(json);
-                if (req != null && req.op == E_Op.place && req.data != null)
+                CallRequest<(long uid, List<long> order_id)>? req = JsonConvert.DeserializeObject<CallRequest<(long, List<long>)>>(json);
+                if (req != null && req.op == E_Op.place)
                 {
                     cancel.Clear();
                     this.mutex.WaitOne();
                     if (req.op == E_Op.cancel_by_id)
                     {
-                        cancel.AddRange(this.model.match_core.CancelOrder(req.data));
+                        cancel.AddRange(this.model.match_core.CancelOrder(req.data.uid, req.data.order_id));
                     }
                     else if (req.op == E_Op.cancel_by_uid)
                     {
-                        cancel.AddRange(this.model.match_core.CancelOrder(req.data.First()));
+                        cancel.AddRange(this.model.match_core.CancelOrder(req.data.uid));
                     }
                     else if (req.op == E_Op.cancel_by_clientid)
                     {
-                        cancel.AddRange(this.model.match_core.CancelOrder(req.data.ToArray()));
+                        cancel.AddRange(this.model.match_core.CancelOrder(req.data.uid, req.data.order_id));
                     }
                     else if (req.op == E_Op.cancel_by_all)
                     {

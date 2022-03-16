@@ -75,21 +75,21 @@ public class MatchCore
     {
         this.model = model;
     }
-    
+
     /// <summary>
     /// 撤消订单
     /// </summary>
     /// <param name="order_id">订单ID</param>
     /// <returns>orderbook变更</returns>
-    public List<Orders> CancelOrder(List<long> order_id)
+    public List<Orders> CancelOrder(long uid, List<long> order_id)
     {
-        List<Orders> cancel_market_bid = this.market_bid.Where(P => order_id.Contains(P.order_id)).ToList();
+        List<Orders> cancel_market_bid = this.market_bid.Where(P => P.uid == uid && order_id.Contains(P.order_id)).ToList();
         this.market_bid.RemoveAll(P => cancel_market_bid.Select(P => P.order_id).Contains(P.order_id));
-        List<Orders> cancel_market_ask = this.market_ask.Where(P => order_id.Contains(P.order_id)).ToList();
+        List<Orders> cancel_market_ask = this.market_ask.Where(P => P.uid == uid && order_id.Contains(P.order_id)).ToList();
         this.market_ask.RemoveAll(P => cancel_market_ask.Select(P => P.order_id).Contains(P.order_id));
-        List<Orders> cancel_fixed_bid = this.fixed_bid.Where(P => order_id.Contains(P.order_id)).ToList();
+        List<Orders> cancel_fixed_bid = this.fixed_bid.Where(P => P.uid == uid && order_id.Contains(P.order_id)).ToList();
         this.fixed_bid.RemoveAll(P => cancel_fixed_bid.Select(P => P.order_id).Contains(P.order_id));
-        List<Orders> cancel_fixed_ask = this.fixed_ask.Where(P => order_id.Contains(P.order_id)).ToList();
+        List<Orders> cancel_fixed_ask = this.fixed_ask.Where(P => P.uid == uid && order_id.Contains(P.order_id)).ToList();
         this.fixed_ask.RemoveAll(P => cancel_fixed_ask.Select(P => P.order_id).Contains(P.order_id));
         List<Orders> cancel = new List<Orders>();
         cancel.AddRange(cancel_market_bid);
@@ -129,15 +129,15 @@ public class MatchCore
     /// </summary>
     /// <param name="client_id">客户订单ID</param>
     /// <returns>orderbook变更</returns>
-    public List<Orders> CancelOrder(long[] client_id)
+    public List<Orders> CancelOrder(long uid, long[] client_id)
     {
-        List<Orders> cancel_market_bid = this.market_bid.Where(P => client_id.Contains(P.order_id)).ToList();
+        List<Orders> cancel_market_bid = this.market_bid.Where(P => P.uid == uid && client_id.Contains(P.order_id)).ToList();
         this.market_bid.RemoveAll(P => cancel_market_bid.Select(P => P.order_id).Contains(P.order_id));
-        List<Orders> cancel_market_ask = this.market_ask.Where(P => client_id.Contains(P.order_id)).ToList();
+        List<Orders> cancel_market_ask = this.market_ask.Where(P => P.uid == uid && client_id.Contains(P.order_id)).ToList();
         this.market_ask.RemoveAll(P => cancel_market_ask.Select(P => P.order_id).Contains(P.order_id));
-        List<Orders> cancel_fixed_bid = this.fixed_bid.Where(P => client_id.Contains(P.order_id)).ToList();
+        List<Orders> cancel_fixed_bid = this.fixed_bid.Where(P => P.uid == uid && client_id.Contains(P.order_id)).ToList();
         this.fixed_bid.RemoveAll(P => cancel_fixed_bid.Select(P => P.order_id).Contains(P.order_id));
-        List<Orders> cancel_fixed_ask = this.fixed_ask.Where(P => client_id.Contains(P.order_id)).ToList();
+        List<Orders> cancel_fixed_ask = this.fixed_ask.Where(P => P.uid == uid && client_id.Contains(P.order_id)).ToList();
         this.fixed_ask.RemoveAll(P => cancel_fixed_ask.Select(P => P.order_id).Contains(P.order_id));
         List<Orders> cancel = new List<Orders>();
         cancel.AddRange(cancel_market_bid);

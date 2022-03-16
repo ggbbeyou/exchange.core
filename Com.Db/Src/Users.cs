@@ -17,7 +17,7 @@ public class Users
     /// 用户名
     /// </summary>
     /// <value></value>
-    public string? name { get; set; }
+    public string name { get; set; } = null!;
     /// <summary>
     /// 用户密码
     /// </summary>

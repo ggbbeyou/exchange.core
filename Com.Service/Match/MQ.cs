@@ -39,11 +39,6 @@ public class MQ
     /// <value></value>
     public string key_deal = "deal";
     /// <summary>
-    /// (Direct)接收取消订单队列名称
-    /// </summary>
-    /// <value></value>
-    public string key_order_cancel = "order_cancel";
-    /// <summary>
     /// (Direct)发送撤单订单成功队列名称
     /// </summary>
     /// <value></value>
@@ -96,8 +91,6 @@ public class MQ
         this.model = model;
         props.DeliveryMode = 2;
         FactoryMatching.instance.constant.i_model.ExchangeDeclare(exchange: this.key_deal, type: ExchangeType.Direct, durable: true, autoDelete: false, arguments: null);
-        FactoryMatching.instance.constant.i_model.ExchangeDeclare(exchange: this.key_order_cancel, type: ExchangeType.Direct, durable: true, autoDelete: false, arguments: null);
-
         FactoryMatching.instance.constant.i_model.ExchangeDeclare(exchange: this.key_order_cancel_success, type: ExchangeType.Direct, durable: true, autoDelete: false, arguments: null);
         OrderCancel();
         OrderReceive();
@@ -146,8 +139,8 @@ public class MQ
                         FactoryMatching.instance.constant.i_model.BasicPublish(exchange: this.key_order_cancel_success, routingKey: this.model.info.market.ToString(), basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(cancel_deal)));
                     }
                 };
+                return true;
             }
-            return true;
         });
 
 

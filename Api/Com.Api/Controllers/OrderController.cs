@@ -12,7 +12,8 @@ using System.IdentityModel.Tokens.Jwt;
 namespace Com.Api.Controllers;
 
 // [Route("api/[controller]/[action]")]
-[Authorize]
+// [Authorize]
+[AllowAnonymous]
 public class OrderController : Controller
 {
     /// <summary>
@@ -23,7 +24,7 @@ public class OrderController : Controller
     /// 登录玩家id
     /// </summary>
     /// <value></value>
-    public int login_playInfo_id
+    public int user_id
     {
         get
         {
@@ -55,14 +56,12 @@ public class OrderController : Controller
     }
 
     /// <summary>
-    /// 
+    /// 挂单
     /// </summary>
     /// <param name="market"></param>
     /// <param name="orders"></param>
     /// <returns></returns>
     [HttpPost]
-    [AllowAnonymous]
-    [ResponseCache(CacheProfileName = "cacheprofile_3")]
     public IActionResult PlaceOrder(long market, List<PlaceOrder> orders)
     {
         List<Orders> matchOrders = new List<Orders>();
@@ -72,11 +71,52 @@ public class OrderController : Controller
             orderResult.order_id = this.constant.worker.NextId();
             orderResult.client_id = item.client_id;
             orderResult.market = market;
-            orderResult.uid = 1;
+            orderResult.uid = user_id;
             orderResult.price = item.price ?? 0;
             orderResult.amount = item.amount;
             orderResult.total = item.price ?? 0 * item.amount;
-            // orderResult.create_time = DateTimeOffset.UtcNow;
+            orderResult.create_time = DateTimeOffset.UtcNow;
+            orderResult.amount_unsold = 0;
+            orderResult.amount_done = item.amount;
+            orderResult.deal_last_time = null;
+            orderResult.side = item.side;
+            orderResult.state = E_OrderState.unsold;
+            orderResult.type = item.type;
+            orderResult.data = null;
+            orderResult.remarks = null;
+            matchOrders.Add(orderResult);
+        }
+        Res<List<Orders>> res = FactoryService.instance.order_service.PlaceOrder(market, matchOrders);
+        CallRequest<List<Orders>> result = new CallRequest<List<Orders>>();
+        result.data = new List<Orders>();
+        foreach (var item in res.data)
+        {
+            result.data.Add(item);
+        }
+        return Json(result);
+    }
+
+    /// <summary>
+    /// 挂单
+    /// </summary>
+    /// <param name="market"></param>
+    /// <param name="orders"></param>
+    /// <returns></returns>
+    [HttpPost]
+    public IActionResult OrderCancel(long market, List<long> cancel)
+    {
+        List<Orders> matchOrders = new List<Orders>();
+        foreach (var item in cancel)
+        {
+            Orders orderResult = new Orders();
+            orderResult.order_id = this.constant.worker.NextId();
+            orderResult.client_id = item.client_id;
+            orderResult.market = market;
+            orderResult.uid = user_id;
+            orderResult.price = item.price ?? 0;
+            orderResult.amount = item.amount;
+            orderResult.total = item.price ?? 0 * item.amount;
+            orderResult.create_time = DateTimeOffset.UtcNow;
             orderResult.amount_unsold = 0;
             orderResult.amount_done = item.amount;
             orderResult.deal_last_time = null;
@@ -98,9 +138,5 @@ public class OrderController : Controller
     }
 
 
-    // [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    // public IActionResult Error()
-    // {
-    //     return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-    // }
+
 }

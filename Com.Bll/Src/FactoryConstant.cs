@@ -209,7 +209,7 @@ public class FactoryConstant
     }
 
     /// <summary>
-    /// MQ 发送消息
+    /// MQ 简单的队列 发送消息
     /// </summary>
     /// <param name="queue_name"></param>
     /// <param name="body"></param>
@@ -220,7 +220,7 @@ public class FactoryConstant
     }
 
     /// <summary>
-    /// MQ 接收消息
+    /// MQ 简单的队列 接收消息
     /// </summary>
     /// <param name="queue_name"></param>
     /// <param name="func"></param>
@@ -242,5 +242,7 @@ public class FactoryConstant
         };
         return this.i_model.BasicConsume(queue: queue_name, autoAck: true, consumer: consumer);
     }
+
+    
 
 }

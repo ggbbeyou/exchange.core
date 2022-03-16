@@ -139,21 +139,6 @@ public class FactoryService
 
 
 
-
-
-
-
-
-
-
-
-
-
-    /// <summary>
-    /// (Direct)接收挂单订单队列名称
-    /// </summary>
-    /// <value></value>
-    public string key_order_send = "order_send";
     /// <summary>
     /// (Direct)发送历史成交记录
     /// </summary>
@@ -174,13 +159,23 @@ public class FactoryService
 
 
     /// <summary>
-    /// MQ:下单队列
+    /// MQ:挂单队列
     /// </summary>
     /// <param name="market"></param>
     /// <returns></returns>
     public string GetMqOrderPlace(long market)
     {
         return string.Format("order_place_{0}", market);
+    }
+
+    /// <summary>
+    /// MQ:撤单队列
+    /// </summary>
+    /// <param name="market"></param>
+    /// <returns></returns>
+    public string GetMqOrderCancel(long market)
+    {
+        return string.Format("order_cancel_{0}", market);
     }
 
     /// <summary>

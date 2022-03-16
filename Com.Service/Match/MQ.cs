@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Com.Bll;
 using Com.Db;
 using Com.Db.Enum;
 using Com.Db.Model;
@@ -23,10 +24,10 @@ public class MQ
     /// </summary>
     private MatchModel model;
     /// <summary>
-    /// (Direct)接收挂单订单队列名称
+    /// 接收挂单订单队列标记
     /// </summary>
     /// <value></value>
-    public string key_order_send = "order_send";
+    public string? consumerTags_order_send;
     /// <summary>
     /// (Direct)发送历史成交记录
     /// </summary>
@@ -91,7 +92,7 @@ public class MQ
         props.DeliveryMode = 2;
         FactoryMatching.instance.constant.i_model.ExchangeDeclare(exchange: this.key_deal, type: ExchangeType.Direct, durable: true, autoDelete: false, arguments: null);
         FactoryMatching.instance.constant.i_model.ExchangeDeclare(exchange: this.key_order_cancel, type: ExchangeType.Direct, durable: true, autoDelete: false, arguments: null);
-        FactoryMatching.instance.constant.i_model.ExchangeDeclare(exchange: this.key_order_send, type: ExchangeType.Direct, durable: true, autoDelete: false, arguments: null);
+
         FactoryMatching.instance.constant.i_model.ExchangeDeclare(exchange: this.key_order_cancel_success, type: ExchangeType.Direct, durable: true, autoDelete: false, arguments: null);
         OrderCancel();
         OrderReceive();
@@ -102,18 +103,15 @@ public class MQ
     /// </summary>
     public void OrderReceive()
     {
-        string queueName = FactoryMatching.instance.constant.i_model.QueueDeclare().QueueName;
-        FactoryMatching.instance.constant.i_model.QueueBind(queue: queueName, exchange: this.key_order_send, routingKey: this.model.info.market.ToString());
-        EventingBasicConsumer consumer = new EventingBasicConsumer(FactoryMatching.instance.constant.i_model);
-        consumer.Received += (model, ea) =>
+        this.consumerTags_order_send = FactoryMatching.instance.constant.MqReceive(FactoryService.instance.GetMqOrderPlace(this.model.info.market), (e) =>
         {
             if (!this.model.run)
             {
-                FactoryMatching.instance.constant.i_model.BasicNack(deliveryTag: ea.DeliveryTag, multiple: true, requeue: true);
+                return false;
             }
             else
             {
-                string json = Encoding.UTF8.GetString(ea.Body.ToArray());
+                string json = Encoding.UTF8.GetString(e);
                 CallRequest<List<Orders>>? req = JsonConvert.DeserializeObject<CallRequest<List<Orders>>>(json);
                 if (req != null && req.op == E_Op.place && req.data != null && req.data.Count > 0)
                 {
@@ -143,10 +141,59 @@ public class MQ
                         FactoryMatching.instance.constant.i_model.BasicPublish(exchange: this.key_order_cancel_success, routingKey: this.model.info.market.ToString(), basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(cancel_deal)));
                     }
                 };
-                FactoryMatching.instance.constant.i_model.BasicAck(ea.DeliveryTag, true);
             }
-        };
-        FactoryMatching.instance.constant.i_model.BasicConsume(queue: queueName, autoAck: false, consumer: consumer);
+            return true;
+        });
+
+
+
+
+
+        // string queueName = FactoryMatching.instance.constant.i_model.QueueDeclare().QueueName;
+        // FactoryMatching.instance.constant.i_model.QueueBind(queue: queueName, exchange: this.key_order_send, routingKey: this.model.info.market.ToString());
+        // EventingBasicConsumer consumer = new EventingBasicConsumer(FactoryMatching.instance.constant.i_model);
+        // consumer.Received += (model, ea) =>
+        // {
+        //     if (!this.model.run)
+        //     {
+        //         FactoryMatching.instance.constant.i_model.BasicNack(deliveryTag: ea.DeliveryTag, multiple: true, requeue: true);
+        //     }
+        //     else
+        //     {
+        //         string json = Encoding.UTF8.GetString(ea.Body.ToArray());
+        //         CallRequest<List<Orders>>? req = JsonConvert.DeserializeObject<CallRequest<List<Orders>>>(json);
+        //         if (req != null && req.op == E_Op.place && req.data != null && req.data.Count > 0)
+        //         {
+        //             deal.Clear();
+        //             cancel_deal.Clear();
+        //             foreach (Orders item in req.data)
+        //             {
+        //                 this.mutex.WaitOne();
+        //                 (Orders? order, List<Deal> deal, List<Orders> cancel) match = this.model.match_core.Match(item);
+        //                 this.mutex.ReleaseMutex();
+        //                 if (match.order == null)
+        //                 {
+        //                     continue;
+        //                 }
+        //                 deal.Add((match.order, match.deal));
+        //                 if (match.cancel.Count > 0)
+        //                 {
+        //                     cancel_deal.AddRange(match.cancel);
+        //                 }
+        //             }
+        //             if (deal.Count() > 0)
+        //             {
+        //                 FactoryMatching.instance.constant.i_model.BasicPublish(exchange: this.key_deal, routingKey: this.model.info.market.ToString(), basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(deal)));
+        //             }
+        //             if (cancel_deal.Count > 0)
+        //             {
+        //                 FactoryMatching.instance.constant.i_model.BasicPublish(exchange: this.key_order_cancel_success, routingKey: this.model.info.market.ToString(), basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(cancel_deal)));
+        //             }
+        //         };
+        //         FactoryMatching.instance.constant.i_model.BasicAck(ea.DeliveryTag, true);
+        //     }
+        // };
+        // FactoryMatching.instance.constant.i_model.BasicConsume(queue: queueName, autoAck: false, consumer: consumer);
     }
 
     /// <summary>
@@ -154,18 +201,15 @@ public class MQ
     /// </summary>
     public void OrderCancel()
     {
-        string queueName = FactoryMatching.instance.constant.i_model.QueueDeclare().QueueName;
-        FactoryMatching.instance.constant.i_model.QueueBind(queue: queueName, exchange: this.key_order_cancel, routingKey: this.model.info.market.ToString());
-        EventingBasicConsumer consumer = new EventingBasicConsumer(FactoryMatching.instance.constant.i_model);
-        consumer.Received += (model, ea) =>
+        this.consumerTags_order_send = FactoryMatching.instance.constant.MqReceive(FactoryService.instance.GetMqOrderCancel(this.model.info.market), (e) =>
         {
             if (!this.model.run)
             {
-                FactoryMatching.instance.constant.i_model.BasicNack(deliveryTag: ea.DeliveryTag, multiple: true, requeue: true);
+                return false;
             }
             else
             {
-                string json = Encoding.UTF8.GetString(ea.Body.ToArray());
+                string json = Encoding.UTF8.GetString(e);
                 CallRequest<List<long>>? req = JsonConvert.DeserializeObject<CallRequest<List<long>>>(json);
                 if (req != null && req.op == E_Op.place && req.data != null)
                 {
@@ -193,10 +237,56 @@ public class MQ
                         FactoryMatching.instance.constant.i_model.BasicPublish(exchange: this.key_order_cancel_success, routingKey: this.model.info.market.ToString(), basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(cancel)));
                     }
                 }
-                FactoryMatching.instance.constant.i_model.BasicAck(ea.DeliveryTag, false);
+                return true;
             }
-        };
-        FactoryMatching.instance.constant.i_model.BasicConsume(queue: queueName, autoAck: false, consumer: consumer);
+        });
+
+
+
+
+        // string queueName = FactoryMatching.instance.constant.i_model.QueueDeclare().QueueName;
+        // FactoryMatching.instance.constant.i_model.QueueBind(queue: queueName, exchange: this.key_order_cancel, routingKey: this.model.info.market.ToString());
+        // EventingBasicConsumer consumer = new EventingBasicConsumer(FactoryMatching.instance.constant.i_model);
+        // consumer.Received += (model, ea) =>
+        // {
+        //     if (!this.model.run)
+        //     {
+        //         FactoryMatching.instance.constant.i_model.BasicNack(deliveryTag: ea.DeliveryTag, multiple: true, requeue: true);
+        //     }
+        //     else
+        //     {
+        //         string json = Encoding.UTF8.GetString(ea.Body.ToArray());
+        //         CallRequest<List<long>>? req = JsonConvert.DeserializeObject<CallRequest<List<long>>>(json);
+        //         if (req != null && req.op == E_Op.place && req.data != null)
+        //         {
+        //             cancel.Clear();
+        //             this.mutex.WaitOne();
+        //             if (req.op == E_Op.cancel_by_id)
+        //             {
+        //                 cancel.AddRange(this.model.match_core.CancelOrder(req.data));
+        //             }
+        //             else if (req.op == E_Op.cancel_by_uid)
+        //             {
+        //                 cancel.AddRange(this.model.match_core.CancelOrder(req.data.First()));
+        //             }
+        //             else if (req.op == E_Op.cancel_by_clientid)
+        //             {
+        //                 cancel.AddRange(this.model.match_core.CancelOrder(req.data.ToArray()));
+        //             }
+        //             else if (req.op == E_Op.cancel_by_all)
+        //             {
+        //                 cancel.AddRange(this.model.match_core.CancelOrder());
+        //             }
+        //             this.mutex.ReleaseMutex();
+        //             if (cancel.Count > 0)
+        //             {
+        //                 FactoryMatching.instance.constant.i_model.BasicPublish(exchange: this.key_order_cancel_success, routingKey: this.model.info.market.ToString(), basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(cancel)));
+        //             }
+        //         }
+        //         FactoryMatching.instance.constant.i_model.BasicAck(ea.DeliveryTag, false);
+        //     }
+        // };
+        // FactoryMatching.instance.constant.i_model.BasicConsume(queue: queueName, autoAck: false, consumer: consumer);
     }
 
 }

@@ -26,7 +26,7 @@ public class OrderService
         req.op = E_Op.place;
         req.market = market;
         req.data = order;
-        FactoryService.instance.constant.i_model.BasicPublish(exchange: FactoryService.instance.GetMqOrderPlace(market), routingKey: "", basicProperties: FactoryService.instance.props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(req)));
+        FactoryService.instance.constant.MqSend(FactoryService.instance.GetMqOrderPlace(market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(req)));
         CallResponse<List<Orders>> res = new CallResponse<List<Orders>>();
         res.op = E_Op.place;
         res.success = true;

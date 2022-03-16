@@ -54,11 +54,6 @@ public class FactoryService
     /// 系统初始化时间  初始化  注:2017-1-1 此时是一年第一天，一年第一月，一年第一个星期日(星期日是一个星期开始的第一天)
     /// </summary>   
     public DateTimeOffset system_init = new DateTimeOffset(2017, 1, 1, 0, 0, 0, TimeSpan.Zero);
-    /// <summary>
-    /// MQ基本属性
-    /// </summary>
-    /// <returns></returns>
-    public IBasicProperties props = null!;
 
     /// <summary>
     /// private构造方法
@@ -75,8 +70,7 @@ public class FactoryService
     public void Init(FactoryConstant constant)
     {
         this.constant = constant;
-        this.props = constant.i_model.CreateBasicProperties();
-        this.props.DeliveryMode = 2;
+
     }
 
     /// <summary>

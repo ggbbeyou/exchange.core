@@ -93,7 +93,7 @@ public class FactoryMatching
     /// <param name="info"></param>
     public MarketInfo ServiceStop(MarketInfo info)
     {
-        if (!this.service.ContainsKey(info.market))
+        if (this.service.ContainsKey(info.market))
         {
             this.service[info.market].run = false;
         }

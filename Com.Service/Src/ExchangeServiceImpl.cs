@@ -58,7 +58,7 @@ public class GreeterImpl : ExchangeService.ExchangeServiceBase
             res.message = $"服务(成功):清除所有缓存:{marketInfo.market}";
             FactoryMatching.instance.constant.logger.LogInformation($"服务(成功):清除所有缓存:{marketInfo.market}");
         }
-        if (req.op == E_Op.service_warm_cache)
+        else if (req.op == E_Op.service_warm_cache)
         {
             MarketInfo? marketInfo = JsonConvert.DeserializeObject<MarketInfo>(req.data);
             if (marketInfo == null)

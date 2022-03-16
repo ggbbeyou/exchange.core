@@ -69,7 +69,7 @@ public class DbContextEF : DbContext
             o.Property(P => P.price_places).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("价格小数位数");
             o.Property(P => P.amount_places).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("量小数位数");
             o.Property(P => P.contract).HasColumnType("nvarchar").HasMaxLength(200).HasComment("合约地址");
-            o.ToTable(nameof(MarketInfo));
+            o.ToTable(nameof(Coin));
         });
         modelBuilder.Entity<Deal>(o =>
         {
@@ -155,6 +155,20 @@ public class DbContextEF : DbContext
             o.Property(P => P.phone).HasColumnType("nvarchar").HasMaxLength(500).HasComment("用户手机号码");
             o.Property(P => P.email).HasColumnType("nvarchar").HasMaxLength(500).HasComment("邮箱");
             o.ToTable(nameof(Users));
+        });
+        modelBuilder.Entity<Wallet>(o =>
+        {
+            o.HasKey(p => p.wallet_id);
+            o.HasIndex(P => new { P.wallet_id, P.user_id, P.coin_id }).IsUnique();
+            o.Property(P => P.wallet_id).IsRequired().ValueGeneratedNever().HasColumnType("bigint").HasComment("钱包id");
+            o.Property(P => P.user_id).IsRequired().ValueGeneratedNever().HasColumnType("bigint").HasComment("用户id");
+            o.Property(P => P.user_name).HasColumnType("nvarchar").HasMaxLength(50).HasComment("用户名");
+            o.Property(P => P.coin_id).IsRequired().ValueGeneratedNever().HasColumnType("bigint").HasComment(" 币id");
+            o.Property(P => P.coin_name).HasColumnType("nvarchar").HasMaxLength(20).HasComment("币名称");
+            o.Property(P => P.total).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("总额");
+            o.Property(P => P.available).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("可用");
+            o.Property(P => P.freeze).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("冻结");
+            o.ToTable(nameof(Wallet));
         });
 
 

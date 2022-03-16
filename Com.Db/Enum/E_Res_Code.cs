@@ -8,12 +8,11 @@ namespace Com.Db.Enum;
 public enum E_Res_Code
 {
     /// <summary>
-    /// 成功
-    /// </summary>
-    ok = 0,
-    /// <summary>
     /// 失败
     /// </summary>
-    fail = 1,
-
+    fail = 0,
+    /// <summary>
+    /// 成功
+    /// </summary>
+    ok = 1,
 }

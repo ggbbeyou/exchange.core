@@ -70,8 +70,7 @@ public class ServiceController : Controller
         }
         else
         {
-            bool result = false;
-            res.code = E_Res_Code.fail;
+            bool result = false;          
             if (status == 1)
             {
                 result = await FactoryAdmin.instance.ServiceClearCache(marketInfo);

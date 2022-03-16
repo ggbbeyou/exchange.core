@@ -106,6 +106,11 @@ public class OrderController : Controller
     [HttpPost]
     public IActionResult OrderCancel(long market, int type, List<long> data)
     {
+        CallResponse<bool> call_res = new CallResponse<bool>();
+        if (type != 2 || type != 3 || type != 4 || type != 5)
+        {
+            return Json(call_res);
+        }
         CallResponse<KeyValuePair<long, List<long>>> res = FactoryService.instance.order_service.CancelOrder(market, user_id, type, data);
         return Json(res);
     }

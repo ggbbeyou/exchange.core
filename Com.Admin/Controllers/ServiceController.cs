@@ -59,28 +59,43 @@ public class ServiceController : Controller
     [HttpPost]
     public async Task<IActionResult> Manage(long market, int status)
     {
+        Res<long> res = new Res<long>();
         MarketInfo? marketInfo = this.constant.db.MarketInfo.FirstOrDefault(P => P.market == market);
         if (marketInfo == null)
         {
-            return Json(new { code = 1, msg = "交易对不存在" });
+            res.success = false;
+            res.code = E_Res_Code.fail;
+            res.message = "交易对不存在";
+            res.data = market;
         }
-        if (status == 1)
+        else
         {
-            await FactoryAdmin.instance.ServiceClearCache(marketInfo);
+            bool result = false;
+            if (status == 1)
+            {
+                result = await FactoryAdmin.instance.ServiceClearCache(marketInfo);
+            }
+            else if (status == 2)
+            {
+                result = await FactoryAdmin.instance.ServiceWarmCache(marketInfo);
+            }
+            else if (status == 3)
+            {
+                result = await FactoryAdmin.instance.ServiceStart(marketInfo);
+            }
+            else if (status == 4)
+            {
+                result = await FactoryAdmin.instance.ServiceStop(marketInfo);
+            }
+            if (result)
+            {
+                res.success = true;
+                res.code = E_Res_Code.ok;
+                res.message = "操作成功";
+                res.data = market;
+            }
         }
-        else if (status == 2)
-        {
-            await FactoryAdmin.instance.ServiceWarmCache(marketInfo);
-        }
-        else if (status == 3)
-        {
-            await FactoryAdmin.instance.ServiceStart(marketInfo);
-        }
-        else if (status == 4)
-        {
-            await FactoryAdmin.instance.ServiceStop(marketInfo);
-        }
-        return Json("");
+        return Json(res);
     }
 
 }

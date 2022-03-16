@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Com.Db;
 
 /// <summary>
-/// 区块钱包基础信息
+/// 区块钱包基础信息(暂时不用)
 /// </summary>
 public class BlockWallet
 {

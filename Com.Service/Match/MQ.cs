@@ -33,11 +33,7 @@ public class MQ
     /// </summary>
     /// <value></value>
     public string? consumerTags_order_cancel;
-    /// <summary>
-    /// (Direct)发送历史成交记录
-    /// </summary>
-    /// <value></value>
-    public string key_deal = "deal";
+   
     /// <summary>
     /// MQ基本属性
     /// </summary>
@@ -75,7 +71,7 @@ public class MQ
     {
         this.model = model;
         props.DeliveryMode = 2;
-        FactoryMatching.instance.constant.i_model.ExchangeDeclare(exchange: this.key_deal, type: ExchangeType.Direct, durable: true, autoDelete: false, arguments: null);
+
 
         OrderCancel();
         OrderReceive();
@@ -117,7 +113,7 @@ public class MQ
                     }
                     if (deal.Count() > 0)
                     {
-                        FactoryMatching.instance.constant.i_model.BasicPublish(exchange: this.key_deal, routingKey: this.model.info.market.ToString(), basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(deal)));
+                        FactoryMatching.instance.constant.MqTask(FactoryService.instance.GetMqOrderDeal(this.model.info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(deal)));
                     }
                     if (cancel_deal.Count > 0)
                     {

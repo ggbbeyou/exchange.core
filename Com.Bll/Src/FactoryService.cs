@@ -125,26 +125,6 @@ public class FactoryService
         return string.Format("tickers_{0}", market);
     }
 
-
-
-
-
-
-
-
-
-
-
-    //
-
-
-
-    /// <summary>
-    /// (Direct)发送历史成交记录
-    /// </summary>
-    /// <value></value>
-    public string key_deal = "deal";
-    
     /// <summary>
     /// MQ:发送历史成交记录
     /// </summary>

@@ -39,21 +39,6 @@ public class MQ
     /// <value></value>
     public string key_deal = "deal";
     /// <summary>
-    /// (Direct)发送撤单订单成功队列名称
-    /// </summary>
-    /// <value></value>
-    public string key_order_cancel_success = "order_cancel_success";
-    /// <summary>
-    /// (Topics)发送orderbook记录,交易机名称
-    /// </summary>
-    /// <value></value>
-    // public string key_exchange_orderbook = "orderbook";
-    /// <summary>
-    /// (Topics)发送K线记录,交易机名称
-    /// </summary>
-    /// <value></value>
-    // public string key_exchange_kline = "kline";
-    /// <summary>
     /// MQ基本属性
     /// </summary>
     /// <returns></returns>
@@ -91,7 +76,7 @@ public class MQ
         this.model = model;
         props.DeliveryMode = 2;
         FactoryMatching.instance.constant.i_model.ExchangeDeclare(exchange: this.key_deal, type: ExchangeType.Direct, durable: true, autoDelete: false, arguments: null);
-        FactoryMatching.instance.constant.i_model.ExchangeDeclare(exchange: this.key_order_cancel_success, type: ExchangeType.Direct, durable: true, autoDelete: false, arguments: null);
+
         OrderCancel();
         OrderReceive();
     }
@@ -136,7 +121,7 @@ public class MQ
                     }
                     if (cancel_deal.Count > 0)
                     {
-                        FactoryMatching.instance.constant.i_model.BasicPublish(exchange: this.key_order_cancel_success, routingKey: this.model.info.market.ToString(), basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(cancel_deal)));
+                        FactoryMatching.instance.constant.MqTask(FactoryService.instance.GetMqOrderCancelSuccess(this.model.info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(cancel_deal)));
                     }
                 };
                 return true;
@@ -232,7 +217,7 @@ public class MQ
                     this.mutex.ReleaseMutex();
                     if (cancel.Count > 0)
                     {
-                        FactoryMatching.instance.constant.i_model.BasicPublish(exchange: this.key_order_cancel_success, routingKey: this.model.info.market.ToString(), basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(cancel)));
+                        FactoryMatching.instance.constant.MqTask(FactoryService.instance.GetMqOrderCancelSuccess(this.model.info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(cancel)));
                     }
                 }
                 return true;

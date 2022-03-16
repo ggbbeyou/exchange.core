@@ -144,19 +144,16 @@ public class FactoryService
     /// </summary>
     /// <value></value>
     public string key_deal = "deal";
+    
     /// <summary>
-    /// (Direct)接收取消订单队列名称
+    /// MQ:发送历史成交记录
     /// </summary>
-    /// <value></value>
-    public string key_order_cancel = "order_cancel";
-    /// <summary>
-    /// (Direct)发送撤单订单成功队列名称
-    /// </summary>
-    /// <value></value>
-    public string key_order_cancel_success = "order_cancel_success";
-
-
-
+    /// <param name="market"></param>
+    /// <returns></returns>
+    public string GetMqOrderDeal(long market)
+    {
+        return string.Format("order_place_{0}", market);
+    }
 
     /// <summary>
     /// MQ:挂单队列
@@ -176,6 +173,16 @@ public class FactoryService
     public string GetMqOrderCancel(long market)
     {
         return string.Format("order_cancel_{0}", market);
+    }
+
+    /// <summary>
+    /// MQ:撤单成功队列
+    /// </summary>
+    /// <param name="market"></param>
+    /// <returns></returns>
+    public string GetMqOrderCancelSuccess(long market)
+    {
+        return string.Format("order_cancel_success_{0}", market);
     }
 
     /// <summary>

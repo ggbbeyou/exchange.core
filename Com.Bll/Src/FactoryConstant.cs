@@ -67,11 +67,6 @@ public class FactoryConstant
     /// mq 通道接口
     /// </summary>
     public readonly IModel i_model = null!;
-    /// <summary>
-    /// MQ基本属性
-    /// </summary>
-    /// <returns></returns>
-    public IBasicProperties props = null!;
 
     /// <summary>
     /// 初始化
@@ -86,8 +81,6 @@ public class FactoryConstant
         this.config = config;
         this.environment = environment;
         this.logger = logger ?? NullLogger.Instance;
-        this.props = this.i_model.CreateBasicProperties();
-        this.props.DeliveryMode = 2;
         try
         {
             string? redisConnection = config.GetConnectionString("Redis");
@@ -178,6 +171,82 @@ public class FactoryConstant
         }
     }
 
+
+    /// <summary>
+    /// MQ 简单的队列 发送消息
+    /// </summary>
+    /// <param name="queue_name"></param>
+    /// <param name="body"></param>
+    public void MqSend(string queue_name, byte[] body)
+    {
+        IBasicProperties props = this.i_model.CreateBasicProperties();
+        props.DeliveryMode = 2;
+        this.i_model.QueueDeclare(queue: queue_name, durable: true, exclusive: false, autoDelete: false, arguments: null);
+        this.i_model.BasicPublish(exchange: "", routingKey: queue_name, basicProperties: props, body: body);
+    }
+
+    /// <summary>
+    /// MQ 简单的队列 接收消息
+    /// </summary>
+    /// <param name="queue_name"></param>
+    /// <param name="func"></param>
+    /// <returns>队列标记</returns>
+    public string MqReceive(string queue_name, Func<byte[], bool> func)
+    {
+        this.i_model.QueueDeclare(queue: queue_name, durable: true, exclusive: false, autoDelete: false, arguments: null);
+        EventingBasicConsumer consumer = new EventingBasicConsumer(this.i_model);
+        consumer.Received += (model, ea) =>
+        {
+            if (func(ea.Body.ToArray()))
+            {
+                this.i_model.BasicAck(deliveryTag: ea.DeliveryTag, multiple: true);
+            }
+            else
+            {
+                this.i_model.BasicNack(deliveryTag: ea.DeliveryTag, multiple: true, requeue: true);
+            }
+        };
+        return this.i_model.BasicConsume(queue: queue_name, autoAck: true, consumer: consumer);
+    }
+
+    /// <summary>
+    /// MQ 发布工作任务
+    /// </summary>
+    /// <param name="queue_name"></param>
+    /// <param name="body"></param>
+    public void MqTask(string queue_name, byte[] body)
+    {
+        this.i_model.QueueDeclare(queue: queue_name, durable: true, exclusive: false, autoDelete: false, arguments: null);
+        var properties = this.i_model.CreateBasicProperties();
+        properties.Persistent = true;
+        this.i_model.BasicPublish(exchange: "", routingKey: queue_name, basicProperties: properties, body: body);
+    }
+
+    /// <summary>
+    /// MQ 处理工作任务
+    /// </summary>
+    /// <param name="queue_name"></param>
+    /// <param name="func"></param>
+    /// <returns></returns>
+    public string MqWorker(string queue_name, Func<byte[], bool> func)
+    {
+        this.i_model.QueueDeclare(queue: queue_name, durable: true, exclusive: false, autoDelete: false, arguments: null);
+        this.i_model.BasicQos(prefetchSize: 0, prefetchCount: 1, global: false);
+        EventingBasicConsumer consumer = new EventingBasicConsumer(this.i_model);
+        consumer.Received += (model, ea) =>
+        {
+            if (func(ea.Body.ToArray()))
+            {
+                this.i_model.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
+            }
+            else
+            {
+                this.i_model.BasicNack(deliveryTag: ea.DeliveryTag, multiple: false, requeue: true);
+            }
+        };
+        return this.i_model.BasicConsume(queue: queue_name, autoAck: true, consumer: consumer);
+    }
+
     /// <summary>
     /// MQ 发布消息
     /// </summary>
@@ -208,41 +277,7 @@ public class FactoryConstant
         return this.i_model.BasicConsume(queue: queueName, autoAck: true, consumer: consumer);
     }
 
-    /// <summary>
-    /// MQ 简单的队列 发送消息
-    /// </summary>
-    /// <param name="queue_name"></param>
-    /// <param name="body"></param>
-    public void MqSend(string queue_name, byte[] body)
-    {
-        this.i_model.QueueDeclare(queue: queue_name, durable: true, exclusive: false, autoDelete: false, arguments: null);
-        this.i_model.BasicPublish(exchange: "", routingKey: queue_name, basicProperties: this.props, body: body);
-    }
 
-    /// <summary>
-    /// MQ 简单的队列 接收消息
-    /// </summary>
-    /// <param name="queue_name"></param>
-    /// <param name="func"></param>
-    /// <returns>队列标记</returns>
-    public string MqReceive(string queue_name, Func<byte[], bool> func)
-    {
-        this.i_model.QueueDeclare(queue: queue_name, durable: true, exclusive: false, autoDelete: false, arguments: null);
-        EventingBasicConsumer consumer = new EventingBasicConsumer(this.i_model);
-        consumer.Received += (model, ea) =>
-        {
-            if (func(ea.Body.ToArray()))
-            {
-                this.i_model.BasicAck(deliveryTag: ea.DeliveryTag, multiple: true);
-            }
-            else
-            {
-                this.i_model.BasicNack(deliveryTag: ea.DeliveryTag, multiple: true, requeue: true);
-            }
-        };
-        return this.i_model.BasicConsume(queue: queue_name, autoAck: true, consumer: consumer);
-    }
 
-    
 
 }

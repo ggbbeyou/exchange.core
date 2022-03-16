@@ -46,6 +46,8 @@ public class ServiceController : Controller
     public ServiceController(IServiceProvider provider, IConfiguration configuration, IHostEnvironment environment, ILogger<ServiceController> logger)
     {
         this.constant = new FactoryConstant(provider, configuration, environment, logger);
+        FactoryService.instance.Init(this.constant);
+        FactoryAdmin.instance.Init(this.constant);
     }
 
     /// <summary>

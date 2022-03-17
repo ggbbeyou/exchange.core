@@ -26,6 +26,13 @@ public class WebSocketController : Controller
     /// <returns></returns>
     public List<string> login_channel = new List<string>() { "account", "orders", "order" };
     byte[] pong = System.Text.Encoding.UTF8.GetBytes("pong");
+
+    /// <summary>
+    /// 交易对基础信息
+    /// </summary>
+    /// <returns></returns>
+    public MarketInfoDb market_info_db = new MarketInfoDb();
+
     /// <summary>
     /// 
     /// </summary>
@@ -35,7 +42,7 @@ public class WebSocketController : Controller
     /// <param name="logger"></param>
     public WebSocketController(IServiceProvider provider, IConfiguration configuration, IHostEnvironment environment, ILogger<OrderController> logger)
     {
-        this.constant = new FactoryConstant(provider, configuration, environment, logger);
+        // this.constant = new FactoryConstant(provider, configuration, environment, logger);
         // FactoryService.instance.Init(this.constant);
 
     }
@@ -170,7 +177,7 @@ public class WebSocketController : Controller
                 }
                 else
                 {
-                    MarketInfo? market = FactoryService.instance.market_info_db.GetMarketBySymbol(item.data);
+                    MarketInfo? market = this.market_info_db.GetMarketBySymbol(item.data);
                     if (market == null)
                     {
                         continue;
@@ -207,7 +214,7 @@ public class WebSocketController : Controller
                 }
                 else
                 {
-                    MarketInfo? market = FactoryService.instance.market_info_db.GetMarketBySymbol(item.data);
+                    MarketInfo? market = this.market_info_db.GetMarketBySymbol(item.data);
                     if (market == null)
                     {
                         continue;

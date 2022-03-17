@@ -19,6 +19,10 @@ public class KilneDb
     /// 数据库
     /// </summary>
     public DbContextEF db = null!;
+    /// <summary>
+    /// DB:交易记录
+    /// </summary>
+    public DealDb deal_db = new DealDb();
 
     /// <summary>
     /// 初始化
@@ -119,7 +123,7 @@ public class KilneDb
             switch (type)
             {
                 case E_KlineType.min1:
-                    return FactoryService.instance.deal_db.GetKlinesMin1ByDeal(market, start, end);
+                    return this.deal_db.GetKlinesMin1ByDeal(market, start, end);
                 case E_KlineType.min5:
                     predicate = predicate.And(P => P.type == E_KlineType.min1);
                     var sql5 = from kline in this.db.Kline.Where(predicate)

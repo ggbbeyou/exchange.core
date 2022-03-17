@@ -14,7 +14,7 @@ public class FactoryMatching
     /// 单例类的实例
     /// </summary>
     /// <returns></returns>
-    public static readonly FactoryMatching instance = new FactoryMatching();   
+    public static readonly FactoryMatching instance = new FactoryMatching();
     /// <summary>
     /// 服务
     /// </summary>
@@ -24,11 +24,20 @@ public class FactoryMatching
     public Dictionary<long, MatchModel> service = new Dictionary<long, MatchModel>();
 
     /// <summary>
+    /// Service:交易记录
+    /// </summary>
+    public DealService deal_service = new DealService();
+    /// <summary>
+    /// Service:K线
+    /// </summary>
+    public KlineService kline_service = new KlineService();
+
+    /// <summary>
     /// 私有构造方法
     /// </summary>
     private FactoryMatching()
     {
-    }    
+    }
 
     /// <summary>
     /// 服务:清除所有缓存
@@ -38,7 +47,7 @@ public class FactoryMatching
     public MarketInfo ServiceClearCache(MarketInfo info)
     {
         //交易记录数据从DB同步到Redis 至少保存最近3个月记录
-        long delete = FactoryService.instance.deal_service.DeleteDeal(info.market, DateTimeOffset.UtcNow.AddMonths(-2));
+        long delete = this.deal_service.DeleteDeal(info.market, DateTimeOffset.UtcNow.AddMonths(-2));
         return info;
     }
 
@@ -49,10 +58,10 @@ public class FactoryMatching
     {
         DateTimeOffset now = DateTimeOffset.UtcNow;
         now = now.AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond);
-        FactoryService.instance.deal_service.DealDbToRedis(info.market, now.AddMonths(-2));
+        this.deal_service.DealDbToRedis(info.market, now.AddMonths(-2));
         DateTimeOffset end = now.AddMilliseconds(-1);
-        FactoryService.instance.kline_service.DBtoRedised(info.market, end);
-        FactoryService.instance.kline_service.DBtoRedising(info.market);
+        this.kline_service.DBtoRedised(info.market, end);
+        this.kline_service.DBtoRedising(info.market);
         return info;
     }
 

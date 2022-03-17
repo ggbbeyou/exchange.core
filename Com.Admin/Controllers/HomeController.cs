@@ -77,31 +77,31 @@ public class HomeController : Controller
     {
 
 
-        long market = 1;
-        List<Orders> orders = new List<Orders>();
-        for (int i = 0; i < 10; i++)
-        {
-            Orders order = new Orders();
-            Orders orderResult = new Orders();
-            orderResult.order_id = worker.NextId();
-            orderResult.client_id = null;
-            orderResult.market = market;
-            orderResult.uid = 1;
-            orderResult.price = (decimal)random.NextDouble();
-            orderResult.amount = (decimal)random.NextDouble();
-            orderResult.total = orderResult.price * orderResult.amount;
-            orderResult.create_time = DateTimeOffset.UtcNow;
-            orderResult.amount_unsold = 0;
-            orderResult.amount_done = orderResult.amount;
-            orderResult.deal_last_time = null;
-            orderResult.side = i % 2 == 0 ? E_OrderSide.buy : E_OrderSide.sell;
-            orderResult.state = E_OrderState.unsold;
-            orderResult.type = i % 2 == 0 ? E_OrderType.price_fixed : E_OrderType.price_market;
-            orderResult.data = null;
-            orderResult.remarks = null;
-            orders.Add(order);
-        }
-        Res<List<Orders>> res = FactoryService.instance.order_service.PlaceOrder(market, orders);
+        // long market = 1;
+        // List<Orders> orders = new List<Orders>();
+        // for (int i = 0; i < 10; i++)
+        // {
+        //     Orders order = new Orders();
+        //     Orders orderResult = new Orders();
+        //     orderResult.order_id = worker.NextId();
+        //     orderResult.client_id = null;
+        //     orderResult.market = market;
+        //     orderResult.uid = 1;
+        //     orderResult.price = (decimal)random.NextDouble();
+        //     orderResult.amount = (decimal)random.NextDouble();
+        //     orderResult.total = orderResult.price * orderResult.amount;
+        //     orderResult.create_time = DateTimeOffset.UtcNow;
+        //     orderResult.amount_unsold = 0;
+        //     orderResult.amount_done = orderResult.amount;
+        //     orderResult.deal_last_time = null;
+        //     orderResult.side = i % 2 == 0 ? E_OrderSide.buy : E_OrderSide.sell;
+        //     orderResult.state = E_OrderState.unsold;
+        //     orderResult.type = i % 2 == 0 ? E_OrderType.price_fixed : E_OrderType.price_market;
+        //     orderResult.data = null;
+        //     orderResult.remarks = null;
+        //     orders.Add(order);
+        // }
+        // Res<List<Orders>> res = FactoryService.instance.order_service.PlaceOrder(market, orders);
 
         return View();
     }

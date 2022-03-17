@@ -34,6 +34,16 @@ public class OrderController : Controller
     }
 
     /// <summary>
+    /// 交易对基础信息
+    /// </summary>
+    /// <returns></returns>
+    public MarketInfoDb market_info_db = new MarketInfoDb();
+    /// <summary>
+    /// Service:订单
+    /// </summary>
+    public OrderService order_service = new OrderService();
+
+    /// <summary>
     /// 
     /// </summary>
     /// <param name="configuration"></param>
@@ -57,7 +67,7 @@ public class OrderController : Controller
     {
         CallRequest<List<Orders>> result = new CallRequest<List<Orders>>();
         List<Orders> matchOrders = new List<Orders>();
-        MarketInfo? market = FactoryService.instance.market_info_db.GetMarketBySymbol(symbol);
+        MarketInfo? market = this.market_info_db.GetMarketBySymbol(symbol);
         if (market == null)
         {
 
@@ -86,7 +96,7 @@ public class OrderController : Controller
                 orderResult.remarks = null;
                 matchOrders.Add(orderResult);
             }
-            Res<List<Orders>> res = FactoryService.instance.order_service.PlaceOrder(market.market, matchOrders);
+            Res<List<Orders>> res = this.order_service.PlaceOrder(market.market, matchOrders);
             result.data = new List<Orders>();
             foreach (var item in res.data)
             {
@@ -111,7 +121,7 @@ public class OrderController : Controller
         {
             return Json(call_res);
         }
-        CallResponse<KeyValuePair<long, List<long>>> res = FactoryService.instance.order_service.CancelOrder(market, user_id, type, data);
+        CallResponse<KeyValuePair<long, List<long>>> res = this.order_service.CancelOrder(market, user_id, type, data);
         return Json(res);
     }
 

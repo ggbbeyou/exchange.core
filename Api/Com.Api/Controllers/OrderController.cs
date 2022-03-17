@@ -119,7 +119,7 @@ public class OrderController : Controller
     public IActionResult PlaceOrderText()
     {
         List<PlaceOrder> orders = new List<PlaceOrder>();
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 1000; i++)
         {
             PlaceOrder orderResult = new PlaceOrder();
             orderResult.client_id = null;

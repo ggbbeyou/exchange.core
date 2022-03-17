@@ -6,6 +6,7 @@ using Com.Bll;
 using Com.Db;
 using Com.Db.Enum;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -20,6 +21,20 @@ namespace Com.Bll;
 /// </summary>
 public class KlineService
 {
+
+    /// <summary>
+    /// 数据库
+    /// </summary>
+    public DbContextEF db = null!;
+
+    /// <summary>
+    /// 初始化
+    /// </summary>
+    public KlineService()
+    {
+        var scope = FactoryService.instance.constant.provider.CreateScope();
+        this.db = scope.ServiceProvider.GetService<DbContextEF>()!;
+    }
 
     #region 已确定K线
 

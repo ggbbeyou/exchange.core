@@ -55,36 +55,43 @@ public class OrderController : Controller
     [HttpPost]
     public IActionResult PlaceOrder(string symbol, List<PlaceOrder> orders)
     {
-        List<Orders> matchOrders = new List<Orders>();
-        long market = FactoryService.instance.market_info_db.GetMarketBySymbol(symbol);
-        foreach (var item in orders)
-        {
-            Orders orderResult = new Orders();
-            orderResult.order_id = FactoryService.instance.constant.worker.NextId();
-            orderResult.client_id = item.client_id;
-            orderResult.market = market;
-            orderResult.symbol = symbol;
-            orderResult.uid = user_id;
-            orderResult.price = item.price ?? 0;
-            orderResult.amount = item.amount;
-            orderResult.total = item.price ?? 0 * item.amount;
-            orderResult.create_time = DateTimeOffset.UtcNow;
-            orderResult.amount_unsold = item.amount;
-            orderResult.amount_done = 0;
-            orderResult.deal_last_time = null;
-            orderResult.side = item.side;
-            orderResult.state = E_OrderState.unsold;
-            orderResult.type = item.type;
-            orderResult.data = null;
-            orderResult.remarks = null;
-            matchOrders.Add(orderResult);
-        }
-        Res<List<Orders>> res = FactoryService.instance.order_service.PlaceOrder(market, matchOrders);
         CallRequest<List<Orders>> result = new CallRequest<List<Orders>>();
-        result.data = new List<Orders>();
-        foreach (var item in res.data)
+        List<Orders> matchOrders = new List<Orders>();
+        MarketInfo? market = FactoryService.instance.market_info_db.GetMarketBySymbol(symbol);
+        if (market == null)
         {
-            result.data.Add(item);
+
+        }
+        else
+        {
+            foreach (var item in orders)
+            {
+                Orders orderResult = new Orders();
+                orderResult.order_id = FactoryService.instance.constant.worker.NextId();
+                orderResult.client_id = item.client_id;
+                orderResult.market = market.market;
+                orderResult.symbol = symbol;
+                orderResult.uid = user_id;
+                orderResult.price = item.price ?? 0;
+                orderResult.amount = item.amount;
+                orderResult.total = item.price ?? 0 * item.amount;
+                orderResult.create_time = DateTimeOffset.UtcNow;
+                orderResult.amount_unsold = item.amount;
+                orderResult.amount_done = 0;
+                orderResult.deal_last_time = null;
+                orderResult.side = item.side;
+                orderResult.state = E_OrderState.unsold;
+                orderResult.type = item.type;
+                orderResult.data = null;
+                orderResult.remarks = null;
+                matchOrders.Add(orderResult);
+            }
+            Res<List<Orders>> res = FactoryService.instance.order_service.PlaceOrder(market.market, matchOrders);
+            result.data = new List<Orders>();
+            foreach (var item in res.data)
+            {
+                result.data.Add(item);
+            }
         }
         return Json(result);
     }

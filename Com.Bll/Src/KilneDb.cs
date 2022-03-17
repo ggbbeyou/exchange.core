@@ -5,6 +5,7 @@ using LinqKit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Com.Bll;
@@ -14,6 +15,19 @@ namespace Com.Bll;
 /// </summary>
 public class KilneDb
 {
+    /// <summary>
+    /// 数据库
+    /// </summary>
+    public DbContextEF db = null!;
+
+    /// <summary>
+    /// 初始化
+    /// </summary>
+    public KilneDb()
+    {
+        var scope = FactoryService.instance.constant.provider.CreateScope();
+        this.db = scope.ServiceProvider.GetService<DbContextEF>()!;
+    }
 
     /// <summary>
     /// 获取最后一条K线
@@ -23,7 +37,7 @@ public class KilneDb
     /// <returns></returns>
     public Kline? GetLastKline(long market, E_KlineType type)
     {
-        return FactoryService.instance.constant.db.Kline.Where(P => P.market == market && P.type == type).OrderByDescending(P => P.time_start).FirstOrDefault();
+        return this.db.Kline.Where(P => P.market == market && P.type == type).OrderByDescending(P => P.time_start).FirstOrDefault();
     }
 
     /// <summary>
@@ -36,7 +50,7 @@ public class KilneDb
     /// <returns></returns>
     public List<Kline> GetKlines(long market, E_KlineType type, DateTimeOffset start, DateTimeOffset end)
     {
-        return FactoryService.instance.constant.db.Kline.Where(P => P.market == market && P.type == type && P.time_start >= start && P.time_start <= end).OrderBy(P => P.time_start).ToList();
+        return this.db.Kline.Where(P => P.market == market && P.type == type && P.time_start >= start && P.time_start <= end).OrderBy(P => P.time_start).ToList();
     }
 
     /// <summary>
@@ -52,7 +66,7 @@ public class KilneDb
         {
             return 0;
         }
-        List<Kline> db_kline = FactoryService.instance.constant.db.Kline.Where(P => P.market == market && P.type == klineType && P.time_start >= klines[0].time_start && P.time_end <= klines[klines.Count - 1].time_end).ToList();
+        List<Kline> db_kline = this.db.Kline.Where(P => P.market == market && P.type == klineType && P.time_start >= klines[0].time_start && P.time_end <= klines[klines.Count - 1].time_end).ToList();
         foreach (var item in klines)
         {
             Kline? kline = db_kline.FirstOrDefault(P => P.time_start == item.time_start);
@@ -63,7 +77,7 @@ public class KilneDb
                 kline.time_start = item.time_start;
                 kline.time_end = item.time_end;
                 kline.time = item.time;
-                FactoryService.instance.constant.db.Kline.Add(kline);
+                this.db.Kline.Add(kline);
             }
             kline.market = market;
             kline.type = klineType;
@@ -78,7 +92,7 @@ public class KilneDb
             kline.time_end = item.time_end;
             kline.time = item.time;
         }
-        return FactoryService.instance.constant.db.SaveChanges();
+        return this.db.SaveChanges();
     }
 
     /// <summary>
@@ -108,7 +122,7 @@ public class KilneDb
                     return FactoryService.instance.deal_db.GetKlinesMin1ByDeal(market, start, end);
                 case E_KlineType.min5:
                     predicate = predicate.And(P => P.type == E_KlineType.min1);
-                    var sql5 = from kline in FactoryService.instance.constant.db.Kline.Where(predicate)
+                    var sql5 = from kline in this.db.Kline.Where(predicate)
                                orderby kline.time_start
                                group kline by EF.Functions.DateDiffMinute(FactoryService.instance.system_init, kline.time_start) / 5 into g
                                select new Kline
@@ -129,7 +143,7 @@ public class KilneDb
                     return sql5.ToList();
                 case E_KlineType.min15:
                     predicate = predicate.And(P => P.type == E_KlineType.min5);
-                    var sql15 = from kline in FactoryService.instance.constant.db.Kline.Where(predicate)
+                    var sql15 = from kline in this.db.Kline.Where(predicate)
                                 orderby kline.time_start
                                 group kline by EF.Functions.DateDiffMinute(FactoryService.instance.system_init, kline.time_start) / 15 into g
                                 select new Kline
@@ -150,7 +164,7 @@ public class KilneDb
                     return sql15.ToList();
                 case E_KlineType.min30:
                     predicate = predicate.And(P => P.type == E_KlineType.min15);
-                    var sql30 = from kline in FactoryService.instance.constant.db.Kline.Where(predicate)
+                    var sql30 = from kline in this.db.Kline.Where(predicate)
                                 orderby kline.time_start
                                 group kline by EF.Functions.DateDiffMinute(FactoryService.instance.system_init, kline.time_start) / 30 into g
                                 select new Kline
@@ -171,7 +185,7 @@ public class KilneDb
                     return sql30.ToList();
                 case E_KlineType.hour1:
                     predicate = predicate.And(P => P.type == E_KlineType.min30);
-                    var sqlhour1 = from kline in FactoryService.instance.constant.db.Kline.Where(predicate)
+                    var sqlhour1 = from kline in this.db.Kline.Where(predicate)
                                    orderby kline.time_start
                                    group kline by EF.Functions.DateDiffHour(FactoryService.instance.system_init, kline.time_start) into g
                                    select new Kline
@@ -192,7 +206,7 @@ public class KilneDb
                     return sqlhour1.ToList();
                 case E_KlineType.hour6:
                     predicate = predicate.And(P => P.type == E_KlineType.hour1);
-                    var sqlhour6 = from kline in FactoryService.instance.constant.db.Kline.Where(predicate)
+                    var sqlhour6 = from kline in this.db.Kline.Where(predicate)
                                    orderby kline.time_start
                                    group kline by EF.Functions.DateDiffHour(FactoryService.instance.system_init, kline.time_start) / 6 into g
                                    select new Kline
@@ -213,7 +227,7 @@ public class KilneDb
                     return sqlhour6.ToList();
                 case E_KlineType.hour12:
                     predicate = predicate.And(P => P.type == E_KlineType.hour6);
-                    var sqlhour12 = from kline in FactoryService.instance.constant.db.Kline.Where(predicate)
+                    var sqlhour12 = from kline in this.db.Kline.Where(predicate)
                                     orderby kline.time_start
                                     group kline by EF.Functions.DateDiffHour(FactoryService.instance.system_init, kline.time_start) / 12 into g
                                     select new Kline
@@ -234,7 +248,7 @@ public class KilneDb
                     return sqlhour12.ToList();
                 case E_KlineType.day1:
                     predicate = predicate.And(P => P.type == E_KlineType.hour12);
-                    var sqlday1 = from kline in FactoryService.instance.constant.db.Kline.Where(predicate)
+                    var sqlday1 = from kline in this.db.Kline.Where(predicate)
                                   orderby kline.time_start
                                   group kline by EF.Functions.DateDiffDay(FactoryService.instance.system_init, kline.time_start) into g
                                   select new Kline
@@ -255,7 +269,7 @@ public class KilneDb
                     return sqlday1.ToList();
                 case E_KlineType.week1:
                     predicate = predicate.And(P => P.type == E_KlineType.day1);
-                    var sqlweek1 = from kline in FactoryService.instance.constant.db.Kline.Where(predicate)
+                    var sqlweek1 = from kline in this.db.Kline.Where(predicate)
                                    orderby kline.time_start
                                    group kline by EF.Functions.DateDiffWeek(FactoryService.instance.system_init, kline.time_start) into g
                                    select new Kline
@@ -276,7 +290,7 @@ public class KilneDb
                     return sqlweek1.ToList();
                 case E_KlineType.month1:
                     predicate = predicate.And(P => P.type == E_KlineType.day1);
-                    var sqlmonth1 = from kline in FactoryService.instance.constant.db.Kline.Where(predicate)
+                    var sqlmonth1 = from kline in this.db.Kline.Where(predicate)
                                     orderby kline.time_start
                                     group kline by EF.Functions.DateDiffMonth(FactoryService.instance.system_init, kline.time_start) into g
                                     select new Kline

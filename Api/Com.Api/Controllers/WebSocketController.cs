@@ -170,14 +170,14 @@ public class WebSocketController : Controller
                 }
                 else
                 {
-                    long market = FactoryService.instance.market_info_db.GetMarketBySymbol(item.data);
-                    if (market == 0)
+                    MarketInfo? market = FactoryService.instance.market_info_db.GetMarketBySymbol(item.data);
+                    if (market == null)
                     {
                         continue;
                     }
                     else
                     {
-                        string key = FactoryService.instance.GetMqTickers(market);
+                        string key = FactoryService.instance.GetMqTickers(market.market);
                         if (channel.ContainsKey(key))
                         {
                             continue;
@@ -207,14 +207,14 @@ public class WebSocketController : Controller
                 }
                 else
                 {
-                    long market = FactoryService.instance.market_info_db.GetMarketBySymbol(item.data);
-                    if (market == 0)
+                    MarketInfo? market = FactoryService.instance.market_info_db.GetMarketBySymbol(item.data);
+                    if (market == null)
                     {
                         continue;
                     }
                     else
                     {
-                        string key = FactoryService.instance.GetMqTickers(market);
+                        string key = FactoryService.instance.GetMqTickers(market.market);
                         if (channel.ContainsKey(key))
                         {
                             this.constant.i_model.BasicCancel(channel[key]);

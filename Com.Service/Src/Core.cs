@@ -5,6 +5,7 @@ using Com.Db.Enum;
 using Com.Db.Model;
 using Com.Service.Match;
 using Com.Service.Models;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
@@ -40,6 +41,10 @@ public class Core
     /// </summary>
     /// <returns></returns>
     public Kline kline_minute = null!;
+    /// <summary>
+    /// 数据库
+    /// </summary>
+    public DbContextEF db = null!;
 
     /// <summary>
     /// 初始化
@@ -48,6 +53,8 @@ public class Core
     public Core(MatchModel model)
     {
         this.model = model;
+        var scope = FactoryService.instance.constant.provider.CreateScope();
+        this.db = scope.ServiceProvider.GetService<DbContextEF>()!;
         ReceiveMatchOrder();
         ReceiveMatchCancelOrder();
     }
@@ -109,10 +116,8 @@ public class Core
             orderBooks.AddRange(GetOrderBooks(item.order, item.deal));
             total.AddRange(item.deal);
         }
-        DbContextEF db = FactoryService.instance.constant.db;
-        db.Deal.AddRange(total);
-        db.SaveChanges();
-
+        this.db.Deal.AddRange(total);
+        this.db.SaveChanges();
         // FactoryService.instance.constant.db.Deal.AddRange(total);
         // FactoryService.instance.constant.db.SaveChanges();
         FactoryMatching.instance.ServiceWarmCache(new MarketInfo() { market = this.model.info.market });

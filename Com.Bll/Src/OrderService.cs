@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using System.Text;
 using RabbitMQ.Client;
 using StackExchange.Redis;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Com.Bll;
 
@@ -13,6 +14,20 @@ namespace Com.Bll;
 /// </summary>
 public class OrderService
 {
+    /// <summary>
+    /// 数据库
+    /// </summary>
+    public DbContextEF db = null!;
+
+    /// <summary>
+    /// 初始化
+    /// </summary>
+    public OrderService()
+    {
+        var scope = FactoryService.instance.constant.provider.CreateScope();
+        this.db = scope.ServiceProvider.GetService<DbContextEF>()!;
+    }
+
     /// <summary>
     /// 挂单总入口
     /// </summary>

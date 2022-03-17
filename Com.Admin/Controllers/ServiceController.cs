@@ -35,6 +35,16 @@ public class ServiceController : Controller
     }
 
     /// <summary>
+    /// 数据库
+    /// </summary>
+    public DbContextEF db = null!;
+
+    public ServiceController(DbContextEF db)
+    {
+        this.db = db;
+    }
+
+    /// <summary>
     /// 服务管理
     /// </summary>
     /// <param name="market">交易对</param>
@@ -44,7 +54,7 @@ public class ServiceController : Controller
     public async Task<IActionResult> Manage(long market, int status)
     {
         Res<long> res = new Res<long>();
-        MarketInfo? marketInfo = FactoryService.instance.constant.db.MarketInfo.FirstOrDefault(P => P.market == market);
+        MarketInfo? marketInfo = this.db.MarketInfo.FirstOrDefault(P => P.market == market);
         if (marketInfo == null)
         {
             res.success = false;

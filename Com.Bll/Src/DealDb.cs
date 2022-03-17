@@ -24,7 +24,7 @@ public class DealDb
     public DealDb()
     {
         var scope = FactoryService.instance.constant.provider.CreateScope();
-        db = scope.ServiceProvider.GetService<DbContextEF>()!;
+        this.db = scope.ServiceProvider.GetService<DbContextEF>()!;
     }
 
     /// <summary>
@@ -45,7 +45,7 @@ public class DealDb
         {
             predicate = predicate.And(P => P.time <= end);
         }
-        return db.Deal.Where(predicate).OrderBy(P => P.time).ToList();
+        return this.db.Deal.Where(predicate).OrderBy(P => P.time).ToList();
     }
 
     /// <summary>
@@ -68,7 +68,7 @@ public class DealDb
         }
         try
         {
-            var sql = from deal in FactoryService.instance.constant.db.Deal.Where(predicate)
+            var sql = from deal in this.db.Deal.Where(predicate)
                       group deal by EF.Functions.DateDiffMinute(FactoryService.instance.system_init, deal.time) into g
                       select new Kline
                       {
@@ -110,7 +110,7 @@ public class DealDb
         }
         try
         {
-            var sql = from deal in FactoryService.instance.constant.db.Deal.Where(predicate)
+            var sql = from deal in this.db.Deal.Where(predicate)
                       group deal by deal.market into g
                       select new Kline
                       {
@@ -142,7 +142,7 @@ public class DealDb
     /// <param name="deals"></param>
     public int AddOrUpdateDeal(List<Deal> deals)
     {
-        List<Deal> temp = FactoryService.instance.constant.db.Deal.Where(P => deals.Select(Q => Q.trade_id).Contains(P.trade_id)).ToList();
+        List<Deal> temp = this.db.Deal.Where(P => deals.Select(Q => Q.trade_id).Contains(P.trade_id)).ToList();
         foreach (var deal in deals)
         {
             var temp_deal = temp.FirstOrDefault(P => P.trade_id == deal.trade_id);
@@ -155,10 +155,10 @@ public class DealDb
             }
             else
             {
-                FactoryService.instance.constant.db.Deal.Add(deal);
+                this.db.Deal.Add(deal);
             }
         }
-        return FactoryService.instance.constant.db.SaveChanges();
+        return this.db.SaveChanges();
     }
 
 }

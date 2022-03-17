@@ -14,7 +14,11 @@ public class DealService
     /// 数据库
     /// </summary>
     public DbContextEF db = null!;
-    
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
     public DealDb deal_db = new DealDb();
 
     /// <summary>
@@ -23,7 +27,7 @@ public class DealService
     public DealService()
     {
         var scope = FactoryService.instance.constant.provider.CreateScope();
-        db = scope.ServiceProvider.GetService<DbContextEF>()!;
+        this.db = scope.ServiceProvider.GetService<DbContextEF>()!;
     }
 
     /// <summary>

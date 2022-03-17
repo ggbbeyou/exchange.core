@@ -3,6 +3,7 @@ using Com.Db;
 using Com.Db.Enum;
 using LinqKit;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Com.Bll;
@@ -12,44 +13,34 @@ namespace Com.Bll;
 /// </summary>
 public class MarketInfoDb
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <typeparam name="string"></typeparam>
-    /// <typeparam name="MarketInfo"></typeparam>
-    /// <returns></returns>
-    public Dictionary<string, MarketInfo> market_info_list = new Dictionary<string, MarketInfo>();
 
+    /// <summary>
+    /// 数据库
+    /// </summary>
+    public DbContextEF db = null!;
+
+    /// <summary>
+    /// 初始化
+    /// </summary>
     public MarketInfoDb()
     {
-        // Update();
+        var scope = FactoryService.instance.constant.provider.CreateScope();
+        this.db = scope.ServiceProvider.GetService<DbContextEF>()!;
+
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    public void Update()
-    {
-        var a = FactoryService.instance.constant.db.MarketInfo.ToList();
-        market_info_list = FactoryService.instance.constant.db.MarketInfo.ToDictionary(x => x.symbol, x => x);
-    }
+
+
+
 
     /// <summary>
     /// 
     /// </summary>
     /// <param name="symbol"></param>
     /// <returns></returns>
-    public long GetMarketBySymbol(string symbol)
+    public MarketInfo? GetMarketBySymbol(string symbol)
     {
-        if (!market_info_list.ContainsKey(symbol))
-        {
-            Update();
-        }
-        if (market_info_list.ContainsKey(symbol))
-        {
-            return market_info_list[symbol].market;
-        }
-        return 0;
+        return this.db.MarketInfo.FirstOrDefault(P => P.symbol == symbol);
     }
 
 }

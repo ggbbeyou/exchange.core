@@ -83,7 +83,7 @@ public class WebSocketController : Controller
                 WebSocketReceiveResult result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
                 while (!result.CloseStatus.HasValue)
                 {
-                    Subscribe(webSocket, result, System.Text.Encoding.UTF8.GetString(buffer, 0, result.Count), channel, ref login);
+                    Subscribe(webSocket, System.Text.Encoding.UTF8.GetString(buffer, 0, result.Count), channel, ref login);
                     result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
                 }
                 foreach (var item in channel)
@@ -109,10 +109,9 @@ public class WebSocketController : Controller
     /// {"op":"unsubscribe","args":[{"channel":"tickers","data":"btc/usdt"},{"channel":"tickers","data":"eth/usdt"}]}
     /// </summary>
     /// <param name="webSocket"></param>
-    /// <param name="result"></param>
     /// <param name="req"></param>
     /// <param name="channel"></param>
-    private void Subscribe(WebSocket webSocket, WebSocketReceiveResult result, string str, Dictionary<string, string> channel, ref bool login)
+    private void Subscribe(WebSocket webSocket, string str, Dictionary<string, string> channel, ref bool login)
     {
         if (str.ToLower() == "ping")
         {

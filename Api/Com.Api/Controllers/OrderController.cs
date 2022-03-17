@@ -50,7 +50,7 @@ public class OrderController : Controller
     }
 
     [HttpPost]
-    public IActionResult A()
+    public IActionResult PlaceOrderText()
     {
         return Json("");
     }

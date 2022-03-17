@@ -91,6 +91,11 @@ public class Orders
     /// <value></value>
     public string? data { get; set; }
     /// <summary>
+    /// 触发挂单价格
+    /// </summary>
+    /// <value></value>   
+    public decimal? trigger_hanging_price { get; set; }
+    /// <summary>
     /// 备注
     /// </summary>
     /// <value></value>

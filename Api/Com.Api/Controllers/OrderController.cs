@@ -49,11 +49,6 @@ public class OrderController : Controller
         this.constant = new FactoryConstant(provider, configuration, environment, logger);
     }
 
-    [HttpPost]
-    public IActionResult PlaceOrderText()
-    {
-        return Json("");
-    }
 
     /// <summary>
     /// 挂单
@@ -116,5 +111,26 @@ public class OrderController : Controller
     }
 
 
+
+    //       /////////////////////////////////////////////////
+
+
+    [HttpPost]
+    public IActionResult PlaceOrderText()
+    {
+        List<PlaceOrder> orders = new List<PlaceOrder>();
+        for (int i = 0; i < 10; i++)
+        {
+            PlaceOrder orderResult = new PlaceOrder();
+            orderResult.client_id = null;
+            orderResult.price = (decimal)this.constant.random.NextDouble();
+            orderResult.amount = (decimal)this.constant.random.NextDouble();
+            orderResult.side = i % 2 == 0 ? E_OrderSide.buy : E_OrderSide.sell;
+            orderResult.type = i % 2 == 0 ? E_OrderType.price_fixed : E_OrderType.price_market;
+            orders.Add(orderResult);
+        }
+        PlaceOrder(1, orders);
+        return Json("");
+    }
 
 }

@@ -33,5 +33,10 @@ public class PlaceOrder
     /// </summary>
     /// <value></value>
     public E_OrderType type { get; set; }
+    /// <summary>
+    /// 触发挂单价格
+    /// </summary>
+    /// <value></value>   
+    public decimal? trigger_hanging_price { get; set; }
 
 }

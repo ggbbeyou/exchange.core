@@ -132,7 +132,7 @@ public class FactoryService
     /// <returns></returns>
     public string GetMqOrderDeal(long market)
     {
-        return string.Format("order_place_{0}", market);
+        return string.Format("deal_{0}", market);
     }
 
     /// <summary>

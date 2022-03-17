@@ -94,7 +94,7 @@ public class Orders
     /// 触发挂单价格
     /// </summary>
     /// <value></value>   
-    public decimal? trigger_hanging_price { get; set; }
+    public decimal trigger_hanging_price { get; set; }
     /// <summary>
     /// 备注
     /// </summary>

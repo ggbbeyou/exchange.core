@@ -37,6 +37,6 @@ public class PlaceOrder
     /// 触发挂单价格
     /// </summary>
     /// <value></value>   
-    public decimal? trigger_hanging_price { get; set; }
+    public decimal trigger_hanging_price { get; set; }
 
 }

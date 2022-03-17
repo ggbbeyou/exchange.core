@@ -142,6 +142,7 @@ public class DbContextEF : DbContext
             o.Property(P => P.state).IsRequired().HasColumnType("tinyint").HasComment("成交状态");
             o.Property(P => P.type).IsRequired().HasColumnType("tinyint").HasComment("订单类型");
             o.Property(P => P.data).HasColumnType("nvarchar").HasMaxLength(200).HasComment("附加数据");
+            o.Property(P => P.trigger_hanging_price).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("触发挂单价格");
             o.Property(P => P.remarks).HasColumnType("nvarchar").HasMaxLength(200).HasComment("备注");
             o.ToTable(nameof(Order));
         });

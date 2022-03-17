@@ -57,7 +57,7 @@ public class Core
     /// </summary>
     public void ReceiveMatchOrder()
     {
-        FactoryMatching.instance.constant.MqWorker(FactoryService.instance.GetMqOrderDeal(this.model.info.market), (b) =>
+        FactoryService.instance.constant.MqWorker(FactoryService.instance.GetMqOrderDeal(this.model.info.market), (b) =>
         {
             if (!this.model.run)
             {
@@ -66,7 +66,7 @@ public class Core
             else
             {
                 string json = Encoding.UTF8.GetString(b);
-                FactoryMatching.instance.constant.logger.LogInformation($"接收撮合传过来的成交订单:{json}");
+                FactoryService.instance.constant.logger.LogInformation($"接收撮合传过来的成交订单:{json}");
                 List<(Orders order, List<Deal> deal)>? deals = JsonConvert.DeserializeObject<List<(Orders order, List<Deal> deal)>>(json);
                 if (deals != null && deals.Count > 0)
                 {
@@ -78,29 +78,29 @@ public class Core
 
 
 
-        // FactoryMatching.instance.constant.i_model.ExchangeDeclare(exchange: this.model.mq.key_deal, type: ExchangeType.Direct, durable: true, autoDelete: false, arguments: null);
-        // string queueName = FactoryMatching.instance.constant.i_model.QueueDeclare().QueueName;
-        // FactoryMatching.instance.constant.i_model.QueueBind(queue: queueName, exchange: this.model.mq.key_deal, routingKey: this.model.info.market.ToString());
-        // EventingBasicConsumer consumer = new EventingBasicConsumer(FactoryMatching.instance.constant.i_model);
+        // FactoryService.instance.constant.i_model.ExchangeDeclare(exchange: this.model.mq.key_deal, type: ExchangeType.Direct, durable: true, autoDelete: false, arguments: null);
+        // string queueName = FactoryService.instance.constant.i_model.QueueDeclare().QueueName;
+        // FactoryService.instance.constant.i_model.QueueBind(queue: queueName, exchange: this.model.mq.key_deal, routingKey: this.model.info.market.ToString());
+        // EventingBasicConsumer consumer = new EventingBasicConsumer(FactoryService.instance.constant.i_model);
         // consumer.Received += (model, ea) =>
         // {
         //     if (!this.model.run)
         //     {
-        //         FactoryMatching.instance.constant.i_model.BasicNack(deliveryTag: ea.DeliveryTag, multiple: true, requeue: true);
+        //         FactoryService.instance.constant.i_model.BasicNack(deliveryTag: ea.DeliveryTag, multiple: true, requeue: true);
         //     }
         //     else
         //     {
         //         string json = Encoding.UTF8.GetString(ea.Body.ToArray());
-        //         FactoryMatching.instance.constant.logger.LogInformation($"接收撮合传过来的成交订单:{json}");
+        //         FactoryService.instance.constant.logger.LogInformation($"接收撮合传过来的成交订单:{json}");
         //         List<(Orders order, List<Deal> deal)>? deals = JsonConvert.DeserializeObject<List<(Orders order, List<Deal> deal)>>(json);
         //         if (deals != null && deals.Count > 0)
         //         {
         //             ReceiveDealOrder(deals);
         //         }
-        //         FactoryMatching.instance.constant.i_model.BasicAck(ea.DeliveryTag, true);
+        //         FactoryService.instance.constant.i_model.BasicAck(ea.DeliveryTag, true);
         //     }
         // };
-        // FactoryMatching.instance.constant.i_model.BasicConsume(queue: queueName, autoAck: false, consumer: consumer);
+        // FactoryService.instance.constant.i_model.BasicConsume(queue: queueName, autoAck: false, consumer: consumer);
     }
 
     /// <summary>
@@ -108,7 +108,7 @@ public class Core
     /// </summary>
     public void ReceiveMatchCancelOrder()
     {
-        FactoryMatching.instance.constant.MqWorker(FactoryService.instance.GetMqOrderCancelSuccess(this.model.info.market), (b) =>
+        FactoryService.instance.constant.MqWorker(FactoryService.instance.GetMqOrderCancelSuccess(this.model.info.market), (b) =>
         {
             if (!this.model.run)
             {
@@ -117,7 +117,7 @@ public class Core
             else
             {
                 string json = Encoding.UTF8.GetString(b);
-                FactoryMatching.instance.constant.logger.LogInformation($"接收撮合传过来的取消订单:{json}");
+                FactoryService.instance.constant.logger.LogInformation($"接收撮合传过来的取消订单:{json}");
                 List<Orders>? deals = JsonConvert.DeserializeObject<List<Orders>>(json);
                 if (deals != null && deals.Count > 0)
                 {
@@ -130,29 +130,29 @@ public class Core
 
 
 
-        // FactoryMatching.instance.constant.i_model.ExchangeDeclare(exchange: this.model.mq.key_order_cancel_success, type: ExchangeType.Direct, durable: true, autoDelete: false, arguments: null);
-        // string queueName = FactoryMatching.instance.constant.i_model.QueueDeclare().QueueName;
-        // FactoryMatching.instance.constant.i_model.QueueBind(queue: queueName, exchange: this.model.mq.key_order_cancel_success, routingKey: this.model.info.market.ToString());
-        // EventingBasicConsumer consumer = new EventingBasicConsumer(FactoryMatching.instance.constant.i_model);
+        // FactoryService.instance.constant.i_model.ExchangeDeclare(exchange: this.model.mq.key_order_cancel_success, type: ExchangeType.Direct, durable: true, autoDelete: false, arguments: null);
+        // string queueName = FactoryService.instance.constant.i_model.QueueDeclare().QueueName;
+        // FactoryService.instance.constant.i_model.QueueBind(queue: queueName, exchange: this.model.mq.key_order_cancel_success, routingKey: this.model.info.market.ToString());
+        // EventingBasicConsumer consumer = new EventingBasicConsumer(FactoryService.instance.constant.i_model);
         // consumer.Received += (model, ea) =>
         // {
         //     if (!this.model.run)
         //     {
-        //         FactoryMatching.instance.constant.i_model.BasicNack(deliveryTag: ea.DeliveryTag, multiple: true, requeue: true);
+        //         FactoryService.instance.constant.i_model.BasicNack(deliveryTag: ea.DeliveryTag, multiple: true, requeue: true);
         //     }
         //     else
         //     {
         //         string json = Encoding.UTF8.GetString(ea.Body.ToArray());
-        //         FactoryMatching.instance.constant.logger.LogInformation($"接收撮合传过来的取消订单:{json}");
+        //         FactoryService.instance.constant.logger.LogInformation($"接收撮合传过来的取消订单:{json}");
         //         List<Orders>? deals = JsonConvert.DeserializeObject<List<Orders>>(json);
         //         if (deals != null && deals.Count > 0)
         //         {
         //             ReceiveCancelOrder(deals);
         //         }
-        //         FactoryMatching.instance.constant.i_model.BasicAck(ea.DeliveryTag, true);
+        //         FactoryService.instance.constant.i_model.BasicAck(ea.DeliveryTag, true);
         //     }
         // };
-        // FactoryMatching.instance.constant.i_model.BasicConsume(queue: queueName, autoAck: false, consumer: consumer);
+        // FactoryService.instance.constant.i_model.BasicConsume(queue: queueName, autoAck: false, consumer: consumer);
     }
 
     /// <summary>
@@ -245,7 +245,7 @@ public class Core
     {
         string key = FactoryService.instance.GetRedisDepth(this.model.info.market, side);
         BaseOrderBook orderBook = new BaseOrderBook();
-        StackExchange.Redis.RedisValue[] redisValues = FactoryMatching.instance.constant.redis.SortedSetRangeByScore(key, price);
+        StackExchange.Redis.RedisValue[] redisValues = FactoryService.instance.constant.redis.SortedSetRangeByScore(key, price);
         if (redisValues.Count() == 0)
         {
             orderBook.market = this.model.info.market;
@@ -254,7 +254,7 @@ public class Core
             orderBook.count = 1;
             orderBook.direction = side;
             orderBook.last_time = deal_time;
-            FactoryMatching.instance.constant.redis.SortedSetAdd(key, JsonConvert.SerializeObject(orderBook), price);
+            FactoryService.instance.constant.redis.SortedSetAdd(key, JsonConvert.SerializeObject(orderBook), price);
         }
         else
         {
@@ -274,7 +274,7 @@ public class Core
                 orderBook.count = is_add ? temp.count + 1 : temp.count;
                 orderBook.last_time = deal_time;
             }
-            FactoryMatching.instance.constant.redis.SortedSetAdd(key, JsonConvert.SerializeObject(orderBook), price);
+            FactoryService.instance.constant.redis.SortedSetAdd(key, JsonConvert.SerializeObject(orderBook), price);
         }
         return orderBook!;
     }
@@ -290,7 +290,7 @@ public class Core
             return;
         }
         string json = JsonConvert.SerializeObject(depth);
-        FactoryMatching.instance.constant.i_model.BasicPublish(exchange: FactoryService.instance.GetMqSubscribeDepth(this.model.info.market), routingKey: "", basicProperties: null, body: Encoding.UTF8.GetBytes(json));
+        FactoryService.instance.constant.i_model.BasicPublish(exchange: FactoryService.instance.GetMqSubscribeDepth(this.model.info.market), routingKey: "", basicProperties: null, body: Encoding.UTF8.GetBytes(json));
     }
 
     /// <summary>
@@ -299,10 +299,10 @@ public class Core
     /// <param name="depth"></param>
     private void PushKline()
     {
-        HashEntry[] hashes = FactoryMatching.instance.constant.redis.HashGetAll(FactoryService.instance.GetRedisKlineing(this.model.info.market));
+        HashEntry[] hashes = FactoryService.instance.constant.redis.HashGetAll(FactoryService.instance.GetRedisKlineing(this.model.info.market));
         foreach (var item in hashes)
         {
-            FactoryMatching.instance.constant.i_model.BasicPublish(exchange: FactoryService.instance.GetMqSubscribeKline(this.model.info.market), routingKey: item.Name, basicProperties: null, body: Encoding.UTF8.GetBytes(item.Value));
+            FactoryService.instance.constant.i_model.BasicPublish(exchange: FactoryService.instance.GetMqSubscribeKline(this.model.info.market), routingKey: item.Name, basicProperties: null, body: Encoding.UTF8.GetBytes(item.Value));
         }
     }
 

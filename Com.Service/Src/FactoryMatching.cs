@@ -14,11 +14,7 @@ public class FactoryMatching
     /// 单例类的实例
     /// </summary>
     /// <returns></returns>
-    public static readonly FactoryMatching instance = new FactoryMatching();
-    /// <summary>
-    /// 常用接口
-    /// </summary>
-    public FactoryConstant constant = null!;
+    public static readonly FactoryMatching instance = new FactoryMatching();   
     /// <summary>
     /// 服务
     /// </summary>
@@ -32,16 +28,7 @@ public class FactoryMatching
     /// </summary>
     private FactoryMatching()
     {
-    }
-
-    /// <summary>
-    /// 初始化方法
-    /// </summary>
-    /// <param name="constant"></param>
-    public void Init(FactoryConstant constant)
-    {
-        this.constant = constant;
-    }
+    }    
 
     /// <summary>
     /// 服务:清除所有缓存

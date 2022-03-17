@@ -1,4 +1,5 @@
 using System;
+using Com.Bll;
 using Com.Db;
 using Com.Db.Enum;
 using Snowflake;
@@ -80,7 +81,7 @@ public static class Util
         }
         Deal deal = new Deal()
         {
-            trade_id = FactoryMatching.instance.constant.worker.NextId(),
+            trade_id = FactoryService.instance.constant.worker.NextId(),
             market = market,
             price = price,
             amount = ask_amount,
@@ -125,7 +126,7 @@ public static class Util
         bid.state = E_OrderState.completed;
         Deal deal = new Deal()
         {
-            trade_id = FactoryMatching.instance.constant.worker.NextId(),
+            trade_id = FactoryService.instance.constant.worker.NextId(),
             market = market,
             price = price,
             amount = bid_amount,

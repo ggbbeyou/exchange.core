@@ -1,3 +1,4 @@
+using Com.Bll;
 using Com.Db;
 using Com.Db.Enum;
 using Com.Db.Model;
@@ -35,7 +36,7 @@ public class GreeterImpl : ExchangeService.ExchangeServiceBase
             res.success = false;
             res.code = E_Res_Code.fail;
             res.message = $"grpc 请求参数为空:{request.Json}";
-            FactoryMatching.instance.constant.logger.LogError($"grpc 请求参数为空:{request.Json}");
+            FactoryService.instance.constant.logger.LogError($"grpc 请求参数为空:{request.Json}");
             reply.Message = JsonConvert.SerializeObject(res);
             return reply;
         }
@@ -50,13 +51,13 @@ public class GreeterImpl : ExchangeService.ExchangeServiceBase
                 res.success = false;
                 res.code = E_Res_Code.fail;
                 res.message = $"服务(失败):清除所有缓存,未获取到请求参数:{request.Json}";
-                FactoryMatching.instance.constant.logger.LogError($"服务(失败):清除所有缓存,未获取到请求参数:{request.Json}");
+                FactoryService.instance.constant.logger.LogError($"服务(失败):清除所有缓存,未获取到请求参数:{request.Json}");
                 reply.Message = JsonConvert.SerializeObject(res);
                 return reply;
             }
             MarketInfo result = FactoryMatching.instance.ServiceClearCache(marketInfo);
             res.message = $"服务(成功):清除所有缓存:{marketInfo.market}";
-            FactoryMatching.instance.constant.logger.LogInformation($"服务(成功):清除所有缓存:{marketInfo.market}");
+            FactoryService.instance.constant.logger.LogInformation($"服务(成功):清除所有缓存:{marketInfo.market}");
         }
         else if (req.op == E_Op.service_warm_cache)
         {
@@ -66,13 +67,13 @@ public class GreeterImpl : ExchangeService.ExchangeServiceBase
                 res.success = false;
                 res.code = E_Res_Code.fail;
                 res.message = $"服务(失败):预热缓存:,未获取到请求参数:{request.Json}";
-                FactoryMatching.instance.constant.logger.LogError($"服务(失败):预热缓存:,未获取到请求参数:{request.Json}");
+                FactoryService.instance.constant.logger.LogError($"服务(失败):预热缓存:,未获取到请求参数:{request.Json}");
                 reply.Message = JsonConvert.SerializeObject(res);
                 return reply;
             }
             MarketInfo result = FactoryMatching.instance.ServiceWarmCache(marketInfo);
             res.message = $"服务(成功):预热缓存:{marketInfo.market}";
-            FactoryMatching.instance.constant.logger.LogInformation($"服务(成功):预热缓存:{marketInfo.market}");
+            FactoryService.instance.constant.logger.LogInformation($"服务(成功):预热缓存:{marketInfo.market}");
         }
         else if (req.op == E_Op.service_start)
         {
@@ -82,13 +83,13 @@ public class GreeterImpl : ExchangeService.ExchangeServiceBase
                 res.success = false;
                 res.code = E_Res_Code.fail;
                 res.message = $"服务(失败):启动服务:,未获取到请求参数:{request.Json}";
-                FactoryMatching.instance.constant.logger.LogError($"服务(失败):启动服务:,未获取到请求参数:{request.Json}");
+                FactoryService.instance.constant.logger.LogError($"服务(失败):启动服务:,未获取到请求参数:{request.Json}");
                 reply.Message = JsonConvert.SerializeObject(res);
                 return reply;
             }
             FactoryMatching.instance.ServiceStart(marketInfo);
             res.message = $"服务(成功):启动服务:{marketInfo.market}";
-            FactoryMatching.instance.constant.logger.LogInformation($"服务(成功):启动服务:{marketInfo.market}");
+            FactoryService.instance.constant.logger.LogInformation($"服务(成功):启动服务:{marketInfo.market}");
         }
         else if (req.op == E_Op.service_stop)
         {
@@ -98,7 +99,7 @@ public class GreeterImpl : ExchangeService.ExchangeServiceBase
                 res.success = false;
                 res.code = E_Res_Code.fail;
                 res.message = $"服务(失败):关闭服务,未获取到请求参数:{request.Json}";
-                FactoryMatching.instance.constant.logger.LogError($"服务(失败):关闭服务,未获取到请求参数:{request.Json}");
+                FactoryService.instance.constant.logger.LogError($"服务(失败):关闭服务,未获取到请求参数:{request.Json}");
                 return reply;
             }
             try
@@ -106,7 +107,7 @@ public class GreeterImpl : ExchangeService.ExchangeServiceBase
                 MarketInfo result = FactoryMatching.instance.ServiceStop(marketInfo);
                 res.data = JsonConvert.SerializeObject(result);
                 res.message = $"服务(成功):关闭服务:{marketInfo.market}";
-                FactoryMatching.instance.constant.logger.LogInformation($"服务(成功):关闭服务:{marketInfo.market}");
+                FactoryService.instance.constant.logger.LogInformation($"服务(成功):关闭服务:{marketInfo.market}");
             }
             catch (System.Exception ex)
             {

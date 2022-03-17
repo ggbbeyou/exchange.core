@@ -33,12 +33,12 @@ public class MQ
     /// </summary>
     /// <value></value>
     public string? consumerTags_order_cancel;
-   
+
     /// <summary>
     /// MQ基本属性
     /// </summary>
     /// <returns></returns>
-    private IBasicProperties props = FactoryMatching.instance.constant.i_model.CreateBasicProperties();
+    private IBasicProperties props = FactoryService.instance.constant.i_model.CreateBasicProperties();
     /// <summary>
     /// 互斥锁
     /// </summary>
@@ -82,7 +82,7 @@ public class MQ
     /// </summary>
     public void OrderReceive()
     {
-        this.consumerTags_order_send = FactoryMatching.instance.constant.MqReceive(FactoryService.instance.GetMqOrderPlace(this.model.info.market), (e) =>
+        this.consumerTags_order_send = FactoryService.instance.constant.MqReceive(FactoryService.instance.GetMqOrderPlace(this.model.info.market), (e) =>
         {
             if (!this.model.run)
             {
@@ -113,11 +113,11 @@ public class MQ
                     }
                     if (deal.Count() > 0)
                     {
-                        FactoryMatching.instance.constant.MqTask(FactoryService.instance.GetMqOrderDeal(this.model.info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(deal)));
+                        FactoryService.instance.constant.MqTask(FactoryService.instance.GetMqOrderDeal(this.model.info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(deal)));
                     }
                     if (cancel_deal.Count > 0)
                     {
-                        FactoryMatching.instance.constant.MqTask(FactoryService.instance.GetMqOrderCancelSuccess(this.model.info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(cancel_deal)));
+                        FactoryService.instance.constant.MqTask(FactoryService.instance.GetMqOrderCancelSuccess(this.model.info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(cancel_deal)));
                     }
                 };
                 return true;
@@ -128,14 +128,14 @@ public class MQ
 
 
 
-        // string queueName = FactoryMatching.instance.constant.i_model.QueueDeclare().QueueName;
-        // FactoryMatching.instance.constant.i_model.QueueBind(queue: queueName, exchange: this.key_order_send, routingKey: this.model.info.market.ToString());
-        // EventingBasicConsumer consumer = new EventingBasicConsumer(FactoryMatching.instance.constant.i_model);
+        // string queueName = FactoryService.instance.constant.i_model.QueueDeclare().QueueName;
+        // FactoryService.instance.constant.i_model.QueueBind(queue: queueName, exchange: this.key_order_send, routingKey: this.model.info.market.ToString());
+        // EventingBasicConsumer consumer = new EventingBasicConsumer(FactoryService.instance.constant.i_model);
         // consumer.Received += (model, ea) =>
         // {
         //     if (!this.model.run)
         //     {
-        //         FactoryMatching.instance.constant.i_model.BasicNack(deliveryTag: ea.DeliveryTag, multiple: true, requeue: true);
+        //         FactoryService.instance.constant.i_model.BasicNack(deliveryTag: ea.DeliveryTag, multiple: true, requeue: true);
         //     }
         //     else
         //     {
@@ -162,17 +162,17 @@ public class MQ
         //             }
         //             if (deal.Count() > 0)
         //             {
-        //                 FactoryMatching.instance.constant.i_model.BasicPublish(exchange: this.key_deal, routingKey: this.model.info.market.ToString(), basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(deal)));
+        //                 FactoryService.instance.constant.i_model.BasicPublish(exchange: this.key_deal, routingKey: this.model.info.market.ToString(), basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(deal)));
         //             }
         //             if (cancel_deal.Count > 0)
         //             {
-        //                 FactoryMatching.instance.constant.i_model.BasicPublish(exchange: this.key_order_cancel_success, routingKey: this.model.info.market.ToString(), basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(cancel_deal)));
+        //                 FactoryService.instance.constant.i_model.BasicPublish(exchange: this.key_order_cancel_success, routingKey: this.model.info.market.ToString(), basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(cancel_deal)));
         //             }
         //         };
-        //         FactoryMatching.instance.constant.i_model.BasicAck(ea.DeliveryTag, true);
+        //         FactoryService.instance.constant.i_model.BasicAck(ea.DeliveryTag, true);
         //     }
         // };
-        // FactoryMatching.instance.constant.i_model.BasicConsume(queue: queueName, autoAck: false, consumer: consumer);
+        // FactoryService.instance.constant.i_model.BasicConsume(queue: queueName, autoAck: false, consumer: consumer);
     }
 
     /// <summary>
@@ -180,7 +180,7 @@ public class MQ
     /// </summary>
     public void OrderCancel()
     {
-        this.consumerTags_order_cancel = FactoryMatching.instance.constant.MqReceive(FactoryService.instance.GetMqOrderCancel(this.model.info.market), (e) =>
+        this.consumerTags_order_cancel = FactoryService.instance.constant.MqReceive(FactoryService.instance.GetMqOrderCancel(this.model.info.market), (e) =>
         {
             if (!this.model.run)
             {
@@ -213,7 +213,7 @@ public class MQ
                     this.mutex.ReleaseMutex();
                     if (cancel.Count > 0)
                     {
-                        FactoryMatching.instance.constant.MqTask(FactoryService.instance.GetMqOrderCancelSuccess(this.model.info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(cancel)));
+                        FactoryService.instance.constant.MqTask(FactoryService.instance.GetMqOrderCancelSuccess(this.model.info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(cancel)));
                     }
                 }
                 return true;
@@ -223,14 +223,14 @@ public class MQ
 
 
 
-        // string queueName = FactoryMatching.instance.constant.i_model.QueueDeclare().QueueName;
-        // FactoryMatching.instance.constant.i_model.QueueBind(queue: queueName, exchange: this.key_order_cancel, routingKey: this.model.info.market.ToString());
-        // EventingBasicConsumer consumer = new EventingBasicConsumer(FactoryMatching.instance.constant.i_model);
+        // string queueName = FactoryService.instance.constant.i_model.QueueDeclare().QueueName;
+        // FactoryService.instance.constant.i_model.QueueBind(queue: queueName, exchange: this.key_order_cancel, routingKey: this.model.info.market.ToString());
+        // EventingBasicConsumer consumer = new EventingBasicConsumer(FactoryService.instance.constant.i_model);
         // consumer.Received += (model, ea) =>
         // {
         //     if (!this.model.run)
         //     {
-        //         FactoryMatching.instance.constant.i_model.BasicNack(deliveryTag: ea.DeliveryTag, multiple: true, requeue: true);
+        //         FactoryService.instance.constant.i_model.BasicNack(deliveryTag: ea.DeliveryTag, multiple: true, requeue: true);
         //     }
         //     else
         //     {
@@ -259,13 +259,13 @@ public class MQ
         //             this.mutex.ReleaseMutex();
         //             if (cancel.Count > 0)
         //             {
-        //                 FactoryMatching.instance.constant.i_model.BasicPublish(exchange: this.key_order_cancel_success, routingKey: this.model.info.market.ToString(), basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(cancel)));
+        //                 FactoryService.instance.constant.i_model.BasicPublish(exchange: this.key_order_cancel_success, routingKey: this.model.info.market.ToString(), basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(cancel)));
         //             }
         //         }
-        //         FactoryMatching.instance.constant.i_model.BasicAck(ea.DeliveryTag, false);
+        //         FactoryService.instance.constant.i_model.BasicAck(ea.DeliveryTag, false);
         //     }
         // };
-        // FactoryMatching.instance.constant.i_model.BasicConsume(queue: queueName, autoAck: false, consumer: consumer);
+        // FactoryService.instance.constant.i_model.BasicConsume(queue: queueName, autoAck: false, consumer: consumer);
     }
 
 }

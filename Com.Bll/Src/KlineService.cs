@@ -51,9 +51,9 @@ public class KlineService
     /// </summary>
     /// <param name="markets">交易对</param>
     /// <param name="end">结束时间</param>
-    public void DBtoRedised(long market, DateTimeOffset end)
+    public void DBtoRedised(long market, string symbol, DateTimeOffset end)
     {
-        SyncKlines(market, end);
+        SyncKlines(market, symbol, end);
         DbSaveRedis(market);
     }
 
@@ -62,7 +62,7 @@ public class KlineService
     /// </summary>
     /// <param name="market">交易对</param>
     /// <param name="end">结束时间</param>
-    public void SyncKlines(long market, DateTimeOffset end)
+    public void SyncKlines(long market, string symbol, DateTimeOffset end)
     {
         foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
         {
@@ -70,7 +70,7 @@ public class KlineService
             List<Kline>? klines = this.kilne_db.CalcKlines(market, cycle, last_kline?.time_end ?? FactoryService.instance.system_init, end);
             if (klines != null)
             {
-                int count = this.kilne_db.SaveKline(market, cycle, klines);
+                int count = this.kilne_db.SaveKline(market, symbol, cycle, klines);
             }
         }
     }

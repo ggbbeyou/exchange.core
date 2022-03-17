@@ -64,7 +64,7 @@ public class KilneDb
     /// <param name="klineType"></param>
     /// <param name="klines"></param>
     /// <returns></returns>
-    public int SaveKline(long market, E_KlineType klineType, List<Kline> klines)
+    public int SaveKline(long market, string symbol, E_KlineType klineType, List<Kline> klines)
     {
         if (klines == null || klines.Count == 0)
         {
@@ -84,6 +84,7 @@ public class KilneDb
                 this.db.Kline.Add(kline);
             }
             kline.market = market;
+            kline.symbol = symbol;
             kline.type = klineType;
             kline.amount = item.amount;
             kline.count = item.count;

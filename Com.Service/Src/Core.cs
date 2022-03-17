@@ -45,6 +45,11 @@ public class Core
     /// 数据库
     /// </summary>
     public DbContextEF db = null!;
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    public DealDb deal_db = new DealDb();
 
     /// <summary>
     /// 初始化
@@ -116,8 +121,11 @@ public class Core
             orderBooks.AddRange(GetOrderBooks(item.order, item.deal));
             total.AddRange(item.deal);
         }
-        this.db.Deal.AddRange(total);
-        this.db.SaveChanges();
+        // this.db.Deal.AddRange(total);
+        // this.db.SaveChanges();
+
+
+        deal_db.AddOrUpdateDeal(total);
         // FactoryService.instance.constant.db.Deal.AddRange(total);
         // FactoryService.instance.constant.db.SaveChanges();
         FactoryMatching.instance.ServiceWarmCache(new MarketInfo() { market = this.model.info.market });

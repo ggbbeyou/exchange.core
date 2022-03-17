@@ -60,7 +60,7 @@ public class FactoryMatching
         now = now.AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond);
         this.deal_service.DealDbToRedis(info.market, now.AddMonths(-2));
         DateTimeOffset end = now.AddMilliseconds(-1);
-        this.kline_service.DBtoRedised(info.market, end);
+        this.kline_service.DBtoRedised(info.market, info.symbol, end);
         this.kline_service.DBtoRedising(info.market);
         return info;
     }

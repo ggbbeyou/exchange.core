@@ -222,7 +222,7 @@ public class FactoryConstant
                 this.i_model.BasicNack(deliveryTag: ea.DeliveryTag, multiple: true, requeue: true);
             }
         };
-        return this.i_model.BasicConsume(queue: queue_name, autoAck: true, consumer: consumer);
+        return this.i_model.BasicConsume(queue: queue_name, autoAck: false, consumer: consumer);
     }
 
     /// <summary>

@@ -129,8 +129,7 @@ public class OrderController : Controller
             orderResult.type = i % 2 == 0 ? E_OrderType.price_fixed : E_OrderType.price_market;
             orders.Add(orderResult);
         }
-        PlaceOrder(1, orders);
-        return Json("");
+        return PlaceOrder(1, orders);
     }
 
 }

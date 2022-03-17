@@ -128,7 +128,7 @@ public class Core
         deal_db.AddOrUpdateDeal(total);
         // FactoryService.instance.constant.db.Deal.AddRange(total);
         // FactoryService.instance.constant.db.SaveChanges();
-        FactoryMatching.instance.ServiceWarmCache(new MarketInfo() { market = this.model.info.market });
+        FactoryMatching.instance.ServiceWarmCache(this.model.info);
         // PushKline();
         // PullDepth(orderBooks);
     }

@@ -17,10 +17,6 @@ namespace Com.Api.Controllers;
 public class OrderController : Controller
 {
     /// <summary>
-    /// 常用接口
-    /// </summary>
-    private FactoryConstant constant = null!;
-    /// <summary>
     /// 登录玩家id
     /// </summary>
     /// <value></value>
@@ -46,7 +42,7 @@ public class OrderController : Controller
     /// <param name="logger"></param>
     public OrderController(IServiceProvider provider, IConfiguration configuration, IHostEnvironment environment, ILogger<OrderController> logger)
     {
-        this.constant = new FactoryConstant(provider, configuration, environment, logger);
+
     }
 
 
@@ -63,7 +59,7 @@ public class OrderController : Controller
         foreach (var item in orders)
         {
             Orders orderResult = new Orders();
-            orderResult.order_id = this.constant.worker.NextId();
+            orderResult.order_id = FactoryService.instance.constant.worker.NextId();
             orderResult.client_id = item.client_id;
             orderResult.market = market;
             orderResult.uid = user_id;
@@ -123,8 +119,8 @@ public class OrderController : Controller
         {
             PlaceOrder orderResult = new PlaceOrder();
             orderResult.client_id = null;
-            orderResult.price = (decimal)this.constant.random.Next(4, 10);
-            orderResult.amount = (decimal)this.constant.random.NextDouble();
+            orderResult.price = (decimal)FactoryService.instance.constant.random.Next(4, 10);
+            orderResult.amount = (decimal)FactoryService.instance.constant.random.NextDouble();
             orderResult.side = i % 2 == 0 ? E_OrderSide.buy : E_OrderSide.sell;
             orderResult.type = i % 2 == 0 ? E_OrderType.price_fixed : E_OrderType.price_market;
             orders.Add(orderResult);

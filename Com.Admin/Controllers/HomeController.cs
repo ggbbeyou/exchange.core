@@ -16,11 +16,6 @@ namespace Com.Admin.Controllers;
 
 public class HomeController : Controller
 {
-    /// <summary>
-    /// 常用接口
-    /// </summary>
-    public FactoryConstant constant = null!;
-
     /// <s ummary>
     /// 雪花算法
     /// </summary>
@@ -38,7 +33,7 @@ public class HomeController : Controller
     /// <param name="logger"></param>
     public HomeController(IServiceProvider provider, IConfiguration configuration, IHostEnvironment environment, ILogger<HomeController> logger)
     {
-        this.constant = new FactoryConstant(provider, configuration, environment, logger);
+      
     }
 
     public IActionResult Index()

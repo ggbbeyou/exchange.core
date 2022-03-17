@@ -3,6 +3,7 @@ using Com.Db;
 using Com.Db.Enum;
 using LinqKit;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Com.Bll;
@@ -12,6 +13,20 @@ namespace Com.Bll;
 /// </summary>
 public class DealDb
 {
+    /// <summary>
+    /// 数据库
+    /// </summary>
+    public DbContextEF db = null!;
+
+    /// <summary>
+    /// 初始化
+    /// </summary>
+    public DealDb()
+    {
+        var scope = FactoryService.instance.constant.provider.CreateScope();
+        db = scope.ServiceProvider.GetService<DbContextEF>()!;
+    }
+
     /// <summary>
     /// 获取交易记录
     /// </summary>
@@ -30,7 +45,7 @@ public class DealDb
         {
             predicate = predicate.And(P => P.time <= end);
         }
-        return FactoryService.instance.constant.db.Deal.Where(predicate).OrderBy(P => P.time).ToList();
+        return db.Deal.Where(predicate).OrderBy(P => P.time).ToList();
     }
 
     /// <summary>
@@ -144,6 +159,6 @@ public class DealDb
             }
         }
         return FactoryService.instance.constant.db.SaveChanges();
-    } 
+    }
 
 }

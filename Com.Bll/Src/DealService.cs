@@ -1,4 +1,5 @@
 using Com.Db;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using StackExchange.Redis;
 
@@ -9,6 +10,22 @@ namespace Com.Bll;
 /// </summary>
 public class DealService
 {
+    /// <summary>
+    /// 数据库
+    /// </summary>
+    public DbContextEF db = null!;
+    
+    public DealDb deal_db = new DealDb();
+
+    /// <summary>
+    /// 初始化
+    /// </summary>
+    public DealService()
+    {
+        var scope = FactoryService.instance.constant.provider.CreateScope();
+        db = scope.ServiceProvider.GetService<DbContextEF>()!;
+    }
+
     /// <summary>
     /// 同步交易记录
     /// </summary>
@@ -22,7 +39,7 @@ public class DealService
         {
             start = deal.time;
         }
-        List<Deal> deals = FactoryService.instance.deal_db.GetDeals(market, start, null);
+        List<Deal> deals = deal_db.GetDeals(market, start, null);
         if (deals.Count() > 0)
         {
             SortedSetEntry[] entries = new SortedSetEntry[deals.Count()];

@@ -59,21 +59,14 @@ public class Core
     {
         FactoryService.instance.constant.MqWorker(FactoryService.instance.GetMqOrderDeal(this.model.info.market), (b) =>
         {
-            if (!this.model.run)
+            string json = Encoding.UTF8.GetString(b);
+            // FactoryService.instance.constant.logger.LogInformation($"接收撮合传过来的成交订单:{json}");
+            List<(Orders order, List<Deal> deal)>? deals = JsonConvert.DeserializeObject<List<(Orders order, List<Deal> deal)>>(json);
+            if (deals != null && deals.Count > 0)
             {
-                return false;
+                ReceiveDealOrder(deals);
             }
-            else
-            {
-                string json = Encoding.UTF8.GetString(b);
-                FactoryService.instance.constant.logger.LogInformation($"接收撮合传过来的成交订单:{json}");
-                List<(Orders order, List<Deal> deal)>? deals = JsonConvert.DeserializeObject<List<(Orders order, List<Deal> deal)>>(json);
-                if (deals != null && deals.Count > 0)
-                {
-                    ReceiveDealOrder(deals);
-                }
-                return true;
-            }
+            return true;
         });
     }
 
@@ -110,32 +103,21 @@ public class Core
     {
         List<BaseOrderBook> orderBooks = new List<BaseOrderBook>();
         List<Kline> klines = new List<Kline>();
-        List<Db.Deal> total = new List<Db.Deal>();
+        List<Deal> total = new List<Deal>();
         foreach ((Orders order, List<Deal> deal) item in match)
         {
             orderBooks.AddRange(GetOrderBooks(item.order, item.deal));
-            foreach (var item1 in item.deal)
-            {
-                total.Add(new Db.Deal()
-                {
-                    trade_id = item1.trade_id,
-                    market = item1.market,
-                    price = item1.price,
-                    amount = item1.amount,
-                    total = item1.total,
-                    trigger_side = item1.trigger_side,
-                    bid_id = item1.bid_id,
-                    ask_id = item1.ask_id,
-                    time = item1.time
-                });
-            }
+            total.AddRange(item.deal);
         }
-        if (FactoryService.instance.deal_db.AddOrUpdateDeal(total) > 0)
-        {
-            FactoryMatching.instance.ServiceWarmCache(new MarketInfo() { market = this.model.info.market });
-        }
-        PushKline();
-        PullDepth(orderBooks);
+        DbContextEF db = FactoryService.instance.constant.db;
+        db.Deal.AddRange(total);
+        db.SaveChanges();
+
+        // FactoryService.instance.constant.db.Deal.AddRange(total);
+        // FactoryService.instance.constant.db.SaveChanges();
+        FactoryMatching.instance.ServiceWarmCache(new MarketInfo() { market = this.model.info.market });
+        // PushKline();
+        // PullDepth(orderBooks);
     }
 
     /// <summary>

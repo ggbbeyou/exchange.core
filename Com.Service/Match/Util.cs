@@ -61,7 +61,7 @@ public static class Util
     /// <param name="trigger_side">触发方向</param>
     /// <param name="now">成交时间</param>
     /// <returns></returns>
-    public static Deal AmountBidAsk(long market, Orders bid, Orders ask, decimal price, E_OrderSide trigger_side, DateTimeOffset now)
+    public static Deal AmountBidAsk(long market, string symbol, Orders bid, Orders ask, decimal price, E_OrderSide trigger_side, DateTimeOffset now)
     {
         decimal ask_amount = ask.amount_unsold;
         ask.amount_unsold = 0;
@@ -83,6 +83,7 @@ public static class Util
         {
             trade_id = FactoryService.instance.constant.worker.NextId(),
             market = market,
+            symbol = symbol,
             price = price,
             amount = ask_amount,
 
@@ -106,7 +107,7 @@ public static class Util
     /// <param name="trigger_side">触发方向</param>
     /// <param name="now">成交时间</param>
     /// <returns></returns>
-    public static Deal AmountAskBid(long market, Orders bid, Orders ask, decimal price, E_OrderSide trigger_side, DateTimeOffset now)
+    public static Deal AmountAskBid(long market, string symbol, Orders bid, Orders ask, decimal price, E_OrderSide trigger_side, DateTimeOffset now)
     {
         decimal bid_amount = bid.amount_unsold;
         ask.amount_unsold -= bid_amount;
@@ -128,6 +129,7 @@ public static class Util
         {
             trade_id = FactoryService.instance.constant.worker.NextId(),
             market = market,
+            symbol =symbol,
             price = price,
             amount = bid_amount,
 

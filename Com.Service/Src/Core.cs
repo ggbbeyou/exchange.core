@@ -75,32 +75,6 @@ public class Core
                 return true;
             }
         });
-
-
-
-        // FactoryService.instance.constant.i_model.ExchangeDeclare(exchange: this.model.mq.key_deal, type: ExchangeType.Direct, durable: true, autoDelete: false, arguments: null);
-        // string queueName = FactoryService.instance.constant.i_model.QueueDeclare().QueueName;
-        // FactoryService.instance.constant.i_model.QueueBind(queue: queueName, exchange: this.model.mq.key_deal, routingKey: this.model.info.market.ToString());
-        // EventingBasicConsumer consumer = new EventingBasicConsumer(FactoryService.instance.constant.i_model);
-        // consumer.Received += (model, ea) =>
-        // {
-        //     if (!this.model.run)
-        //     {
-        //         FactoryService.instance.constant.i_model.BasicNack(deliveryTag: ea.DeliveryTag, multiple: true, requeue: true);
-        //     }
-        //     else
-        //     {
-        //         string json = Encoding.UTF8.GetString(ea.Body.ToArray());
-        //         FactoryService.instance.constant.logger.LogInformation($"接收撮合传过来的成交订单:{json}");
-        //         List<(Orders order, List<Deal> deal)>? deals = JsonConvert.DeserializeObject<List<(Orders order, List<Deal> deal)>>(json);
-        //         if (deals != null && deals.Count > 0)
-        //         {
-        //             ReceiveDealOrder(deals);
-        //         }
-        //         FactoryService.instance.constant.i_model.BasicAck(ea.DeliveryTag, true);
-        //     }
-        // };
-        // FactoryService.instance.constant.i_model.BasicConsume(queue: queueName, autoAck: false, consumer: consumer);
     }
 
     /// <summary>
@@ -126,33 +100,6 @@ public class Core
                 return true;
             }
         });
-
-
-
-
-        // FactoryService.instance.constant.i_model.ExchangeDeclare(exchange: this.model.mq.key_order_cancel_success, type: ExchangeType.Direct, durable: true, autoDelete: false, arguments: null);
-        // string queueName = FactoryService.instance.constant.i_model.QueueDeclare().QueueName;
-        // FactoryService.instance.constant.i_model.QueueBind(queue: queueName, exchange: this.model.mq.key_order_cancel_success, routingKey: this.model.info.market.ToString());
-        // EventingBasicConsumer consumer = new EventingBasicConsumer(FactoryService.instance.constant.i_model);
-        // consumer.Received += (model, ea) =>
-        // {
-        //     if (!this.model.run)
-        //     {
-        //         FactoryService.instance.constant.i_model.BasicNack(deliveryTag: ea.DeliveryTag, multiple: true, requeue: true);
-        //     }
-        //     else
-        //     {
-        //         string json = Encoding.UTF8.GetString(ea.Body.ToArray());
-        //         FactoryService.instance.constant.logger.LogInformation($"接收撮合传过来的取消订单:{json}");
-        //         List<Orders>? deals = JsonConvert.DeserializeObject<List<Orders>>(json);
-        //         if (deals != null && deals.Count > 0)
-        //         {
-        //             ReceiveCancelOrder(deals);
-        //         }
-        //         FactoryService.instance.constant.i_model.BasicAck(ea.DeliveryTag, true);
-        //     }
-        // };
-        // FactoryService.instance.constant.i_model.BasicConsume(queue: queueName, autoAck: false, consumer: consumer);
     }
 
     /// <summary>

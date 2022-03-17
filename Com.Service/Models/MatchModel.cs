@@ -55,6 +55,9 @@ public class MatchModel
     public MatchModel(MarketInfo info)
     {
         this.info = info;
+#if (DEBUG)
+        run = true;
+#endif
         // this.deal_queue = new ConcurrentQueue<List<Deal>>();
         // this.cancel_queue = new ConcurrentQueue<List<Orders>>();
     }

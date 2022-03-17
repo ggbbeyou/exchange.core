@@ -123,7 +123,7 @@ public class OrderController : Controller
         {
             PlaceOrder orderResult = new PlaceOrder();
             orderResult.client_id = null;
-            orderResult.price = (decimal)this.constant.random.NextDouble();
+            orderResult.price = (decimal)this.constant.random.Next(4, 10);
             orderResult.amount = (decimal)this.constant.random.NextDouble();
             orderResult.side = i % 2 == 0 ? E_OrderSide.buy : E_OrderSide.sell;
             orderResult.type = i % 2 == 0 ? E_OrderType.price_fixed : E_OrderType.price_market;

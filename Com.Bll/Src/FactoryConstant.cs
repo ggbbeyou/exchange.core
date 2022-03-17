@@ -54,35 +54,25 @@ public class FactoryConstant
     {
         get
         {
-            try
+            var scope = provider.CreateScope();
+            DbContextEF? db = scope.ServiceProvider.GetService<DbContextEF>();
+            if (db != null)
             {
-                var scope = provider.CreateScope();
-                DbContextEF? db = scope.ServiceProvider.GetService<DbContextEF>();
-                if (db != null)
-                {
-                    return db;
-                }
-                else
-                {
-                    //下面可以创建数据库   Code First
-                    string? dbConnection = config.GetConnectionString("Mssql");
-                    if (!string.IsNullOrWhiteSpace(dbConnection))
-                    {
-                        var options = new DbContextOptionsBuilder<DbContextEF>().UseSqlServer(dbConnection).Options;
-                        var factorydb = new PooledDbContextFactory<DbContextEF>(options);
-                        db = factorydb.CreateDbContext();
-                        db.Database.EnsureCreated();
-                        return db;
-                    }
-                }
+                return db;
             }
-            catch (Exception ex)
+            else
             {
-                this.logger.LogError(ex, $"DB服务器连接不上");
+                //下面可以创建数据库   Code First
+                string? dbConnection = config.GetConnectionString("Mssql");
+                var options = new DbContextOptionsBuilder<DbContextEF>().UseSqlServer(dbConnection).Options;
+                var factorydb = new PooledDbContextFactory<DbContextEF>(options);
+                db = factorydb.CreateDbContext();
+                db.Database.EnsureCreated();
+                return db;
             }
-            return new DbContextEF(config.GetConnectionString("Mssql"));
         }
     }
+
     /// <summary>
     /// redis数据库
     /// </summary>

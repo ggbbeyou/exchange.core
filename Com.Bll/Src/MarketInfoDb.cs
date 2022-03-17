@@ -41,7 +41,10 @@ public class MarketInfoDb
     /// <returns></returns>
     public long GetMarketBySymbol(string symbol)
     {
-        Update();
+        if (!market_info_list.ContainsKey(symbol))
+        {
+            Update();
+        }
         if (market_info_list.ContainsKey(symbol))
         {
             return market_info_list[symbol].market;

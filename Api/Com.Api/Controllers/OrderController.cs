@@ -53,22 +53,24 @@ public class OrderController : Controller
     /// <param name="orders"></param>
     /// <returns></returns>
     [HttpPost]
-    public IActionResult PlaceOrder(long market, List<PlaceOrder> orders)
+    public IActionResult PlaceOrder(string symbol, List<PlaceOrder> orders)
     {
         List<Orders> matchOrders = new List<Orders>();
+        long market = FactoryService.instance.market_info_db.GetMarketBySymbol(symbol);
         foreach (var item in orders)
         {
             Orders orderResult = new Orders();
             orderResult.order_id = FactoryService.instance.constant.worker.NextId();
             orderResult.client_id = item.client_id;
             orderResult.market = market;
+            orderResult.symbol = symbol;
             orderResult.uid = user_id;
             orderResult.price = item.price ?? 0;
             orderResult.amount = item.amount;
             orderResult.total = item.price ?? 0 * item.amount;
             orderResult.create_time = DateTimeOffset.UtcNow;
-            orderResult.amount_unsold = 0;
-            orderResult.amount_done = item.amount;
+            orderResult.amount_unsold = item.amount;
+            orderResult.amount_done = 0;
             orderResult.deal_last_time = null;
             orderResult.side = item.side;
             orderResult.state = E_OrderState.unsold;
@@ -125,7 +127,7 @@ public class OrderController : Controller
             orderResult.type = i % 2 == 0 ? E_OrderType.price_fixed : E_OrderType.price_market;
             orders.Add(orderResult);
         }
-        return PlaceOrder(1, orders);
+        return PlaceOrder("btc/usdt", orders);
     }
 
 }

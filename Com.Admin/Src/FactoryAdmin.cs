@@ -25,7 +25,7 @@ public class FactoryAdmin
     /// <summary>
     /// 常用接口
     /// </summary>
-    public FactoryConstant constant = null!;
+    // public FactoryConstant constant = null!;
 
 
     /// <summary>
@@ -40,10 +40,10 @@ public class FactoryAdmin
     /// 初始化方法
     /// </summary>
     /// <param name="constant"></param>
-    public void Init(FactoryConstant constant)
-    {
-        this.constant = constant;
-    }
+    // public void Init(FactoryConstant constant)
+    // {
+    //     this.constant = constant;
+    // }
 
     /// <summary>
     /// 服务:清除所有缓存
@@ -54,7 +54,7 @@ public class FactoryAdmin
     {
         try
         {
-            GrpcChannel channel = GrpcChannel.ForAddress(this.constant.config.GetValue<string>("manage_url"));
+            GrpcChannel channel = GrpcChannel.ForAddress(FactoryService.instance.constant.config.GetValue<string>("manage_url"));
             var client = new ExchangeService.ExchangeServiceClient(channel);
             CallRequest<string> req = new CallRequest<string>();
             req.op = E_Op.service_clear_cache;
@@ -67,7 +67,7 @@ public class FactoryAdmin
         }
         catch (System.Exception ex)
         {
-            this.constant.logger.LogError(ex, "服务:清除所有缓存");
+            FactoryService.instance.constant.logger.LogError(ex, "服务:清除所有缓存");
         }
         return false;
     }
@@ -81,7 +81,7 @@ public class FactoryAdmin
     {
         try
         {
-            GrpcChannel channel = GrpcChannel.ForAddress(this.constant.config.GetValue<string>("manage_url"));
+            GrpcChannel channel = GrpcChannel.ForAddress(FactoryService.instance.constant.config.GetValue<string>("manage_url"));
             var client = new ExchangeService.ExchangeServiceClient(channel);
             CallRequest<string> req = new CallRequest<string>();
             req.op = E_Op.service_warm_cache;
@@ -94,7 +94,7 @@ public class FactoryAdmin
         }
         catch (System.Exception ex)
         {
-            this.constant.logger.LogError(ex, "服务:预热缓存");
+            FactoryService.instance.constant.logger.LogError(ex, "服务:预热缓存");
         }
         return false;
     }
@@ -108,7 +108,7 @@ public class FactoryAdmin
     {
         try
         {
-            GrpcChannel channel = GrpcChannel.ForAddress(this.constant.config.GetValue<string>("manage_url"));
+            GrpcChannel channel = GrpcChannel.ForAddress(FactoryService.instance.constant.config.GetValue<string>("manage_url"));
             var client = new ExchangeService.ExchangeServiceClient(channel);
             CallRequest<string> req = new CallRequest<string>();
             req.op = E_Op.service_start;
@@ -121,7 +121,7 @@ public class FactoryAdmin
         }
         catch (System.Exception ex)
         {
-            this.constant.logger.LogError(ex, "服务:启动服务");
+            FactoryService.instance.constant.logger.LogError(ex, "服务:启动服务");
         }
         return false;
     }
@@ -135,7 +135,7 @@ public class FactoryAdmin
     {
         try
         {
-            GrpcChannel channel = GrpcChannel.ForAddress(this.constant.config.GetValue<string>("manage_url"));
+            GrpcChannel channel = GrpcChannel.ForAddress(FactoryService.instance.constant.config.GetValue<string>("manage_url"));
             var client = new ExchangeService.ExchangeServiceClient(channel);
             CallRequest<string> req = new CallRequest<string>();
             req.op = E_Op.service_stop;
@@ -148,7 +148,7 @@ public class FactoryAdmin
         }
         catch (System.Exception ex)
         {
-            this.constant.logger.LogError(ex, "服务:停止服务");
+            FactoryService.instance.constant.logger.LogError(ex, "服务:停止服务");
         }
         return false;
     }

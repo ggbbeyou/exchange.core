@@ -28,7 +28,6 @@ public class MainService : BackgroundService
     public MainService(IServiceProvider provider, IConfiguration configuration, IHostEnvironment environment, ILogger<MainService> logger)
     {
         this.constant = new FactoryConstant(provider, configuration, environment, logger);
-       
     }
 
     /// <summary>
@@ -41,6 +40,7 @@ public class MainService : BackgroundService
         this.constant.logger.LogInformation("准备启动业务后台服务");
         try
         {
+            FactoryService.instance.Init(this.constant);          
             this.constant.logger.LogInformation("启动业务后台服务成功");
         }
         catch (Exception ex)

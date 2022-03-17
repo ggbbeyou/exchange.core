@@ -50,7 +50,39 @@ public class FactoryConstant
     /// <summary>
     /// 数据库
     /// </summary>
-    public readonly DbContextEF db = null!;
+    public DbContextEF db
+    {
+        get
+        {
+            try
+            {
+                var scope = provider.CreateScope();
+                DbContextEF? db = scope.ServiceProvider.GetService<DbContextEF>();
+                if (db != null)
+                {
+                    return db;
+                }
+                else
+                {
+                    //下面可以创建数据库   Code First
+                    string? dbConnection = config.GetConnectionString("Mssql");
+                    if (!string.IsNullOrWhiteSpace(dbConnection))
+                    {
+                        var options = new DbContextOptionsBuilder<DbContextEF>().UseSqlServer(dbConnection).Options;
+                        var factorydb = new PooledDbContextFactory<DbContextEF>(options);
+                        db = factorydb.CreateDbContext();
+                        db.Database.EnsureCreated();
+                        return db;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, $"DB服务器连接不上");
+            }
+            return new DbContextEF(config.GetConnectionString("Mssql"));
+        }
+    }
     /// <summary>
     /// redis数据库
     /// </summary>
@@ -96,31 +128,6 @@ public class FactoryConstant
         }
         try
         {
-            var scope = provider.CreateScope();
-            DbContextEF? db = scope.ServiceProvider.GetService<DbContextEF>();
-            if (db != null)
-            {
-                this.db = db;
-            }
-            else
-            {
-                //下面可以创建数据库   Code First
-                string? dbConnection = config.GetConnectionString("Mssql");
-                if (!string.IsNullOrWhiteSpace(dbConnection))
-                {
-                    var options = new DbContextOptionsBuilder<DbContextEF>().UseSqlServer(dbConnection).Options;
-                    var factorydb = new PooledDbContextFactory<DbContextEF>(options);
-                    this.db = factorydb.CreateDbContext();
-                    this.db.Database.EnsureCreated();
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            this.logger.LogError(ex, $"DB服务器连接不上");
-        }
-        try
-        {
             ConnectionFactory? factory = config.GetSection("RabbitMQ").Get<ConnectionFactory>();
             if (factory != null)
             {
@@ -133,6 +140,15 @@ public class FactoryConstant
             this.logger.LogError(ex, $"MQ服务器连接不上");
         }
     }
+
+    /// <summary>
+    /// 设置数据库上下文
+    /// </summary>
+    /// <param name="db"></param>
+    // public void SetDb(DbContextEF db)
+    // {
+    //     this.db = db;
+    // }
 
     /// <summary>
     /// 上分布式锁

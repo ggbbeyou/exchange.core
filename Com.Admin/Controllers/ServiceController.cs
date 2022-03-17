@@ -13,12 +13,10 @@ namespace Com.Api.Controllers;
 
 // [Route("api/[controller]/[action]")]
 // [Authorize]
+[AllowAnonymous]
 public class ServiceController : Controller
 {
-    /// <summary>
-    /// 常用接口
-    /// </summary>
-    private FactoryConstant constant = null!;
+
     /// <summary>
     /// 登录玩家id
     /// </summary>
@@ -37,20 +35,6 @@ public class ServiceController : Controller
     }
 
     /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="configuration"></param>
-    /// <param name="environment"></param>
-    /// <param name="provider"></param>
-    /// <param name="logger"></param>
-    public ServiceController(IServiceProvider provider, IConfiguration configuration, IHostEnvironment environment, ILogger<ServiceController> logger)
-    {
-        this.constant = new FactoryConstant(provider, configuration, environment, logger);
-        FactoryService.instance.Init(this.constant);
-        FactoryAdmin.instance.Init(this.constant);
-    }
-
-    /// <summary>
     /// 服务管理
     /// </summary>
     /// <param name="market">交易对</param>
@@ -60,7 +44,7 @@ public class ServiceController : Controller
     public async Task<IActionResult> Manage(long market, int status)
     {
         Res<long> res = new Res<long>();
-        MarketInfo? marketInfo = this.constant.db.MarketInfo.FirstOrDefault(P => P.market == market);
+        MarketInfo? marketInfo = FactoryService.instance.constant.db.MarketInfo.FirstOrDefault(P => P.market == market);
         if (marketInfo == null)
         {
             res.success = false;
@@ -70,7 +54,7 @@ public class ServiceController : Controller
         }
         else
         {
-            bool result = false;          
+            bool result = false;
             if (status == 1)
             {
                 result = await FactoryAdmin.instance.ServiceClearCache(marketInfo);

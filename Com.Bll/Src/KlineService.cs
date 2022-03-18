@@ -122,7 +122,7 @@ public class KlineService
     /// 缓存预热(未确定K线)
     /// </summary>
     /// <param name="market">交易对</param>
-    public void DBtoRedising(long market)
+    public void DBtoRedising(long market, string symbol)
     {
         foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
         {
@@ -132,7 +132,7 @@ public class KlineService
             {
                 start = kline_last.time_end.AddMilliseconds(1);
             }
-            Kline? kline_new = this.deal_db.GetKlinesByDeal(market, cycle, start, null);
+            Kline? kline_new = this.deal_db.GetKlinesByDeal(market, symbol, cycle, start, null);
             if (kline_new != null)
             {
                 FactoryService.instance.constant.redis.HashSet(FactoryService.instance.GetRedisKlineing(market), cycle.ToString(), JsonConvert.SerializeObject(kline_new));

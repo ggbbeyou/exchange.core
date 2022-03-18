@@ -101,7 +101,7 @@ public class DealDb
     /// <param name="start">开始时间</param>
     /// <param name="end">结束时间</param>
     /// <returns></returns>
-    public Kline? GetKlinesByDeal(long market, E_KlineType type, DateTimeOffset start, DateTimeOffset? end)
+    public Kline? GetKlinesByDeal(long market, string symbol, E_KlineType type, DateTimeOffset start, DateTimeOffset? end)
     {
         Expression<Func<Deal, bool>> predicate = P => P.market == market && start <= P.time;
         if (end != null)
@@ -115,6 +115,7 @@ public class DealDb
                       select new Kline
                       {
                           market = market,
+                          symbol = symbol,
                           amount = g.Sum(P => P.amount),
                           count = g.Count(),
                           total = g.Sum(P => P.total),

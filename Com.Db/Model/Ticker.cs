@@ -28,36 +28,27 @@ public class Ticker
     /// </summary>
     /// <value></value>
     public decimal price_change_percent { get; set; }
-    /// <summary>
-    /// 最新成交价
-    /// </summary>
-    /// <value></value>
-    public decimal last_price { get; set; }
-    /// <summary>
-    /// 最新成交量
-    /// </summary>
-    /// <value></value>
-    public decimal last_amount { get; set; }
-    /// <summary>
-    /// 卖1价
-    /// </summary>
-    /// <value></value>
-    public decimal ask1_price { get; set; }
-    /// <summary>
-    /// 买1量
-    /// </summary>
-    /// <value></value>
-    public decimal ask1_volume { get; set; }
-    /// <summary>
-    /// 买1价
-    /// </summary>
-    /// <value></value>
-    public decimal bid1_price { get; set; }
-    /// <summary>
-    /// 买1量
-    /// </summary>
-    /// <value></value>
-    public decimal bid1_volume { get; set; }
+
+    // /// <summary>
+    // /// 卖1价
+    // /// </summary>
+    // /// <value></value>
+    // public decimal ask1_price { get; set; }
+    // /// <summary>
+    // /// 买1量
+    // /// </summary>
+    // /// <value></value>
+    // public decimal ask1_volume { get; set; }
+    // /// <summary>
+    // /// 买1价
+    // /// </summary>
+    // /// <value></value>
+    // public decimal bid1_price { get; set; }
+    // /// <summary>
+    // /// 买1量
+    // /// </summary>
+    // /// <value></value>
+    // public decimal bid1_volume { get; set; }
     /// <summary>
     /// 24小时内开盘价
     /// </summary>
@@ -74,6 +65,21 @@ public class Ticker
     /// <value></value>
     public decimal low { get; set; }
     /// <summary>
+    /// 24小时内收盘价
+    /// </summary>
+    /// <value></value>
+    public decimal close { get; set; }
+    /// <summary>
+    /// 24小时内收盘量
+    /// </summary>
+    /// <value></value>
+    public decimal close_amount { get; set; }
+    /// <summary>
+    /// 24小时内最后一笔成交时间
+    /// </summary>
+    /// <value></value>
+    public DateTimeOffset close_time { get; set; }
+    /// <summary>
     /// 24小时内交易量
     /// </summary>
     /// <value></value>
@@ -88,16 +94,6 @@ public class Ticker
     /// </summary>
     /// <value></value>
     public int count { get; set; }
-    /// <summary>
-    /// 24小时内第一笔成交时间
-    /// </summary>
-    /// <value></value>
-    public DateTimeOffset open_time { get; set; }
-    /// <summary>
-    /// 24小时内最后一笔成交时间
-    /// </summary>
-    /// <value></value>
-    public DateTimeOffset close_time { get; set; }
     /// <summary>
     /// 记录时间
     /// </summary>

@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using Com.Db;
 using Com.Db.Enum;
+using Com.Db.Model;
 using LinqKit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -47,6 +48,32 @@ public class DealDb
         }
         return this.db.Deal.Where(predicate).OrderBy(P => P.time).ToList();
     }
+
+    /// <summary>
+    /// 添加或保存交易记录
+    /// </summary>
+    /// <param name="deals"></param>
+    public int AddOrUpdateDeal(List<Deal> deals)
+    {
+        List<Deal> temp = this.db.Deal.Where(P => deals.Select(Q => Q.trade_id).Contains(P.trade_id)).ToList();
+        foreach (var deal in deals)
+        {
+            var temp_deal = temp.FirstOrDefault(P => P.trade_id == deal.trade_id);
+            if (temp_deal != null)
+            {
+                temp_deal.price = deal.price;
+                temp_deal.amount = deal.amount;
+                temp_deal.total = deal.total;
+                temp_deal.time = deal.time;
+            }
+            else
+            {
+                this.db.Deal.Add(deal);
+            }
+        }
+        return this.db.SaveChanges();
+    }
+
 
     /// <summary>
     /// 交易记录转换成一分钟K线
@@ -101,7 +128,7 @@ public class DealDb
     /// <param name="start">开始时间</param>
     /// <param name="end">结束时间</param>
     /// <returns></returns>
-    public Kline? GetKlinesByDeal(long market, string symbol, E_KlineType type, DateTimeOffset start, DateTimeOffset? end)
+    public Kline? GetKlinesByDeal(long market, E_KlineType type, DateTimeOffset start, DateTimeOffset? end)
     {
         Expression<Func<Deal, bool>> predicate = P => P.market == market && start <= P.time;
         if (end != null)
@@ -111,11 +138,11 @@ public class DealDb
         try
         {
             var sql = from deal in this.db.Deal.Where(predicate)
-                      group deal by deal.market into g
+                      group deal by new { deal.market, deal.symbol } into g
                       select new Kline
                       {
-                          market = market,
-                          symbol = symbol,
+                          market = g.Key.market,
+                          symbol = g.Key.symbol,
                           amount = g.Sum(P => P.amount),
                           count = g.Count(),
                           total = g.Sum(P => P.total),
@@ -138,28 +165,42 @@ public class DealDb
     }
 
     /// <summary>
-    /// 添加或保存交易记录
+    /// 获取最近24小时聚合行情
     /// </summary>
-    /// <param name="deals"></param>
-    public int AddOrUpdateDeal(List<Deal> deals)
+    /// <param name="market"></param>
+    /// <returns></returns>
+    public Ticker? Get24HoursTicker(long market)
     {
-        List<Deal> temp = this.db.Deal.Where(P => deals.Select(Q => Q.trade_id).Contains(P.trade_id)).ToList();
-        foreach (var deal in deals)
+        try
         {
-            var temp_deal = temp.FirstOrDefault(P => P.trade_id == deal.trade_id);
-            if (temp_deal != null)
-            {
-                temp_deal.price = deal.price;
-                temp_deal.amount = deal.amount;
-                temp_deal.total = deal.total;
-                temp_deal.time = deal.time;
-            }
-            else
-            {
-                this.db.Deal.Add(deal);
-            }
+            var sql = from deal in this.db.Deal
+                      where deal.market == market && deal.time >= DateTimeOffset.UtcNow.AddDays(-1)
+                      group deal by new { deal.market, deal.symbol } into g
+                      select new Ticker
+                      {
+                          market = g.Key.market,
+                          symbol = g.Key.symbol,
+                          price_change = g.Average(P => P.price),
+                          price_change_percent = 0,
+                          open = g.OrderBy(P => P.time).First().price,
+                          close = g.OrderBy(P => P.time).Last().price,
+                          low = g.Min(P => P.price),
+                          high = g.Max(P => P.price),
+                          close_amount = g.OrderBy(P => P.time).Last().amount,
+                          close_time = g.OrderBy(P => P.time).Last().time,
+                          volume = g.Sum(P => P.amount),
+                          volume_currency = g.Sum(P => P.total),
+                          count = g.Count(),
+                          time = DateTimeOffset.UtcNow,
+                      };
+            return sql.FirstOrDefault();
         }
-        return this.db.SaveChanges();
+        catch (Exception ex)
+        {
+            FactoryService.instance.constant.logger.LogError(ex, "交易记录转换成一分钟K线失败");
+        }
+        return null;
     }
+
 
 }

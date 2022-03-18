@@ -187,7 +187,7 @@ public class Core
     {
         string key = FactoryService.instance.GetRedisDepth(this.model.info.market, side);
         BaseOrderBook orderBook = new BaseOrderBook();
-        StackExchange.Redis.RedisValue[] redisValues = FactoryService.instance.constant.redis.SortedSetRangeByScore(key, (double)price);
+        StackExchange.Redis.RedisValue[] redisValues = FactoryService.instance.constant.redis.SortedSetRangeByScore(key, (double)price, take: 1);
         if (redisValues.Count() == 0)
         {
             orderBook.market = this.model.info.market;
@@ -197,7 +197,7 @@ public class Core
             orderBook.count = 1;
             orderBook.direction = side;
             orderBook.last_time = deal_time;
-            FactoryService.instance.constant.redis.SortedSetAdd(key, JsonConvert.SerializeObject(orderBook), (double)price);
+            FactoryService.instance.constant.redis.SortedSetAdd(key, JsonConvert.SerializeObject(orderBook), (double)price, When.NotExists);
         }
         else
         {
@@ -218,7 +218,7 @@ public class Core
                 orderBook.count = is_add ? temp.count + 1 : temp.count;
                 orderBook.last_time = deal_time;
             }
-            FactoryService.instance.constant.redis.SortedSetAdd(key, JsonConvert.SerializeObject(orderBook), (double)price);
+            FactoryService.instance.constant.redis.SortedSetAdd(key, JsonConvert.SerializeObject(orderBook), (double)price, When.NotExists);
         }
         return orderBook!;
     }

@@ -498,11 +498,11 @@ public class MatchCore
         if (deals.Count > 0)
         {
             //触发市价撤单价格
-            decimal total_price = deals.Last().price;
-            List<Orders> bid = this.market_bid.Where(P => P.trigger_cancel_price >= total_price).ToList();
+            decimal last_price = deals.Last().price;
+            List<Orders> bid = this.market_bid.Where(P => P.trigger_cancel_price > 0 && P.trigger_cancel_price >= last_price).ToList();
             bid.ForEach(P => { P.state = E_OrderState.cancel; P.deal_last_time = DateTimeOffset.UtcNow; P.remarks = "市价买单已高于触发价,自动撤单"; });
             cancel.AddRange(bid);
-            List<Orders> ask = this.market_ask.Where(P => P.trigger_cancel_price <= total_price).ToList();
+            List<Orders> ask = this.market_ask.Where(P => P.trigger_cancel_price > 0 && P.trigger_cancel_price <= last_price).ToList();
             ask.ForEach(P => { P.state = E_OrderState.cancel; P.deal_last_time = DateTimeOffset.UtcNow; P.remarks = "市价卖单已低于触发价,自动撤单"; });
             cancel.AddRange(ask);
         }

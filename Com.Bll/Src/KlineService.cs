@@ -25,15 +25,15 @@ public class KlineService
     /// <summary>
     /// 数据库
     /// </summary>
-    public DbContextEF db = null!;
+    private DbContextEF db = null!;
     /// <summary>
     /// DB:交易记录
     /// </summary>
-    public DealDb deal_db = new DealDb();
+    private DealDb deal_db = new DealDb();
     /// <summary>
     /// DB:K线
     /// </summary>
-    public KilneDb kilne_db = new KilneDb();
+    private KilneDb kilne_db = new KilneDb();
 
     /// <summary>
     /// 初始化
@@ -141,4 +141,72 @@ public class KlineService
     }
 
     #endregion
+
+    /// <summary>
+    /// 交易记录转换成K线
+    /// </summary>
+    /// <param name="deals"></param>
+    public Dictionary<E_KlineType, List<Kline>> DealToKline(List<Deal> deals)
+    {
+        Dictionary<E_KlineType, List<Kline>> kline = new Dictionary<E_KlineType, List<Kline>>();
+        foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
+        {
+            switch (cycle)
+            {
+                case E_KlineType.min1:
+                    var min1 = from deal in deals
+                               group deal by new { deal.market, deal.symbol, min = (int)(deal.time - FactoryService.instance.system_init).TotalMinutes } into g
+                               select new Kline
+                               {
+                                   id = FactoryService.instance.constant.worker.NextId(),
+                                   market = g.Key.market,
+                                   symbol = g.Key.symbol,
+                                   type = cycle,
+                                   amount = g.Sum(x => x.amount),
+                                   count = g.Count(),
+                                   total = g.Sum(x => x.total),
+                                   open = g.First().price,
+                                   close = g.Last().price,
+                                   high = g.Max(x => x.price),
+                                   low = g.Min(x => x.price),
+                                   time_start = FactoryService.instance.system_init.AddMinutes(g.Key.min),
+                                   time_end = FactoryService.instance.system_init.AddMinutes(g.Key.min).AddMinutes(1),
+                                   time = DateTimeOffset.UtcNow,
+                               };
+                    kline.Add(cycle, min1.ToList());
+                    break;
+                case E_KlineType.min5:
+
+                    break;
+                case E_KlineType.min15:
+
+                    break;
+                case E_KlineType.min30:
+
+                    break;
+                case E_KlineType.hour1:
+
+                    break;
+                case E_KlineType.hour6:
+
+                    break;
+                case E_KlineType.hour12:
+
+                    break;
+                case E_KlineType.day1:
+
+                    break;
+                case E_KlineType.week1:
+
+                    break;
+                case E_KlineType.month1:
+
+                    break;
+                default:
+                    break;
+            }
+        }
+        return kline;
+    }
+
 }

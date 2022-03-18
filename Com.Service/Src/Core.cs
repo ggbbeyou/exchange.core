@@ -55,6 +55,11 @@ public class Core
     /// </summary>
     /// <returns></returns>
     public OrdersDb orders_db = new OrdersDb();
+    /// <summary>
+    /// K线服务
+    /// </summary>
+    /// <returns></returns>
+    public KlineService kline_service = new KlineService();
 
     /// <summary>
     /// 初始化
@@ -120,7 +125,7 @@ public class Core
     {
         List<BaseOrderBook> orderBooks = new List<BaseOrderBook>();
         List<Orders> orders = new List<Orders>();
-        List<Kline> klines = new List<Kline>();
+
         List<Deal> deals = new List<Deal>();
         foreach ((Orders order, List<Deal> deal) item in match)
         {
@@ -129,10 +134,10 @@ public class Core
             orderBooks.AddRange(GetOrderBooks(item.order, item.deal));
         }
         deal_db.AddOrUpdateDeal(deals);
-        orders_db.AddOrUpdateOrder(orders);     
-        FactoryMatching.instance.ServiceWarmCache(this.model.info);
-        // PushKline();
-        // PullDepth(orderBooks);
+        orders_db.AddOrUpdateOrder(orders);
+        Dictionary<E_KlineType, List<Kline>> klines = kline_service.DealToKline(deals);
+        PushKline();
+        PullDepth(orderBooks);
     }
 
     /// <summary>
@@ -193,6 +198,7 @@ public class Core
         if (redisValues.Count() == 0)
         {
             orderBook.market = this.model.info.market;
+            orderBook.symbol = this.model.info.symbol;
             orderBook.price = (decimal)price;
             orderBook.amount = amount;
             orderBook.count = 1;
@@ -206,6 +212,7 @@ public class Core
             if (temp == null)
             {
                 orderBook.market = this.model.info.market;
+                orderBook.symbol = this.model.info.symbol;
                 orderBook.price = (decimal)price;
                 orderBook.amount = amount;
                 orderBook.count = 1;
@@ -237,6 +244,15 @@ public class Core
         FactoryService.instance.constant.i_model.BasicPublish(exchange: FactoryService.instance.GetMqSubscribeDepth(this.model.info.market), routingKey: "", basicProperties: null, body: Encoding.UTF8.GetBytes(json));
     }
 
+
+
+
+    #endregion
+
+    #region Kline
+
+
+
     /// <summary>
     /// K线往消息队列推送
     /// </summary>
@@ -249,9 +265,5 @@ public class Core
             FactoryService.instance.constant.i_model.BasicPublish(exchange: FactoryService.instance.GetMqSubscribeKline(this.model.info.market), routingKey: item.Name, basicProperties: null, body: Encoding.UTF8.GetBytes(item.Value));
         }
     }
-
-
     #endregion
-
-
 }

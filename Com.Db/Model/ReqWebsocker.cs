@@ -12,7 +12,7 @@ public class ReqWebsocker
     /// 操作:login,Logout,subscribe unsubscribe 
     /// </summary>
     /// <value></value>
-    public string op { get; set; } = "subscribe";
+    public E_WebsockerOp op { get; set; }
     /// <summary>
     /// 请求订阅的频道列表
     /// </summary>
@@ -36,9 +36,9 @@ public class ReqChannel
     /// 
     /// </summary>
     /// <value></value>
-    public string channel { get; set; } = null!;
+    public E_WebsockerChannel channel { get; set; }
     /// <summary>
-    /// 数据
+    /// 数据 交易对或其它数据
     /// </summary>
     /// <value></value>
     public string data { get; set; } = null!;

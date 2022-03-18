@@ -24,8 +24,8 @@ public class WebSocketController : Controller
     /// </summary>
     /// <typeparam name="string"></typeparam>
     /// <returns></returns>
-    public List<string> login_channel = new List<string>() { "account", "orders", "order" };
-    byte[] pong = System.Text.Encoding.UTF8.GetBytes("pong");
+    public List<E_WebsockerChannel> login_channel = new List<E_WebsockerChannel>() { E_WebsockerChannel.assets, E_WebsockerChannel.orders };
+    private byte[] pong = System.Text.Encoding.UTF8.GetBytes("pong");
 
     /// <summary>
     /// 交易对基础信息
@@ -127,14 +127,14 @@ public class WebSocketController : Controller
             byte[] b = System.Text.Encoding.UTF8.GetBytes($"无法解析请求命令:{str},{ex.Message}");
             webSocket.SendAsync(new ArraySegment<byte>(b, 0, b.Length), WebSocketMessageType.Text, true, CancellationToken.None);
         }
-        if (req == null || string.IsNullOrWhiteSpace(req.op))
+        if (req == null)
         {
             return;
         }
         ResWebsocker resWebsocker = new ResWebsocker();
         resWebsocker.success = true;
         resWebsocker.op = req.op;
-        if (login == false && req.op == "subscribe")
+        if (login == false && req.op == E_WebsockerOp.subscribe)
         {
             List<ReqChannel> Logout = req.args.Where(P => login_channel.Contains(P.channel)).ToList();
             foreach (var item in Logout)
@@ -148,25 +148,25 @@ public class WebSocketController : Controller
             }
             req.args.RemoveAll(P => Logout.Contains(P));
         }
-        if (req.op == "login")
+        if (req.op == E_WebsockerOp.login)
         {
             login = true;
-            resWebsocker.channel = "";
+            resWebsocker.channel = E_WebsockerChannel.none;
             resWebsocker.data = "";
             resWebsocker.message = "登录成功!";
             byte[] b = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(resWebsocker));
             webSocket.SendAsync(new ArraySegment<byte>(b, 0, b.Length), WebSocketMessageType.Text, true, CancellationToken.None);
         }
-        else if (req.op == "Logout")
+        else if (req.op == E_WebsockerOp.Logout)
         {
             login = false;
-            resWebsocker.channel = "";
+            resWebsocker.channel = E_WebsockerChannel.none;
             resWebsocker.data = "";
             resWebsocker.message = "登出成功!";
             byte[] b = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(resWebsocker));
             webSocket.SendAsync(new ArraySegment<byte>(b, 0, b.Length), WebSocketMessageType.Text, true, CancellationToken.None);
         }
-        else if (req.op == "subscribe")
+        else if (req.op == E_WebsockerOp.subscribe)
         {
             foreach (ReqChannel item in req.args)
             {
@@ -183,7 +183,7 @@ public class WebSocketController : Controller
                     }
                     else
                     {
-                        string key = FactoryService.instance.GetMqTickers(market.market);
+                        string key = $"{item.channel.ToString()}_{market.market}";
                         if (channel.ContainsKey(key))
                         {
                             continue;
@@ -203,7 +203,7 @@ public class WebSocketController : Controller
                 }
             }
         }
-        else if (req.op == "unsubscribe")
+        else if (req.op == E_WebsockerOp.unsubscribe)
         {
             foreach (ReqChannel item in req.args)
             {
@@ -220,7 +220,7 @@ public class WebSocketController : Controller
                     }
                     else
                     {
-                        string key = FactoryService.instance.GetMqTickers(market.market);
+                        string key = $"{item.channel.ToString()}_{market.market}";
                         if (channel.ContainsKey(key))
                         {
                             this.constant.i_model.BasicCancel(channel[key]);

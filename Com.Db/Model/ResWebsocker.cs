@@ -17,12 +17,12 @@ public class ResWebsocker
     /// 操作，subscribe unsubscribe 
     /// </summary>
     /// <value></value>
-    public string op { get; set; } = "subscribe";
+    public E_WebsockerOp op { get; set; }
     // <summary>
     /// 频道     
     /// </summary>
     /// <value></value>
-    public string channel { get; set; } = null!;
+    public E_WebsockerChannel channel { get; set; }
     /// <summary>
     /// 数据
     /// </summary>

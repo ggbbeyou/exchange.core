@@ -113,18 +113,6 @@ public class FactoryService
         return string.Format("klineing:{0}", market);
     }
 
-    //
-
-    /// <summary>
-    /// 聚合行情 MQ:Publish/Subscribe=>exchange:tickers_market;
-    /// </summary>
-    /// <param name="market"></param>
-    /// <returns></returns>
-    public string GetMqTickers(long market)
-    {
-        return string.Format("tickers_{0}", market);
-    }
-
     /// <summary>
     /// MQ:发送历史成交记录
     /// </summary>

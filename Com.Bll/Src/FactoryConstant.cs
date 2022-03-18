@@ -129,6 +129,19 @@ public class FactoryConstant
         {
             this.logger.LogError(ex, $"MQ服务器连接不上");
         }
+        try
+        {
+            //下面可以创建数据库   Code First
+            string? dbConnection = config.GetConnectionString("Mssql");
+            var options = new DbContextOptionsBuilder<DbContextEF>().UseSqlServer(dbConnection).Options;
+            var factorydb = new PooledDbContextFactory<DbContextEF>(options);
+            DbContextEF db = factorydb.CreateDbContext();
+            db.Database.EnsureCreated();
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogError(ex, $"MQ服务器连接不上");
+        }
     }
 
     /// <summary>

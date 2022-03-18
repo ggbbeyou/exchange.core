@@ -71,8 +71,6 @@ public class MQ
     {
         this.model = model;
         props.DeliveryMode = 2;
-
-
         OrderCancel();
         OrderReceive();
     }

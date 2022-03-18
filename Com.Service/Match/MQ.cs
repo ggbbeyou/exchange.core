@@ -49,13 +49,13 @@ public class MQ
     /// </summary>
     /// <typeparam name="MatchDeal"></typeparam>
     /// <returns></returns>
-    private List<(Orders order, List<Deal> deal)> deal = new List<(Orders order, List<Deal> deal)>();
+    private List<Deal> deal = new List<Deal>();
     /// <summary>
     /// 临时变量
     /// </summary>
     /// <typeparam name="MatchOrder"></typeparam>
     /// <returns></returns>
-    private List<Orders> cancel_deal = new List<Orders>();
+    private List<long> cancel_deal = new List<long>();
     /// <summary>
     /// 临时变量
     /// </summary>
@@ -98,17 +98,13 @@ public class MQ
                     foreach (Orders item in req.data)
                     {
                         this.mutex.WaitOne();
-                        (Orders? order, List<Deal> deal, List<Orders> cancel) match = this.model.match_core.Match(item);
+                        List<Deal> match = this.model.match_core.Match(item);
+                        if (match.Count > 0)
+                        {
+                            cancel_deal.AddRange(this.model.match_core.TriggerCancel(match.Last().price));
+                        }
                         this.mutex.ReleaseMutex();
-                        if (match.order == null)
-                        {
-                            continue;
-                        }
-                        deal.Add((match.order, match.deal));
-                        if (match.cancel.Count > 0)
-                        {
-                            cancel_deal.AddRange(match.cancel);
-                        }
+                        deal.AddRange(match);
                     }
                     if (deal.Count() > 0)
                     {
@@ -122,56 +118,6 @@ public class MQ
                 return true;
             }
         });
-
-
-
-
-
-        // string queueName = FactoryService.instance.constant.i_model.QueueDeclare().QueueName;
-        // FactoryService.instance.constant.i_model.QueueBind(queue: queueName, exchange: this.key_order_send, routingKey: this.model.info.market.ToString());
-        // EventingBasicConsumer consumer = new EventingBasicConsumer(FactoryService.instance.constant.i_model);
-        // consumer.Received += (model, ea) =>
-        // {
-        //     if (!this.model.run)
-        //     {
-        //         FactoryService.instance.constant.i_model.BasicNack(deliveryTag: ea.DeliveryTag, multiple: true, requeue: true);
-        //     }
-        //     else
-        //     {
-        //         string json = Encoding.UTF8.GetString(ea.Body.ToArray());
-        //         CallRequest<List<Orders>>? req = JsonConvert.DeserializeObject<CallRequest<List<Orders>>>(json);
-        //         if (req != null && req.op == E_Op.place && req.data != null && req.data.Count > 0)
-        //         {
-        //             deal.Clear();
-        //             cancel_deal.Clear();
-        //             foreach (Orders item in req.data)
-        //             {
-        //                 this.mutex.WaitOne();
-        //                 (Orders? order, List<Deal> deal, List<Orders> cancel) match = this.model.match_core.Match(item);
-        //                 this.mutex.ReleaseMutex();
-        //                 if (match.order == null)
-        //                 {
-        //                     continue;
-        //                 }
-        //                 deal.Add((match.order, match.deal));
-        //                 if (match.cancel.Count > 0)
-        //                 {
-        //                     cancel_deal.AddRange(match.cancel);
-        //                 }
-        //             }
-        //             if (deal.Count() > 0)
-        //             {
-        //                 FactoryService.instance.constant.i_model.BasicPublish(exchange: this.key_deal, routingKey: this.model.info.market.ToString(), basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(deal)));
-        //             }
-        //             if (cancel_deal.Count > 0)
-        //             {
-        //                 FactoryService.instance.constant.i_model.BasicPublish(exchange: this.key_order_cancel_success, routingKey: this.model.info.market.ToString(), basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(cancel_deal)));
-        //             }
-        //         };
-        //         FactoryService.instance.constant.i_model.BasicAck(ea.DeliveryTag, true);
-        //     }
-        // };
-        // FactoryService.instance.constant.i_model.BasicConsume(queue: queueName, autoAck: false, consumer: consumer);
     }
 
     /// <summary>
@@ -219,53 +165,6 @@ public class MQ
                 return true;
             }
         });
-
-
-
-
-        // string queueName = FactoryService.instance.constant.i_model.QueueDeclare().QueueName;
-        // FactoryService.instance.constant.i_model.QueueBind(queue: queueName, exchange: this.key_order_cancel, routingKey: this.model.info.market.ToString());
-        // EventingBasicConsumer consumer = new EventingBasicConsumer(FactoryService.instance.constant.i_model);
-        // consumer.Received += (model, ea) =>
-        // {
-        //     if (!this.model.run)
-        //     {
-        //         FactoryService.instance.constant.i_model.BasicNack(deliveryTag: ea.DeliveryTag, multiple: true, requeue: true);
-        //     }
-        //     else
-        //     {
-        //         string json = Encoding.UTF8.GetString(ea.Body.ToArray());
-        //         CallRequest<List<long>>? req = JsonConvert.DeserializeObject<CallRequest<List<long>>>(json);
-        //         if (req != null && req.op == E_Op.place && req.data != null)
-        //         {
-        //             cancel.Clear();
-        //             this.mutex.WaitOne();
-        //             if (req.op == E_Op.cancel_by_id)
-        //             {
-        //                 cancel.AddRange(this.model.match_core.CancelOrder(req.data));
-        //             }
-        //             else if (req.op == E_Op.cancel_by_uid)
-        //             {
-        //                 cancel.AddRange(this.model.match_core.CancelOrder(req.data.First()));
-        //             }
-        //             else if (req.op == E_Op.cancel_by_clientid)
-        //             {
-        //                 cancel.AddRange(this.model.match_core.CancelOrder(req.data.ToArray()));
-        //             }
-        //             else if (req.op == E_Op.cancel_by_all)
-        //             {
-        //                 cancel.AddRange(this.model.match_core.CancelOrder());
-        //             }
-        //             this.mutex.ReleaseMutex();
-        //             if (cancel.Count > 0)
-        //             {
-        //                 FactoryService.instance.constant.i_model.BasicPublish(exchange: this.key_order_cancel_success, routingKey: this.model.info.market.ToString(), basicProperties: props, body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(cancel)));
-        //             }
-        //         }
-        //         FactoryService.instance.constant.i_model.BasicAck(ea.DeliveryTag, false);
-        //     }
-        // };
-        // FactoryService.instance.constant.i_model.BasicConsume(queue: queueName, autoAck: false, consumer: consumer);
     }
 
 }

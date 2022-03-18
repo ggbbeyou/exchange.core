@@ -29,7 +29,7 @@ public class OrderController : Controller
             {
                 return Convert.ToInt32(claim.Value);
             }
-            return 0;
+            return 5;
         }
     }
 
@@ -137,11 +137,18 @@ public class OrderController : Controller
         for (int i = 0; i < 1000; i++)
         {
             PlaceOrder orderResult = new PlaceOrder();
-            orderResult.client_id = null;
-            orderResult.price = (decimal)FactoryService.instance.constant.random.Next(4, 10);
-            orderResult.amount = (decimal)FactoryService.instance.constant.random.NextDouble();
             orderResult.side = i % 2 == 0 ? E_OrderSide.buy : E_OrderSide.sell;
             orderResult.type = i % 2 == 0 ? E_OrderType.price_fixed : E_OrderType.price_market;
+            orderResult.client_id = null;
+            if (orderResult.type == E_OrderType.price_fixed)
+            {
+                orderResult.price = (decimal)FactoryService.instance.constant.random.Next(4, 10);
+            }
+            else
+            {
+                orderResult.price = null;
+            }
+            orderResult.amount = (decimal)FactoryService.instance.constant.random.NextDouble();
             orders.Add(orderResult);
         }
         return PlaceOrder("btc/usdt", orders);

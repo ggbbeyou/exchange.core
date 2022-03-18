@@ -103,8 +103,7 @@ public class Orders
     /// <summary>
     /// 触发撤单价格
     /// </summary>
-    /// <value></value>
-    [NotMapped]
+    /// <value></value>    
     [JsonIgnore]
     public decimal trigger_cancel_price { get; set; }
 }

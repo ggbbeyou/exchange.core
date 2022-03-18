@@ -33,7 +33,7 @@ public class DbContextEF : DbContext
     /// 订单表
     /// </summary>
     /// <value></value>
-    public DbSet<Orders> Order { get; set; } = null!;
+    public DbSet<Orders> Orders { get; set; } = null!;
     /// <summary>
     /// 用户基础信息
     /// </summary>
@@ -170,7 +170,7 @@ public class DbContextEF : DbContext
             o.Property(P => P.data).HasColumnType("nvarchar").HasMaxLength(200).HasComment("附加数据");
             o.Property(P => P.trigger_hanging_price).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("触发挂单价格");
             o.Property(P => P.remarks).HasColumnType("nvarchar").HasMaxLength(200).HasComment("备注");
-            o.ToTable(nameof(Order));
+            o.ToTable(nameof(Orders));
         });
         modelBuilder.Entity<Users>(o =>
         {

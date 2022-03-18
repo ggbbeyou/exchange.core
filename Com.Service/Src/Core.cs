@@ -46,10 +46,15 @@ public class Core
     /// </summary>
     public DbContextEF db = null!;
     /// <summary>
-    /// 
+    /// 交易记录Db操作
     /// </summary>
     /// <returns></returns>
     public DealDb deal_db = new DealDb();
+    /// <summary>
+    /// 订单Db操作
+    /// </summary>
+    /// <returns></returns>
+    public OrdersDb orders_db = new OrdersDb();
 
     /// <summary>
     /// 初始化
@@ -114,20 +119,17 @@ public class Core
     private void ReceiveDealOrder(List<(Orders order, List<Deal> deal)> match)
     {
         List<BaseOrderBook> orderBooks = new List<BaseOrderBook>();
+        List<Orders> orders = new List<Orders>();
         List<Kline> klines = new List<Kline>();
-        List<Deal> total = new List<Deal>();
+        List<Deal> deals = new List<Deal>();
         foreach ((Orders order, List<Deal> deal) item in match)
         {
+            orders.Add(item.order);
+            deals.AddRange(item.deal);
             orderBooks.AddRange(GetOrderBooks(item.order, item.deal));
-            total.AddRange(item.deal);
         }
-        // this.db.Deal.AddRange(total);
-        // this.db.SaveChanges();
-
-
-        deal_db.AddOrUpdateDeal(total);
-        // FactoryService.instance.constant.db.Deal.AddRange(total);
-        // FactoryService.instance.constant.db.SaveChanges();
+        deal_db.AddOrUpdateDeal(deals);
+        orders_db.AddOrUpdateOrder(orders);     
         FactoryMatching.instance.ServiceWarmCache(this.model.info);
         // PushKline();
         // PullDepth(orderBooks);

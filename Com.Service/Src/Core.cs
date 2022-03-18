@@ -25,18 +25,6 @@ public class Core
     /// <value></value>
     public MatchModel model { get; set; } = null!;
     /// <summary>
-    /// 买盘 高->低
-    /// </summary>
-    /// <typeparam name="OrderBook">买盘</typeparam>
-    /// <returns></returns>
-    public List<BaseOrderBook> bid = new List<BaseOrderBook>();
-    /// <summary>
-    /// 卖盘 低->高
-    /// </summary>
-    /// <typeparam name="OrderBook">卖盘</typeparam>
-    /// <returns></returns>
-    public List<BaseOrderBook> ask = new List<BaseOrderBook>();
-    /// <summary>
     /// 最后一分钟K线
     /// </summary>
     /// <returns></returns>
@@ -125,7 +113,6 @@ public class Core
     {
         List<BaseOrderBook> orderBooks = new List<BaseOrderBook>();
         List<Orders> orders = new List<Orders>();
-
         List<Deal> deals = new List<Deal>();
         foreach ((Orders order, List<Deal> deal) item in match)
         {
@@ -135,14 +122,20 @@ public class Core
         }
         deal_db.AddOrUpdateDeal(deals);
         orders_db.AddOrUpdateOrder(orders);
-        Dictionary<E_KlineType, List<Kline>> klines = kline_service.DealToKline(deals);
-        
-
-
-
-
-        PushKline();
-        PullDepth(orderBooks);
+        string json = JsonConvert.SerializeObject(orderBooks);
+        FactoryService.instance.constant.MqPublish($"{E_WebsockerChannel.books10}_{this.model.info.market}", json);
+        FactoryService.instance.constant.MqPublish($"{E_WebsockerChannel.books50}_{this.model.info.market}", json);
+        FactoryService.instance.constant.MqPublish($"{E_WebsockerChannel.books200}_{this.model.info.market}", json);
+        DateTimeOffset now = DateTimeOffset.UtcNow;
+        now = now.AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond);
+        DateTimeOffset end = now.AddMilliseconds(-1);
+        this.kline_service.DBtoRedised(this.model.info.market, this.model.info.symbol, end);
+        this.kline_service.DBtoRedising(this.model.info.market);
+        HashEntry[] hashes = FactoryService.instance.constant.redis.HashGetAll(FactoryService.instance.GetRedisKlineing(this.model.info.market));
+        foreach (var item in hashes)
+        {
+            FactoryService.instance.constant.MqPublish($"{item.Name}_{this.model.info.market}", item.Value);
+        }
     }
 
     /// <summary>
@@ -174,14 +167,14 @@ public class Core
         List<BaseOrderBook> depth = new List<BaseOrderBook>();
         if (order.type == E_OrderType.price_fixed && order.amount_unsold > 0)
         {
-            depth.Add(UpdateOrderBook(order.side, (double)order.price, order.amount_unsold, order.deal_last_time ?? DateTimeOffset.UtcNow, true));
+            depth.Add(UpdateOrderBook(order.side, order.price, order.amount_unsold, order.deal_last_time ?? DateTimeOffset.UtcNow, true));
         }
         foreach (Deal item in deals)
         {
-            Orders opponent = order.side == E_OrderSide.buy ? item.ask : item.bid;
+            Orders opponent = item.trigger_side == E_OrderSide.buy ? item.ask : item.bid;
             if (opponent.type == E_OrderType.price_fixed)
             {
-                depth.Add(UpdateOrderBook(opponent.side, (double)opponent.price, item.amount, item.time, false));
+                depth.Add(UpdateOrderBook(opponent.side, opponent.price, item.amount, item.time, false));
             }
         }
         return depth;
@@ -195,11 +188,11 @@ public class Core
     /// <param name="amount"></param>
     /// <param name="is_add"></param>
     /// <returns></returns>
-    public BaseOrderBook UpdateOrderBook(E_OrderSide side, double price, decimal amount, DateTimeOffset deal_time, bool is_add)
+    public BaseOrderBook UpdateOrderBook(E_OrderSide side, decimal price, decimal amount, DateTimeOffset deal_time, bool is_add)
     {
         string key = FactoryService.instance.GetRedisDepth(this.model.info.market, side);
         BaseOrderBook orderBook = new BaseOrderBook();
-        StackExchange.Redis.RedisValue[] redisValues = FactoryService.instance.constant.redis.SortedSetRangeByScore(key, price);
+        StackExchange.Redis.RedisValue[] redisValues = FactoryService.instance.constant.redis.SortedSetRangeByScore(key, (double)price);
         if (redisValues.Count() == 0)
         {
             orderBook.market = this.model.info.market;
@@ -209,7 +202,7 @@ public class Core
             orderBook.count = 1;
             orderBook.direction = side;
             orderBook.last_time = deal_time;
-            FactoryService.instance.constant.redis.SortedSetAdd(key, JsonConvert.SerializeObject(orderBook), price);
+            FactoryService.instance.constant.redis.SortedSetAdd(key, JsonConvert.SerializeObject(orderBook), (double)price);
         }
         else
         {
@@ -230,45 +223,15 @@ public class Core
                 orderBook.count = is_add ? temp.count + 1 : temp.count;
                 orderBook.last_time = deal_time;
             }
-            FactoryService.instance.constant.redis.SortedSetAdd(key, JsonConvert.SerializeObject(orderBook), price);
+            FactoryService.instance.constant.redis.SortedSetAdd(key, JsonConvert.SerializeObject(orderBook), (double)price);
         }
         return orderBook!;
     }
 
-    /// <summary>
-    /// 消息队列推送=>更新Depth
-    /// </summary>
-    /// <param name="depth"></param>
-    private void PullDepth(List<BaseOrderBook> depth)
-    {
-        if (depth.Count == 0)
-        {
-            return;
-        }
-        string json = JsonConvert.SerializeObject(depth);
-        FactoryService.instance.constant.i_model.BasicPublish(exchange: FactoryService.instance.GetMqSubscribeDepth(this.model.info.market), routingKey: "", basicProperties: null, body: Encoding.UTF8.GetBytes(json));
-    }
-
 
 
 
     #endregion
 
-    #region Kline
 
-
-
-    /// <summary>
-    /// K线往消息队列推送
-    /// </summary>
-    /// <param name="depth"></param>
-    private void PushKline()
-    {
-        HashEntry[] hashes = FactoryService.instance.constant.redis.HashGetAll(FactoryService.instance.GetRedisKlineing(this.model.info.market));
-        foreach (var item in hashes)
-        {
-            FactoryService.instance.constant.i_model.BasicPublish(exchange: FactoryService.instance.GetMqSubscribeKline(this.model.info.market), routingKey: item.Name, basicProperties: null, body: Encoding.UTF8.GetBytes(item.Value));
-        }
-    }
-    #endregion
 }

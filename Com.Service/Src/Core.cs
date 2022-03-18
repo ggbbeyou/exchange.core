@@ -136,6 +136,11 @@ public class Core
         deal_db.AddOrUpdateDeal(deals);
         orders_db.AddOrUpdateOrder(orders);
         Dictionary<E_KlineType, List<Kline>> klines = kline_service.DealToKline(deals);
+        
+
+
+
+
         PushKline();
         PullDepth(orderBooks);
     }

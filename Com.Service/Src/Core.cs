@@ -25,11 +25,6 @@ public class Core
     /// <value></value>
     public MatchModel model { get; set; } = null!;
     /// <summary>
-    /// 最后一分钟K线
-    /// </summary>
-    /// <returns></returns>
-    public Kline kline_minute = null!;
-    /// <summary>
     /// 数据库
     /// </summary>
     public DbContextEF db = null!;

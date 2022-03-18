@@ -78,9 +78,9 @@ public class OrderController : Controller
             {
                 Orders orderResult = new Orders();
                 orderResult.order_id = FactoryService.instance.constant.worker.NextId();
-                orderResult.client_id = item.client_id;
                 orderResult.market = market.market;
-                orderResult.symbol = symbol;
+                orderResult.symbol = market.symbol;
+                orderResult.client_id = item.client_id;
                 orderResult.uid = user_id;
                 orderResult.price = item.price ?? 0;
                 orderResult.amount = item.amount;
@@ -92,6 +92,8 @@ public class OrderController : Controller
                 orderResult.side = item.side;
                 orderResult.state = E_OrderState.unsold;
                 orderResult.type = item.type;
+                orderResult.trigger_hanging_price = 0;
+                orderResult.trigger_cancel_price = 0;
                 orderResult.data = null;
                 orderResult.remarks = null;
                 matchOrders.Add(orderResult);
@@ -134,15 +136,16 @@ public class OrderController : Controller
     public IActionResult PlaceOrderText()
     {
         List<PlaceOrder> orders = new List<PlaceOrder>();
+        Random r = new Random();
         for (int i = 0; i < 1000; i++)
         {
             PlaceOrder orderResult = new PlaceOrder();
-            orderResult.side = i % 2 == 0 ? E_OrderSide.buy : E_OrderSide.sell;
-            orderResult.type = i % 2 == 0 ? E_OrderType.price_fixed : E_OrderType.price_market;
+            orderResult.side = r.Next(0, 2) == 0 ? E_OrderSide.buy : E_OrderSide.sell;
+            orderResult.type = r.Next(0, 2) == 0 ? E_OrderType.price_fixed : E_OrderType.price_market;
             orderResult.client_id = null;
             if (orderResult.type == E_OrderType.price_fixed)
             {
-                orderResult.price = (decimal)FactoryService.instance.constant.random.Next(4, 10);
+                orderResult.price = (decimal)FactoryService.instance.constant.random.Next(4, 100);
             }
             else
             {

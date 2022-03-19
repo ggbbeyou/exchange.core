@@ -107,25 +107,7 @@ public class MQ
                         deal.AddRange(match);
                         this.mutex.ReleaseMutex();
                     }
-                    //增加未成交的订单更新到OrderBook
-                    List<(BaseOrderBook depth, string json)> depth = new List<(BaseOrderBook depth, string json)>();
-                    var bids = from bid in req.data
-                               where bid.side == E_OrderSide.buy && bid.type == E_OrderType.price_fixed && bid.amount_unsold > 0 && (bid.state == E_OrderState.partial || bid.state == E_OrderState.unsold)
-                               group bid by new { bid.market, bid.symbol, bid.price } into g
-                               select new { market = g.Key.market, symbol = g.Key.symbol, price = g.Key.price, amount_unsold = g.Sum(x => x.amount_unsold), count = g.Count(), time = g.Max(x => x.create_time) };
-                    foreach (var item in bids)
-                    {
-                        depth.Add(depth_service.UpdateOrderBook(item.market, item.symbol, E_OrderSide.buy, item.price, item.amount_unsold, item.count, item.time)!.Value);
-                    }
-                    var asks = from ask in req.data
-                               where ask.side == E_OrderSide.sell && ask.type == E_OrderType.price_fixed && ask.amount_unsold > 0 && (ask.state == E_OrderState.partial || ask.state == E_OrderState.unsold)
-                               group ask by new { ask.market, ask.symbol, ask.price } into g
-                               select new { market = g.Key.market, symbol = g.Key.symbol, price = g.Key.price, amount_unsold = g.Sum(x => x.amount_unsold), count = g.Count(), time = g.Max(x => x.create_time) };
-                    foreach (var item in asks)
-                    {
-                        depth.Add(depth_service.UpdateOrderBook(item.market, item.symbol, E_OrderSide.sell, item.price, item.amount_unsold, item.count, item.time)!.Value);
-                    }
-                    depth_service.Push(depth);
+                    (List<BaseOrderBook> bid, List<BaseOrderBook> ask) orderbook = this.model.match_core.GetOrderBook();
                     if (deal.Count() > 0)
                     {
                         FactoryService.instance.constant.MqTask(FactoryService.instance.GetMqOrderDeal(this.model.info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(deal)));
@@ -134,6 +116,7 @@ public class MQ
                     {
                         FactoryService.instance.constant.MqTask(FactoryService.instance.GetMqOrderCancelSuccess(this.model.info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(cancel_deal)));
                     }
+                    depth_service.Push(orderbook);
                 };
                 return true;
             }

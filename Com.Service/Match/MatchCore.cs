@@ -28,6 +28,7 @@
 
 using Com.Db;
 using Com.Db.Enum;
+using Com.Db.Model;
 using Com.Service.Models;
 
 namespace Com.Service.Match;
@@ -187,6 +188,23 @@ public class MatchCore
         ask.ForEach(P => { P.state = E_OrderState.cancel; P.deal_last_time = DateTimeOffset.UtcNow; P.remarks = "市价卖单已低于触发价,自动撤单"; });
         cancel.AddRange(ask);
         return cancel.Select(P => P.order_id).ToList();
+    }
+
+    /// <summary>
+    /// 获取订单
+    /// </summary>
+    /// <param name="bid"></param>
+    /// <param name="GetOrderBook("></param>
+    /// <returns></returns>
+    public (List<BaseOrderBook> bid, List<BaseOrderBook> ask) GetOrderBook()
+    {
+        var bids = from b in fixed_bid
+                   group b by new { b.market, b.symbol, b.price } into g
+                   select new BaseOrderBook { market = g.Key.market, symbol = g.Key.symbol, price = g.Key.price, amount = g.Sum(p => p.amount_unsold), count = g.Count(), direction = E_OrderSide.buy, last_time = g.Max(p => p.deal_last_time ?? DateTimeOffset.UtcNow) };
+        var asks = from a in fixed_ask
+                   group a by new { a.market, a.symbol, a.price } into g
+                   select new BaseOrderBook { market = g.Key.market, symbol = g.Key.symbol, price = g.Key.price, amount = g.Sum(p => p.amount_unsold), count = g.Count(), direction = E_OrderSide.sell, last_time = g.Max(p => p.deal_last_time ?? DateTimeOffset.UtcNow) };
+        return (bids.ToList(), asks.ToList());
     }
 
     /// <summary>

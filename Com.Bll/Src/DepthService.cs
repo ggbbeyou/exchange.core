@@ -78,7 +78,7 @@ public class DepthService
     /// 
     /// </summary>
     /// <param name="depth"></param>
-    public void Push(List<(BaseOrderBook depth, string json)> depth)
+    public void Push((List<BaseOrderBook> bid, List<BaseOrderBook> ask) depth)
     {
 
     }

@@ -137,7 +137,7 @@ public class OrderController : Controller
     {
         List<PlaceOrder> orders = new List<PlaceOrder>();
         Random r = new Random();
-        for (int i = 0; i < 10000; i++)
+        for (int i = 0; i < 300; i++)
         {
             PlaceOrder orderResult = new PlaceOrder();
             orderResult.side = r.Next(0, 2) == 0 ? E_OrderSide.buy : E_OrderSide.sell;
@@ -145,13 +145,13 @@ public class OrderController : Controller
             orderResult.client_id = null;
             if (orderResult.type == E_OrderType.price_fixed)
             {
-                orderResult.price = (decimal)FactoryService.instance.constant.random.Next(4, 100);
+                orderResult.price = (decimal)FactoryService.instance.constant.random.Next(1, 30);
             }
             else
             {
                 orderResult.price = null;
             }
-            orderResult.amount = (decimal)FactoryService.instance.constant.random.NextDouble();
+            orderResult.amount = (decimal)FactoryService.instance.constant.random.Next(1, 30);
             orders.Add(orderResult);
         }
         return PlaceOrder("btc/usdt", orders);

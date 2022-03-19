@@ -85,7 +85,7 @@ public class MQ
         {
             if (!this.model.run)
             {
-                Thread.Sleep(1000);
+                Thread.Sleep(1000 * 10);
                 return false;
             }
             else
@@ -100,21 +100,21 @@ public class MQ
                     {
                         this.mutex.WaitOne();
                         List<Deal> match = this.model.match_core.Match(item);
+                        deal.AddRange(match);
                         if (match.Count > 0)
                         {
                             cancel_deal.AddRange(this.model.match_core.CancelOrder(match.Last().price));
                         }
-                        deal.AddRange(match);
                         this.mutex.ReleaseMutex();
                     }
                     if (deal.Count() > 0)
                     {
                         FactoryService.instance.constant.MqTask(FactoryService.instance.GetMqOrderDeal(this.model.info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(deal)));
                     }
-                    // if (cancel_deal.Count > 0)
-                    // {
-                    //     FactoryService.instance.constant.MqTask(FactoryService.instance.GetMqOrderCancelSuccess(this.model.info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(cancel_deal)));
-                    // }
+                    if (cancel_deal.Count > 0)
+                    {
+                        FactoryService.instance.constant.MqTask(FactoryService.instance.GetMqOrderCancelSuccess(this.model.info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(cancel_deal)));
+                    }
                     if (deal.Count() > 0 || cancel_deal.Count > 0)
                     {
                         (List<BaseOrderBook> bid, List<BaseOrderBook> ask) orderbook = this.model.match_core.GetOrderBook();
@@ -135,7 +135,7 @@ public class MQ
         {
             if (!this.model.run)
             {
-                Thread.Sleep(1000);
+                Thread.Sleep(1000 * 10);
                 return false;
             }
             else

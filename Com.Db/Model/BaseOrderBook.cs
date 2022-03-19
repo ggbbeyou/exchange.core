@@ -43,7 +43,7 @@ public class BaseOrderBook
     /// 挂单笔数量
     /// </summary>
     /// <value></value>
-    public decimal count { get; set; }
+    public int count { get; set; }
     /// <summary>
     /// 交易方向
     /// </summary>

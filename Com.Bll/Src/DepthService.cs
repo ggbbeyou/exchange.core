@@ -43,7 +43,7 @@ public class DepthService
     public (BaseOrderBook depth, string json)? UpdateOrderBook(long market, string symbol, E_OrderSide side, decimal price, decimal amount, int count, DateTimeOffset create_time)
     {
         string key = FactoryService.instance.GetRedisDepth(market, side);
-        StackExchange.Redis.RedisValue[] redisValues = FactoryService.instance.constant.redis.SortedSetRangeByScore(key, (double)price, take: 1);
+        StackExchange.Redis.RedisValue[] redisValues = FactoryService.instance.constant.redis.SortedSetRangeByScore(key, start: (double)price, stop: (double)price, take: 1);
         if (redisValues.Count() == 0)
         {
             BaseOrderBook orderBook = new BaseOrderBook();
@@ -67,7 +67,7 @@ public class DepthService
                 temp.count += count;
                 temp.last_time = create_time;
                 string json = JsonConvert.SerializeObject(temp);
-                FactoryService.instance.constant.redis.SortedSetAdd(key, json, (double)price, When.NotExists);
+                FactoryService.instance.constant.redis.SortedSetAdd(key, json, (double)price, When.Exists);
                 return (temp, json);
             }
         }

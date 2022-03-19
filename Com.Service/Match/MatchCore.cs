@@ -43,6 +43,10 @@ public class MatchCore
     /// <value></value>
     public MatchModel model { get; set; } = null!;
     /// <summary>
+    /// 最后价格
+    /// </summary>
+    private decimal last_price;
+    /// <summary>
     /// 市价买单
     /// </summary>
     /// <typeparam name="Order">订单</typeparam>
@@ -74,6 +78,7 @@ public class MatchCore
     public MatchCore(MatchModel model)
     {
         this.model = model;
+        this.last_price = model.info.last_price;
     }
 
     /// <summary>

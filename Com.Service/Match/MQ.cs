@@ -107,7 +107,6 @@ public class MQ
                         deal.AddRange(match);
                         this.mutex.ReleaseMutex();
                     }
-                    (List<BaseOrderBook> bid, List<BaseOrderBook> ask) orderbook = this.model.match_core.GetOrderBook();
                     if (deal.Count() > 0)
                     {
                         FactoryService.instance.constant.MqTask(FactoryService.instance.GetMqOrderDeal(this.model.info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(deal)));
@@ -116,6 +115,7 @@ public class MQ
                     {
                         FactoryService.instance.constant.MqTask(FactoryService.instance.GetMqOrderCancelSuccess(this.model.info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(cancel_deal)));
                     }
+                    (List<BaseOrderBook> bid, List<BaseOrderBook> ask) orderbook = this.model.match_core.GetOrderBook();
                     depth_service.Push(orderbook);
                 };
                 return true;

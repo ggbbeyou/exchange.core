@@ -266,6 +266,10 @@ public class MatchCore
                     {
                         //使用撮合价规则
                         decimal new_price = Util.GetNewPrice(order.price, fixed_ask[i].price, this.last_price);
+                        if (new_price <= 0)
+                        {
+                            break;
+                        }
                         Deal deal = Util.CreateDeal(this.model.info.market, this.model.info.symbol, order, fixed_ask[i], new_price, E_OrderSide.buy, now);
                         deals.Add(deal);
                         this.last_price = new_price;
@@ -363,6 +367,10 @@ public class MatchCore
                     {
                         //使用撮合价规则
                         decimal new_price = Util.GetNewPrice(fixed_bid[i].price, order.price, this.last_price);
+                        if (new_price <= 0)
+                        {
+                            break;
+                        }
                         Deal deal = Util.CreateDeal(this.model.info.market, this.model.info.symbol, fixed_bid[i], order, new_price, E_OrderSide.sell, now);
                         deals.Add(deal);
                         this.last_price = new_price;

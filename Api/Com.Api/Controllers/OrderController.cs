@@ -137,7 +137,7 @@ public class OrderController : Controller
     {
         List<PlaceOrder> orders = new List<PlaceOrder>();
         Random r = new Random();
-        for (int i = 0; i < 300; i++)
+        for (int i = 0; i < 50; i++)
         {
             PlaceOrder orderResult = new PlaceOrder();
             orderResult.side = r.Next(0, 2) == 0 ? E_OrderSide.buy : E_OrderSide.sell;

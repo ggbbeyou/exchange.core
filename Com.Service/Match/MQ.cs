@@ -107,14 +107,6 @@ public class MQ
                         this.mutex.ReleaseMutex();
                         deal.AddRange(match);
                     }
-                    if (deal.Count() > 0)
-                    {
-                        FactoryService.instance.constant.MqTask(FactoryService.instance.GetMqOrderDeal(this.model.info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(deal)));
-                    }
-                    if (cancel_deal.Count > 0)
-                    {
-                        FactoryService.instance.constant.MqTask(FactoryService.instance.GetMqOrderCancelSuccess(this.model.info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(cancel_deal)));
-                    }
                     //增加未成交的订单更新到OrderBook
                     List<(BaseOrderBook depth, string json)> depth = new List<(BaseOrderBook depth, string json)>();
                     var bids = from bid in req.data
@@ -134,6 +126,14 @@ public class MQ
                         depth.Add(depth_service.UpdateOrderBook(item.market, item.symbol, E_OrderSide.sell, item.price, item.amount_unsold, item.count, item.time)!.Value);
                     }
                     depth_service.Push(depth);
+                    if (deal.Count() > 0)
+                    {
+                        FactoryService.instance.constant.MqTask(FactoryService.instance.GetMqOrderDeal(this.model.info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(deal)));
+                    }
+                    if (cancel_deal.Count > 0)
+                    {
+                        FactoryService.instance.constant.MqTask(FactoryService.instance.GetMqOrderCancelSuccess(this.model.info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(cancel_deal)));
+                    }
                 };
                 return true;
             }

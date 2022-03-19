@@ -55,7 +55,7 @@ public class DepthService
             orderBook.direction = side;
             orderBook.last_time = create_time;
             string json = JsonConvert.SerializeObject(orderBook);
-            FactoryService.instance.constant.redis.SortedSetAdd(key, JsonConvert.SerializeObject(orderBook), (double)price);
+            FactoryService.instance.constant.redis.SortedSetAdd(key, JsonConvert.SerializeObject(orderBook), (double)price, When.NotExists);
             return (orderBook, json);
         }
         else

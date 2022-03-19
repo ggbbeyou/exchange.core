@@ -129,16 +129,16 @@ public static class Util
         {
             trade_id = FactoryService.instance.constant.worker.NextId(),
             market = market,
-            symbol =symbol,
+            symbol = symbol,
             price = price,
             amount = bid_amount,
-
+            total = price * bid_amount,
             trigger_side = trigger_side,
-            time = now,
             bid = bid,
             bid_id = bid.order_id,
             ask = ask,
-            ask_id = ask.order_id
+            ask_id = ask.order_id,
+            time = now,
         };
         return deal;
     }

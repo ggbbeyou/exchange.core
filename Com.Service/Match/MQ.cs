@@ -104,8 +104,8 @@ public class MQ
                         {
                             cancel_deal.AddRange(this.model.match_core.CancelOrder(match.Last().price));
                         }
-                        this.mutex.ReleaseMutex();
                         deal.AddRange(match);
+                        this.mutex.ReleaseMutex();
                     }
                     //增加未成交的订单更新到OrderBook
                     List<(BaseOrderBook depth, string json)> depth = new List<(BaseOrderBook depth, string json)>();

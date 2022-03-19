@@ -115,8 +115,11 @@ public class MQ
                     {
                         FactoryService.instance.constant.MqTask(FactoryService.instance.GetMqOrderCancelSuccess(this.model.info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(cancel_deal)));
                     }
-                    (List<BaseOrderBook> bid, List<BaseOrderBook> ask) orderbook = this.model.match_core.GetOrderBook();
-                    depth_service.Push(orderbook);
+                    if (deal.Count() > 0 || cancel_deal.Count > 0)
+                    {
+                        (List<BaseOrderBook> bid, List<BaseOrderBook> ask) orderbook = this.model.match_core.GetOrderBook();
+                        depth_service.Push(orderbook);
+                    }
                 };
                 return true;
             }
@@ -163,6 +166,8 @@ public class MQ
                     if (cancel.Count > 0)
                     {
                         FactoryService.instance.constant.MqTask(FactoryService.instance.GetMqOrderCancelSuccess(this.model.info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(cancel)));
+                        (List<BaseOrderBook> bid, List<BaseOrderBook> ask) orderbook = this.model.match_core.GetOrderBook();
+                        depth_service.Push(orderbook);
                     }
                 }
                 return true;

@@ -65,11 +65,7 @@ public class ServiceController : Controller
         else
         {
             Deal? deal = this.db.Deal.OrderByDescending(P => P.time).FirstOrDefault(P => P.market == market);
-            if (deal == null)
-            {
-                marketInfo.last_price = 0;
-            }
-            else
+            if (deal != null)
             {
                 marketInfo.last_price = deal.price;
             }

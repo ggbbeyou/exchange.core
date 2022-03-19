@@ -61,86 +61,48 @@ public static class Util
     /// <param name="trigger_side">触发方向</param>
     /// <param name="now">成交时间</param>
     /// <returns></returns>
-    public static Deal AmountBidAsk(long market, string symbol, Orders bid, Orders ask, decimal price, E_OrderSide trigger_side, DateTimeOffset now)
+    public static Deal CreateDeal(long market, string symbol, Orders bid, Orders ask, decimal price, E_OrderSide trigger_side, DateTimeOffset now)
     {
-        decimal ask_amount = ask.amount_unsold;
-        ask.amount_unsold = 0;
-        ask.amount_done += ask_amount;
-        ask.deal_last_time = now;
-        ask.state = E_OrderState.completed;
-        bid.amount_unsold -= ask_amount;
-        bid.amount_done += ask_amount;
-        bid.deal_last_time = now;
-        if (bid.amount_unsold <= 0)
+        decimal amount = 0;
+        if (bid.amount_unsold > ask.amount_unsold)
         {
-            bid.state = E_OrderState.completed;
-        }
-        else
-        {
+            amount = ask.amount_unsold;
+            ask.state = E_OrderState.completed;
             bid.state = E_OrderState.partial;
         }
-        Deal deal = new Deal()
+        else if (bid.amount_unsold < ask.amount_unsold)
         {
-            trade_id = FactoryService.instance.constant.worker.NextId(),
-            market = market,
-            symbol = symbol,
-            price = price,
-            amount = ask_amount,
-
-            trigger_side = trigger_side,
-            time = now,
-            bid = bid,
-            bid_id = bid.order_id,
-            ask = ask,
-            ask_id = ask.order_id
-        };
-        return deal;
-    }
-
-    /// <summary>
-    /// 卖单量>=买单量
-    /// </summary>
-    /// <param name="market">名称</param>
-    /// <param name="bid">买单</param>
-    /// <param name="ask">卖单</param>
-    /// <param name="price">成交价</param>
-    /// <param name="trigger_side">触发方向</param>
-    /// <param name="now">成交时间</param>
-    /// <returns></returns>
-    public static Deal AmountAskBid(long market, string symbol, Orders bid, Orders ask, decimal price, E_OrderSide trigger_side, DateTimeOffset now)
-    {
-        decimal bid_amount = bid.amount_unsold;
-        ask.amount_unsold -= bid_amount;
-        ask.amount_done += bid_amount;
-        ask.deal_last_time = now;
-        if (ask.amount_unsold <= 0)
-        {
-            ask.state = E_OrderState.completed;
-        }
-        else
-        {
+            amount = bid.amount_unsold;
+            bid.state = E_OrderState.completed;
             ask.state = E_OrderState.partial;
         }
-        bid.amount_unsold = 0;
-        bid.amount_done = bid_amount;
+        else if (bid.amount_unsold == ask.amount_unsold)
+        {
+            amount = bid.amount_unsold;
+            bid.state = E_OrderState.completed;
+            ask.state = E_OrderState.completed;
+        }
+        bid.amount_unsold -= amount;
+        bid.amount_done += amount;
         bid.deal_last_time = now;
-        bid.state = E_OrderState.completed;
+        ask.amount_unsold -= amount;
+        ask.amount_done += amount;
+        ask.deal_last_time = now;
         Deal deal = new Deal()
         {
             trade_id = FactoryService.instance.constant.worker.NextId(),
             market = market,
             symbol = symbol,
             price = price,
-            amount = bid_amount,
-            total = price * bid_amount,
+            amount = amount,
+            total = amount * price,
             trigger_side = trigger_side,
-            bid = bid,
             bid_id = bid.order_id,
-            ask = ask,
             ask_id = ask.order_id,
             time = now,
         };
         return deal;
     }
+
 
 }

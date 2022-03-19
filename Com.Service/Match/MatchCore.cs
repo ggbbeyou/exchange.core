@@ -284,22 +284,8 @@ public class MatchCore
                 //限价买单没成交部分添加到限价买单相应的位置,(价格优先,时间优先原则)
                 if (order.amount_unsold > 0)
                 {
-                    if (fixed_bid.Count == 0)
-                    {
-                        fixed_bid.Add(order);
-                    }
-                    else
-                    {
-                        int index = fixed_bid.FindIndex(P => P.price <= order.price && P.create_time < order.create_time);
-                        if (index == -1)
-                        {
-                            fixed_bid.Add(order);
-                        }
-                        else
-                        {
-                            fixed_bid.Insert(index, order);
-                        }
-                    }
+                    fixed_bid.Add(order);
+                    fixed_bid = fixed_bid.OrderByDescending(P => P.price).ThenBy(P => P.create_time).ToList();
                 }
             }
         }
@@ -384,22 +370,8 @@ public class MatchCore
                 //限价卖单没成交部分添加到限价卖单相应的位置,(价格优先,时间优先原则)
                 if (order.amount_unsold > 0)
                 {
-                    if (fixed_ask.Count == 0)
-                    {
-                        fixed_ask.Add(order);
-                    }
-                    else
-                    {
-                        int index = fixed_ask.FindIndex(P => P.price > order.price && P.create_time < order.create_time);
-                        if (index == -1)
-                        {
-                            fixed_ask.Add(order);
-                        }
-                        else
-                        {
-                            fixed_ask.Insert(index, order);
-                        }
-                    }
+                    fixed_ask.Add(order);
+                    fixed_ask = fixed_ask.OrderBy(P => P.price).ThenBy(P => P.create_time).ToList();
                 }
             }
         }

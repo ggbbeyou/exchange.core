@@ -185,10 +185,10 @@ public class MatchCore
     }
 
     /// <summary>
-    ///  撮合算法(不考虑手续费问题)
+    ///  撮合算法
     /// </summary>
-    /// <param name="order">挂单订单(手续费问题在推送到撮合之前扣除)</param>
-    /// <returns>成交情况</returns>
+    /// <param name="order">挂单订单</param>
+    /// <returns>成交订单</returns>
     public List<Deal> Match(Orders order)
     {
         List<Deal> deals = new List<Deal>();

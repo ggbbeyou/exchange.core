@@ -61,8 +61,9 @@ public static class Util
     /// <param name="trigger_side">触发方向</param>
     /// <param name="now">成交时间</param>
     /// <returns></returns>
-    public static Deal CreateDeal(long market, string symbol, Orders bid, Orders ask, decimal price, E_OrderSide trigger_side, DateTimeOffset now)
+    public static Deal CreateDeal(long market, string symbol, Orders bid, Orders ask, decimal price, E_OrderSide trigger_side)
     {
+        DateTimeOffset now = DateTimeOffset.UtcNow;
         decimal amount = 0;
         if (bid.amount_unsold > ask.amount_unsold)
         {

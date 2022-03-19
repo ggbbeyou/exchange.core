@@ -39,6 +39,11 @@ public class Core
     /// <returns></returns>
     public OrdersDb orders_db = new OrdersDb();
     /// <summary>
+    /// 订单服务
+    /// </summary>
+    /// <returns></returns>
+    public OrderService order_service = new OrderService();
+    /// <summary>
     /// K线服务
     /// </summary>
     /// <returns></returns>
@@ -66,7 +71,7 @@ public class Core
         {
             string json = Encoding.UTF8.GetString(b);
             // FactoryService.instance.constant.logger.LogInformation($"接收撮合传过来的成交订单:{json}");
-            List<(Orders order, List<Deal> deal)>? deals = JsonConvert.DeserializeObject<List<(Orders order, List<Deal> deal)>>(json);
+            List<Deal>? deals = JsonConvert.DeserializeObject<List<Deal>>(json);
             if (deals != null && deals.Count > 0)
             {
                 ReceiveDealOrder(deals);
@@ -104,23 +109,35 @@ public class Core
     /// 接收到成交订单
     /// </summary>
     /// <param name="match"></param>
-    private void ReceiveDealOrder(List<(Orders order, List<Deal> deal)> match)
+    private void ReceiveDealOrder(List<Deal> match)
     {
-        List<BaseOrderBook> orderBooks = new List<BaseOrderBook>();
-        List<Orders> orders = new List<Orders>();
-        List<Deal> deals = new List<Deal>();
-        foreach ((Orders order, List<Deal> deal) item in match)
+        deal_db.AddOrUpdateDeal(match);
+        List<(long, decimal, DateTimeOffset)> list = new List<(long, decimal, DateTimeOffset)>();
+        var bid = from deal in match
+                  group deal by new { deal.bid_id } into g
+                  select new
+                  {
+                      g.Key.bid_id,
+                      amount = g.Sum(x => x.amount),
+                      deal_last_time = g.OrderBy(P => P.time).Last().time,
+                  };
+        foreach (var item in bid)
         {
-            orders.Add(item.order);
-            deals.AddRange(item.deal);
-            orderBooks.AddRange(GetOrderBooks(item.order, item.deal));
+            list.Add((item.bid_id, item.amount, item.deal_last_time));
         }
-        deal_db.AddOrUpdateDeal(deals);
-        orders_db.AddOrUpdateOrder(orders);
-        string json = JsonConvert.SerializeObject(orderBooks);
-        FactoryService.instance.constant.MqPublish($"{E_WebsockerChannel.books10}_{this.model.info.market}", json);
-        FactoryService.instance.constant.MqPublish($"{E_WebsockerChannel.books50}_{this.model.info.market}", json);
-        FactoryService.instance.constant.MqPublish($"{E_WebsockerChannel.books200}_{this.model.info.market}", json);
+        var ask = from deal in match
+                  group deal by new { deal.ask_id } into g
+                  select new
+                  {
+                      g.Key.ask_id,
+                      amount = g.Sum(x => x.amount),
+                      deal_last_time = g.OrderBy(P => P.time).Last().time,
+                  };
+        foreach (var item in ask)
+        {
+            list.Add((item.ask_id, item.amount, item.deal_last_time));
+        }
+        order_service.UpdateOrder(list);
         DateTimeOffset now = DateTimeOffset.UtcNow;
         now = now.AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond);
         DateTimeOffset end = now.AddMilliseconds(-1);
@@ -131,6 +148,45 @@ public class Core
         {
             FactoryService.instance.constant.MqPublish($"{item.Name}_{this.model.info.market}", item.Value);
         }
+
+        // FactoryService.instance.constant.redis.SortedSetRangeByRank()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // List<BaseOrderBook> orderBooks = new List<BaseOrderBook>();
+
+        // List<Deal> deals = new List<Deal>();
+        // foreach ((Orders order, List<Deal> deal) item in match)
+        // {
+        //     orders.Add(item.order);
+        //     deals.AddRange(item.deal);
+        //     orderBooks.AddRange(GetOrderBooks(item.order, item.deal));
+        // }
+
+
+
+
+        // orders_db.AddOrUpdateOrder(orders);
+
+
+
+
+        // string json = JsonConvert.SerializeObject(orderBooks);
+        // FactoryService.instance.constant.MqPublish($"{E_WebsockerChannel.books10}_{this.model.info.market}", json);
+        // FactoryService.instance.constant.MqPublish($"{E_WebsockerChannel.books50}_{this.model.info.market}", json);
+        // FactoryService.instance.constant.MqPublish($"{E_WebsockerChannel.books200}_{this.model.info.market}", json);
+
     }
 
     /// <summary>

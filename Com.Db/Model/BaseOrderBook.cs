@@ -45,13 +45,13 @@ public class BaseOrderBook
     /// <value></value>
     public decimal count { get; set; }
     /// <summary>
-    /// 变更时间
-    /// </summary>
-    /// <value></value>
-    public DateTimeOffset last_time { get; set; }
-    /// <summary>
     /// 交易方向
     /// </summary>
     /// <value></value>
     public E_OrderSide direction { get; set; }
+    /// <summary>
+    /// 变更时间
+    /// </summary>
+    /// <value></value>
+    public DateTimeOffset last_time { get; set; }
 }

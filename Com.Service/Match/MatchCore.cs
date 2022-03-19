@@ -245,17 +245,20 @@ public class MatchCore
             else if (order.type == E_OrderType.price_fixed)
             {
                 //限价买单与市价卖单撮合
-                for (int i = 0; i < market_ask.Count; i++)
+                if (order.amount_unsold > 0 && market_ask.Count() > 0)
                 {
-                    Deal deal = Util.CreateDeal(this.model.info.market, this.model.info.symbol, order, market_ask[i], order.price, E_OrderSide.buy, now);
-                    deals.Add(deal);
-                    if (order.amount_unsold <= 0)
+                    for (int i = 0; i < market_ask.Count; i++)
                     {
-                        break;
+                        Deal deal = Util.CreateDeal(this.model.info.market, this.model.info.symbol, order, market_ask[i], order.price, E_OrderSide.buy, now);
+                        deals.Add(deal);
+                        if (order.amount_unsold <= 0)
+                        {
+                            break;
+                        }
                     }
+                    this.last_price = order.price;
+                    market_ask.RemoveAll(P => P.state == E_OrderState.completed);
                 }
-                this.last_price = order.price;
-                market_ask.RemoveAll(P => P.state == E_OrderState.completed);
                 //限价买单与限价卖单撮合
                 if (order.amount_unsold > 0 && fixed_ask.Count() > 0)
                 {
@@ -301,17 +304,20 @@ public class MatchCore
             //先市价成交,再限价成交
             if (order.type == E_OrderType.price_market)
             {
-                //市价卖单与市价买单撮合
-                for (int i = 0; i < market_bid.Count; i++)
+                if (order.amount_unsold > 0 && market_bid.Count() > 0)
                 {
-                    Deal deal = Util.CreateDeal(this.model.info.market, this.model.info.symbol, market_bid[i], order, this.last_price, E_OrderSide.sell, now);
-                    deals.Add(deal);
-                    if (order.amount_unsold <= 0)
+                    //市价卖单与市价买单撮合
+                    for (int i = 0; i < market_bid.Count; i++)
                     {
-                        break;
+                        Deal deal = Util.CreateDeal(this.model.info.market, this.model.info.symbol, market_bid[i], order, this.last_price, E_OrderSide.sell, now);
+                        deals.Add(deal);
+                        if (order.amount_unsold <= 0)
+                        {
+                            break;
+                        }
                     }
+                    market_bid.RemoveAll(P => P.state == E_OrderState.completed);
                 }
-                market_bid.RemoveAll(P => P.state == E_OrderState.completed);
                 //市价卖单与限价买单撮合
                 if (order.amount_unsold > 0 && fixed_bid.Count() > 0)
                 {
@@ -336,17 +342,20 @@ public class MatchCore
             else if (order.type == E_OrderType.price_fixed)
             {
                 //限价卖单与市价买市撮合
-                for (int i = 0; i < market_bid.Count; i++)
+                if (order.amount_unsold > 0 && market_bid.Count() > 0)
                 {
-                    Deal deal = Util.CreateDeal(this.model.info.market, this.model.info.symbol, market_bid[i], order, order.price, E_OrderSide.sell, now);
-                    deals.Add(deal);
-                    this.last_price = order.price;
-                    if (order.amount_unsold <= 0)
+                    for (int i = 0; i < market_bid.Count; i++)
                     {
-                        break;
+                        Deal deal = Util.CreateDeal(this.model.info.market, this.model.info.symbol, market_bid[i], order, order.price, E_OrderSide.sell, now);
+                        deals.Add(deal);
+                        if (order.amount_unsold <= 0)
+                        {
+                            break;
+                        }
                     }
+                    this.last_price = order.price;
+                    market_bid.RemoveAll(P => P.state == E_OrderState.completed);
                 }
-                market_bid.RemoveAll(P => P.state == E_OrderState.completed);
                 //限价卖单与限价买单撮合
                 if (order.amount_unsold > 0 && fixed_bid.Count() > 0)
                 {

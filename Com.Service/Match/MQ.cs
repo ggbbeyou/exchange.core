@@ -101,7 +101,7 @@ public class MQ
                         List<Deal> match = this.model.match_core.Match(item);
                         if (match.Count > 0)
                         {
-                            cancel_deal.AddRange(this.model.match_core.TriggerCancel(match.Last().price));
+                            cancel_deal.AddRange(this.model.match_core.CancelOrder(match.Last().price));
                         }
                         this.mutex.ReleaseMutex();
                         deal.AddRange(match);

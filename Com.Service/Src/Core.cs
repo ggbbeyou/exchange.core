@@ -154,8 +154,9 @@ public class Core
         resWebsocker.op = E_WebsockerOp.subscribe_date;
         foreach (var item in hashes)
         {
+            resWebsocker.channel = (E_WebsockerChannel)Enum.Parse(typeof(E_WebsockerChannel), item.Name.ToString());
             resWebsocker.data = JsonConvert.DeserializeObject<Kline>(item.Value);
-            FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe((E_WebsockerChannel)Enum.Parse(typeof(E_WebsockerChannel), item.Name.ToString()), this.model.info.market), JsonConvert.SerializeObject(resWebsocker));
+            FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(resWebsocker.channel, this.model.info.market), JsonConvert.SerializeObject(resWebsocker));
         }
         Ticker? ticker = deal_service.Get24HoursTicker(this.model.info.market);
         deal_service.PushTicker(ticker);

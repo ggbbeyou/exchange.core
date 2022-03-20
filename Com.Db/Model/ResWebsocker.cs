@@ -32,7 +32,7 @@ public class ResWebsocker<T>
     /// 数据
     /// </summary>
     /// <value></value>
-    public T data { get; set; } = default!;
+    public T data { get; set; } = default(T)!;
     /// <summary>
     /// 消息
     /// </summary>

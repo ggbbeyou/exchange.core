@@ -53,7 +53,7 @@ public class Core
     /// </summary>
     /// <typeparam name="Kline?"></typeparam>
     /// <returns></returns>
-    private ResWebsocker<Kline?> res_kline = new ResWebsocker<Kline?>();
+    private ResWebsocker<List<Kline>> res_kline = new ResWebsocker<List<Kline>>();
     /// <summary>
     /// 初始化
     /// </summary>
@@ -149,10 +149,10 @@ public class Core
         order_service.UpdateOrder(list);
         FactoryService.instance.constant.stopwatch.Stop();
         FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};DB=>更新{list.Count}条订单记录");
+        FactoryService.instance.constant.stopwatch.Restart();
         DateTimeOffset now = DateTimeOffset.UtcNow;
         now = now.AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond);
         DateTimeOffset end = now.AddMilliseconds(-1);
-        FactoryService.instance.constant.stopwatch.Restart();
         this.kline_service.DBtoRedised(this.model.info.market, this.model.info.symbol, end);
         this.kline_service.DBtoRedising(this.model.info.market);
         FactoryService.instance.constant.stopwatch.Stop();
@@ -175,10 +175,11 @@ public class Core
         HashEntry[] hashes = FactoryService.instance.constant.redis.HashGetAll(FactoryService.instance.GetRedisKlineing(this.model.info.market));
         res_kline.success = true;
         res_kline.op = E_WebsockerOp.subscribe_date;
+        res_kline.data = new List<Kline>();
         foreach (var item in hashes)
         {
             res_kline.channel = (E_WebsockerChannel)Enum.Parse(typeof(E_WebsockerChannel), item.Name.ToString());
-            res_kline.data = JsonConvert.DeserializeObject<Kline>(item.Value);
+            res_kline.data.Add(JsonConvert.DeserializeObject<Kline>(item.Value)!);
             FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(res_kline.channel, this.model.info.market), JsonConvert.SerializeObject(res_kline));
         }
         Ticker? ticker = deal_service.Get24HoursTicker(this.model.info.market);

@@ -20,11 +20,6 @@ public class OrderService
     /// 数据库
     /// </summary>
     public DbContextEF db = null!;
-    /// <summary>
-    /// 秒表
-    /// </summary>
-    /// <returns></returns>
-    private Stopwatch stopwatch = new Stopwatch();
 
     /// <summary>
     /// 初始化
@@ -96,20 +91,19 @@ public class OrderService
     /// <returns></returns>
     public CallResponse<List<Orders>> PlaceOrder(long market, List<Orders> order)
     {
-        stopwatch.Restart();
+        FactoryService.instance.constant.stopwatch.Restart();
         db.Orders.AddRange(order);
         db.SaveChanges();
-        stopwatch.Stop();
-        TimeSpan ts = stopwatch.Elapsed;
-        FactoryService.instance.constant.logger.LogInformation($"插入{order.Count}条订单到DB:耗时:{stopwatch.Elapsed.ToString()}");
+        FactoryService.instance.constant.stopwatch.Stop();
+        FactoryService.instance.constant.logger.LogTrace($"计算耗时:插入{order.Count}条订单到DB:耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()}");
         CallRequest<List<Orders>> req = new CallRequest<List<Orders>>();
         req.op = E_Op.place;
         req.market = market;
         req.data = order;
-        stopwatch.Restart();
+        FactoryService.instance.constant.stopwatch.Restart();
         FactoryService.instance.constant.MqSend(FactoryService.instance.GetMqOrderPlace(market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(req)));
-        stopwatch.Stop();
-        FactoryService.instance.constant.logger.LogInformation($"插入{order.Count}条订单到Mq:耗时:{stopwatch.Elapsed.ToString()}");
+        FactoryService.instance.constant.stopwatch.Stop();
+        FactoryService.instance.constant.logger.LogTrace($"计算耗时:插入{order.Count}条订单到Mq:耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()}");
         CallResponse<List<Orders>> res = new CallResponse<List<Orders>>();
         res.op = E_Op.place;
         res.success = true;

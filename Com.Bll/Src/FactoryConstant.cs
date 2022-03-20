@@ -1,4 +1,5 @@
 
+using System.Diagnostics;
 using System.Text;
 using Com.Db;
 using Microsoft.EntityFrameworkCore;
@@ -34,6 +35,10 @@ public class FactoryConstant
     /// </summary>
     public readonly IConfiguration config;
     /// <summary>
+    /// 驱动接口
+    /// </summary>
+    public readonly IServiceProvider provider = null!;
+    /// <summary>
     /// 雪花算法
     /// </summary>
     /// <returns></returns>
@@ -44,9 +49,11 @@ public class FactoryConstant
     /// <returns></returns>
     public readonly Random random = new Random();
     /// <summary>
-    /// 驱动接口
+    /// 秒表
     /// </summary>
-    public readonly IServiceProvider provider = null!;
+    /// <returns></returns>
+    public Stopwatch stopwatch = new Stopwatch();
+
     /// <summary>
     /// 数据库
     /// </summary>

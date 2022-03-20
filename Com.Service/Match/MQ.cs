@@ -7,6 +7,7 @@ using Com.Db.Enum;
 using Com.Db.Model;
 using Com.Service.Models;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -97,6 +98,7 @@ public class MQ
                 {
                     deal.Clear();
                     cancel_deal.Clear();
+                    FactoryService.instance.constant.stopwatch.Restart();
                     foreach (Orders item in req.data)
                     {
                         this.mutex.WaitOne();
@@ -108,6 +110,8 @@ public class MQ
                         }
                         this.mutex.ReleaseMutex();
                     }
+                    FactoryService.instance.constant.stopwatch.Stop();
+                    FactoryService.instance.constant.logger.LogTrace($"计算耗时:撮合订单{req.data.Count}条:耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()}");
                     if (deal.Count() > 0)
                     {
                         FactoryService.instance.constant.MqTask(FactoryService.instance.GetMqOrderDeal(this.model.info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(deal)));
@@ -118,9 +122,12 @@ public class MQ
                     }
                     if (deal.Count() > 0 || cancel_deal.Count > 0)
                     {
+                        FactoryService.instance.constant.stopwatch.Restart();
                         (List<BaseOrderBook> bid, List<BaseOrderBook> ask) orderbook = this.model.match_core.GetOrderBook();
                         Dictionary<E_WebsockerChannel, Depth> depths = depth_service.ConvertDepth(this.model.info.market, this.model.info.symbol, orderbook);
                         depth_service.Push(depths);
+                        FactoryService.instance.constant.stopwatch.Stop();
+                        FactoryService.instance.constant.logger.LogTrace($"计算耗时:推送深度行情,耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()}");
                     }
                 };
                 return true;

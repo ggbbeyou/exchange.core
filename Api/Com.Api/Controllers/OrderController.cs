@@ -137,7 +137,7 @@ public class OrderController : Controller
     {
         List<PlaceOrder> orders = new List<PlaceOrder>();
         Random r = new Random();
-        for (int i = 0; i < 50; i++)
+        for (int i = 0; i < 500; i++)
         {
             PlaceOrder orderResult = new PlaceOrder();
             orderResult.side = r.Next(0, 2) == 0 ? E_OrderSide.buy : E_OrderSide.sell;
@@ -154,9 +154,9 @@ public class OrderController : Controller
             orderResult.amount = (decimal)FactoryService.instance.constant.random.Next(1, 30);
             orders.Add(orderResult);
         }
-        PlaceOrder("btc/usdt", orders);
+        PlaceOrder("eth/usdt", orders);
         List<PlaceOrder> orders1 = new List<PlaceOrder>();
-        for (int i = 0; i < 50; i++)
+        for (int i = 0; i < 500; i++)
         {
             PlaceOrder orderResult = new PlaceOrder();
             orderResult.side = r.Next(0, 2) == 0 ? E_OrderSide.buy : E_OrderSide.sell;
@@ -173,7 +173,7 @@ public class OrderController : Controller
             orderResult.amount = (decimal)FactoryService.instance.constant.random.Next(1, 30);
             orders1.Add(orderResult);
         }
-        PlaceOrder("eth/usdt", orders);
+        PlaceOrder("btc/usdt", orders);
         return Json(new { });
     }
 

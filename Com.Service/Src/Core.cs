@@ -43,7 +43,17 @@ public class Core
     /// </summary>
     /// <returns></returns>
     public KlineService kline_service = new KlineService();
-
+    /// <summary>
+    /// 临时变量
+    /// </summary>
+    /// <returns></returns>
+    private ResWebsocker<List<Deal>> res_deal = new ResWebsocker<List<Deal>>();
+    /// <summary>
+    /// 临时变量
+    /// </summary>
+    /// <typeparam name="Kline?"></typeparam>
+    /// <returns></returns>
+    private ResWebsocker<Kline?> res_kline = new ResWebsocker<Kline?>();
     /// <summary>
     /// 初始化
     /// </summary>
@@ -109,7 +119,7 @@ public class Core
         FactoryService.instance.constant.stopwatch.Restart();
         deal_service.AddOrUpdateDeal(match);
         FactoryService.instance.constant.stopwatch.Stop();
-        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};插入{match.Count}条成交记录");
+        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};DB=>插入{match.Count}条成交记录");
         List<(long, decimal, DateTimeOffset)> list = new List<(long, decimal, DateTimeOffset)>();
         FactoryService.instance.constant.stopwatch.Restart();
         var bid = from deal in match
@@ -138,7 +148,7 @@ public class Core
         }
         order_service.UpdateOrder(list);
         FactoryService.instance.constant.stopwatch.Stop();
-        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};更新{list.Count}条订单记录");
+        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};DB=>更新{list.Count}条订单记录");
         DateTimeOffset now = DateTimeOffset.UtcNow;
         now = now.AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond);
         DateTimeOffset end = now.AddMilliseconds(-1);
@@ -146,22 +156,35 @@ public class Core
         this.kline_service.DBtoRedised(this.model.info.market, this.model.info.symbol, end);
         this.kline_service.DBtoRedising(this.model.info.market);
         FactoryService.instance.constant.stopwatch.Stop();
-        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};同步K线记录");
+        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};DB=>同步K线记录");
+        FactoryService.instance.constant.stopwatch.Restart();
+        SortedSetEntry[] entries = new SortedSetEntry[match.Count()];
+        for (int i = 0; i < match.Count(); i++)
+        {
+            entries[i] = new SortedSetEntry(JsonConvert.SerializeObject(match[i]), match[i].time.ToUnixTimeMilliseconds());
+        }
+        FactoryService.instance.constant.redis.SortedSetAdd(FactoryService.instance.GetRedisDeal(this.model.info.market), entries);
+        res_deal.success = true;
+        res_deal.op = E_WebsockerOp.subscribe_date;
+        res_deal.channel = E_WebsockerChannel.trades;
+        res_deal.data = match;
+        FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.trades, this.model.info.market), JsonConvert.SerializeObject(res_deal));
+        FactoryService.instance.constant.stopwatch.Stop();
+        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};Mq,Redis=>推送交易记录");
         FactoryService.instance.constant.stopwatch.Restart();
         HashEntry[] hashes = FactoryService.instance.constant.redis.HashGetAll(FactoryService.instance.GetRedisKlineing(this.model.info.market));
-        ResWebsocker<Kline?> resWebsocker = new ResWebsocker<Kline?>();
-        resWebsocker.success = true;
-        resWebsocker.op = E_WebsockerOp.subscribe_date;
+        res_kline.success = true;
+        res_kline.op = E_WebsockerOp.subscribe_date;
         foreach (var item in hashes)
         {
-            resWebsocker.channel = (E_WebsockerChannel)Enum.Parse(typeof(E_WebsockerChannel), item.Name.ToString());
-            resWebsocker.data = JsonConvert.DeserializeObject<Kline>(item.Value);
-            FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(resWebsocker.channel, this.model.info.market), JsonConvert.SerializeObject(resWebsocker));
+            res_kline.channel = (E_WebsockerChannel)Enum.Parse(typeof(E_WebsockerChannel), item.Name.ToString());
+            res_kline.data = JsonConvert.DeserializeObject<Kline>(item.Value);
+            FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(res_kline.channel, this.model.info.market), JsonConvert.SerializeObject(res_kline));
         }
         Ticker? ticker = deal_service.Get24HoursTicker(this.model.info.market);
         deal_service.PushTicker(ticker);
         FactoryService.instance.constant.stopwatch.Stop();
-        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};推送K线记录和聚合行情");
+        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};Mq,Redis=>推送K线记录和聚合行情");
     }
 
     /// <summary>

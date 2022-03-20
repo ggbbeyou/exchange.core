@@ -95,7 +95,7 @@ public class OrderService
         db.Orders.AddRange(order);
         db.SaveChanges();
         FactoryService.instance.constant.stopwatch.Stop();
-        FactoryService.instance.constant.logger.LogTrace($"计算耗时:插入{order.Count}条订单到DB:耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()}");
+        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};插入{order.Count}条订单到DB");
         CallRequest<List<Orders>> req = new CallRequest<List<Orders>>();
         req.op = E_Op.place;
         req.market = market;
@@ -103,7 +103,7 @@ public class OrderService
         FactoryService.instance.constant.stopwatch.Restart();
         FactoryService.instance.constant.MqSend(FactoryService.instance.GetMqOrderPlace(market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(req)));
         FactoryService.instance.constant.stopwatch.Stop();
-        FactoryService.instance.constant.logger.LogTrace($"计算耗时:插入{order.Count}条订单到Mq:耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()}");
+        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};插入{order.Count}条订单到Mq");
         CallResponse<List<Orders>> res = new CallResponse<List<Orders>>();
         res.op = E_Op.place;
         res.success = true;

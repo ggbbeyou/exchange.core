@@ -111,7 +111,7 @@ public class MQ
                         this.mutex.ReleaseMutex();
                     }
                     FactoryService.instance.constant.stopwatch.Stop();
-                    FactoryService.instance.constant.logger.LogTrace($"计算耗时:撮合订单{req.data.Count}条:耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()}");
+                    FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};撮合订单{req.data.Count}条");
                     if (deal.Count() > 0)
                     {
                         FactoryService.instance.constant.MqTask(FactoryService.instance.GetMqOrderDeal(this.model.info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(deal)));
@@ -127,7 +127,7 @@ public class MQ
                         Dictionary<E_WebsockerChannel, Depth> depths = depth_service.ConvertDepth(this.model.info.market, this.model.info.symbol, orderbook);
                         depth_service.Push(depths);
                         FactoryService.instance.constant.stopwatch.Stop();
-                        FactoryService.instance.constant.logger.LogTrace($"计算耗时:推送深度行情,耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()}");
+                        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};推送深度行情");
                     }
                 };
                 return true;

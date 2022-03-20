@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text;
 using Com.Bll;
 using Com.Db;
@@ -55,6 +56,12 @@ public class Core
     /// <returns></returns>
     private ResWebsocker<List<Kline>> res_kline = new ResWebsocker<List<Kline>>();
     /// <summary>
+    /// 秒表
+    /// </summary>
+    /// <returns></returns>
+    public Stopwatch stopwatch = new Stopwatch();
+
+    /// <summary>
     /// 初始化
     /// </summary>
     /// <param name="model"></param>
@@ -79,7 +86,10 @@ public class Core
             List<Deal>? deals = JsonConvert.DeserializeObject<List<Deal>>(json);
             if (deals != null && deals.Count > 0)
             {
+                this.stopwatch.Restart();
                 ReceiveDealOrder(deals);
+                this.stopwatch.Stop();
+                FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};撮合后续处理总时间,成交记录:{deals.Count}");
             }
             return true;
         });

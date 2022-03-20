@@ -88,9 +88,9 @@ public class FactoryService
     /// </summary>
     /// <param name="market"></param>
     /// <returns></returns>
-    public string GetRedisDepth(long market, E_OrderSide side)
+    public string GetRedisDepth(long market)
     {
-        return string.Format("depth:{0}:{1}", market, side);
+        return string.Format("depth:{0}", market);
     }
 
     /// <summary>
@@ -158,9 +158,9 @@ public class FactoryService
     /// </summary>
     /// <param name="market"></param>
     /// <returns></returns>
-    public string GetMqSubscribeDepth(long market)
+    public string GetMqSubscribeDepth(long market, E_WebsockerChannel channel)
     {
-        return string.Format("subscribe_depth_{0}", market);
+        return string.Format("subscribe_depth_{0}_{1}", market, channel);
     }
 
     /// <summary>

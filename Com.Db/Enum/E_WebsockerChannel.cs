@@ -60,23 +60,35 @@ public enum E_WebsockerChannel
     /// </summary>
     trades = 12,
     /// <summary>
-    /// 盘口10档
+    /// 盘口10档(全部)
     /// </summary>
     books10 = 13,
     /// <summary>
-    /// 盘口50档
+    /// 盘口50档(全部)
     /// </summary>
     books50 = 14,
     /// <summary>
-    /// 盘口200档
+    /// 盘口200档(全部)
     /// </summary>
     books200 = 15,
     /// <summary>
+    /// 盘口10档(增量)
+    /// </summary>
+    books10_inc = 16,
+    /// <summary>
+    /// 盘口50档(增量)
+    /// </summary>
+    books50_inc = 17,
+    /// <summary>
+    /// 盘口200档(增量)
+    /// </summary>
+    books200_inc = 18,
+    /// <summary>
     /// 资金
     /// </summary>
-    assets = 13,
+    assets = 19,
     /// <summary>
     /// 订单
     /// </summary>
-    orders = 13,
+    orders = 20,
 }

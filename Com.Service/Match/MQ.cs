@@ -118,7 +118,8 @@ public class MQ
                     if (deal.Count() > 0 || cancel_deal.Count > 0)
                     {
                         (List<BaseOrderBook> bid, List<BaseOrderBook> ask) orderbook = this.model.match_core.GetOrderBook();
-                        depth_service.Push(orderbook);
+                        Dictionary<E_WebsockerChannel, Depth> depths = depth_service.ConvertDepth(this.model.info.market, this.model.info.symbol, orderbook);
+                        depth_service.Push(depths);
                     }
                 };
                 return true;
@@ -167,7 +168,7 @@ public class MQ
                     {
                         FactoryService.instance.constant.MqTask(FactoryService.instance.GetMqOrderCancelSuccess(this.model.info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(cancel)));
                         (List<BaseOrderBook> bid, List<BaseOrderBook> ask) orderbook = this.model.match_core.GetOrderBook();
-                        depth_service.Push(orderbook);
+                        // depth_service.ConvertDepth(orderbook);
                     }
                 }
                 return true;

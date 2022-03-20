@@ -11,7 +11,7 @@ namespace Com.Bll;
 /// <summary>
 /// Db:交易对
 /// </summary>
-public class MarketInfoDb
+public class MarketInfoService
 {
 
     /// <summary>
@@ -22,7 +22,7 @@ public class MarketInfoDb
     /// <summary>
     /// 初始化
     /// </summary>
-    public MarketInfoDb()
+    public MarketInfoService()
     {
         var scope = FactoryService.instance.constant.provider.CreateScope();
         this.db = scope.ServiceProvider.GetService<DbContextEF>()!;

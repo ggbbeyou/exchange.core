@@ -37,7 +37,7 @@ public class OrderController : Controller
     /// 交易对基础信息
     /// </summary>
     /// <returns></returns>
-    public MarketInfoDb market_info_db = new MarketInfoDb();
+    public MarketInfoService market_info_db = new MarketInfoService();
     /// <summary>
     /// Service:订单
     /// </summary>

@@ -18,20 +18,24 @@ public class WebSocketController : Controller
     /// <summary>
     /// 常用接口
     /// </summary>
-    private FactoryConstant constant = null!;
+    // private FactoryConstant constant = null!;
     /// <summary>
     /// 需要登录权限的订阅频道
     /// </summary>
     /// <typeparam name="string"></typeparam>
     /// <returns></returns>
-    public List<E_WebsockerChannel> login_channel = new List<E_WebsockerChannel>() { E_WebsockerChannel.assets, E_WebsockerChannel.orders };
+    private List<E_WebsockerChannel> login_channel = new List<E_WebsockerChannel>() { E_WebsockerChannel.assets, E_WebsockerChannel.orders };
+    /// <summary>
+    /// pong
+    /// </summary>
+    /// <returns></returns>
     private byte[] pong = System.Text.Encoding.UTF8.GetBytes("pong");
 
     /// <summary>
     /// 交易对基础信息
     /// </summary>
     /// <returns></returns>
-    public MarketInfoDb market_info_db = new MarketInfoDb();
+    public MarketInfoService market_info_service = new MarketInfoService();
 
     /// <summary>
     /// 
@@ -42,8 +46,8 @@ public class WebSocketController : Controller
     /// <param name="logger"></param>
     public WebSocketController(IServiceProvider provider, IConfiguration configuration, IHostEnvironment environment, ILogger<OrderController> logger)
     {
-        // this.constant = new FactoryConstant(provider, configuration, environment, logger);
-        // FactoryService.instance.Init(this.constant);
+        // FactoryService.instance.constant = new FactoryConstant(provider, configuration, environment, logger);
+        // FactoryService.instance.Init(FactoryService.instance.constant);
 
     }
 
@@ -71,7 +75,7 @@ public class WebSocketController : Controller
                         {
                             foreach (var item in channel)
                             {
-                                this.constant.i_model.BasicCancel(item.Value);
+                                FactoryService.instance.constant.i_model.BasicCancel(item.Value);
                             }
                             channel.Clear();
                             break;
@@ -88,14 +92,14 @@ public class WebSocketController : Controller
                 }
                 foreach (var item in channel)
                 {
-                    this.constant.i_model.BasicCancel(item.Value);
+                    FactoryService.instance.constant.i_model.BasicCancel(item.Value);
                 }
                 channel.Clear();
                 await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
             }
             catch (System.Exception ex)
             {
-                this.constant.logger.LogInformation(ex, $"websocket报错");
+                FactoryService.instance.constant.logger.LogInformation(ex, $"websocket报错");
             }
         }
         return new EmptyResult();
@@ -178,7 +182,7 @@ public class WebSocketController : Controller
                 }
                 else
                 {
-                    MarketInfo? market = this.market_info_db.GetMarketBySymbol(item.data);
+                    MarketInfo? market = this.market_info_service.GetMarketBySymbol(item.data);
                     if (market == null)
                     {
                         continue;
@@ -190,7 +194,7 @@ public class WebSocketController : Controller
                         {
                             continue;
                         }
-                        string ConsumerTags = this.constant.MqSubscribe(key, async (b) =>
+                        string ConsumerTags = FactoryService.instance.constant.MqSubscribe(key, async (b) =>
                         {
                             await webSocket.SendAsync(new ArraySegment<byte>(b, 0, b.Length), WebSocketMessageType.Text, true, CancellationToken.None);
                         });
@@ -215,7 +219,7 @@ public class WebSocketController : Controller
                 }
                 else
                 {
-                    MarketInfo? market = this.market_info_db.GetMarketBySymbol(item.data);
+                    MarketInfo? market = this.market_info_service.GetMarketBySymbol(item.data);
                     if (market == null)
                     {
                         continue;
@@ -225,7 +229,7 @@ public class WebSocketController : Controller
                         string key = $"{item.channel.ToString()}_{market.market}";
                         if (channel.ContainsKey(key))
                         {
-                            this.constant.i_model.BasicCancel(channel[key]);
+                            FactoryService.instance.constant.i_model.BasicCancel(channel[key]);
                             channel.Remove(key);
                             resWebsocker.channel = item.channel;
                             resWebsocker.data = item.data;

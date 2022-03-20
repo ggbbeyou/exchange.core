@@ -137,7 +137,7 @@ public class WebSocketController : Controller
         {
             return;
         }
-        ResWebsocker resWebsocker = new ResWebsocker();
+        ResWebsocker<string> resWebsocker = new ResWebsocker<string>();
         resWebsocker.success = true;
         resWebsocker.op = req.op;
         if (login == false && req.op == E_WebsockerOp.subscribe)

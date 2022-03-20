@@ -24,6 +24,10 @@ public enum E_WebsockerOp
     /// 取消订阅
     /// </summary>
     unsubscribe = 4,
+    /// <summary>
+    /// 订阅数据
+    /// </summary>
+    subscribe_date = 5,
 
 
 }

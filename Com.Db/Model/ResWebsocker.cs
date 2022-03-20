@@ -9,7 +9,7 @@ namespace Com.Db.Model;
 /// <summary>
 /// 订阅响应
 /// </summary>
-public class ResWebsocker
+public class ResWebsocker<T>
 {
     /// <summary>
     /// 是否订阅成功
@@ -32,7 +32,7 @@ public class ResWebsocker
     /// 数据
     /// </summary>
     /// <value></value>
-    public string? data { get; set; }
+    public T data { get; set; } = default!;
     /// <summary>
     /// 消息
     /// </summary>

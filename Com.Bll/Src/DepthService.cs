@@ -103,10 +103,15 @@ public class DepthService
     /// <param name="depth"></param>
     public void Push(Dictionary<E_WebsockerChannel, Depth> depths)
     {
+        ResWebsocker<Depth> resWebsocker = new ResWebsocker<Depth>();
+        resWebsocker.success = true;
+        resWebsocker.op = E_WebsockerOp.subscribe_date;
         foreach (var item in depths)
         {
             FactoryService.instance.constant.redis.HashSet(FactoryService.instance.GetRedisDepth(item.Value.market), item.Key.ToString(), JsonConvert.SerializeObject(item.Value));
-            FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(item.Key, item.Value.market), JsonConvert.SerializeObject(item.Value));
+            resWebsocker.channel = item.Key;
+            resWebsocker.data = item.Value;
+            FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(item.Key, item.Value.market), JsonConvert.SerializeObject(resWebsocker));
         }
     }
 

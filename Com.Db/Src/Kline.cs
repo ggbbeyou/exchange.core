@@ -1,5 +1,7 @@
 using System;
 using Com.Db.Enum;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Com.Db;
 
@@ -12,6 +14,7 @@ public class Kline
     /// 主键
     /// </summary>
     /// <value></value>
+    [JsonIgnore]
     public long id { get; set; }
     /// <summary>
     /// 交易对
@@ -27,6 +30,7 @@ public class Kline
     /// K线类型
     /// </summary>
     /// <value></value>
+    [JsonConverter(typeof(StringEnumConverter))]
     public E_KlineType type { get; set; }
     /// <summary>
     /// 成交量

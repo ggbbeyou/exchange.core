@@ -32,7 +32,7 @@ public class Core
     /// 交易记录Db操作
     /// </summary>
     /// <returns></returns>
-    public DealService deal_service = new DealService();   
+    public DealService deal_service = new DealService();
     /// <summary>
     /// 订单服务
     /// </summary>
@@ -104,7 +104,7 @@ public class Core
     /// 接收到成交订单
     /// </summary>
     /// <param name="match"></param>
-    private void ReceiveDealOrder(List<Deal> match)
+    private async void ReceiveDealOrder(List<Deal> match)
     {
         deal_service.AddOrUpdateDeal(match);
         List<(long, decimal, DateTimeOffset)> list = new List<(long, decimal, DateTimeOffset)>();
@@ -139,9 +139,13 @@ public class Core
         this.kline_service.DBtoRedised(this.model.info.market, this.model.info.symbol, end);
         this.kline_service.DBtoRedising(this.model.info.market);
         HashEntry[] hashes = FactoryService.instance.constant.redis.HashGetAll(FactoryService.instance.GetRedisKlineing(this.model.info.market));
+        ResWebsocker<Kline?> resWebsocker = new ResWebsocker<Kline?>();
+        resWebsocker.success = true;
+        resWebsocker.op = E_WebsockerOp.subscribe_date;
         foreach (var item in hashes)
         {
-            FactoryService.instance.constant.MqPublish($"{item.Name}_{this.model.info.market}", item.Value);
+            resWebsocker.data = JsonConvert.DeserializeObject<Kline>(item.Value);
+            FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe((E_WebsockerChannel)Enum.Parse(typeof(E_WebsockerChannel), item.Name.ToString()), this.model.info.market), JsonConvert.SerializeObject(resWebsocker));
         }
 
         // FactoryService.instance.constant.redis.SortedSetRangeByRank()
@@ -200,7 +204,7 @@ public class Core
         // }
     }
 
- 
+
 
 
 }

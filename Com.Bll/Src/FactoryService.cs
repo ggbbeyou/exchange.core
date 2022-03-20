@@ -154,23 +154,15 @@ public class FactoryService
     }
 
     /// <summary>
-    /// MQ:订阅深度
+    /// MQ:订阅
     /// </summary>
     /// <param name="market"></param>
     /// <returns></returns>
-    public string GetMqSubscribeDepth(long market, E_WebsockerChannel channel)
+    public string GetMqSubscribe(E_WebsockerChannel channel, long market)
     {
-        return string.Format("subscribe_depth_{0}_{1}", market, channel);
+        return string.Format("{0}_{1}", channel, market);
     }
 
-    /// <summary>
-    /// MQ:订阅K线
-    /// </summary>
-    /// <param name="market"></param>
-    /// <returns></returns>
-    public string GetMqSubscribeKline(long market)
-    {
-        return string.Format("subscribe_kline_{0}", market);
-    }
+
 
 }

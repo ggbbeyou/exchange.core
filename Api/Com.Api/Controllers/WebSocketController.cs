@@ -183,7 +183,7 @@ public class WebSocketController : Controller
                     }
                     else
                     {
-                        string key = $"{item.channel.ToString()}_{market.market}";
+                        string key = FactoryService.instance.GetMqSubscribe(item.channel, market.market);
                         if (channel.ContainsKey(key))
                         {
                             continue;

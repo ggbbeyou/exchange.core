@@ -106,7 +106,7 @@ public class DepthService
         foreach (var item in depths)
         {
             FactoryService.instance.constant.redis.HashSet(FactoryService.instance.GetRedisDepth(item.Value.market), item.Key.ToString(), JsonConvert.SerializeObject(item.Value));
-            FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribeDepth(item.Value.market, item.Key), JsonConvert.SerializeObject(item.Value));
+            FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(item.Key, item.Value.market), JsonConvert.SerializeObject(item.Value));
         }
     }
 

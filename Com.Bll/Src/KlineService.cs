@@ -33,7 +33,7 @@ public class KlineService
     /// DB:交易记录
     /// </summary>
     private DealService deal_service = new DealService();
-  
+
     /// <summary>
     /// 初始化
     /// </summary>
@@ -403,6 +403,33 @@ public class KlineService
             return JsonConvert.DeserializeObject<Kline>(redisvalue[0]);
         }
         return null;
+    }
+
+    /// <summary>
+    /// 从redis获取的K线
+    /// </summary>
+    /// <param name="market">交易对</param>
+    /// <param name="klineType">K线类型</param>
+    /// <returns></returns>
+    public List<Kline> GetRedisKline(long market, E_KlineType klineType, DateTimeOffset? start, DateTimeOffset? end)
+    {
+        List<Kline> klines = new List<Kline>();
+        double start1 = double.NegativeInfinity;
+        double stop1 = double.PositiveInfinity;
+        if (start != null)
+        {
+            start1 = start.Value.ToUnixTimeMilliseconds();
+        }
+        if (end != null)
+        {
+            stop1 = end.Value.ToUnixTimeMilliseconds();
+        }
+        RedisValue[] redisvalue = FactoryService.instance.constant.redis.SortedSetRangeByScore(key: FactoryService.instance.GetRedisKline(market, klineType), start: start1, stop: stop1, order: StackExchange.Redis.Order.Ascending);
+        foreach (var item in redisvalue)
+        {
+            klines.Add(JsonConvert.DeserializeObject<Kline>(item)!);
+        }
+        return klines;
     }
 
     #endregion

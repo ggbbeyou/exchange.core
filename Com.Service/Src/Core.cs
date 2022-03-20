@@ -153,6 +153,19 @@ public class Core
         DateTimeOffset now = DateTimeOffset.UtcNow;
         now = now.AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond);
         DateTimeOffset end = now.AddMilliseconds(-1);
+        Dictionary<E_KlineType, DateTimeOffset> last_kline = new Dictionary<E_KlineType, DateTimeOffset>();
+        foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
+        {
+            Kline? Last_kline = kline_service.GetRedisLastKline(this.model.info.market, cycle);
+            if (Last_kline == null)
+            {
+                last_kline.Add(cycle, FactoryService.instance.system_init);
+            }
+            else
+            {
+                last_kline.Add(cycle, Last_kline.time_start);
+            }
+        }
         this.kline_service.DBtoRedised(this.model.info.market, this.model.info.symbol, end);
         this.kline_service.DBtoRedising(this.model.info.market);
         FactoryService.instance.constant.stopwatch.Stop();
@@ -178,6 +191,11 @@ public class Core
         res_kline.data = new List<Kline>();
         foreach (var item in hashes)
         {
+            E_KlineType klineType = (E_KlineType)Enum.Parse(typeof(E_KlineType), item.Name.ToString());
+            if (last_kline.ContainsKey(klineType))
+            {
+                res_kline.data.AddRange(kline_service.GetRedisKline(this.model.info.market, klineType, last_kline[klineType], null));
+            }
             res_kline.channel = (E_WebsockerChannel)Enum.Parse(typeof(E_WebsockerChannel), item.Name.ToString());
             res_kline.data.Add(JsonConvert.DeserializeObject<Kline>(item.Value)!);
             FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(res_kline.channel, this.model.info.market), JsonConvert.SerializeObject(res_kline));

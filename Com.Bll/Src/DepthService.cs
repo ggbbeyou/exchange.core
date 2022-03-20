@@ -42,11 +42,12 @@ public class DepthService
         depths.Add(E_WebsockerChannel.books10, new Depth());
         depths.Add(E_WebsockerChannel.books50, new Depth());
         depths.Add(E_WebsockerChannel.books200, new Depth());
-        depths.Add(E_WebsockerChannel.books10_inc, new Depth());
-        depths.Add(E_WebsockerChannel.books50_inc, new Depth());
-        depths.Add(E_WebsockerChannel.books200_inc, new Depth());
+        // depths.Add(E_WebsockerChannel.books10_inc, new Depth());
+        // depths.Add(E_WebsockerChannel.books50_inc, new Depth());
+        // depths.Add(E_WebsockerChannel.books200_inc, new Depth());
         foreach (var item in depths)
         {
+            item.Value.market = market;
             item.Value.symbol = symbol;
             item.Value.timestamp = DateTimeOffset.UtcNow;
             switch (item.Key)

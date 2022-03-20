@@ -89,7 +89,7 @@ public class Core
                 this.stopwatch.Restart();
                 ReceiveDealOrder(deals);
                 this.stopwatch.Stop();
-                FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};撮合后续处理总时间,成交记录:{deals.Count}");
+                FactoryService.instance.constant.logger.LogTrace($"计算耗时:{this.stopwatch.Elapsed.ToString()};撮合后续处理总时间,成交记录:{deals.Count}");
             }
             return true;
         });

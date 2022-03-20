@@ -191,6 +191,7 @@ public class Core
         res_kline.data = new List<Kline>();
         foreach (var item in hashes)
         {
+            res_kline.data.Clear();
             E_KlineType klineType = (E_KlineType)Enum.Parse(typeof(E_KlineType), item.Name.ToString());
             if (last_kline.ContainsKey(klineType))
             {

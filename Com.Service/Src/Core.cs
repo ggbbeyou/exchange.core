@@ -32,12 +32,7 @@ public class Core
     /// 交易记录Db操作
     /// </summary>
     /// <returns></returns>
-    public DealDb deal_db = new DealDb();
-    /// <summary>
-    /// 订单Db操作
-    /// </summary>
-    /// <returns></returns>
-    public OrdersDb orders_db = new OrdersDb();
+    public DealService deal_service = new DealService();   
     /// <summary>
     /// 订单服务
     /// </summary>
@@ -111,7 +106,7 @@ public class Core
     /// <param name="match"></param>
     private void ReceiveDealOrder(List<Deal> match)
     {
-        deal_db.AddOrUpdateDeal(match);
+        deal_service.AddOrUpdateDeal(match);
         List<(long, decimal, DateTimeOffset)> list = new List<(long, decimal, DateTimeOffset)>();
         var bid = from deal in match
                   group deal by new { deal.bid_id } into g

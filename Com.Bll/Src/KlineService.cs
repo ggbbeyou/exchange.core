@@ -33,11 +33,7 @@ public class KlineService
     /// DB:交易记录
     /// </summary>
     private DealService deal_service = new DealService();
-    /// <summary>
-    /// DB:K线
-    /// </summary>
-    private KlineService kilne_service = new KlineService();
-
+  
     /// <summary>
     /// 初始化
     /// </summary>
@@ -362,11 +358,11 @@ public class KlineService
     {
         foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
         {
-            Kline? last_kline = this.kilne_service.GetLastKline(market, cycle);
-            List<Kline>? klines = this.kilne_service.CalcKlines(market, cycle, last_kline?.time_end ?? FactoryService.instance.system_init, end);
+            Kline? last_kline = this.GetLastKline(market, cycle);
+            List<Kline>? klines = this.CalcKlines(market, cycle, last_kline?.time_end ?? FactoryService.instance.system_init, end);
             if (klines != null)
             {
-                int count = this.kilne_service.SaveKline(market, symbol, cycle, klines);
+                int count = this.SaveKline(market, symbol, cycle, klines);
             }
         }
     }
@@ -380,7 +376,7 @@ public class KlineService
         foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
         {
             Kline? Last_kline = GetRedisLastKline(market, cycle);
-            List<Kline> klines = this.kilne_service.GetKlines(market, cycle, Last_kline?.time_end ?? FactoryService.instance.system_init, DateTimeOffset.Now);
+            List<Kline> klines = this.GetKlines(market, cycle, Last_kline?.time_end ?? FactoryService.instance.system_init, DateTimeOffset.Now);
             if (klines.Count() > 0)
             {
                 SortedSetEntry[] entries = new SortedSetEntry[klines.Count()];
@@ -423,7 +419,7 @@ public class KlineService
         foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
         {
             DateTimeOffset start = FactoryService.instance.system_init;
-            Kline? kline_last = this.kilne_service.GetLastKline(market, cycle);
+            Kline? kline_last = this.GetLastKline(market, cycle);
             if (kline_last != null)
             {
                 start = kline_last.time_end.AddMilliseconds(1);

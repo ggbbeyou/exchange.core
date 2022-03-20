@@ -84,13 +84,23 @@ public class FactoryService
     }
 
     /// <summary>
-    /// redis zset 深度行情 depth:{market}:{bid/ask}
+    /// redis hast 深度行情 depth:{market}
     /// </summary>
     /// <param name="market"></param>
     /// <returns></returns>
     public string GetRedisDepth(long market)
     {
         return string.Format("depth:{0}", market);
+    }
+
+    /// <summary>
+    /// redis hast 深度行情 depth
+    /// </summary>
+    /// <param name="market"></param>
+    /// <returns></returns>
+    public string GetRedisTicker()
+    {
+        return string.Format("ticker");
     }
 
     /// <summary>

@@ -19,7 +19,7 @@ public class DealService
     /// <summary>
     /// 数据库
     /// </summary>
-    public DbContextEF db = null!;  
+    public DbContextEF db = null!;
 
     /// <summary>
     /// 初始化
@@ -202,6 +202,24 @@ public class DealService
             FactoryService.instance.constant.logger.LogError(ex, "交易记录转换成一分钟K线失败");
         }
         return null;
+    }
+
+    /// <summary>
+    /// 深度行情保存到redis并且推送到MQ
+    /// </summary>
+    /// <param name="depth"></param>
+    public void PushTicker(Ticker? ticker)
+    {
+        if (ticker != null)
+        {
+            ResWebsocker<Ticker> resWebsocker = new ResWebsocker<Ticker>();
+            resWebsocker.success = true;
+            resWebsocker.op = E_WebsockerOp.subscribe_date;
+            resWebsocker.channel = E_WebsockerChannel.tickers;
+            resWebsocker.data = ticker;
+            FactoryService.instance.constant.redis.HashSet(FactoryService.instance.GetRedisTicker(), ticker.market, JsonConvert.SerializeObject(ticker));
+            FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.tickers, ticker.market), JsonConvert.SerializeObject(resWebsocker));
+        }
     }
 
 

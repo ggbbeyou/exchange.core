@@ -104,7 +104,7 @@ public class Core
     /// 接收到成交订单
     /// </summary>
     /// <param name="match"></param>
-    private async void ReceiveDealOrder(List<Deal> match)
+    private void ReceiveDealOrder(List<Deal> match)
     {
         deal_service.AddOrUpdateDeal(match);
         List<(long, decimal, DateTimeOffset)> list = new List<(long, decimal, DateTimeOffset)>();
@@ -147,45 +147,8 @@ public class Core
             resWebsocker.data = JsonConvert.DeserializeObject<Kline>(item.Value);
             FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe((E_WebsockerChannel)Enum.Parse(typeof(E_WebsockerChannel), item.Name.ToString()), this.model.info.market), JsonConvert.SerializeObject(resWebsocker));
         }
-
-        // FactoryService.instance.constant.redis.SortedSetRangeByRank()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        // List<BaseOrderBook> orderBooks = new List<BaseOrderBook>();
-
-        // List<Deal> deals = new List<Deal>();
-        // foreach ((Orders order, List<Deal> deal) item in match)
-        // {
-        //     orders.Add(item.order);
-        //     deals.AddRange(item.deal);
-        //     orderBooks.AddRange(GetOrderBooks(item.order, item.deal));
-        // }
-
-
-
-
-        // orders_db.AddOrUpdateOrder(orders);
-
-
-
-
-        // string json = JsonConvert.SerializeObject(orderBooks);
-        // FactoryService.instance.constant.MqPublish($"{E_WebsockerChannel.books10}_{this.model.info.market}", json);
-        // FactoryService.instance.constant.MqPublish($"{E_WebsockerChannel.books50}_{this.model.info.market}", json);
-        // FactoryService.instance.constant.MqPublish($"{E_WebsockerChannel.books200}_{this.model.info.market}", json);
-
+        Ticker? ticker = deal_service.Get24HoursTicker(this.model.info.market);
+        deal_service.PushTicker(ticker);
     }
 
     /// <summary>

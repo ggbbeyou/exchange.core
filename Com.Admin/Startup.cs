@@ -50,7 +50,7 @@ namespace Com.Admin
         /// <param name="services">服务集合接口</param>
         public void ConfigureServices(IServiceCollection services)
         {
-            NLog.GlobalDiagnosticsContext.Set("NlogDbConStr", Configuration.GetConnectionString("Mssql"));
+            // NLog.GlobalDiagnosticsContext.Set("NlogDbConStr", Configuration.GetConnectionString("Mssql"));
             services.AddCors(options =>
             {
                 options.AddPolicy("any", builder =>

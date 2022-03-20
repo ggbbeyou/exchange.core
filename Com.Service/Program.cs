@@ -37,8 +37,8 @@ class Program
         {
             services.AddDbContextPool<DbContextEF>(options =>
             {
-                options.UseLoggerFactory(LoggerFactory.Create(builder => { builder.AddConsole(); }));
-                options.EnableSensitiveDataLogging();
+                // options.UseLoggerFactory(LoggerFactory.Create(builder => { builder.AddConsole(); }));
+                // options.EnableSensitiveDataLogging();
                 DbContextOptions options1 = options.UseSqlServer(hostContext.Configuration.GetConnectionString("Mssql")).Options;
             });
             services.AddHostedService<MainService>();

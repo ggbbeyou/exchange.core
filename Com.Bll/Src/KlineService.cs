@@ -469,7 +469,7 @@ public class KlineService
                         low = last_deal.price,
                         high = last_deal.price,
                         type = cycle,
-                        time_start = KlineTime(cycle, now).start,
+                        time_start = startend.start,
                         time_end = now,
                         time = now,
                     };

@@ -113,16 +113,16 @@ public class Core
     /// <summary>
     /// 接收到成交订单
     /// </summary>
-    /// <param name="match"></param>
-    private void ReceiveDealOrder(List<Deal> match)
+    /// <param name="deals"></param>
+    private void ReceiveDealOrder(List<Deal> deals)
     {
         FactoryService.instance.constant.stopwatch.Restart();
-        deal_service.AddOrUpdateDeal(match);
+        deal_service.AddOrUpdateDeal(deals);
         FactoryService.instance.constant.stopwatch.Stop();
-        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};DB=>插入{match.Count}条成交记录");
+        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};DB=>插入{deals.Count}条成交记录");
         List<(long, decimal, DateTimeOffset)> list = new List<(long, decimal, DateTimeOffset)>();
         FactoryService.instance.constant.stopwatch.Restart();
-        var bid = from deal in match
+        var bid = from deal in deals
                   group deal by new { deal.bid_id } into g
                   select new
                   {
@@ -134,7 +134,7 @@ public class Core
         {
             list.Add((item.bid_id, item.amount, item.deal_last_time));
         }
-        var ask = from deal in match
+        var ask = from deal in deals
                   group deal by new { deal.ask_id } into g
                   select new
                   {
@@ -171,16 +171,16 @@ public class Core
         FactoryService.instance.constant.stopwatch.Stop();
         FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};DB=>同步K线记录");
         FactoryService.instance.constant.stopwatch.Restart();
-        SortedSetEntry[] entries = new SortedSetEntry[match.Count()];
-        for (int i = 0; i < match.Count(); i++)
+        SortedSetEntry[] entries = new SortedSetEntry[deals.Count()];
+        for (int i = 0; i < deals.Count(); i++)
         {
-            entries[i] = new SortedSetEntry(JsonConvert.SerializeObject(match[i]), match[i].time.ToUnixTimeMilliseconds());
+            entries[i] = new SortedSetEntry(JsonConvert.SerializeObject(deals[i]), deals[i].time.ToUnixTimeMilliseconds());
         }
         FactoryService.instance.constant.redis.SortedSetAdd(FactoryService.instance.GetRedisDeal(this.model.info.market), entries);
         res_deal.success = true;
         res_deal.op = E_WebsockerOp.subscribe_date;
         res_deal.channel = E_WebsockerChannel.trades;
-        res_deal.data = match;
+        res_deal.data = deals;
         FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.trades, this.model.info.market), JsonConvert.SerializeObject(res_deal));
         FactoryService.instance.constant.stopwatch.Stop();
         FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};Mq,Redis=>推送交易记录");

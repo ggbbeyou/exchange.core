@@ -442,17 +442,12 @@ public class KlineService
     /// </summary>
     /// <param name="market">交易对</param>
     public void DBtoRedising(long market, string symbol)
-
     {
         foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
         {
-            DateTimeOffset start = FactoryService.instance.system_init;
-            Kline? kline_last = this.GetLastKline(market, cycle);
-            if (kline_last != null)
-            {
-                start = kline_last.time_end.AddMilliseconds(1);
-            }
-            Kline? kline_new = this.deal_service.GetKlinesByDeal(market, cycle, start, null);
+            DateTimeOffset now = DateTimeOffset.UtcNow;
+            (DateTimeOffset start, DateTimeOffset end) startend = KlineTime(cycle, now);
+            Kline? kline_new = this.deal_service.GetKlinesByDeal(market, cycle, startend.start, null);
             if (kline_new == null)
             {
                 Deal? last_deal = deal_service.GetRedisLastDeal(market);
@@ -462,7 +457,6 @@ public class KlineService
                 }
                 else
                 {
-                    DateTimeOffset now = DateTimeOffset.UtcNow;
                     kline_new = new Kline()
                     {
                         market = market,
@@ -491,6 +485,12 @@ public class KlineService
 
     #endregion
 
+    /// <summary>
+    /// 计算K线开始时间和结束时间
+    /// </summary>
+    /// <param name="cycle"></param>
+    /// <param name="time"></param>
+    /// <returns></returns>
     public (DateTimeOffset start, DateTimeOffset end) KlineTime(E_KlineType cycle, DateTimeOffset time)
     {
         DateTimeOffset start = time;
@@ -498,7 +498,7 @@ public class KlineService
         switch (cycle)
         {
             case E_KlineType.min1:
-                start = FactoryService.instance.system_init.AddMinutes((int)(time - FactoryService.instance.system_init).TotalMinutes);
+                start = time.AddSeconds(-time.Second).AddMilliseconds(-time.Millisecond);
                 end = start.AddMinutes(1).AddMilliseconds(-1);
                 break;
             case E_KlineType.min5:
@@ -514,7 +514,7 @@ public class KlineService
                 end = start.AddMinutes(30).AddMilliseconds(-1);
                 break;
             case E_KlineType.hour1:
-                start = FactoryService.instance.system_init.AddHours((int)(time - FactoryService.instance.system_init).TotalHours);
+                start = time.AddMinutes(-time.Minute).AddSeconds(-time.Second).AddMilliseconds(-time.Millisecond);
                 end = start.AddHours(1).AddMilliseconds(-1);
                 break;
             case E_KlineType.hour6:
@@ -526,7 +526,7 @@ public class KlineService
                 end = start.AddHours(12).AddMilliseconds(-1);
                 break;
             case E_KlineType.day1:
-                start = FactoryService.instance.system_init.AddDays((int)(time - FactoryService.instance.system_init).TotalDays);
+                start = time.AddHours(-time.Hour).AddMinutes(-time.Minute).AddSeconds(-time.Second).AddMilliseconds(-time.Millisecond);
                 end = start.AddDays(1).AddMilliseconds(-1);
                 break;
             case E_KlineType.week1:
@@ -534,7 +534,7 @@ public class KlineService
                 end = start.AddDays(7).AddMilliseconds(-1);
                 break;
             case E_KlineType.month1:
-                start = FactoryService.instance.system_init.AddMonths((int)(time - FactoryService.instance.system_init).TotalDays / 30 * 30);
+                start = time.AddDays(-time.Day).AddHours(-time.Hour).AddMinutes(-time.Minute).AddSeconds(-time.Second).AddMilliseconds(-time.Millisecond);
                 end = start.AddMonths(1).AddMilliseconds(-1);
                 break;
             default:

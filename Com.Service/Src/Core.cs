@@ -167,7 +167,7 @@ public class Core
             }
         }
         this.kline_service.DBtoRedised(this.model.info.market, this.model.info.symbol, end);
-        this.kline_service.DBtoRedising(this.model.info.market);
+        this.kline_service.DBtoRedising(this.model.info.market, this.model.info.symbol);
         FactoryService.instance.constant.stopwatch.Stop();
         FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};DB=>同步K线记录");
         FactoryService.instance.constant.stopwatch.Restart();

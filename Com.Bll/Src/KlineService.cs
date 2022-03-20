@@ -441,7 +441,8 @@ public class KlineService
     /// 缓存预热(未确定K线)
     /// </summary>
     /// <param name="market">交易对</param>
-    public void DBtoRedising(long market)
+    public void DBtoRedising(long market, string symbol)
+
     {
         foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
         {
@@ -452,7 +453,36 @@ public class KlineService
                 start = kline_last.time_end.AddMilliseconds(1);
             }
             Kline? kline_new = this.deal_service.GetKlinesByDeal(market, cycle, start, null);
-            if (kline_new != null)
+            if (kline_new == null)
+            {
+                Deal? last_deal = deal_service.GetRedisLastDeal(market);
+                if (last_deal == null)
+                {
+                    FactoryService.instance.constant.redis.HashDelete(FactoryService.instance.GetRedisKlineing(market), cycle.ToString());
+                }
+                else
+                {
+                    DateTimeOffset now = DateTimeOffset.UtcNow;
+                    kline_new = new Kline()
+                    {
+                        market = market,
+                        symbol = symbol,
+                        amount = 0,
+                        count = 0,
+                        total = 0,
+                        open = last_deal.price,
+                        close = last_deal.price,
+                        low = last_deal.price,
+                        high = last_deal.price,
+                        type = cycle,
+                        time_start = KlineTime(cycle, now).start,
+                        time_end = now,
+                        time = now,
+                    };
+                    FactoryService.instance.constant.redis.HashSet(FactoryService.instance.GetRedisKlineing(market), cycle.ToString(), JsonConvert.SerializeObject(kline_new));
+                }
+            }
+            else
             {
                 FactoryService.instance.constant.redis.HashSet(FactoryService.instance.GetRedisKlineing(market), cycle.ToString(), JsonConvert.SerializeObject(kline_new));
             }
@@ -461,87 +491,123 @@ public class KlineService
 
     #endregion
 
+    public (DateTimeOffset start, DateTimeOffset end) KlineTime(E_KlineType cycle, DateTimeOffset time)
+    {
+        DateTimeOffset start = time;
+        DateTimeOffset end = time;
+        switch (cycle)
+        {
+            case E_KlineType.min1:
+                start = FactoryService.instance.system_init.AddMinutes((int)(time - FactoryService.instance.system_init).TotalMinutes);
+                end = start.AddMinutes(1).AddMilliseconds(-1);
+                break;
+            case E_KlineType.min5:
+                start = FactoryService.instance.system_init.AddMinutes((int)(time - FactoryService.instance.system_init).TotalMinutes / 5 * 5);
+                end = start.AddMinutes(5).AddMilliseconds(-1);
+                break;
+            case E_KlineType.min15:
+                start = FactoryService.instance.system_init.AddMinutes((int)(time - FactoryService.instance.system_init).TotalMinutes / 15 * 15);
+                end = start.AddMinutes(15).AddMilliseconds(-1);
+                break;
+            case E_KlineType.min30:
+                start = FactoryService.instance.system_init.AddMinutes((int)(time - FactoryService.instance.system_init).TotalMinutes / 30 * 30);
+                end = start.AddMinutes(30).AddMilliseconds(-1);
+                break;
+            case E_KlineType.hour1:
+                start = FactoryService.instance.system_init.AddHours((int)(time - FactoryService.instance.system_init).TotalHours);
+                end = start.AddHours(1).AddMilliseconds(-1);
+                break;
+            case E_KlineType.hour6:
+                start = FactoryService.instance.system_init.AddHours((int)(time - FactoryService.instance.system_init).TotalHours / 6 * 6);
+                end = start.AddHours(6).AddMilliseconds(-1);
+                break;
+            case E_KlineType.hour12:
+                start = FactoryService.instance.system_init.AddHours((int)(time - FactoryService.instance.system_init).TotalHours / 12 * 12);
+                end = start.AddHours(12).AddMilliseconds(-1);
+                break;
+            case E_KlineType.day1:
+                start = FactoryService.instance.system_init.AddDays((int)(time - FactoryService.instance.system_init).TotalDays);
+                end = start.AddDays(1).AddMilliseconds(-1);
+                break;
+            case E_KlineType.week1:
+                start = FactoryService.instance.system_init.AddDays((int)(time - FactoryService.instance.system_init).TotalDays / 7 * 7);
+                end = start.AddDays(7).AddMilliseconds(-1);
+                break;
+            case E_KlineType.month1:
+                start = FactoryService.instance.system_init.AddMonths((int)(time - FactoryService.instance.system_init).TotalDays / 30 * 30);
+                end = start.AddMonths(1).AddMilliseconds(-1);
+                break;
+            default:
+                break;
+        }
+        return (start, end);
+    }
     // /// <summary>
     // /// 交易记录转换成K线
     // /// </summary>
     // /// <param name="deals"></param>
-    // public Dictionary<E_KlineType, List<Kline>> DealToKline(List<Deal> deals)
+    // public List<Kline>? DealToKline(E_KlineType cycle, List<Deal> deals)
     // {
-    //     Dictionary<E_KlineType, List<Kline>> kline = new Dictionary<E_KlineType, List<Kline>>();
-    //     foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
+    //     if (deals == null || deals.Count == 0)
     //     {
-    //         switch (cycle)
-    //         {
-    //             case E_KlineType.min1:
-    //                 var min1 = from deal in deals
-    //                            group deal by new { deal.market, deal.symbol, min = (int)(deal.time - FactoryService.instance.system_init).TotalMinutes } into g
-    //                            select new Kline
-    //                            {
-    //                                id = FactoryService.instance.constant.worker.NextId(),
-    //                                market = g.Key.market,
-    //                                symbol = g.Key.symbol,
-    //                                type = cycle,
-    //                                amount = g.Sum(x => x.amount),
-    //                                count = g.Count(),
-    //                                total = g.Sum(x => x.total),
-    //                                open = g.First().price,
-    //                                close = g.Last().price,
-    //                                high = g.Max(x => x.price),
-    //                                low = g.Min(x => x.price),
-    //                                time_start = FactoryService.instance.system_init.AddMinutes(g.Key.min),
-    //                                time_end = FactoryService.instance.system_init.AddMinutes(g.Key.min).AddMinutes(1).AddMilliseconds(-1),
-    //                                time = DateTimeOffset.UtcNow,
-    //                            };
-    //                 kline.Add(cycle, min1.ToList());
-    //                 break;
-    //             case E_KlineType.min5:
-
-    //                 break;
-    //             case E_KlineType.min15:
-
-    //                 break;
-    //             case E_KlineType.min30:
-
-    //                 break;
-    //             case E_KlineType.hour1:
-
-    //                 break;
-    //             case E_KlineType.hour6:
-
-    //                 break;
-    //             case E_KlineType.hour12:
-
-    //                 break;
-    //             case E_KlineType.day1:
-
-    //                 break;
-    //             case E_KlineType.week1:
-
-    //                 break;
-    //             case E_KlineType.month1:
-
-    //                 break;
-    //             default:
-    //                 break;
-    //         }
+    //         return null;
     //     }
-    //     return kline;
+    //     switch (cycle)
+    //     {
+    //         case E_KlineType.min1:
+    //             var min1 = from deal in deals
+    //                        group deal by new { deal.market, deal.symbol, min = (int)(deal.time - FactoryService.instance.system_init).TotalMinutes } into g
+    //                        select new Kline
+    //                        {
+    //                            id = FactoryService.instance.constant.worker.NextId(),
+    //                            market = g.Key.market,
+    //                            symbol = g.Key.symbol,
+    //                            type = cycle,
+    //                            amount = g.Sum(x => x.amount),
+    //                            count = g.Count(),
+    //                            total = g.Sum(x => x.total),
+    //                            open = g.First().price,
+    //                            close = g.Last().price,
+    //                            high = g.Max(x => x.price),
+    //                            low = g.Min(x => x.price),
+    //                            time_start = FactoryService.instance.system_init.AddMinutes(g.Key.min),
+    //                            time_end = FactoryService.instance.system_init.AddMinutes(g.Key.min).AddMinutes(1).AddMilliseconds(-1),
+    //                            time = DateTimeOffset.UtcNow,
+    //                        };
+    //             return min1.ToList();
+    //         case E_KlineType.min5:
+
+    //             break;
+    //         case E_KlineType.min15:
+
+    //             break;
+    //         case E_KlineType.min30:
+
+    //             break;
+    //         case E_KlineType.hour1:
+
+    //             break;
+    //         case E_KlineType.hour6:
+
+    //             break;
+    //         case E_KlineType.hour12:
+
+    //             break;
+    //         case E_KlineType.day1:
+
+    //             break;
+    //         case E_KlineType.week1:
+
+    //             break;
+    //         case E_KlineType.month1:
+
+    //             break;
+    //         default:
+    //             break;
+    //     }
+    //     return null;
     // }
 
-    // /// <summary>
-    // /// 分析最新K线
-    // /// </summary>
-    // /// <param name="klines"></param>
-    // public void AnalysisKline(Dictionary<E_KlineType, List<Kline>> klines)
-    // {
-    //     foreach (KeyValuePair<E_KlineType, List<Kline>> item in klines)
-    //     {
-    //         if (item.Value.Count == 0)
-    //         {
-    //             continue;
-    //         }
 
-    //     }
-    // }
 
 }

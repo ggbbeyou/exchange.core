@@ -1,5 +1,8 @@
 using System;
+
 using Com.Db.Enum;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Com.Db.Model;
 
@@ -17,11 +20,13 @@ public class ResWebsocker
     /// 操作，subscribe unsubscribe 
     /// </summary>
     /// <value></value>
+    [JsonConverter(typeof(StringEnumConverter))]
     public E_WebsockerOp op { get; set; }
     // <summary>
     /// 频道     
     /// </summary>
     /// <value></value>
+    [JsonConverter(typeof(StringEnumConverter))]
     public E_WebsockerChannel channel { get; set; }
     /// <summary>
     /// 数据

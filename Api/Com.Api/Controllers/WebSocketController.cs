@@ -107,6 +107,7 @@ public class WebSocketController : Controller
     /// {"op":"Logout","args":[{"channel":"","data":""}]}
     /// {"op":"subscribe","args":[{"channel":"tickers","data":"btc/usdt"},{"channel":"tickers","data":"eth/usdt"}]}
     /// {"op":"unsubscribe","args":[{"channel":"tickers","data":"btc/usdt"},{"channel":"tickers","data":"eth/usdt"}]}
+    /// {"op":"subscribe","args":[{"channel":"tickers","data":"btc/usdt"},{"channel":"tickers","data":"eth/usdt"}]}
     /// </summary>
     /// <param name="webSocket"></param>
     /// <param name="req"></param>

@@ -40,6 +40,11 @@ public class DbContextEF : DbContext
     /// <value></value>
     public DbSet<Users> Users { get; set; } = null!;
     /// <summary>
+    /// api用户
+    /// </summary>
+    /// <value></value>
+    public DbSet<UsersApi> UsersApi { get; set; } = null!;
+    /// <summary>
     /// 计账钱包基础信息
     /// </summary>
     /// <value></value>
@@ -196,6 +201,20 @@ public class DbContextEF : DbContext
             o.Property(P => P.phone).HasColumnType("nvarchar").HasMaxLength(500).HasComment("用户手机号码");
             o.Property(P => P.email).HasColumnType("nvarchar").HasMaxLength(500).HasComment("邮箱");
             o.ToTable(nameof(Users));
+        });
+        modelBuilder.Entity<UsersApi>(o =>
+        {
+            o.HasKey(p => p.id);
+            o.HasIndex(P => new { P.user_id, P.api_key });
+            o.HasIndex(P => new { P.api_key }).IsUnique();
+            o.Property(P => P.user_id).IsRequired().HasColumnType("bigint").HasComment("用户id");
+            o.Property(P => P.api_key).HasColumnType("nvarchar").HasMaxLength(50).HasComment("账户key");
+            o.Property(P => P.api_secret).HasColumnType("nvarchar").HasMaxLength(500).HasComment("账户密钥");
+            o.Property(P => P.transaction).IsRequired().HasColumnType("bit").HasComment("是否交易");
+            o.Property(P => P.withdrawal).IsRequired().HasColumnType("bit").HasComment("是否提现");
+            o.Property(P => P.white_list_ip).HasColumnType("nvarchar").HasMaxLength(200).HasComment("IP白名单");
+            o.Property(P => P.last_login_ip).HasColumnType("nvarchar").HasMaxLength(50).HasComment("最后登录IP地址");
+            o.ToTable(nameof(UsersApi));
         });
         modelBuilder.Entity<Wallet>(o =>
         {

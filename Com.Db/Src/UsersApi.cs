@@ -9,6 +9,11 @@ namespace Com.Db;
 public class UsersApi
 {
     /// <summary>
+    /// id
+    /// </summary>
+    /// <value></value>
+    public long id { get; set; }
+    /// <summary>
     /// 用户id
     /// </summary>
     /// <value></value>
@@ -29,7 +34,7 @@ public class UsersApi
     /// <value></value>
     public bool transaction { get; set; }
     /// <summary>
-    /// 提现
+    /// 是否提现
     /// </summary>
     /// <value></value>
     public bool withdrawal { get; set; }

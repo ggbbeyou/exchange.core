@@ -30,6 +30,10 @@ public class Core
     /// </summary>
     public DbContextEF db = null!;
     /// <summary>
+    /// 日志事件ID
+    /// </summary>
+    public EventId eventId;
+    /// <summary>
     /// 交易记录Db操作
     /// </summary>
     /// <returns></returns>
@@ -44,6 +48,11 @@ public class Core
     /// </summary>
     /// <returns></returns>
     public KlineService kline_service = new KlineService();
+    /// <summary>
+    /// 秒表
+    /// </summary>
+    /// <returns></returns>
+    public Stopwatch stopwatch = new Stopwatch();
     /// <summary>
     /// 临时变量
     /// </summary>
@@ -61,11 +70,6 @@ public class Core
     /// <typeparam name="Kline?"></typeparam>
     /// <returns></returns>
     private ResWebsocker<List<Orders>> res_order = new ResWebsocker<List<Orders>>();
-    /// <summary>
-    /// 秒表
-    /// </summary>
-    /// <returns></returns>
-    public Stopwatch stopwatch = new Stopwatch();
 
     /// <summary>
     /// 初始化
@@ -74,6 +78,7 @@ public class Core
     public Core(MatchModel model)
     {
         this.model = model;
+        this.eventId = new EventId(1, model.info.symbol);
         res_order.success = true;
         res_order.op = E_WebsockerOp.subscribe_date;
         res_order.channel = E_WebsockerChannel.orders;
@@ -101,8 +106,7 @@ public class Core
             this.stopwatch.Restart();
             ReceiveDealOrder(deals.deals, deals.orders);
             this.stopwatch.Stop();
-            FactoryService.instance.constant.logger.LogTrace($"计算耗时:{this.stopwatch.Elapsed.ToString()};撮合后续处理总时间,成交记录:{deals.deals.Count}");
-
+            FactoryService.instance.constant.logger.LogTrace(this.eventId, $"计算耗时:{this.stopwatch.Elapsed.ToString()};撮合后续处理总时间,成交记录:{deals.deals.Count}");
             return true;
         });
     }
@@ -121,7 +125,7 @@ public class Core
             else
             {
                 string json = Encoding.UTF8.GetString(b);
-                FactoryService.instance.constant.logger.LogInformation($"接收撮合传过来的取消订单:{json}");
+                FactoryService.instance.constant.logger.LogInformation(this.eventId, $"接收撮合传过来的取消订单:{json}");
                 List<Orders>? deals = JsonConvert.DeserializeObject<List<Orders>>(json);
                 if (deals != null && deals.Count > 0)
                 {
@@ -141,11 +145,11 @@ public class Core
         FactoryService.instance.constant.stopwatch.Restart();
         deal_service.AddOrUpdateDeal(deals);
         FactoryService.instance.constant.stopwatch.Stop();
-        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};DB=>插入{deals.Count}条成交记录");
+        FactoryService.instance.constant.logger.LogTrace(this.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};DB=>插入{deals.Count}条成交记录");
         FactoryService.instance.constant.stopwatch.Restart();
         order_service.UpdateOrder(orders);
         FactoryService.instance.constant.stopwatch.Stop();
-        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};DB=>更新{orders.Count}条订单记录");
+        FactoryService.instance.constant.logger.LogTrace(this.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};DB=>更新{orders.Count}条订单记录");
         FactoryService.instance.constant.stopwatch.Restart();
         var uid_order = orders.GroupBy(P => P.uid).ToList();
         foreach (var item in uid_order)
@@ -154,7 +158,7 @@ public class Core
             FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.orders, this.model.info.market, item.Key), JsonConvert.SerializeObject(item.ToList()));
         }
         FactoryService.instance.constant.stopwatch.Stop();
-        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};Mq=>推送订单更新");
+        FactoryService.instance.constant.logger.LogTrace(this.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};Mq=>推送订单更新");
         FactoryService.instance.constant.stopwatch.Restart();
         DateTimeOffset now = DateTimeOffset.UtcNow;
         now = now.AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond);
@@ -175,7 +179,7 @@ public class Core
         this.kline_service.DBtoRedised(this.model.info.market, this.model.info.symbol, end);
         this.kline_service.DBtoRedising(this.model.info.market, this.model.info.symbol, deals);
         FactoryService.instance.constant.stopwatch.Stop();
-        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};DB=>同步K线记录");
+        FactoryService.instance.constant.logger.LogTrace(this.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};DB=>同步K线记录");
         FactoryService.instance.constant.stopwatch.Restart();
         SortedSetEntry[] entries = new SortedSetEntry[deals.Count()];
         for (int i = 0; i < deals.Count(); i++)
@@ -186,7 +190,7 @@ public class Core
         res_deal.data = deals;
         FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.trades, this.model.info.market), JsonConvert.SerializeObject(res_deal));
         FactoryService.instance.constant.stopwatch.Stop();
-        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};Mq,Redis=>推送交易记录");
+        FactoryService.instance.constant.logger.LogTrace(this.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};Mq,Redis=>推送交易记录");
         FactoryService.instance.constant.stopwatch.Restart();
         HashEntry[] hashes = FactoryService.instance.constant.redis.HashGetAll(FactoryService.instance.GetRedisKlineing(this.model.info.market));
         foreach (var item in hashes)
@@ -204,7 +208,7 @@ public class Core
         Ticker? ticker = deal_service.Get24HoursTicker(this.model.info.market);
         deal_service.PushTicker(ticker);
         FactoryService.instance.constant.stopwatch.Stop();
-        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};Mq,Redis=>推送K线记录和聚合行情");
+        FactoryService.instance.constant.logger.LogTrace(this.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};Mq,Redis=>推送K线记录和聚合行情");
     }
 
     /// <summary>

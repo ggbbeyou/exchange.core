@@ -166,11 +166,24 @@ public class FactoryService
     /// <summary>
     /// MQ:订阅
     /// </summary>
-    /// <param name="market"></param>
+    /// <param name="channel">订阅频道</param>
+    /// <param name="market">交易对</param>
     /// <returns></returns>
     public string GetMqSubscribe(E_WebsockerChannel channel, long market)
     {
         return string.Format("{0}_{1}", channel, market);
+    }
+
+    /// <summary>
+    /// MQ:订阅(有权限)
+    /// </summary>
+    /// <param name="channel">订阅频道</param>
+    /// <param name="market">交易对</param>
+    /// <param name="uid">用户</param>
+    /// <returns></returns>
+    public string GetMqSubscribe(E_WebsockerChannel channel, long market, long uid)
+    {
+        return string.Format("{0}_{1}_{2}", channel, market, uid);
     }
 
 

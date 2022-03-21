@@ -82,12 +82,12 @@ public class WebSocketController : Controller
                         }
                     }
                 });
-                bool login = false;
+                long uid = 0;
                 var buffer = new byte[1024 * 1024];
                 WebSocketReceiveResult result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
                 while (!result.CloseStatus.HasValue)
                 {
-                    Subscribe(webSocket, System.Text.Encoding.UTF8.GetString(buffer, 0, result.Count), channel, ref login);
+                    Subscribe(webSocket, System.Text.Encoding.UTF8.GetString(buffer, 0, result.Count), channel, ref uid);
                     result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
                 }
                 foreach (var item in channel)
@@ -117,7 +117,7 @@ public class WebSocketController : Controller
     /// <param name="webSocket"></param>
     /// <param name="req"></param>
     /// <param name="channel"></param>
-    private void Subscribe(WebSocket webSocket, string str, Dictionary<string, string> channel, ref bool login)
+    private void Subscribe(WebSocket webSocket, string str, Dictionary<string, string> channel, ref long uid)
     {
         if (str.ToLower() == "ping")
         {
@@ -140,7 +140,7 @@ public class WebSocketController : Controller
         ResWebsocker<string> resWebsocker = new ResWebsocker<string>();
         resWebsocker.success = true;
         resWebsocker.op = req.op;
-        if (login == false && req.op == E_WebsockerOp.subscribe)
+        if (uid == 0 && req.op == E_WebsockerOp.subscribe)
         {
             List<ReqChannel> Logout = req.args.Where(P => login_channel.Contains(P.channel)).ToList();
             foreach (var item in Logout)
@@ -156,7 +156,7 @@ public class WebSocketController : Controller
         }
         if (req.op == E_WebsockerOp.login)
         {
-            login = true;
+            uid = 1;
             resWebsocker.channel = E_WebsockerChannel.none;
             resWebsocker.data = "";
             resWebsocker.message = "登录成功!";
@@ -165,7 +165,7 @@ public class WebSocketController : Controller
         }
         else if (req.op == E_WebsockerOp.Logout)
         {
-            login = false;
+            uid = 0;
             resWebsocker.channel = E_WebsockerChannel.none;
             resWebsocker.data = "";
             resWebsocker.message = "登出成功!";
@@ -190,6 +190,10 @@ public class WebSocketController : Controller
                     else
                     {
                         string key = FactoryService.instance.GetMqSubscribe(item.channel, market.market);
+                        if (login_channel.Contains(item.channel))
+                        {
+                            key = FactoryService.instance.GetMqSubscribe(item.channel, market.market, uid);
+                        }
                         if (channel.ContainsKey(key))
                         {
                             continue;
@@ -226,7 +230,11 @@ public class WebSocketController : Controller
                     }
                     else
                     {
-                        string key = $"{item.channel.ToString()}_{market.market}";
+                        string key = FactoryService.instance.GetMqSubscribe(item.channel, market.market);
+                        if (login_channel.Contains(item.channel))
+                        {
+                            key = FactoryService.instance.GetMqSubscribe(item.channel, market.market, uid);
+                        }
                         if (channel.ContainsKey(key))
                         {
                             FactoryService.instance.constant.i_model.BasicCancel(channel[key]);

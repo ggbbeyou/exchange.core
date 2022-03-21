@@ -162,6 +162,43 @@ public class Core
         FactoryService.instance.constant.stopwatch.Stop();
         FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};DB=>更新{list.Count}条订单记录");
         FactoryService.instance.constant.stopwatch.Restart();
+        List<Order> bid_orders = new List<Order>();
+        var bid_uid = deals.Select(P => P.bid_uid).Distinct().ToList();
+        foreach (var item in bid_uid)
+        {
+            List<Deal> deal = deals.Where(P => P.bid_uid == item).ToList();
+            bid_orders.Add(new Order()
+            {
+                // order_id = deal.First().bid_id,
+            });
+
+
+
+        }
+
+
+
+        var bid_order = from deal in deals
+                        group deal by new { deal.bid_id, deal.bid_uid } into g
+                        select new
+                        {
+                            order_id = g.Key.bid_id,
+                            uid = g.Key.bid_uid,
+                            amount = g.Sum(x => x.amount),
+                            deal_last_time = g.OrderBy(P => P.time).Last().time,
+                        };
+
+
+
+
+
+
+
+
+
+        FactoryService.instance.constant.stopwatch.Stop();
+        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};Mq=>推送订单更新");
+        FactoryService.instance.constant.stopwatch.Restart();
         DateTimeOffset now = DateTimeOffset.UtcNow;
         now = now.AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond);
         DateTimeOffset end = now.AddMilliseconds(-1);
@@ -189,11 +226,6 @@ public class Core
             entries[i] = new SortedSetEntry(JsonConvert.SerializeObject(deals[i]), deals[i].time.ToUnixTimeMilliseconds());
         }
         FactoryService.instance.constant.redis.SortedSetAdd(FactoryService.instance.GetRedisDeal(this.model.info.market), entries);
-
-
-
-
-        
         res_deal.success = true;
         res_deal.op = E_WebsockerOp.subscribe_date;
         res_deal.channel = E_WebsockerChannel.trades;

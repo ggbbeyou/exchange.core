@@ -61,7 +61,7 @@ public static class Util
     /// <param name="trigger_side">触发方向</param>
     /// <param name="now">成交时间</param>
     /// <returns></returns>
-    public static Deal CreateDeal(long market, string symbol, Orders bid, Orders ask, decimal price, E_OrderSide trigger_side)
+    public static Deal CreateDeal(long market, string symbol, Orders bid, Orders ask, decimal price, E_OrderSide trigger_side, List<Orders> orders)
     {
         DateTimeOffset now = DateTimeOffset.UtcNow;
         decimal amount = 0;
@@ -89,6 +89,14 @@ public static class Util
         ask.amount_unsold -= amount;
         ask.amount_done += amount;
         ask.deal_last_time = now;
+        if (trigger_side == E_OrderSide.buy)
+        {
+            orders.Add(ask);
+        }
+        else if (trigger_side == E_OrderSide.sell)
+        {
+            orders.Add(bid);
+        }
         Deal deal = new Deal()
         {
             trade_id = FactoryService.instance.constant.worker.NextId(),

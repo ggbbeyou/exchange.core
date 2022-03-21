@@ -212,13 +212,15 @@ public class MatchCore
     /// </summary>
     /// <param name="order">挂单订单</param>
     /// <returns>成交订单</returns>
-    public List<Deal> Match(Orders order)
+    public (List<Deal>, List<Orders>) Match(Orders order)
     {
         List<Deal> deals = new List<Deal>();
+        List<Orders> orders = new List<Orders>();
         if (order.market != this.model.info.market || order.amount <= 0 || order.amount_unsold <= 0 || order.state == E_OrderState.completed || order.state == E_OrderState.cancel)
         {
-            return deals;
+            return (deals, orders);
         }
+        orders.Add(order);
         if (order.side == E_OrderSide.buy)
         {
             //先市价成交,再限价成交
@@ -229,7 +231,7 @@ public class MatchCore
                 {
                     for (int i = 0; i < market_ask.Count; i++)
                     {
-                        Deal deal = Util.CreateDeal(this.model.info.market, this.model.info.symbol, order, market_ask[i], this.last_price, E_OrderSide.buy);
+                        Deal deal = Util.CreateDeal(this.model.info.market, this.model.info.symbol, order, market_ask[i], this.last_price, E_OrderSide.buy, orders);
                         deals.Add(deal);
                         if (order.amount_unsold <= 0)
                         {
@@ -243,7 +245,7 @@ public class MatchCore
                 {
                     for (int i = 0; i < fixed_ask.Count; i++)
                     {
-                        Deal deal = Util.CreateDeal(this.model.info.market, this.model.info.symbol, order, fixed_ask[i], fixed_ask[i].price, E_OrderSide.buy);
+                        Deal deal = Util.CreateDeal(this.model.info.market, this.model.info.symbol, order, fixed_ask[i], fixed_ask[i].price, E_OrderSide.buy, orders);
                         deals.Add(deal);
                         this.last_price = fixed_ask[i].price;
                         if (order.amount_unsold <= 0)
@@ -266,7 +268,7 @@ public class MatchCore
                 {
                     for (int i = 0; i < market_ask.Count; i++)
                     {
-                        Deal deal = Util.CreateDeal(this.model.info.market, this.model.info.symbol, order, market_ask[i], order.price, E_OrderSide.buy);
+                        Deal deal = Util.CreateDeal(this.model.info.market, this.model.info.symbol, order, market_ask[i], order.price, E_OrderSide.buy, orders);
                         deals.Add(deal);
                         if (order.amount_unsold <= 0)
                         {
@@ -287,7 +289,7 @@ public class MatchCore
                         {
                             break;
                         }
-                        Deal deal = Util.CreateDeal(this.model.info.market, this.model.info.symbol, order, fixed_ask[i], new_price, E_OrderSide.buy);
+                        Deal deal = Util.CreateDeal(this.model.info.market, this.model.info.symbol, order, fixed_ask[i], new_price, E_OrderSide.buy, orders);
                         deals.Add(deal);
                         this.last_price = new_price;
                         //量全部处理完了
@@ -316,7 +318,7 @@ public class MatchCore
                     //市价卖单与市价买单撮合
                     for (int i = 0; i < market_bid.Count; i++)
                     {
-                        Deal deal = Util.CreateDeal(this.model.info.market, this.model.info.symbol, market_bid[i], order, this.last_price, E_OrderSide.sell);
+                        Deal deal = Util.CreateDeal(this.model.info.market, this.model.info.symbol, market_bid[i], order, this.last_price, E_OrderSide.sell, orders);
                         deals.Add(deal);
                         if (order.amount_unsold <= 0)
                         {
@@ -330,7 +332,7 @@ public class MatchCore
                 {
                     for (int i = 0; i < fixed_bid.Count; i++)
                     {
-                        Deal deal = Util.CreateDeal(this.model.info.market, this.model.info.symbol, fixed_bid[i], order, fixed_bid[i].price, E_OrderSide.sell);
+                        Deal deal = Util.CreateDeal(this.model.info.market, this.model.info.symbol, fixed_bid[i], order, fixed_bid[i].price, E_OrderSide.sell, orders);
                         deals.Add(deal);
                         this.last_price = fixed_bid[i].price;
                         if (order.amount_unsold <= 0)
@@ -353,7 +355,7 @@ public class MatchCore
                 {
                     for (int i = 0; i < market_bid.Count; i++)
                     {
-                        Deal deal = Util.CreateDeal(this.model.info.market, this.model.info.symbol, market_bid[i], order, order.price, E_OrderSide.sell);
+                        Deal deal = Util.CreateDeal(this.model.info.market, this.model.info.symbol, market_bid[i], order, order.price, E_OrderSide.sell, orders);
                         deals.Add(deal);
                         if (order.amount_unsold <= 0)
                         {
@@ -374,7 +376,7 @@ public class MatchCore
                         {
                             break;
                         }
-                        Deal deal = Util.CreateDeal(this.model.info.market, this.model.info.symbol, fixed_bid[i], order, new_price, E_OrderSide.sell);
+                        Deal deal = Util.CreateDeal(this.model.info.market, this.model.info.symbol, fixed_bid[i], order, new_price, E_OrderSide.sell, orders);
                         deals.Add(deal);
                         this.last_price = new_price;
                         if (order.amount_unsold <= 0)
@@ -392,7 +394,7 @@ public class MatchCore
                 }
             }
         }
-        return deals;
+        return (deals, orders);
     }
 
 

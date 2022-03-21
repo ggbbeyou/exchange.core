@@ -169,8 +169,8 @@ public class MQ
                 CallRequest<(long uid, List<long> order_id)>? req = JsonConvert.DeserializeObject<CallRequest<(long, List<long>)>>(json);
                 if (req != null && req.op == E_Op.place)
                 {
-                    cancel.Clear();
                     this.mutex.WaitOne();
+                    cancel.Clear();
                     if (req.op == E_Op.cancel_by_id)
                     {
                         cancel.AddRange(this.model.match_core.CancelOrder(req.data.uid, req.data.order_id));

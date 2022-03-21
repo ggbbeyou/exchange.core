@@ -36,17 +36,6 @@ public class MatchModel
     /// </summary>
     /// <value></value>
     public Core core { get; set; } = null!;
-    /// <summary>
-    /// 成交记录队列
-    /// </summary>
-    /// <param name="deal"></param>
-    /// <param name="cancel"></param>
-    // public ConcurrentQueue<List<Deal>> deal_queue { get; set; } = null!;
-    /// <summary>
-    /// 撤单记录队列
-    /// </summary>
-    /// <value></value>
-    // public ConcurrentQueue<List<Orders>> cancel_queue { get; set; } = null!;
 
     /// <summary>
     /// 初始化
@@ -55,7 +44,5 @@ public class MatchModel
     public MatchModel(MarketInfo info)
     {
         this.info = info;
-        // this.deal_queue = new ConcurrentQueue<List<Deal>>();
-        // this.cancel_queue = new ConcurrentQueue<List<Orders>>();
     }
 }

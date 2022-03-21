@@ -16,14 +16,6 @@ public class FactoryMatching
     /// <returns></returns>
     public static readonly FactoryMatching instance = new FactoryMatching();
     /// <summary>
-    /// 服务
-    /// </summary>
-    /// <typeparam name="string">交易对</typeparam>
-    /// <typeparam name="Core">服务</typeparam>
-    /// <returns></returns>
-    public Dictionary<long, MatchModel> service = new Dictionary<long, MatchModel>();
-
-    /// <summary>
     /// Service:交易记录
     /// </summary>
     public DealService deal_service = new DealService();
@@ -31,6 +23,13 @@ public class FactoryMatching
     /// Service:K线
     /// </summary>
     public KlineService kline_service = new KlineService();
+    /// <summary>
+    /// 服务
+    /// </summary>
+    /// <typeparam name="string">交易对</typeparam>
+    /// <typeparam name="Core">服务</typeparam>
+    /// <returns></returns>
+    public Dictionary<long, MatchModel> service = new Dictionary<long, MatchModel>();
 
     /// <summary>
     /// 私有构造方法

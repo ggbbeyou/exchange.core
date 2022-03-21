@@ -25,6 +25,11 @@ public class MQ
     /// </summary>
     private MatchModel model;
     /// <summary>
+    /// Service:交易记录
+    /// </summary>
+    /// <returns></returns>
+    private DepthService depth_service = new DepthService();
+    /// <summary>
     /// 接收挂单订单队列标记
     /// </summary>
     /// <value></value>
@@ -34,7 +39,6 @@ public class MQ
     /// </summary>
     /// <value></value>
     public string? consumerTags_order_cancel;
-
     /// <summary>
     /// MQ基本属性
     /// </summary>
@@ -51,6 +55,11 @@ public class MQ
     /// <typeparam name="MatchDeal"></typeparam>
     /// <returns></returns>
     private List<Deal> deal = new List<Deal>();
+    /// <summary>
+    /// 临时变量
+    /// </summary>
+    /// <typeparam name="Orders"></typeparam>
+    /// <returns></returns>
     private List<Orders> deal_order = new List<Orders>();
     /// <summary>
     /// 临时变量
@@ -64,8 +73,6 @@ public class MQ
     /// <typeparam name="MatchOrder"></typeparam>
     /// <returns></returns>
     private List<Orders> cancel = new List<Orders>();
-    private DepthService depth_service = new DepthService();
-
 
     /// <summary>
     /// 初始化

@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 namespace Com.Bll;
 
 /// <summary>
-/// Db:
+/// Service:钱包
 /// </summary>
 public class WalletService
 {

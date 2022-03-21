@@ -128,8 +128,8 @@ public class Core
         deal_service.AddOrUpdateDeal(deals);
         FactoryService.instance.constant.stopwatch.Stop();
         FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};DB=>插入{deals.Count}条成交记录");
-        List<(long order_id, long uid, decimal amount, DateTimeOffset deal_last_time)> list = new List<(long order_id, long uid, decimal amount, DateTimeOffset deal_last_time)>();
         FactoryService.instance.constant.stopwatch.Restart();
+        // List<(long order_id, long uid, decimal amount, DateTimeOffset deal_last_time)> list = new List<(long order_id, long uid, decimal amount, DateTimeOffset deal_last_time)>();
         // var bid = from deal in deals
         //           group deal by new { deal.bid_id, deal.bid_uid } into g
         //           select new
@@ -158,7 +158,7 @@ public class Core
         // }
         order_service.UpdateOrder(orders);
         FactoryService.instance.constant.stopwatch.Stop();
-        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};DB=>更新{list.Count}条订单记录");
+        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};DB=>更新{orders.Count}条订单记录");
         FactoryService.instance.constant.stopwatch.Restart();
         var a = orders.GroupBy(P => P.uid).ToList();
         foreach (var item in a)

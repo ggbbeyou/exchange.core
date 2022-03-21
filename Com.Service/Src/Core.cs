@@ -83,14 +83,12 @@ public class Core
         {
             string json = Encoding.UTF8.GetString(b);
             // FactoryService.instance.constant.logger.LogInformation($"接收撮合传过来的成交订单:{json}");
-            List<Deal>? deals = JsonConvert.DeserializeObject<List<Deal>>(json);
-            if (deals != null && deals.Count > 0)
-            {
-                this.stopwatch.Restart();
-                ReceiveDealOrder(deals);
-                this.stopwatch.Stop();
-                FactoryService.instance.constant.logger.LogTrace($"计算耗时:{this.stopwatch.Elapsed.ToString()};撮合后续处理总时间,成交记录:{deals.Count}");
-            }
+            (List<Deal> deals, List<Orders> orders) deals = JsonConvert.DeserializeObject<(List<Deal>, List<Orders>)>(json);
+            this.stopwatch.Restart();
+            ReceiveDealOrder(deals.deals, deals.orders);
+            this.stopwatch.Stop();
+            FactoryService.instance.constant.logger.LogTrace($"计算耗时:{this.stopwatch.Elapsed.ToString()};撮合后续处理总时间,成交记录:{deals.deals.Count}");
+
             return true;
         });
     }
@@ -124,7 +122,7 @@ public class Core
     /// 接收到成交订单
     /// </summary>
     /// <param name="deals"></param>
-    private void ReceiveDealOrder(List<Deal> deals)
+    private void ReceiveDealOrder(List<Deal> deals, List<Orders> orders)
     {
         FactoryService.instance.constant.stopwatch.Restart();
         deal_service.AddOrUpdateDeal(deals);
@@ -132,32 +130,32 @@ public class Core
         FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};DB=>插入{deals.Count}条成交记录");
         List<(long order_id, long uid, decimal amount, DateTimeOffset deal_last_time)> list = new List<(long order_id, long uid, decimal amount, DateTimeOffset deal_last_time)>();
         FactoryService.instance.constant.stopwatch.Restart();
-        var bid = from deal in deals
-                  group deal by new { deal.bid_id, deal.bid_uid } into g
-                  select new
-                  {
-                      order_id = g.Key.bid_id,
-                      uid = g.Key.bid_uid,
-                      amount = g.Sum(x => x.amount),
-                      deal_last_time = g.OrderBy(P => P.time).Last().time,
-                  };
-        foreach (var item in bid)
-        {
-            list.Add((item.order_id, item.uid, item.amount, item.deal_last_time));
-        }
-        var ask = from deal in deals
-                  group deal by new { deal.ask_id, deal.ask_uid } into g
-                  select new
-                  {
-                      order_id = g.Key.ask_id,
-                      uid = g.Key.ask_uid,
-                      amount = g.Sum(x => x.amount),
-                      deal_last_time = g.OrderBy(P => P.time).Last().time,
-                  };
-        foreach (var item in ask)
-        {
-            list.Add((item.order_id, item.uid, item.amount, item.deal_last_time));
-        }
+        // var bid = from deal in deals
+        //           group deal by new { deal.bid_id, deal.bid_uid } into g
+        //           select new
+        //           {
+        //               order_id = g.Key.bid_id,
+        //               uid = g.Key.bid_uid,
+        //               amount = g.Sum(x => x.amount),
+        //               deal_last_time = g.OrderBy(P => P.time).Last().time,
+        //           };
+        // foreach (var item in bid)
+        // {
+        //     list.Add((item.order_id, item.uid, item.amount, item.deal_last_time));
+        // }
+        // var ask = from deal in deals
+        //           group deal by new { deal.ask_id, deal.ask_uid } into g
+        //           select new
+        //           {
+        //               order_id = g.Key.ask_id,
+        //               uid = g.Key.ask_uid,
+        //               amount = g.Sum(x => x.amount),
+        //               deal_last_time = g.OrderBy(P => P.time).Last().time,
+        //           };
+        // foreach (var item in ask)
+        // {
+        //     list.Add((item.order_id, item.uid, item.amount, item.deal_last_time));
+        // }
         order_service.UpdateOrder(list);
         FactoryService.instance.constant.stopwatch.Stop();
         FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};DB=>更新{list.Count}条订单记录");

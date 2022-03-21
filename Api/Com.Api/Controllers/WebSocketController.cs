@@ -69,7 +69,6 @@ public class WebSocketController : Controller
                 {
                     while (true)
                     {
-                        // await Task.Delay(1000);
                         await Task.Delay(1000 * 60 * 5);
                         if (webSocket.State == WebSocketState.Closed)
                         {

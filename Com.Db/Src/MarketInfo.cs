@@ -17,13 +17,7 @@ public class MarketInfo
     /// 交易对名称
     /// </summary>
     /// <value></value>
-    public string symbol
-    {
-        get
-        {
-            return $"{this.coin_name_base}{separator}{this.coin_name_quote}";
-        }
-    }
+    public string symbol { get; set; } = null!;
     /// <summary>
     /// 基础币种id
     /// </summary>

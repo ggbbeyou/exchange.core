@@ -7,6 +7,7 @@ namespace Com.Db;
 
 /// <summary>
 /// K线
+/// 注:此表数据量超大,请使用数据库表分区功能
 /// </summary>
 public class Kline
 {

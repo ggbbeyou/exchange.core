@@ -121,7 +121,7 @@ public class Core
             else
             {
                 string json = Encoding.UTF8.GetString(b);
-                FactoryService.instance.constant.logger.LogInformation(this.model.eventId, $"接收撮合传过来的取消订单:{json}");
+                // FactoryService.instance.constant.logger.LogInformation(this.model.eventId, $"接收撮合传过来的取消订单:{json}");
                 List<Orders>? deals = JsonConvert.DeserializeObject<List<Orders>>(json);
                 if (deals != null && deals.Count > 0)
                 {

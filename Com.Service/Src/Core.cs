@@ -82,7 +82,6 @@ public class Core
         FactoryService.instance.constant.MqWorker(FactoryService.instance.GetMqOrderDeal(this.model.info.market), (b) =>
         {
             string json = Encoding.UTF8.GetString(b);
-            // FactoryService.instance.constant.logger.LogInformation($"接收撮合传过来的成交订单:{json}");
             (List<Deal> deals, List<Orders> orders) deals = JsonConvert.DeserializeObject<(List<Deal>, List<Orders>)>(json);
             this.stopwatch.Restart();
             ReceiveDealOrder(deals.deals, deals.orders);

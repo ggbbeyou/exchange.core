@@ -122,7 +122,7 @@ public class Core
     /// 接收到成交订单
     /// </summary>
     /// <param name="deals"></param>
-    private async void ReceiveDealOrder(List<Deal> deals, List<Orders> orders)
+    private void ReceiveDealOrder(List<Deal> deals, List<Orders> orders)
     {
         FactoryService.instance.constant.stopwatch.Restart();
         deal_service.AddOrUpdateDeal(deals);
@@ -156,25 +156,15 @@ public class Core
         // {
         //     list.Add((item.order_id, item.uid, item.amount, item.deal_last_time));
         // }
-        order_service.UpdateOrder(list);
+        order_service.UpdateOrder(orders);
         FactoryService.instance.constant.stopwatch.Stop();
         FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};DB=>更新{list.Count}条订单记录");
         FactoryService.instance.constant.stopwatch.Restart();
-
-
         var a = orders.GroupBy(P => P.uid).ToList();
         foreach (var item in a)
         {
-
-            FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.trades, this.model.info.market, item.Key), JsonConvert.SerializeObject(item.ToList()));
+            FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.orders, this.model.info.market, item.Key), JsonConvert.SerializeObject(item.ToList()));
         }
-
-
-
-
-
-
-
         FactoryService.instance.constant.stopwatch.Stop();
         FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};Mq=>推送订单更新");
         FactoryService.instance.constant.stopwatch.Restart();

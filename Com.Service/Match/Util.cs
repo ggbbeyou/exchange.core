@@ -110,14 +110,12 @@ public static class Util
             bid_uid = bid.uid,
             bid_amount = bid.amount,
             bid_amount_unsold = bid.amount_unsold,
-            bid_amount_done = bid.amount_done,
-            bid_state = bid.state,
+            bid_amount_done = bid.amount_done,           
             ask_id = ask.order_id,
             ask_uid = ask.uid,
             ask_amount = ask.amount,
             ask_amount_unsold = ask.amount_unsold,
             ask_amount_done = ask.amount_done,
-            ask_state = ask.state,
             time = now,
         };
         return deal;

@@ -71,11 +71,6 @@ public class Deal
     /// <value></value>
     public decimal bid_amount_done { get; set; }
     /// <summary>
-    /// 买单订单状态
-    /// </summary>
-    /// <value></value>
-    public E_OrderState bid_state { get; set; }
-    /// <summary>
     /// 卖单id
     /// </summary>
     /// <value></value>
@@ -100,11 +95,6 @@ public class Deal
     /// </summary>
     /// <value></value>
     public decimal ask_amount_done { get; set; }
-    /// <summary>
-    /// 卖单订单状态
-    /// </summary>
-    /// <value></value>
-    public E_OrderState ask_state { get; set; }
     /// <summary>
     /// 成交时间
     /// </summary>

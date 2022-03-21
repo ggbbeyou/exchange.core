@@ -46,7 +46,7 @@ public class OrderService
     /// <param name="uid">用户id</param>
     /// <param name="order">订单列表</param>
     /// <returns></returns>
-    public CallResponse<List<Orders>> PlaceOrder(long market, List<Orders> order)
+    public CallResponse<List<Orders>> PlaceOrder(long market, long uid, List<Orders> order)
     {
         FactoryService.instance.constant.stopwatch.Restart();
         db.Orders.AddRange(order);

@@ -112,7 +112,7 @@ public class DbContextEF : DbContext
             o.Property(P => P.bid_uid).IsRequired().HasColumnType("bigint").HasComment("买单用户id");
             o.Property(P => P.bid_amount).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("买单挂单量");
             o.Property(P => P.bid_amount_unsold).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("买单未成交量");
-            o.Property(P => P.bid_amount_done).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("买单已成交量");          
+            o.Property(P => P.bid_amount_done).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("买单已成交量");
             o.Property(P => P.ask_id).IsRequired().HasColumnType("bigint").HasComment("卖单id");
             o.Property(P => P.ask_uid).IsRequired().HasColumnType("bigint").HasComment("卖单用户id");
             o.Property(P => P.ask_amount).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("卖单挂单量");
@@ -148,6 +148,11 @@ public class DbContextEF : DbContext
             o.HasIndex(P => new { P.symbol }).IsUnique();
             o.Property(P => P.market).IsRequired().ValueGeneratedNever().HasColumnType("bigint").HasComment("交易对");
             o.Property(P => P.symbol).HasColumnType("nvarchar").HasMaxLength(20).HasComment("交易对名称");
+            o.Property(P => P.coin_id_base).IsRequired().ValueGeneratedNever().HasColumnType("bigint").HasComment("基础币种id");
+            o.Property(P => P.coin_name_base).HasColumnType("nvarchar").HasMaxLength(20).HasComment("基础币种名");
+            o.Property(P => P.coin_id_quote).IsRequired().ValueGeneratedNever().HasColumnType("bigint").HasComment("报价币种id");
+            o.Property(P => P.coin_name_quote).HasColumnType("nvarchar").HasMaxLength(20).HasComment("报价币种名");
+            o.Property(P => P.separator).HasColumnType("nvarchar").HasMaxLength(10).HasComment("分隔符");
             o.Property(P => P.price_places).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("价格小数位数");
             o.Property(P => P.amount_places).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("量小数位数");
             o.Property(P => P.amount_multiple).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("交易量整数倍数");

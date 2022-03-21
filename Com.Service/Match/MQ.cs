@@ -191,8 +191,12 @@ public class MQ
                     if (cancel.Count > 0)
                     {
                         FactoryService.instance.constant.MqTask(FactoryService.instance.GetMqOrderCancelSuccess(this.model.info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(cancel)));
-                        // (List<BaseOrderBook> bid, List<BaseOrderBook> ask) orderbook = this.model.match_core.GetOrderBook();
-                        // depth_service.ConvertDepth(orderbook);
+                        FactoryService.instance.constant.stopwatch.Restart();
+                        (List<BaseOrderBook> bid, List<BaseOrderBook> ask) orderbook = this.model.match_core.GetOrderBook();
+                        Dictionary<E_WebsockerChannel, Depth> depths = depth_service.ConvertDepth(this.model.info.market, this.model.info.symbol, orderbook);
+                        depth_service.Push(depths);
+                        FactoryService.instance.constant.stopwatch.Stop();
+                        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};推送深度行情");
                     }
                 }
                 return true;

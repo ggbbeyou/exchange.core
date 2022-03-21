@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using Com.Db;
 using Com.Db.Enum;
 using Com.Service.Match;
+using Microsoft.Extensions.Logging;
 
 namespace Com.Service.Models;
 
@@ -16,6 +17,10 @@ public class MatchModel
     /// </summary>
     /// <value></value>
     public bool run { get; set; }
+    /// <summary>
+    /// 日志事件ID
+    /// </summary>
+    public EventId eventId;
     /// <summary>
     /// 交易对基本信息
     /// </summary>
@@ -44,5 +49,6 @@ public class MatchModel
     public MatchModel(MarketInfo info)
     {
         this.info = info;
+        this.eventId = new EventId(1, info.symbol);
     }
 }

@@ -179,9 +179,9 @@ public class OrderService
     {
         using (var scope = FactoryService.instance.constant.provider.CreateScope())
         {
-            this.db = scope.ServiceProvider.GetService<DbContextEF>()!;
-            this.db.Orders.UpdateRange(data);
-            this.db.SaveChanges();
+            DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!;
+            db.Orders.UpdateRange(data);
+            db.SaveChanges();
         }
     }
 

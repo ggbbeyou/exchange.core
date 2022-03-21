@@ -89,13 +89,13 @@ public static class Util
         ask.amount_unsold -= amount;
         ask.amount_done += amount;
         ask.deal_last_time = now;
-        if (trigger_side == E_OrderSide.buy)
-        {
-            orders.Add(ask);
-        }
-        else if (trigger_side == E_OrderSide.sell)
+        if (!orders.Exists(P => P.order_id == bid.order_id))
         {
             orders.Add(bid);
+        }
+        if (!orders.Exists(P => P.order_id == ask.order_id))
+        {
+            orders.Add(ask);
         }
         Deal deal = new Deal()
         {

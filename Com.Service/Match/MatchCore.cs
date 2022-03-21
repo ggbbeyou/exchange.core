@@ -220,7 +220,6 @@ public class MatchCore
         {
             return (deals, orders);
         }
-        orders.Add(order);
         if (order.side == E_OrderSide.buy)
         {
             //先市价成交,再限价成交

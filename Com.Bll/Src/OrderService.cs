@@ -177,8 +177,12 @@ public class OrderService
     /// <param name="data"></param>
     public void UpdateOrder(List<Orders> data)
     {
-        this.db.Orders.UpdateRange(data);
-        this.db.SaveChanges();
+        using (var scope = FactoryService.instance.constant.provider.CreateScope())
+        {
+            this.db = scope.ServiceProvider.GetService<DbContextEF>()!;
+            this.db.Orders.UpdateRange(data);
+            this.db.SaveChanges();
+        }
     }
 
 

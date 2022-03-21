@@ -49,22 +49,62 @@ public class Deal
     /// 买单id
     /// </summary>
     /// <value></value>
+    public long bid_id { get; set; }
+    /// <summary>
+    /// 买单用户id
+    /// </summary>
+    /// <value></value>
     public long bid_uid { get; set; }
     /// <summary>
-    /// 卖单id
+    /// 买单挂单量
     /// </summary>
     /// <value></value>
-    public long ask_uid { get; set; }
+    public decimal bid_amount { get; set; }
     /// <summary>
-    /// 买单id
+    /// 买单未成交量
     /// </summary>
     /// <value></value>
-    public long bid_id { get; set; }
+    public decimal bid_amount_unsold { get; set; }
+    /// <summary>
+    /// 买单已成交量
+    /// </summary>
+    /// <value></value>
+    public decimal bid_amount_done { get; set; }
+    /// <summary>
+    /// 买单订单状态
+    /// </summary>
+    /// <value></value>
+    public E_OrderState bid_state { get; set; }
     /// <summary>
     /// 卖单id
     /// </summary>
     /// <value></value>
     public long ask_id { get; set; }
+    /// <summary>
+    /// 卖单用户id
+    /// </summary>
+    /// <value></value>
+    public long ask_uid { get; set; }
+    /// <summary>
+    /// 卖单挂单量
+    /// </summary>
+    /// <value></value>
+    public decimal ask_amount { get; set; }
+    /// <summary>
+    /// 卖单未成交量
+    /// </summary>
+    /// <value></value>
+    public decimal ask_amount_unsold { get; set; }
+    /// <summary>
+    /// 卖单已成交量
+    /// </summary>
+    /// <value></value>
+    public decimal ask_amount_done { get; set; }
+    /// <summary>
+    /// 卖单订单状态
+    /// </summary>
+    /// <value></value>
+    public E_OrderState ask_state { get; set; }
     /// <summary>
     /// 成交时间
     /// </summary>

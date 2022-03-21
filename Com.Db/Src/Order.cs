@@ -61,7 +61,7 @@ public class Orders
     /// <value></value>
     public decimal amount_unsold { get; set; }
     /// <summary>
-    /// 已成交挂单量
+    /// 已成交量
     /// </summary>
     /// <value></value>
     public decimal amount_done { get; set; }

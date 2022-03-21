@@ -189,6 +189,11 @@ public class Core
             entries[i] = new SortedSetEntry(JsonConvert.SerializeObject(deals[i]), deals[i].time.ToUnixTimeMilliseconds());
         }
         FactoryService.instance.constant.redis.SortedSetAdd(FactoryService.instance.GetRedisDeal(this.model.info.market), entries);
+
+
+
+
+        
         res_deal.success = true;
         res_deal.op = E_WebsockerOp.subscribe_date;
         res_deal.channel = E_WebsockerChannel.trades;

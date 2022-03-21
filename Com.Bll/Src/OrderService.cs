@@ -10,6 +10,8 @@ using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Data.Entity;
+using System.Linq.Expressions;
+using LinqKit;
 
 namespace Com.Bll;
 
@@ -39,46 +41,18 @@ public class OrderService
     /// <param name="start">开始时间</param>
     /// <param name="end">结束时间</param>
     /// <returns></returns>
-    // public List<Deal> GetDeals(long market, DateTimeOffset? start, DateTimeOffset? end)
-    // {
-    //     Expression<Func<Deal, bool>> predicate = P => P.market == market;
-    //     if (start != null)
-    //     {
-    //         predicate = predicate.And(P => start <= P.time);
-    //     }
-    //     if (end != null)
-    //     {
-    //         predicate = predicate.And(P => P.time <= end);
-    //     }
-    //     return this.db.Deal.Where(predicate).OrderBy(P => P.time).ToList();
-    // }
-
-
-
-    /// <summary>
-    /// 添加或保存
-    /// </summary>
-    /// <param name="deals"></param>
-    public int AddOrUpdateOrder(List<Orders> deals)
+    public List<Deal> GetDeals(long market, DateTimeOffset? start, DateTimeOffset? end)
     {
-        List<Orders> temp = this.db.Orders.Where(P => deals.Select(Q => Q.order_id).Contains(P.order_id)).ToList();
-        foreach (var deal in deals)
+        Expression<Func<Deal, bool>> predicate = P => P.market == market;
+        if (start != null)
         {
-            var temp_deal = temp.FirstOrDefault(P => P.order_id == deal.order_id);
-            if (temp_deal != null)
-            {
-                temp_deal.amount_unsold = deal.amount_unsold;
-                temp_deal.amount_done = deal.amount_done;
-                temp_deal.deal_last_time = deal.deal_last_time;
-                temp_deal.state = deal.state;
-                temp_deal.trigger_cancel_price = deal.trigger_cancel_price;
-            }
-            else
-            {
-                this.db.Orders.Add(deal);
-            }
+            predicate = predicate.And(P => start <= P.time);
         }
-        return this.db.SaveChanges();
+        if (end != null)
+        {
+            predicate = predicate.And(P => P.time <= end);
+        }
+        return this.db.Deal.Where(predicate).OrderBy(P => P.time).ToList();
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////
@@ -116,7 +90,6 @@ public class OrderService
         return res;
     }
 
-
     /// <summary>
     /// 挂单总入口
     /// </summary>  
@@ -140,35 +113,6 @@ public class OrderService
         res.message = null;
         res.data = new KeyValuePair<long, List<long>>(uid, order);
         return res;
-    }
-
-    /// <summary>
-    /// 更新订单
-    /// </summary>
-    /// <param name="data"></param>
-    public void UpdateOrder(List<(long order_id, long uid, decimal amount, DateTimeOffset last_deal_date)> data)
-    {
-        List<Orders> orders = this.db.Orders.Where(P => data.Select(p => p.order_id).Contains(P.order_id)).ToList();
-        foreach (var item in data)
-        {
-            Orders? order = orders.FirstOrDefault(p => p.order_id == item.order_id);
-            if (order == null)
-            {
-                continue;
-            }
-            order.amount_done += item.amount;
-            order.amount_unsold -= item.amount;
-            order.deal_last_time = item.last_deal_date;
-            if (order.amount_unsold == 0)
-            {
-                order.state = E_OrderState.completed;
-            }
-            else
-            {
-                order.state = E_OrderState.partial;
-            }
-        }
-        this.db.SaveChanges();
     }
 
     /// <summary>

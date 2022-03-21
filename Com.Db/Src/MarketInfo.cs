@@ -17,7 +17,38 @@ public class MarketInfo
     /// 交易对名称
     /// </summary>
     /// <value></value>
-    public string symbol { get; set; } = null!;
+    public string symbol
+    {
+        get
+        {
+            return $"{this.coin_name_base}{separator}{this.coin_name_quote}";
+        }
+    }
+    /// <summary>
+    /// 基础币种id
+    /// </summary>
+    /// <value></value>
+    public long coin_id_base { get; set; }
+    /// <summary>
+    /// 基础币种名
+    /// </summary>
+    /// <value></value>
+    public string coin_name_base { get; set; } = null!;
+    /// <summary>
+    /// 报价币种id
+    /// </summary>
+    /// <value></value>
+    public long coin_id_quote { get; set; }
+    /// <summary>
+    /// 报价币种名
+    /// </summary>
+    /// <value></value>
+    public string coin_name_quote { get; set; } = null!;
+    /// <summary>
+    /// 分隔符
+    /// </summary>
+    /// <value></value>
+    public string separator { get; set; } = "/";
     /// <summary>
     /// 价格小数位数
     /// </summary>

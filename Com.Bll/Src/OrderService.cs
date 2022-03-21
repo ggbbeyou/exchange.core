@@ -24,6 +24,11 @@ public class OrderService
     /// 数据库
     /// </summary>
     public DbContextEF db = null!;
+    /// <summary>
+    /// 钱包服务
+    /// </summary>
+    /// <returns></returns>
+    public WalletService wallet_service = new WalletService();
 
     /// <summary>
     /// 初始化
@@ -33,30 +38,6 @@ public class OrderService
         var scope = FactoryService.instance.constant.provider.CreateScope();
         this.db = scope.ServiceProvider.GetService<DbContextEF>()!;
     }
-
-    /// <summary>
-    /// 获取交易记录
-    /// </summary>
-    /// <param name="market">交易对</param>
-    /// <param name="start">开始时间</param>
-    /// <param name="end">结束时间</param>
-    /// <returns></returns>
-    public List<Deal> GetDeals(long market, DateTimeOffset? start, DateTimeOffset? end)
-    {
-        Expression<Func<Deal, bool>> predicate = P => P.market == market;
-        if (start != null)
-        {
-            predicate = predicate.And(P => start <= P.time);
-        }
-        if (end != null)
-        {
-            predicate = predicate.And(P => P.time <= end);
-        }
-        return this.db.Deal.Where(predicate).OrderBy(P => P.time).ToList();
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////////////////
-
 
     /// <summary>
     /// 挂单总入口

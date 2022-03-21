@@ -137,15 +137,9 @@ public class DealService
         {
             predicate = predicate.And(P => P.time <= end);
         }
-        else
-        {
-            end = DateTimeOffset.UtcNow;
-        }
         try
         {
-            // var sql = from deal in this.db.Deal.Where(predicate)
             var sql = from deal in this.db.Deal.Where(predicate)
-                      where deal.market == market && start <= deal.time && deal.time <= end
                       group deal by new { deal.market, deal.symbol } into g
                       select new Kline
                       {

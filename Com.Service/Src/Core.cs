@@ -56,6 +56,12 @@ public class Core
     /// <returns></returns>
     private ResWebsocker<List<Kline>> res_kline = new ResWebsocker<List<Kline>>();
     /// <summary>
+    /// 临时变量
+    /// </summary>
+    /// <typeparam name="Kline?"></typeparam>
+    /// <returns></returns>
+    private ResWebsocker<List<Orders>> res_order = new ResWebsocker<List<Orders>>();
+    /// <summary>
     /// 秒表
     /// </summary>
     /// <returns></returns>
@@ -68,6 +74,15 @@ public class Core
     public Core(MatchModel model)
     {
         this.model = model;
+        res_order.success = true;
+        res_order.op = E_WebsockerOp.subscribe_date;
+        res_order.channel = E_WebsockerChannel.orders;
+        res_deal.success = true;
+        res_deal.op = E_WebsockerOp.subscribe_date;
+        res_deal.channel = E_WebsockerChannel.trades;
+        res_kline.success = true;
+        res_kline.op = E_WebsockerOp.subscribe_date;
+        res_kline.data = new List<Kline>();
         var scope = FactoryService.instance.constant.provider.CreateScope();
         this.db = scope.ServiceProvider.GetService<DbContextEF>()!;
         ReceiveMatchOrder();
@@ -135,6 +150,7 @@ public class Core
         var uid_order = orders.GroupBy(P => P.uid).ToList();
         foreach (var item in uid_order)
         {
+            res_order.data = item.ToList();
             FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.orders, this.model.info.market, item.Key), JsonConvert.SerializeObject(item.ToList()));
         }
         FactoryService.instance.constant.stopwatch.Stop();
@@ -167,18 +183,12 @@ public class Core
             entries[i] = new SortedSetEntry(JsonConvert.SerializeObject(deals[i]), deals[i].time.ToUnixTimeMilliseconds());
         }
         FactoryService.instance.constant.redis.SortedSetAdd(FactoryService.instance.GetRedisDeal(this.model.info.market), entries);
-        res_deal.success = true;
-        res_deal.op = E_WebsockerOp.subscribe_date;
-        res_deal.channel = E_WebsockerChannel.trades;
         res_deal.data = deals;
         FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.trades, this.model.info.market), JsonConvert.SerializeObject(res_deal));
         FactoryService.instance.constant.stopwatch.Stop();
         FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};Mq,Redis=>推送交易记录");
         FactoryService.instance.constant.stopwatch.Restart();
         HashEntry[] hashes = FactoryService.instance.constant.redis.HashGetAll(FactoryService.instance.GetRedisKlineing(this.model.info.market));
-        res_kline.success = true;
-        res_kline.op = E_WebsockerOp.subscribe_date;
-        res_kline.data = new List<Kline>();
         foreach (var item in hashes)
         {
             res_kline.data.Clear();

@@ -91,7 +91,7 @@ public class OrderService
     }
 
     /// <summary>
-    /// 挂单总入口
+    /// 取消挂单总入口
     /// </summary>  
     /// <param name="market">交易对</param>
     /// <param name="uid">用户id</param>

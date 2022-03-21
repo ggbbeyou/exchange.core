@@ -191,7 +191,7 @@ public class MatchCore
     }
 
     /// <summary>
-    /// 获取订单
+    /// 获取深度行情
     /// </summary>
     /// <param name="bid"></param>
     /// <param name="GetOrderBook("></param>

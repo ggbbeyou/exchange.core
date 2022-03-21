@@ -122,7 +122,7 @@ public class Core
     /// 接收到成交订单
     /// </summary>
     /// <param name="deals"></param>
-    private void ReceiveDealOrder(List<Deal> deals, List<Orders> orders)
+    private async void ReceiveDealOrder(List<Deal> deals, List<Orders> orders)
     {
         FactoryService.instance.constant.stopwatch.Restart();
         deal_service.AddOrUpdateDeal(deals);
@@ -160,33 +160,14 @@ public class Core
         FactoryService.instance.constant.stopwatch.Stop();
         FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};DB=>更新{list.Count}条订单记录");
         FactoryService.instance.constant.stopwatch.Restart();
-        List<Order> bid_orders = new List<Order>();
-        var bid_uid = deals.Select(P => P.bid_uid).Distinct().ToList();
-        foreach (var item in bid_uid)
+
+
+        var a = orders.GroupBy(P => P.uid).ToList();
+        foreach (var item in a)
         {
-            List<Deal> deal = deals.Where(P => P.bid_uid == item).ToList();
-            bid_orders.Add(new Order()
-            {
-                // order_id = deal.First().bid_id,
-            });
 
-
-
+            FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.trades, this.model.info.market, item.Key), JsonConvert.SerializeObject(item.ToList()));
         }
-
-
-
-        var bid_order = from deal in deals
-                        group deal by new { deal.bid_id, deal.bid_uid } into g
-                        select new
-                        {
-                            order_id = g.Key.bid_id,
-                            uid = g.Key.bid_uid,
-                            amount = g.Sum(x => x.amount),
-                            deal_last_time = g.OrderBy(P => P.time).Last().time,
-                        };
-
-
 
 
 

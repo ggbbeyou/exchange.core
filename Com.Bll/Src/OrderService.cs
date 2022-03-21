@@ -144,7 +144,7 @@ public class OrderService
     /// 更新订单
     /// </summary>
     /// <param name="data"></param>
-    public void UpdateOrder(List<(long order_id, decimal amount, DateTimeOffset last_deal_date)> data)
+    public void UpdateOrder(List<(long order_id, long uid, decimal amount, DateTimeOffset last_deal_date)> data)
     {
         List<Orders> orders = this.db.Orders.Where(P => data.Select(p => p.order_id).Contains(P.order_id)).ToList();
         foreach (var item in data)

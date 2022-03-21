@@ -99,7 +99,9 @@ public static class Util
             total = amount * price,
             trigger_side = trigger_side,
             bid_id = bid.order_id,
+            bid_uid = bid.uid,
             ask_id = ask.order_id,
+            ask_uid = ask.uid,
             time = now,
         };
         return deal;

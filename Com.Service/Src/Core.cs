@@ -130,31 +130,33 @@ public class Core
         deal_service.AddOrUpdateDeal(deals);
         FactoryService.instance.constant.stopwatch.Stop();
         FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};DB=>插入{deals.Count}条成交记录");
-        List<(long, decimal, DateTimeOffset)> list = new List<(long, decimal, DateTimeOffset)>();
+        List<(long order_id, long uid, decimal amount, DateTimeOffset deal_last_time)> list = new List<(long order_id, long uid, decimal amount, DateTimeOffset deal_last_time)>();
         FactoryService.instance.constant.stopwatch.Restart();
         var bid = from deal in deals
-                  group deal by new { deal.bid_id } into g
+                  group deal by new { deal.bid_id, deal.bid_uid } into g
                   select new
                   {
-                      g.Key.bid_id,
+                      order_id = g.Key.bid_id,
+                      uid = g.Key.bid_uid,
                       amount = g.Sum(x => x.amount),
                       deal_last_time = g.OrderBy(P => P.time).Last().time,
                   };
         foreach (var item in bid)
         {
-            list.Add((item.bid_id, item.amount, item.deal_last_time));
+            list.Add((item.order_id, item.uid, item.amount, item.deal_last_time));
         }
         var ask = from deal in deals
-                  group deal by new { deal.ask_id } into g
+                  group deal by new { deal.ask_id, deal.ask_uid } into g
                   select new
                   {
-                      g.Key.ask_id,
+                      order_id = g.Key.ask_id,
+                      uid = g.Key.ask_uid,
                       amount = g.Sum(x => x.amount),
                       deal_last_time = g.OrderBy(P => P.time).Last().time,
                   };
         foreach (var item in ask)
         {
-            list.Add((item.ask_id, item.amount, item.deal_last_time));
+            list.Add((item.order_id, item.uid, item.amount, item.deal_last_time));
         }
         order_service.UpdateOrder(list);
         FactoryService.instance.constant.stopwatch.Stop();
@@ -177,7 +179,7 @@ public class Core
             }
         }
         this.kline_service.DBtoRedised(this.model.info.market, this.model.info.symbol, end);
-        this.kline_service.DBtoRedising(this.model.info.market, this.model.info.symbol,deals);
+        this.kline_service.DBtoRedising(this.model.info.market, this.model.info.symbol, deals);
         FactoryService.instance.constant.stopwatch.Stop();
         FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};DB=>同步K线记录");
         FactoryService.instance.constant.stopwatch.Restart();

@@ -49,6 +49,16 @@ public class Deal
     /// 买单id
     /// </summary>
     /// <value></value>
+    public long bid_uid { get; set; }
+    /// <summary>
+    /// 卖单id
+    /// </summary>
+    /// <value></value>
+    public long ask_uid { get; set; }
+    /// <summary>
+    /// 买单id
+    /// </summary>
+    /// <value></value>
     public long bid_id { get; set; }
     /// <summary>
     /// 卖单id
@@ -60,18 +70,18 @@ public class Deal
     /// </summary>
     /// <value></value>
     public DateTimeOffset time { get; set; }
-    /// <summary>
-    /// 买订单
-    /// </summary>
-    /// <value></value>
-    [NotMapped]
-    [JsonIgnore]
-    public Orders bid { get; set; } = null!;
-    /// <summary>
-    /// 卖订单
-    /// </summary>
-    /// <value></value>
-    [NotMapped]
-    [JsonIgnore]
-    public Orders ask { get; set; } = null!;
+    // /// <summary>
+    // /// 买订单
+    // /// </summary>
+    // /// <value></value>
+    // [NotMapped]
+    // [JsonIgnore]
+    // public Orders bid { get; set; } = null!;
+    // /// <summary>
+    // /// 卖订单
+    // /// </summary>
+    // /// <value></value>
+    // [NotMapped]
+    // [JsonIgnore]
+    // public Orders ask { get; set; } = null!;
 }

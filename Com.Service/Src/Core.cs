@@ -74,7 +74,6 @@ public class Core
     public Core(MatchModel model)
     {
         this.model = model;
-
         res_order.success = true;
         res_order.op = E_WebsockerOp.subscribe_date;
         res_order.channel = E_WebsockerChannel.orders;

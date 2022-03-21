@@ -8,6 +8,8 @@ using StackExchange.Redis;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using System.Data.Entity;
 
 namespace Com.Bll;
 
@@ -169,33 +171,13 @@ public class OrderService
         this.db.SaveChanges();
     }
 
-
     /// <summary>
     /// 更新订单
     /// </summary>
     /// <param name="data"></param>
     public void UpdateOrder(List<Orders> data)
     {
-        List<Orders> orders = this.db.Orders.Where(P => data.Select(p => p.order_id).Contains(P.order_id)).ToList();
-        foreach (var item in data)
-        {
-            Orders? order = orders.FirstOrDefault(p => p.order_id == item.order_id);
-            if (order == null)
-            {
-                continue;
-            }
-            order.amount_done += item.amount;
-            order.amount_unsold -= item.amount;
-            order.deal_last_time = item.deal_last_time;
-            if (order.amount_unsold == 0)
-            {
-                order.state = E_OrderState.completed;
-            }
-            else
-            {
-                order.state = E_OrderState.partial;
-            }
-        }
+        this.db.Orders.UpdateRange(data);
         this.db.SaveChanges();
     }
 

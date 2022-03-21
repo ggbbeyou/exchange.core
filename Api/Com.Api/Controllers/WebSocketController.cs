@@ -156,6 +156,7 @@ public class WebSocketController : Controller
         }
         if (req.op == E_WebsockerOp.login)
         {
+            //执行登录操作，并设置用户id            
             uid = 1;
             resWebsocker.channel = E_WebsockerChannel.none;
             resWebsocker.data = "";

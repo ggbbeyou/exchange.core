@@ -129,39 +129,12 @@ public class Core
         FactoryService.instance.constant.stopwatch.Stop();
         FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};DB=>插入{deals.Count}条成交记录");
         FactoryService.instance.constant.stopwatch.Restart();
-        // List<(long order_id, long uid, decimal amount, DateTimeOffset deal_last_time)> list = new List<(long order_id, long uid, decimal amount, DateTimeOffset deal_last_time)>();
-        // var bid = from deal in deals
-        //           group deal by new { deal.bid_id, deal.bid_uid } into g
-        //           select new
-        //           {
-        //               order_id = g.Key.bid_id,
-        //               uid = g.Key.bid_uid,
-        //               amount = g.Sum(x => x.amount),
-        //               deal_last_time = g.OrderBy(P => P.time).Last().time,
-        //           };
-        // foreach (var item in bid)
-        // {
-        //     list.Add((item.order_id, item.uid, item.amount, item.deal_last_time));
-        // }
-        // var ask = from deal in deals
-        //           group deal by new { deal.ask_id, deal.ask_uid } into g
-        //           select new
-        //           {
-        //               order_id = g.Key.ask_id,
-        //               uid = g.Key.ask_uid,
-        //               amount = g.Sum(x => x.amount),
-        //               deal_last_time = g.OrderBy(P => P.time).Last().time,
-        //           };
-        // foreach (var item in ask)
-        // {
-        //     list.Add((item.order_id, item.uid, item.amount, item.deal_last_time));
-        // }
         order_service.UpdateOrder(orders);
         FactoryService.instance.constant.stopwatch.Stop();
         FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};DB=>更新{orders.Count}条订单记录");
         FactoryService.instance.constant.stopwatch.Restart();
-        var a = orders.GroupBy(P => P.uid).ToList();
-        foreach (var item in a)
+        var uid_order = orders.GroupBy(P => P.uid).ToList();
+        foreach (var item in uid_order)
         {
             FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.orders, this.model.info.market, item.Key), JsonConvert.SerializeObject(item.ToList()));
         }

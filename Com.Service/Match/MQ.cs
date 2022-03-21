@@ -99,6 +99,7 @@ public class MQ
                 {
                     deal.Clear();
                     cancel_deal.Clear();
+                    deal_order.Clear();
                     FactoryService.instance.constant.stopwatch.Restart();
                     foreach (Orders item in req.data)
                     {
@@ -107,7 +108,7 @@ public class MQ
                         deal.AddRange(match.deals);
                         foreach (var item1 in match.orders)
                         {
-                            if (!deal_order.Contains(item1))
+                            if (!deal_order.Exists(P => P.order_id == item1.order_id))
                             {
                                 deal_order.Add(item1);
                             }

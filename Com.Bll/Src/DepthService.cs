@@ -17,14 +17,14 @@ public class DepthService
     /// </summary>
     /// <returns></returns>
     public static readonly DepthService instance = new DepthService();
- 
+
     /// <summary>
     /// 初始化
     /// </summary>
     private DepthService()
     {
     }
-    
+
     /// <summary>
     /// 转换深度行情
     /// </summary>
@@ -121,7 +121,92 @@ public class DepthService
     /// <returns></returns>
     public (List<BaseOrderBook> bid, List<BaseOrderBook> ask) DiffOrderBook((List<BaseOrderBook> bid, List<BaseOrderBook> ask) book_old, (List<BaseOrderBook> bid, List<BaseOrderBook> ask) book_new)
     {
-        return book_new;
+        List<BaseOrderBook> bid_diff = new List<BaseOrderBook>();
+        List<BaseOrderBook> ask_diff = new List<BaseOrderBook>();
+        if (book_old.bid == null || book_old.bid.Count == 0)
+        {
+            bid_diff = book_new.bid;
+        }
+        else
+        {
+            bid_diff = DiffOrderBook(book_old.bid, book_new.bid);
+        }
+        if (book_old.ask == null || book_old.ask.Count == 0)
+        {
+            ask_diff = book_new.ask;
+        }
+        else
+        {
+            ask_diff = DiffOrderBook(book_old.ask, book_new.ask);
+        }
+        return (bid_diff, ask_diff);
+    }
+
+    /// <summary>
+    /// 差异
+    /// </summary>
+    /// <param name="book_old"></param>
+    /// <param name="book_new"></param>
+    /// <returns></returns>
+    public List<BaseOrderBook> DiffOrderBook(List<BaseOrderBook> book_old, List<BaseOrderBook> book_new)
+    {
+        List<BaseOrderBook> diff = new List<BaseOrderBook>();
+        foreach (var item in book_old)
+        {
+            BaseOrderBook? book = book_new.FirstOrDefault(x => x.price == item.price);
+            if (book == null)
+            {
+                diff.Add(new BaseOrderBook()
+                {
+                    market = item.market,
+                    symbol = item.symbol,
+                    price = item.price,
+                    amount = 0,
+                    count = 0,
+                    direction = item.direction,
+                    last_time = DateTimeOffset.UtcNow,
+                });
+            }
+            else
+            {
+                diff.Add(new BaseOrderBook()
+                {
+                    market = book.market,
+                    symbol = book.symbol,
+                    price = book.price,
+                    amount = book.amount,
+                    count = book.count,
+                    direction = book.direction,
+                    last_time = book.last_time,
+                });
+            }
+        }
+        List<BaseOrderBook> add = book_new.Where(P => diff.Select(T => T.price).Contains(P.price)).ToList();
+        foreach (var item in add)
+        {
+            diff.Add(new BaseOrderBook()
+            {
+                market = item.market,
+                symbol = item.symbol,
+                price = item.price,
+                amount = item.amount,
+                count = item.count,
+                direction = item.direction,
+                last_time = item.last_time,
+            });
+        }
+        if (diff.Count > 0)
+        {
+            if (diff[0].direction == E_OrderSide.buy)
+            {
+                diff = diff.OrderByDescending(P => P.price).ToList();
+            }
+            else if (diff[0].direction == E_OrderSide.sell)
+            {
+                diff = diff.OrderBy(P => P.price).ToList();
+            }
+        }
+        return diff;
     }
 
     /// <summary>

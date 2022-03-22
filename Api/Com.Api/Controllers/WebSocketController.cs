@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using Microsoft.AspNetCore.Authorization;
+using StackExchange.Redis;
 
 namespace Com.Api.Controllers;
 
@@ -198,16 +199,35 @@ public class WebSocketController : Controller
                         {
                             continue;
                         }
-                        string ConsumerTags = FactoryService.instance.constant.MqSubscribe(key, async (b) =>
-                        {
-                            await webSocket.SendAsync(new ArraySegment<byte>(b, 0, b.Length), WebSocketMessageType.Text, true, CancellationToken.None);
-                        });
                         resWebsocker.channel = item.channel;
                         resWebsocker.data = item.data;
                         resWebsocker.message = "订阅成功";
                         string Json = JsonConvert.SerializeObject(resWebsocker);
                         byte[] bb = System.Text.Encoding.UTF8.GetBytes(Json);
                         webSocket.SendAsync(new ArraySegment<byte>(bb, 0, bb.Length), WebSocketMessageType.Text, true, CancellationToken.None);
+                        if (item.channel == E_WebsockerChannel.books10_inc || item.channel == E_WebsockerChannel.books50_inc || item.channel == E_WebsockerChannel.books200_inc)
+                        {
+                            string key_depth = "";
+                            if (item.channel == E_WebsockerChannel.books10_inc)
+                            {
+                                key_depth = E_WebsockerChannel.books10.ToString();
+                            }
+                            else if (item.channel == E_WebsockerChannel.books50_inc)
+                            {
+                                key_depth = E_WebsockerChannel.books50.ToString();
+                            }
+                            else if (item.channel == E_WebsockerChannel.books200_inc)
+                            {
+                                key_depth = E_WebsockerChannel.books200.ToString();
+                            }
+                            RedisValue rv = FactoryService.instance.constant.redis.HashGet(FactoryService.instance.GetRedisDepth(market.market), key_depth);
+                            byte[] bbb = System.Text.Encoding.UTF8.GetBytes(rv);
+                            webSocket.SendAsync(new ArraySegment<byte>(bbb, 0, bbb.Length), WebSocketMessageType.Text, true, CancellationToken.None);
+                        }
+                        string ConsumerTags = FactoryService.instance.constant.MqSubscribe(key, async (b) =>
+                        {
+                            await webSocket.SendAsync(new ArraySegment<byte>(b, 0, b.Length), WebSocketMessageType.Text, true, CancellationToken.None);
+                        });
                         channel.Add(key, ConsumerTags);
                     }
                 }

@@ -97,7 +97,9 @@ public class WalletService
                     return false;
                 }
                 wallet_from.available -= amount;
+                wallet_from.total = wallet_from.available + wallet_from.freeze;
                 wallet_to.available += amount;
+                wallet_to.total = wallet_to.available + wallet_to.freeze;
                 this.db.SaveChanges();
                 transaction.Commit();
                 return true;

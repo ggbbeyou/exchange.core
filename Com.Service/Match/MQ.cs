@@ -136,6 +136,33 @@ public class MQ
                         DepthService.instance.Push(depths);
                         (List<(int index, BaseOrderBook orderbook)> bid, List<(int index, BaseOrderBook orderbook)> ask) diff = DepthService.instance.DiffOrderBook(this.orderbook_old, orderbook);
                         Dictionary<E_WebsockerChannel, Depth> depths_diff = DepthService.instance.ConvertDepth(this.model.info.market, this.model.info.symbol, diff);
+                        foreach (var item in depths_diff)
+                        {
+                            if (item.Key == E_WebsockerChannel.books10_inc)
+                            {
+                                if (depths.ContainsKey(E_WebsockerChannel.books10))
+                                {
+                                    item.Value.total_bid = depths[E_WebsockerChannel.books10].total_bid;
+                                    item.Value.total_ask = depths[E_WebsockerChannel.books10].total_ask;
+                                }
+                            }
+                            else if (item.Key == E_WebsockerChannel.books50_inc)
+                            {
+                                if (depths.ContainsKey(E_WebsockerChannel.books50))
+                                {
+                                    item.Value.total_bid = depths[E_WebsockerChannel.books50].total_bid;
+                                    item.Value.total_ask = depths[E_WebsockerChannel.books50].total_ask;
+                                }
+                            }
+                            else if (item.Key == E_WebsockerChannel.books200_inc)
+                            {
+                                if (depths.ContainsKey(E_WebsockerChannel.books200))
+                                {
+                                    item.Value.total_bid = depths[E_WebsockerChannel.books200].total_bid;
+                                    item.Value.total_ask = depths[E_WebsockerChannel.books200].total_ask;
+                                }
+                            }
+                        }
                         DepthService.instance.PushDiff(depths_diff);
                         this.orderbook_old = orderbook;
                         FactoryService.instance.constant.stopwatch.Stop();

@@ -159,7 +159,6 @@ public class DepthService
         resWebsocker.op = E_WebsockerOp.subscribe_date;
         foreach (var item in depths)
         {
-            FactoryService.instance.constant.redis.HashSet(FactoryService.instance.GetRedisDepth(item.Value.market), item.Key.ToString(), JsonConvert.SerializeObject(item.Value));
             resWebsocker.channel = item.Key;
             resWebsocker.data = item.Value;
             FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(item.Key, item.Value.market), JsonConvert.SerializeObject(resWebsocker));

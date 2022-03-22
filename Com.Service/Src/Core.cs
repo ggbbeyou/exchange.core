@@ -97,9 +97,9 @@ public class Core
         FactoryService.instance.constant.MqWorker(FactoryService.instance.GetMqOrderDeal(this.model.info.market), (b) =>
         {
             string json = Encoding.UTF8.GetString(b);
-            (List<Deal> deals, List<Orders> orders) deals = JsonConvert.DeserializeObject<(List<Deal>, List<Orders>)>(json);
+            (List<Orders> orders, List<Deal> deals, List<Orders> cancels) deals = JsonConvert.DeserializeObject<(List<Orders> orders, List<Deal> deals, List<Orders> cancels)>(json);
             this.stopwatch.Restart();
-            ReceiveDealOrder(deals.deals, deals.orders);
+            ReceiveDealOrder(deals.orders, deals.deals, deals.cancels);
             this.stopwatch.Stop();
             FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{this.stopwatch.Elapsed.ToString()};撮合后续处理总时间,成交记录:{deals.deals.Count}");
             return true;
@@ -135,7 +135,7 @@ public class Core
     /// 接收到成交订单
     /// </summary>
     /// <param name="deals"></param>
-    private void ReceiveDealOrder(List<Deal> deals, List<Orders> orders)
+    private void ReceiveDealOrder(List<Orders> orders, List<Deal> deals, List<Orders> cancel)
     {
         FactoryService.instance.constant.stopwatch.Restart();
         deal_service.AddOrUpdateDeal(deals);

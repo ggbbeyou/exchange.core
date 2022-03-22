@@ -174,11 +174,11 @@ public class MatchCore
     /// </summary>
     /// <param name="price">最后成交价格</param>
     /// <returns></returns>
-    public List<long> CancelOrder(decimal price)
+    public List<Orders> CancelOrder(decimal price)
     {
         if (price <= 0)
         {
-            return new List<long>();
+            return new List<Orders>();
         }
         List<Orders> cancel = new List<Orders>();
         List<Orders> bid = this.market_bid.Where(P => P.trigger_cancel_price > 0 && P.trigger_cancel_price >= price).ToList();
@@ -187,7 +187,7 @@ public class MatchCore
         List<Orders> ask = this.market_ask.Where(P => P.trigger_cancel_price > 0 && P.trigger_cancel_price <= price).ToList();
         ask.ForEach(P => { P.state = E_OrderState.cancel; P.deal_last_time = DateTimeOffset.UtcNow; P.remarks = "市价卖单已低于触发价,自动撤单"; });
         cancel.AddRange(ask);
-        return cancel.Select(P => P.order_id).ToList();
+        return cancel.ToList();
     }
 
     /// <summary>
@@ -212,13 +212,14 @@ public class MatchCore
     /// </summary>
     /// <param name="order">挂单订单</param>
     /// <returns>成交订单</returns>
-    public (List<Deal>, List<Orders>) Match(Orders order)
+    public (List<Orders> orders, List<Deal> deals, List<Orders> cancels) Match(Orders order)
     {
-        List<Deal> deals = new List<Deal>();
         List<Orders> orders = new List<Orders>();
+        List<Deal> deals = new List<Deal>();
+        List<Orders> cancels = new List<Orders>();
         if (order.market != this.model.info.market || order.amount <= 0 || order.amount_unsold <= 0 || order.state == E_OrderState.completed || order.state == E_OrderState.cancel)
         {
-            return (deals, orders);
+            return (orders, deals, cancels);
         }
         if (order.side == E_OrderSide.buy)
         {
@@ -393,7 +394,7 @@ public class MatchCore
                 }
             }
         }
-        return (deals, orders);
+        return (orders, deals, cancels); ;
     }
 
 

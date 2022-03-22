@@ -66,7 +66,7 @@ public class MQ
     /// </summary>
     /// <typeparam name="MatchOrder"></typeparam>
     /// <returns></returns>
-    private List<long> cancel_deal = new List<long>();
+    private List<Orders> cancel_deal = new List<Orders>();
     /// <summary>
     /// 临时变量
     /// </summary>
@@ -104,14 +104,14 @@ public class MQ
                 CallRequest<List<Orders>>? req = JsonConvert.DeserializeObject<CallRequest<List<Orders>>>(json);
                 if (req != null && req.op == E_Op.place && req.data != null && req.data.Count > 0)
                 {
+                    deal_order.Clear();
                     deal.Clear();
                     cancel_deal.Clear();
-                    deal_order.Clear();
                     FactoryService.instance.constant.stopwatch.Restart();
                     foreach (Orders item in req.data)
                     {
                         this.mutex.WaitOne();
-                        (List<Deal> deals, List<Orders> orders) match = this.model.match_core.Match(item);
+                        (List<Orders> orders, List<Deal> deals, List<Orders> cancels) match = this.model.match_core.Match(item);
                         deal.AddRange(match.deals);
                         foreach (var item1 in match.orders)
                         {
@@ -120,22 +120,23 @@ public class MQ
                                 deal_order.Add(item1);
                             }
                         }
-                        if (match.deals.Count > 0)
-                        {
-                            cancel_deal.AddRange(this.model.match_core.CancelOrder(match.deals.Last().price));
-                        }
+                        cancel.AddRange(match.cancels);
+                        // if (match.deals.Count > 0)
+                        // {
+                        //     cancel_deal.AddRange(this.model.match_core.CancelOrder(match.deals.Last().price));
+                        // }
                         this.mutex.ReleaseMutex();
                     }
                     FactoryService.instance.constant.stopwatch.Stop();
                     FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};撮合订单{req.data.Count}条");
-                    if (deal.Count() > 0)
+                    if (deal.Count() > 0 || deal.Count() > 0 || cancel_deal.Count() > 0)
                     {
-                        FactoryService.instance.constant.MqTask(FactoryService.instance.GetMqOrderDeal(this.model.info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject((deal, deal_order))));
+                        FactoryService.instance.constant.MqTask(FactoryService.instance.GetMqOrderDeal(this.model.info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject((deal_order, deal, cancel_deal))));
                     }
-                    if (cancel_deal.Count > 0)
-                    {
-                        FactoryService.instance.constant.MqTask(FactoryService.instance.GetMqOrderCancelSuccess(this.model.info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(cancel_deal)));
-                    }
+                    // if (cancel_deal.Count > 0)
+                    // {
+                    //     FactoryService.instance.constant.MqTask(FactoryService.instance.GetMqOrderCancelSuccess(this.model.info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(cancel_deal)));
+                    // }
                     if (deal.Count() > 0 || cancel_deal.Count > 0)
                     {
                         FactoryService.instance.constant.stopwatch.Restart();

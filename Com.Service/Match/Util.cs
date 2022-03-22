@@ -2,6 +2,7 @@ using System;
 using Com.Bll;
 using Com.Db;
 using Com.Db.Enum;
+using Com.Db.Model;
 using Snowflake;
 
 namespace Com.Service.Match;
@@ -110,7 +111,7 @@ public static class Util
             bid_uid = bid.uid,
             bid_amount = bid.amount,
             bid_amount_unsold = bid.amount_unsold,
-            bid_amount_done = bid.amount_done,           
+            bid_amount_done = bid.amount_done,
             ask_id = ask.order_id,
             ask_uid = ask.uid,
             ask_amount = ask.amount,
@@ -120,6 +121,8 @@ public static class Util
         };
         return deal;
     }
+
+   
 
 
 }

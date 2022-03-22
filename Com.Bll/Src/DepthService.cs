@@ -12,24 +12,19 @@ namespace Com.Bll;
 /// </summary>
 public class DepthService
 {
-
-
     /// <summary>
-    /// 数据库
+    /// 单例类的实例
     /// </summary>
-    public DbContextEF db = null!;
-
+    /// <returns></returns>
+    public static readonly DepthService instance = new DepthService();
+ 
     /// <summary>
     /// 初始化
     /// </summary>
-    public DepthService()
+    private DepthService()
     {
-        var scope = FactoryService.instance.constant.provider.CreateScope();
-        this.db = scope.ServiceProvider.GetService<DbContextEF>()!;
     }
-
-
-
+    
     /// <summary>
     /// 转换深度行情
     /// </summary>
@@ -114,5 +109,38 @@ public class DepthService
             FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(item.Key, item.Value.market), JsonConvert.SerializeObject(resWebsocker));
         }
     }
+
+    /// <summary>
+    /// 深度差异
+    /// </summary>
+    /// <param name="bid"></param>
+    /// <param name="bid"></param>
+    /// <param name="book_old"></param>
+    /// <param name="bid"></param>
+    /// <param name="book_new"></param>
+    /// <returns></returns>
+    public (List<BaseOrderBook> bid, List<BaseOrderBook> ask) DiffOrderBook((List<BaseOrderBook> bid, List<BaseOrderBook> ask) book_old, (List<BaseOrderBook> bid, List<BaseOrderBook> ask) book_new)
+    {
+        return book_new;
+    }
+
+    /// <summary>
+    /// 深度行情保存到redis并且推送到MQ
+    /// </summary>
+    /// <param name="depth"></param>
+    public void PushDiff(Dictionary<E_WebsockerChannel, Depth> depths)
+    {
+        ResWebsocker<Depth> resWebsocker = new ResWebsocker<Depth>();
+        resWebsocker.success = true;
+        resWebsocker.op = E_WebsockerOp.subscribe_date;
+        foreach (var item in depths)
+        {
+            FactoryService.instance.constant.redis.HashSet(FactoryService.instance.GetRedisDepth(item.Value.market), item.Key.ToString(), JsonConvert.SerializeObject(item.Value));
+            resWebsocker.channel = item.Key;
+            resWebsocker.data = item.Value;
+            FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(item.Key, item.Value.market), JsonConvert.SerializeObject(resWebsocker));
+        }
+    }
+
 
 }

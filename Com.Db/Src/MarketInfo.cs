@@ -59,15 +59,25 @@ public class MarketInfo
     /// <value></value>
     public int amount_multiple { get; set; }
     /// <summary>
-    /// 买手续费
+    /// 市价买手续费
     /// </summary>
     /// <value></value>
-    public decimal rate_buy { get; set; }
+    public decimal rate_market_buy { get; set; }
     /// <summary>
-    /// 卖手续费
+    /// 市价卖手续费
     /// </summary>
     /// <value></value>
-    public decimal rate_sell { get; set; }
+    public decimal rate_market_sell { get; set; }
+    /// <summary>
+    /// 限价买手续费
+    /// </summary>
+    /// <value></value>
+    public decimal rate_fixed_buy { get; set; }
+    /// <summary>
+    /// 限价卖手续费
+    /// </summary>
+    /// <value></value>
+    public decimal rate_fixed_sell { get; set; }
     /// <summary>
     /// 结算账号
     /// </summary>

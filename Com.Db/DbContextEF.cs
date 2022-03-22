@@ -163,8 +163,10 @@ public class DbContextEF : DbContext
             o.Property(P => P.price_places).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("价格小数位数");
             o.Property(P => P.amount_places).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("量小数位数");
             o.Property(P => P.amount_multiple).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("交易量整数倍数");
-            o.Property(P => P.rate_buy).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("买手续费");
-            o.Property(P => P.rate_sell).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("卖手续费");
+            o.Property(P => P.rate_market_buy).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("市价买手续费");
+            o.Property(P => P.rate_market_sell).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("市价卖手续费");
+            o.Property(P => P.rate_fixed_buy).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("限价买手续费");
+            o.Property(P => P.rate_fixed_sell).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("限价卖手续费");
             o.Property(P => P.settlement_uid).IsRequired().HasColumnType("bigint").HasComment("结算账号");
             o.Property(P => P.market_uid).IsRequired().HasColumnType("bigint").HasComment("作市账号");
             o.ToTable(nameof(MarketInfo));

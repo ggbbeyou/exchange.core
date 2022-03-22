@@ -85,7 +85,7 @@ public class DepthService
     /// <param name="bid"></param>
     /// <param name="orderbook"></param>
     /// <returns></returns>
-    public Dictionary<E_WebsockerChannel, Depth> ConvertDepth(long market, string symbol, (List<(int, BaseOrderBook)> bid, List<(int, BaseOrderBook)> ask) orderbook)
+    public Dictionary<E_WebsockerChannel, Depth> ConvertDepth(long market, string symbol, (List<(int index, BaseOrderBook orderbook)> bid, List<(int index, BaseOrderBook orderbook)> ask) orderbook)
     {
         Dictionary<E_WebsockerChannel, Depth> depths = new Dictionary<E_WebsockerChannel, Depth>();
         depths.Add(E_WebsockerChannel.books10_inc, new Depth());
@@ -99,33 +99,30 @@ public class DepthService
             switch (item.Key)
             {
                 case E_WebsockerChannel.books10_inc:
-                    item.Value.bid = new decimal[orderbook.bid.Count < 10 ? orderbook.bid.Count : 10, 2];
-                    item.Value.ask = new decimal[orderbook.ask.Count < 10 ? orderbook.ask.Count : 10, 2];
+                    item.Value.bid = new decimal[orderbook.bid.Count(P => Math.Abs(P.index) <= 10), 2];
+                    item.Value.ask = new decimal[orderbook.ask.Count(P => Math.Abs(P.index) <= 10), 2];
                     break;
                 case E_WebsockerChannel.books50_inc:
-                    item.Value.bid = new decimal[orderbook.bid.Count < 50 ? orderbook.bid.Count : 50, 2];
-                    item.Value.ask = new decimal[orderbook.ask.Count < 50 ? orderbook.ask.Count : 50, 2];
+                    item.Value.bid = new decimal[orderbook.bid.Count(P => Math.Abs(P.index) <= 50), 2];
+                    item.Value.ask = new decimal[orderbook.ask.Count(P => Math.Abs(P.index) <= 50), 2];
                     break;
                 case E_WebsockerChannel.books200_inc:
-                    item.Value.bid = new decimal[orderbook.bid.Count < 200 ? orderbook.bid.Count : 200, 2];
-                    item.Value.ask = new decimal[orderbook.ask.Count < 200 ? orderbook.ask.Count : 200, 2];
+                    item.Value.bid = new decimal[orderbook.bid.Count(P => Math.Abs(P.index) <= 200), 2];
+                    item.Value.ask = new decimal[orderbook.ask.Count(P => Math.Abs(P.index) <= 200), 2];
                     break;
                 default:
                     break;
             }
-            // for (int i = 0; i < item.Value.bid.GetLength(0); i++)
-            // {
-            //     item.Value.bid[i, 0] = orderbook.bid[i].price;
-            //     item.Value.bid[i, 1] = orderbook.bid[i].amount;
-            //     total_bid += orderbook.bid[i].amount * orderbook.bid[i].price;
-            // }
-
-            // for (int i = 0; i < item.Value.ask.GetLength(0); i++)
-            // {
-            //     item.Value.ask[i, 0] = orderbook.ask[i].price;
-            //     item.Value.ask[i, 1] = orderbook.ask[i].amount;
-            //     total_ask += orderbook.ask[i].amount * orderbook.ask[i].price;
-            // }
+            for (int i = 0; i < item.Value.bid.GetLength(0); i++)
+            {
+                item.Value.bid[i, 0] = orderbook.bid[i].orderbook.price;
+                item.Value.bid[i, 1] = orderbook.bid[i].orderbook.amount;
+            }
+            for (int i = 0; i < item.Value.ask.GetLength(0); i++)
+            {
+                item.Value.ask[i, 0] = orderbook.ask[i].orderbook.price;
+                item.Value.ask[i, 1] = orderbook.ask[i].orderbook.amount;
+            }
         }
         return depths;
     }
@@ -176,8 +173,8 @@ public class DepthService
     /// <returns></returns>
     public (List<(int, BaseOrderBook)> bid, List<(int, BaseOrderBook)> ask) DiffOrderBook((List<BaseOrderBook> bid, List<BaseOrderBook> ask) book_old, (List<BaseOrderBook> bid, List<BaseOrderBook> ask) book_new)
     {
-        List<(int, BaseOrderBook)> bid_diff = new List<(int, BaseOrderBook)>();
-        List<(int, BaseOrderBook)> ask_diff = new List<(int, BaseOrderBook)>();
+        List<(int index, BaseOrderBook orderbook)> bid_diff = new List<(int index, BaseOrderBook orderbook)>();
+        List<(int index, BaseOrderBook orderbook)> ask_diff = new List<(int index, BaseOrderBook orderbook)>();
         if (book_old.bid == null || book_old.bid.Count == 0)
         {
             for (int i = 0; i < book_new.bid.Count; i++)
@@ -200,6 +197,8 @@ public class DepthService
         {
             ask_diff = DiffOrderBook(book_old.ask, book_new.ask);
         }
+        bid_diff = bid_diff.OrderBy(P => P.index).ToList();
+        ask_diff = ask_diff.OrderBy(P => P.index).ToList();
         return (bid_diff, ask_diff);
     }
 

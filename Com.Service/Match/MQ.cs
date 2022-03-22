@@ -121,10 +121,6 @@ public class MQ
                             }
                         }
                         cancel.AddRange(match.cancels);
-                        // if (match.deals.Count > 0)
-                        // {
-                        //     cancel_deal.AddRange(this.model.match_core.CancelOrder(match.deals.Last().price));
-                        // }
                         this.mutex.ReleaseMutex();
                     }
                     FactoryService.instance.constant.stopwatch.Stop();

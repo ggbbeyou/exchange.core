@@ -40,7 +40,7 @@ public class MarketInfoService
     /// <returns></returns>
     public MarketInfo? GetMarketBySymbol(string symbol)
     {
-        return this.db.MarketInfo.FirstOrDefault(P => P.symbol == symbol);
+        return this.db.MarketInfo.SingleOrDefault(P => P.symbol == symbol);
     }
 
 }

@@ -155,7 +155,7 @@ public class KlineService
                                    time_end = FactoryService.instance.system_init.AddMinutes((g.Key + 1) * 5).AddMilliseconds(-1),
                                    time = DateTimeOffset.UtcNow,
                                };
-                    return sql5.ToList();
+                    return sql5.AsNoTracking().ToList();
                 case E_KlineType.min15:
                     predicate = predicate.And(P => P.type == E_KlineType.min5);
                     var sql15 = from kline in this.db.Kline.Where(predicate)
@@ -176,7 +176,7 @@ public class KlineService
                                     time_end = FactoryService.instance.system_init.AddMinutes((g.Key + 1) * 15).AddMilliseconds(-1),
                                     time = DateTimeOffset.UtcNow,
                                 };
-                    return sql15.ToList();
+                    return sql15.AsNoTracking().ToList();
                 case E_KlineType.min30:
                     predicate = predicate.And(P => P.type == E_KlineType.min15);
                     var sql30 = from kline in this.db.Kline.Where(predicate)
@@ -197,7 +197,7 @@ public class KlineService
                                     time_end = FactoryService.instance.system_init.AddMinutes((g.Key + 1) * 30).AddMilliseconds(-1),
                                     time = DateTimeOffset.UtcNow,
                                 };
-                    return sql30.ToList();
+                    return sql30.AsNoTracking().ToList();
                 case E_KlineType.hour1:
                     predicate = predicate.And(P => P.type == E_KlineType.min30);
                     var sqlhour1 = from kline in this.db.Kline.Where(predicate)
@@ -218,7 +218,7 @@ public class KlineService
                                        time_end = FactoryService.instance.system_init.AddHours(g.Key + 1).AddMilliseconds(-1),
                                        time = DateTimeOffset.UtcNow,
                                    };
-                    return sqlhour1.ToList();
+                    return sqlhour1.AsNoTracking().ToList();
                 case E_KlineType.hour6:
                     predicate = predicate.And(P => P.type == E_KlineType.hour1);
                     var sqlhour6 = from kline in this.db.Kline.Where(predicate)
@@ -239,7 +239,7 @@ public class KlineService
                                        time_end = FactoryService.instance.system_init.AddHours((g.Key + 1) * 6).AddMilliseconds(-1),
                                        time = DateTimeOffset.UtcNow,
                                    };
-                    return sqlhour6.ToList();
+                    return sqlhour6.AsNoTracking().ToList();
                 case E_KlineType.hour12:
                     predicate = predicate.And(P => P.type == E_KlineType.hour6);
                     var sqlhour12 = from kline in this.db.Kline.Where(predicate)
@@ -260,7 +260,7 @@ public class KlineService
                                         time_end = FactoryService.instance.system_init.AddHours((g.Key + 1) * 12).AddMilliseconds(-1),
                                         time = DateTimeOffset.UtcNow,
                                     };
-                    return sqlhour12.ToList();
+                    return sqlhour12.AsNoTracking().ToList();
                 case E_KlineType.day1:
                     predicate = predicate.And(P => P.type == E_KlineType.hour12);
                     var sqlday1 = from kline in this.db.Kline.Where(predicate)
@@ -281,7 +281,7 @@ public class KlineService
                                       time_end = FactoryService.instance.system_init.AddDays(g.Key + 1).AddMilliseconds(-1),
                                       time = DateTimeOffset.UtcNow,
                                   };
-                    return sqlday1.ToList();
+                    return sqlday1.AsNoTracking().ToList();
                 case E_KlineType.week1:
                     predicate = predicate.And(P => P.type == E_KlineType.day1);
                     var sqlweek1 = from kline in this.db.Kline.Where(predicate)
@@ -302,7 +302,7 @@ public class KlineService
                                        time_end = FactoryService.instance.system_init.AddDays((g.Key + 1) * 7).AddMilliseconds(-1),
                                        time = DateTimeOffset.UtcNow,
                                    };
-                    return sqlweek1.ToList();
+                    return sqlweek1.AsNoTracking().ToList();
                 case E_KlineType.month1:
                     predicate = predicate.And(P => P.type == E_KlineType.day1);
                     var sqlmonth1 = from kline in this.db.Kline.Where(predicate)
@@ -323,7 +323,7 @@ public class KlineService
                                         time_end = FactoryService.instance.system_init.AddMonths(g.Key + 1).AddMilliseconds(-1),
                                         time = DateTimeOffset.UtcNow,
                                     };
-                    return sqlmonth1.ToList();
+                    return sqlmonth1.AsNoTracking().ToList();
             }
         }
         catch (System.Exception ex)

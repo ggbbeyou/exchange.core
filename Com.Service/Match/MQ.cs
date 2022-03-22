@@ -133,10 +133,6 @@ public class MQ
                     {
                         FactoryService.instance.constant.MqTask(FactoryService.instance.GetMqOrderDeal(this.model.info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject((deal_order, deal, cancel_deal))));
                     }
-                    // if (cancel_deal.Count > 0)
-                    // {
-                    //     FactoryService.instance.constant.MqTask(FactoryService.instance.GetMqOrderCancelSuccess(this.model.info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(cancel_deal)));
-                    // }
                     if (deal.Count() > 0 || cancel_deal.Count > 0)
                     {
                         FactoryService.instance.constant.stopwatch.Restart();
@@ -192,7 +188,6 @@ public class MQ
                     if (cancel.Count > 0)
                     {
                         FactoryService.instance.constant.MqTask(FactoryService.instance.GetMqOrderDeal(this.model.info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject((new List<Orders>(), new List<Deal>(), cancel))));
-                        // FactoryService.instance.constant.MqTask(FactoryService.instance.GetMqOrderCancelSuccess(this.model.info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(cancel)));
                         FactoryService.instance.constant.stopwatch.Restart();
                         (List<BaseOrderBook> bid, List<BaseOrderBook> ask) orderbook = this.model.match_core.GetOrderBook();
                         Dictionary<E_WebsockerChannel, Depth> depths = depth_service.ConvertDepth(this.model.info.market, this.model.info.symbol, orderbook);

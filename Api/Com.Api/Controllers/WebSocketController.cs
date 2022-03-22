@@ -37,6 +37,13 @@ public class WebSocketController : Controller
     /// </summary>
     /// <returns></returns>
     public MarketInfoService market_info_service = new MarketInfoService();
+    /// <summary>
+    /// 临时变量
+    /// </summary>
+    /// <typeparam name="Depth"></typeparam>
+    /// <returns></returns>
+
+
 
     /// <summary>
     /// 
@@ -221,8 +228,17 @@ public class WebSocketController : Controller
                                 key_depth = E_WebsockerChannel.books200.ToString();
                             }
                             RedisValue rv = FactoryService.instance.constant.redis.HashGet(FactoryService.instance.GetRedisDepth(market.market), key_depth);
-                            byte[] bbb = System.Text.Encoding.UTF8.GetBytes(rv);
-                            webSocket.SendAsync(new ArraySegment<byte>(bbb, 0, bbb.Length), WebSocketMessageType.Text, true, CancellationToken.None);
+                            Depth? depth = JsonConvert.DeserializeObject<Depth>(rv);
+                            if (depth != null)
+                            {
+                                ResWebsocker<Depth> depth_res = new ResWebsocker<Depth>();
+                                depth_res.success = true;
+                                depth_res.op = E_WebsockerOp.subscribe_date;
+                                depth_res.channel = item.channel;
+                                depth_res.data = depth;
+                                byte[] bb1 = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(depth_res));
+                                webSocket.SendAsync(new ArraySegment<byte>(bb1, 0, bb1.Length), WebSocketMessageType.Text, true, CancellationToken.None);
+                            }
                         }
                         string ConsumerTags = FactoryService.instance.constant.MqSubscribe(key, async (b) =>
                         {

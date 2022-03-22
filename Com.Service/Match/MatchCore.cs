@@ -181,12 +181,12 @@ public class MatchCore
             return new List<Orders>();
         }
         List<Orders> cancel = new List<Orders>();
-        List<Orders> bid = this.market_bid.Where(P => P.trigger_cancel_price > 0 && P.trigger_cancel_price >= price).ToList();
-        bid.ForEach(P => { P.state = E_OrderState.cancel; P.deal_last_time = DateTimeOffset.UtcNow; P.remarks = "市价买单已高于触发价,自动撤单"; });
-        cancel.AddRange(bid);
-        List<Orders> ask = this.market_ask.Where(P => P.trigger_cancel_price > 0 && P.trigger_cancel_price <= price).ToList();
-        ask.ForEach(P => { P.state = E_OrderState.cancel; P.deal_last_time = DateTimeOffset.UtcNow; P.remarks = "市价卖单已低于触发价,自动撤单"; });
-        cancel.AddRange(ask);
+        List<Orders> bid_market = this.market_bid.Where(P => P.trigger_cancel_price > 0 && P.trigger_cancel_price >= price).ToList();
+        bid_market.ForEach(P => { P.state = E_OrderState.cancel; P.deal_last_time = DateTimeOffset.UtcNow; P.remarks = "市价买单已高于触发价,自动撤单"; });
+        cancel.AddRange(bid_market);
+        List<Orders> ask_market = this.market_ask.Where(P => P.trigger_cancel_price > 0 && P.trigger_cancel_price <= price).ToList();
+        ask_market.ForEach(P => { P.state = E_OrderState.cancel; P.deal_last_time = DateTimeOffset.UtcNow; P.remarks = "市价卖单已低于触发价,自动撤单"; });
+        cancel.AddRange(ask_market);
         return cancel.ToList();
     }
 
@@ -233,6 +233,7 @@ public class MatchCore
                     {
                         Deal deal = Util.CreateDeal(this.model.info.market, this.model.info.symbol, order, market_ask[i], this.last_price, E_OrderSide.buy, orders);
                         deals.Add(deal);
+                        cancels.AddRange(CancelOrder(deal.price));
                         if (order.amount_unsold <= 0)
                         {
                             break;
@@ -247,6 +248,7 @@ public class MatchCore
                     {
                         Deal deal = Util.CreateDeal(this.model.info.market, this.model.info.symbol, order, fixed_ask[i], fixed_ask[i].price, E_OrderSide.buy, orders);
                         deals.Add(deal);
+                        cancels.AddRange(CancelOrder(deal.price));
                         this.last_price = fixed_ask[i].price;
                         if (order.amount_unsold <= 0)
                         {
@@ -270,6 +272,7 @@ public class MatchCore
                     {
                         Deal deal = Util.CreateDeal(this.model.info.market, this.model.info.symbol, order, market_ask[i], order.price, E_OrderSide.buy, orders);
                         deals.Add(deal);
+                        cancels.AddRange(CancelOrder(deal.price));
                         if (order.amount_unsold <= 0)
                         {
                             break;
@@ -291,6 +294,7 @@ public class MatchCore
                         }
                         Deal deal = Util.CreateDeal(this.model.info.market, this.model.info.symbol, order, fixed_ask[i], new_price, E_OrderSide.buy, orders);
                         deals.Add(deal);
+                        cancels.AddRange(CancelOrder(deal.price));
                         this.last_price = new_price;
                         //量全部处理完了
                         if (order.amount_unsold <= 0)
@@ -320,6 +324,7 @@ public class MatchCore
                     {
                         Deal deal = Util.CreateDeal(this.model.info.market, this.model.info.symbol, market_bid[i], order, this.last_price, E_OrderSide.sell, orders);
                         deals.Add(deal);
+                        cancels.AddRange(CancelOrder(deal.price));
                         if (order.amount_unsold <= 0)
                         {
                             break;
@@ -334,6 +339,7 @@ public class MatchCore
                     {
                         Deal deal = Util.CreateDeal(this.model.info.market, this.model.info.symbol, fixed_bid[i], order, fixed_bid[i].price, E_OrderSide.sell, orders);
                         deals.Add(deal);
+                        cancels.AddRange(CancelOrder(deal.price));
                         this.last_price = fixed_bid[i].price;
                         if (order.amount_unsold <= 0)
                         {
@@ -357,6 +363,7 @@ public class MatchCore
                     {
                         Deal deal = Util.CreateDeal(this.model.info.market, this.model.info.symbol, market_bid[i], order, order.price, E_OrderSide.sell, orders);
                         deals.Add(deal);
+                        cancels.AddRange(CancelOrder(deal.price));
                         if (order.amount_unsold <= 0)
                         {
                             break;
@@ -378,6 +385,7 @@ public class MatchCore
                         }
                         Deal deal = Util.CreateDeal(this.model.info.market, this.model.info.symbol, fixed_bid[i], order, new_price, E_OrderSide.sell, orders);
                         deals.Add(deal);
+                        cancels.AddRange(CancelOrder(deal.price));
                         this.last_price = new_price;
                         if (order.amount_unsold <= 0)
                         {

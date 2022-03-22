@@ -87,6 +87,11 @@ public class Orders
     /// <value></value>
     public E_OrderType type { get; set; }
     /// <summary>
+    /// 手续费率
+    /// </summary>
+    /// <value></value>
+    public decimal rate { get; set; }
+    /// <summary>
     /// 触发挂单价格
     /// </summary>
     /// <value></value>   

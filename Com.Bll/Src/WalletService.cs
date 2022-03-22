@@ -26,21 +26,12 @@ public class WalletService
     {
         var scope = FactoryService.instance.constant.provider.CreateScope();
         this.db = scope.ServiceProvider.GetService<DbContextEF>()!;
-
     }
 
 
 
 
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="symbol"></param>
-    /// <returns></returns>
-    public MarketInfo? GetMarketBySymbol(string symbol)
-    {
-        return this.db.MarketInfo.FirstOrDefault(P => P.symbol == symbol);
-    }
+
 
 }

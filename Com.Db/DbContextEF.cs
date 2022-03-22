@@ -161,7 +161,10 @@ public class DbContextEF : DbContext
             o.Property(P => P.price_places).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("价格小数位数");
             o.Property(P => P.amount_places).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("量小数位数");
             o.Property(P => P.amount_multiple).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("交易量整数倍数");
-            o.Property(P => P.fee).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("手续费");
+            o.Property(P => P.rate_buy).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("买手续费");
+            o.Property(P => P.rate_sell).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("卖手续费");
+            o.Property(P => P.settlement_uid).IsRequired().HasColumnType("bigint").HasComment("结算账号");
+            o.Property(P => P.market_uid).IsRequired().HasColumnType("bigint").HasComment("作市账号");
             o.ToTable(nameof(MarketInfo));
         });
         modelBuilder.Entity<Orders>(o =>
@@ -219,8 +222,9 @@ public class DbContextEF : DbContext
         modelBuilder.Entity<Wallet>(o =>
         {
             o.HasKey(p => p.wallet_id);
-            o.HasIndex(P => new { P.wallet_id, P.user_id, P.coin_id }).IsUnique();
+            o.HasIndex(P => new { P.wallet_type, P.user_id, P.coin_id }).IsUnique();
             o.Property(P => P.wallet_id).IsRequired().ValueGeneratedNever().HasColumnType("bigint").HasComment("钱包id");
+            o.Property(P => P.wallet_type).IsRequired().HasColumnType("tinyint").HasComment("钱包类型");
             o.Property(P => P.user_id).IsRequired().ValueGeneratedNever().HasColumnType("bigint").HasComment("用户id");
             o.Property(P => P.user_name).HasColumnType("nvarchar").HasMaxLength(50).HasComment("用户名");
             o.Property(P => P.coin_id).IsRequired().ValueGeneratedNever().HasColumnType("bigint").HasComment(" 币id");

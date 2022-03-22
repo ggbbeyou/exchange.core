@@ -59,10 +59,25 @@ public class MarketInfo
     /// <value></value>
     public int amount_multiple { get; set; }
     /// <summary>
-    /// 手续费
+    /// 买手续费
     /// </summary>
     /// <value></value>
-    public decimal fee { get; set; }
+    public decimal rate_buy { get; set; }
+    /// <summary>
+    /// 卖手续费
+    /// </summary>
+    /// <value></value>
+    public decimal rate_sell { get; set; }
+    /// <summary>
+    /// 结算账号
+    /// </summary>
+    /// <value></value>
+    public long settlement_uid { get; set; }
+    /// <summary>
+    /// 作市账号
+    /// </summary>
+    /// <value></value>
+    public long market_uid { get; set; }
     /// <summary>
     /// 最后的成交价
     /// </summary>

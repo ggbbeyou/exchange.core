@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
+using Com.Db.Enum;
 
 namespace Com.Db;
 
@@ -13,6 +14,11 @@ public class Wallet
     /// </summary>
     /// <value></value>
     public long wallet_id { get; set; }
+    /// <summary>
+    /// 钱包类型
+    /// </summary>
+    /// <value></value>
+    public E_WalletType wallet_type { get; set; }
     /// <summary>
     /// 用户id
     /// </summary>

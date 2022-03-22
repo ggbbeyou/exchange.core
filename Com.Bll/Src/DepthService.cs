@@ -131,31 +131,17 @@ public class DepthService
     /// (全部)深度行情保存到redis并且推送到MQ
     /// </summary>
     /// <param name="depth"></param>
-    public void Push(Dictionary<E_WebsockerChannel, Depth> depths)
+    public void Push(Dictionary<E_WebsockerChannel, Depth> depths, bool all)
     {
         ResWebsocker<Depth> resWebsocker = new ResWebsocker<Depth>();
         resWebsocker.success = true;
         resWebsocker.op = E_WebsockerOp.subscribe_date;
         foreach (var item in depths)
         {
-            FactoryService.instance.constant.redis.HashSet(FactoryService.instance.GetRedisDepth(item.Value.market), item.Key.ToString(), JsonConvert.SerializeObject(item.Value));
-            resWebsocker.channel = item.Key;
-            resWebsocker.data = item.Value;
-            FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(item.Key, item.Value.market), JsonConvert.SerializeObject(resWebsocker));
-        }
-    }
-
-    /// <summary>
-    /// (部分)深度行情保存到redis并且推送到MQ
-    /// </summary>
-    /// <param name="depth"></param>
-    public void PushDiff(Dictionary<E_WebsockerChannel, Depth> depths)
-    {
-        ResWebsocker<Depth> resWebsocker = new ResWebsocker<Depth>();
-        resWebsocker.success = true;
-        resWebsocker.op = E_WebsockerOp.subscribe_date;
-        foreach (var item in depths)
-        {
+            if (all)
+            {
+                FactoryService.instance.constant.redis.HashSet(FactoryService.instance.GetRedisDepth(item.Value.market), item.Key.ToString(), JsonConvert.SerializeObject(item.Value));
+            }
             resWebsocker.channel = item.Key;
             resWebsocker.data = item.Value;
             FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(item.Key, item.Value.market), JsonConvert.SerializeObject(resWebsocker));
@@ -197,8 +183,6 @@ public class DepthService
         {
             ask_diff = DiffOrderBook(book_old.ask, book_new.ask);
         }
-        bid_diff = bid_diff.OrderBy(P => P.index).ToList();
-        ask_diff = ask_diff.OrderBy(P => P.index).ToList();
         return (bid_diff, ask_diff);
     }
 

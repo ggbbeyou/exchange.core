@@ -133,7 +133,7 @@ public class MQ
                         FactoryService.instance.constant.stopwatch.Restart();
                         (List<BaseOrderBook> bid, List<BaseOrderBook> ask) orderbook = this.model.match_core.GetOrderBook();
                         Dictionary<E_WebsockerChannel, Depth> depths = DepthService.instance.ConvertDepth(this.model.info.market, this.model.info.symbol, orderbook);
-                        DepthService.instance.Push(depths);
+                        DepthService.instance.Push(depths, true);
                         (List<(int index, BaseOrderBook orderbook)> bid, List<(int index, BaseOrderBook orderbook)> ask) diff = DepthService.instance.DiffOrderBook(this.orderbook_old, orderbook);
                         Dictionary<E_WebsockerChannel, Depth> depths_diff = DepthService.instance.ConvertDepth(this.model.info.market, this.model.info.symbol, diff);
                         foreach (var item in depths_diff)
@@ -163,7 +163,7 @@ public class MQ
                                 }
                             }
                         }
-                        DepthService.instance.PushDiff(depths_diff);
+                        DepthService.instance.Push(depths_diff, false);
                         this.orderbook_old = orderbook;
                         FactoryService.instance.constant.stopwatch.Stop();
                         FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};推送深度行情");
@@ -217,7 +217,7 @@ public class MQ
                         FactoryService.instance.constant.stopwatch.Restart();
                         (List<BaseOrderBook> bid, List<BaseOrderBook> ask) orderbook = this.model.match_core.GetOrderBook();
                         Dictionary<E_WebsockerChannel, Depth> depths = DepthService.instance.ConvertDepth(this.model.info.market, this.model.info.symbol, orderbook);
-                        DepthService.instance.Push(depths);
+                        DepthService.instance.Push(depths, true);
                         // (List<BaseOrderBook> bid, List<BaseOrderBook> ask) diff = DepthService.instance.DiffOrderBook(this.orderbook_old, orderbook);
                         // Dictionary<E_WebsockerChannel, Depth> depths_diff = DepthService.instance.ConvertDepth(this.model.info.market, this.model.info.symbol, diff);
                         // DepthService.instance.PushDiff(depths_diff);

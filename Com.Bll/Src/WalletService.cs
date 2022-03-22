@@ -64,6 +64,55 @@ public class WalletService
         return this.db.SaveChanges() > 0;
     }
 
+    /// <summary>
+    /// 可用余额转账
+    /// </summary>
+    /// <param name="coin_id">币ID</param>
+    /// <param name="from">来源:用户id</param>
+    /// <param name="to">目的:用户id</param>
+    /// <param name="amount">数量</param>
+    /// <returns></returns>
+    public bool Transfer(long coin_id, long from, long to, decimal amount)
+    {
+        if (amount == 0)
+        {
+            return false;
+        }
+        using (var transaction = this.db.Database.BeginTransaction())
+        {
+            try
+            {
+                Wallet? wallet_from = this.db.Wallet.Where(x => x.coin_id == coin_id && x.user_id == from).SingleOrDefault();
+                Wallet? wallet_to = this.db.Wallet.Where(x => x.coin_id == coin_id && x.user_id == to).SingleOrDefault();
+                if (wallet_from == null || wallet_to == null)
+                {
+                    return false;
+                }
+                if (amount > 0 && wallet_from.available < amount)
+                {
+                    return false;
+                }
+                else if (amount < 0 && wallet_to.available < Math.Abs(amount))
+                {
+                    return false;
+                }
+                wallet_from.available -= amount;
+                wallet_to.available += amount;
+                this.db.SaveChanges();
+                transaction.Commit();
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+                transaction.Rollback();
+                FactoryService.instance.constant.logger.LogError(ex, ex.Message);
+                return false;
+            }
+        }
+    }
+
+
+
 
 
 

@@ -117,12 +117,14 @@ public static class Util
             ask_amount = ask.amount,
             ask_amount_unsold = ask.amount_unsold,
             ask_amount_done = ask.amount_done,
+            rate_buy = bid.rate,
+            rate_sell = ask.rate,
             time = now,
         };
         return deal;
     }
 
-   
+
 
 
 }

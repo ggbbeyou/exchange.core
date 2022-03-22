@@ -97,6 +97,16 @@ public class Deal
     /// <value></value>
     public decimal ask_amount_done { get; set; }
     /// <summary>
+    /// 买手续费
+    /// </summary>
+    /// <value></value>
+    public decimal rate_buy { get; set; }
+    /// <summary>
+    /// 卖手续费
+    /// </summary>
+    /// <value></value>
+    public decimal rate_sell { get; set; }
+    /// <summary>
     /// 成交时间
     /// </summary>
     /// <value></value>

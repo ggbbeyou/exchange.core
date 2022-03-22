@@ -123,6 +123,8 @@ public class DbContextEF : DbContext
             o.Property(P => P.ask_amount).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("卖单挂单量");
             o.Property(P => P.ask_amount_unsold).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("卖单未成交量");
             o.Property(P => P.ask_amount_done).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("卖单已成交量");
+            o.Property(P => P.rate_buy).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("买手续费");
+            o.Property(P => P.rate_sell).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("卖手续费");
             o.Property(P => P.time).IsRequired().HasColumnType("datetimeoffset").HasComment("成交时间");
             o.ToTable(nameof(Deal));
         });

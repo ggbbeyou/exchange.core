@@ -48,7 +48,7 @@ public class DealService
         {
             predicate = predicate.And(P => P.time <= end);
         }
-        return this.db.Deal.Where(predicate).OrderBy(P => P.time).ToList();
+        return this.db.Deal.Where(predicate).OrderBy(P => P.time).AsNoTracking().ToList();
     }
 
     /// <summary>
@@ -195,7 +195,7 @@ public class DealService
                           count = g.Count(),
                           time = DateTimeOffset.UtcNow,
                       };
-            return sql.FirstOrDefault();
+            return sql.AsNoTracking().FirstOrDefault();
         }
         catch (Exception ex)
         {

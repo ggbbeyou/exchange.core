@@ -51,7 +51,7 @@ public class KlineService
     /// <returns></returns>
     public Kline? GetLastKline(long market, E_KlineType type)
     {
-        return this.db.Kline.Where(P => P.market == market && P.type == type).OrderByDescending(P => P.time_start).FirstOrDefault();
+        return this.db.Kline.Where(P => P.market == market && P.type == type).OrderByDescending(P => P.time_start).AsNoTracking().SingleOrDefault();
     }
 
     /// <summary>
@@ -64,7 +64,7 @@ public class KlineService
     /// <returns></returns>
     public List<Kline> GetKlines(long market, E_KlineType type, DateTimeOffset start, DateTimeOffset end)
     {
-        return this.db.Kline.Where(P => P.market == market && P.type == type && P.time_start >= start && P.time_start <= end).OrderBy(P => P.time_start).ToList();
+        return this.db.Kline.Where(P => P.market == market && P.type == type && P.time_start >= start && P.time_start <= end).OrderBy(P => P.time_start).AsNoTracking().ToList();
     }
 
     /// <summary>
@@ -614,7 +614,7 @@ public class KlineService
                        time_end = g.Last().time,
                        time = DateTimeOffset.UtcNow,
                    };
-        return min1.FirstOrDefault();
+        return min1.SingleOrDefault();
     }
 
 

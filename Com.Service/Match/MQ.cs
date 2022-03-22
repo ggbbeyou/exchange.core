@@ -134,7 +134,7 @@ public class MQ
                         (List<BaseOrderBook> bid, List<BaseOrderBook> ask) orderbook = this.model.match_core.GetOrderBook();
                         Dictionary<E_WebsockerChannel, Depth> depths = DepthService.instance.ConvertDepth(this.model.info.market, this.model.info.symbol, orderbook);
                         DepthService.instance.Push(depths);
-                        (List<BaseOrderBook> bid, List<BaseOrderBook> ask) diff = DepthService.instance.DiffOrderBook(this.orderbook_old, orderbook);
+                        (List<(int index, BaseOrderBook orderbook)> bid, List<(int index, BaseOrderBook orderbook)> ask) diff = DepthService.instance.DiffOrderBook(this.orderbook_old, orderbook);
                         Dictionary<E_WebsockerChannel, Depth> depths_diff = DepthService.instance.ConvertDepth(this.model.info.market, this.model.info.symbol, diff);
                         DepthService.instance.PushDiff(depths_diff);
                         this.orderbook_old = orderbook;
@@ -191,12 +191,12 @@ public class MQ
                         (List<BaseOrderBook> bid, List<BaseOrderBook> ask) orderbook = this.model.match_core.GetOrderBook();
                         Dictionary<E_WebsockerChannel, Depth> depths = DepthService.instance.ConvertDepth(this.model.info.market, this.model.info.symbol, orderbook);
                         DepthService.instance.Push(depths);
-                        (List<BaseOrderBook> bid, List<BaseOrderBook> ask) diff = DepthService.instance.DiffOrderBook(this.orderbook_old, orderbook);
-                        Dictionary<E_WebsockerChannel, Depth> depths_diff = DepthService.instance.ConvertDepth(this.model.info.market, this.model.info.symbol, diff);
-                        DepthService.instance.PushDiff(depths_diff);
-                        this.orderbook_old = orderbook;
-                        FactoryService.instance.constant.stopwatch.Stop();
-                        FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};推送深度行情");
+                        // (List<BaseOrderBook> bid, List<BaseOrderBook> ask) diff = DepthService.instance.DiffOrderBook(this.orderbook_old, orderbook);
+                        // Dictionary<E_WebsockerChannel, Depth> depths_diff = DepthService.instance.ConvertDepth(this.model.info.market, this.model.info.symbol, diff);
+                        // DepthService.instance.PushDiff(depths_diff);
+                        // this.orderbook_old = orderbook;
+                        // FactoryService.instance.constant.stopwatch.Stop();
+                        // FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};推送深度行情");
                     }
                 }
                 return true;

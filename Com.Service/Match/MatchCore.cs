@@ -394,7 +394,7 @@ public class MatchCore
                 }
             }
         }
-        return (orders, deals, cancels); ;
+        return (orders, deals, cancels);
     }
 
 

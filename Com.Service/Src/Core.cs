@@ -86,7 +86,7 @@ public class Core
         var scope = FactoryService.instance.constant.provider.CreateScope();
         this.db = scope.ServiceProvider.GetService<DbContextEF>()!;
         ReceiveMatchOrder();
-        ReceiveMatchCancelOrder();
+        // ReceiveMatchCancelOrder();
     }
 
     /// <summary>
@@ -109,27 +109,27 @@ public class Core
     /// <summary>
     /// 接收撮合传过来的取消订单
     /// </summary>
-    public void ReceiveMatchCancelOrder()
-    {
-        FactoryService.instance.constant.MqWorker(FactoryService.instance.GetMqOrderCancelSuccess(this.model.info.market), (b) =>
-        {
-            if (!this.model.run)
-            {
-                return false;
-            }
-            else
-            {
-                string json = Encoding.UTF8.GetString(b);
-                // FactoryService.instance.constant.logger.LogInformation(this.model.eventId, $"接收撮合传过来的取消订单:{json}");
-                List<Orders>? deals = JsonConvert.DeserializeObject<List<Orders>>(json);
-                if (deals != null && deals.Count > 0)
-                {
-                    ReceiveCancelOrder(deals);
-                }
-                return true;
-            }
-        });
-    }
+    // public void ReceiveMatchCancelOrder()
+    // {
+    //     FactoryService.instance.constant.MqWorker(FactoryService.instance.GetMqOrderCancelSuccess(this.model.info.market), (b) =>
+    //     {
+    //         if (!this.model.run)
+    //         {
+    //             return false;
+    //         }
+    //         else
+    //         {
+    //             string json = Encoding.UTF8.GetString(b);
+    //             // FactoryService.instance.constant.logger.LogInformation(this.model.eventId, $"接收撮合传过来的取消订单:{json}");
+    //             List<Orders>? deals = JsonConvert.DeserializeObject<List<Orders>>(json);
+    //             if (deals != null && deals.Count > 0)
+    //             {
+    //                 ReceiveCancelOrder(deals);
+    //             }
+    //             return true;
+    //         }
+    //     });
+    // }
 
     /// <summary>
     /// 接收到成交订单

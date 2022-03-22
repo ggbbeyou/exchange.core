@@ -72,7 +72,7 @@ public class WalletService
     /// <param name="to">目的:用户id</param>
     /// <param name="amount">数量</param>
     /// <returns></returns>
-    public bool Transfer(long coin_id, long from, long to, decimal amount)
+    public bool TransferAvailable(long coin_id, long from, long to, decimal amount)
     {
         if (amount == 0)
         {

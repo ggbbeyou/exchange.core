@@ -114,7 +114,7 @@ public class DealService
                           time_end = FactoryService.instance.system_init.AddMinutes(g.Key + 1).AddMilliseconds(-1),
                           time = DateTimeOffset.UtcNow,
                       };
-            return sql.ToList();
+            return sql.AsNoTracking().ToList();
         }
         catch (Exception ex)
         {
@@ -157,7 +157,7 @@ public class DealService
                           time_end = g.OrderBy(P => P.time).Last().time,
                           time = DateTimeOffset.UtcNow,
                       };
-            return sql.FirstOrDefault();
+            return sql.AsNoTracking().SingleOrDefault();
         }
         catch (Exception ex)
         {
@@ -195,7 +195,7 @@ public class DealService
                           count = g.Count(),
                           time = DateTimeOffset.UtcNow,
                       };
-            return sql.AsNoTracking().FirstOrDefault();
+            return sql.AsNoTracking().SingleOrDefault();
         }
         catch (Exception ex)
         {

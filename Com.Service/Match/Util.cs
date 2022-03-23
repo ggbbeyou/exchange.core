@@ -117,8 +117,8 @@ public static class Util
             ask_amount = ask.amount,
             ask_amount_unsold = ask.amount_unsold,
             ask_amount_done = ask.amount_done,
-            fee_rate_buy = bid.rate,
-            fee_rate_sell = ask.rate,
+            fee_rate_buy = bid.fee_rate,
+            fee_rate_sell = ask.fee_rate,
             time = now,
         };
         return deal;

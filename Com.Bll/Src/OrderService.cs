@@ -96,7 +96,73 @@ public class OrderService
         {
             vip = new Vip();
         }
+        List<PlaceOrder> buy_market = orders.Where(P => P.side == E_OrderSide.buy && P.type == E_OrderType.price_market).ToList();
+        List<PlaceOrder> buy_limit = orders.Where(P => P.side == E_OrderSide.buy && P.type == E_OrderType.price_fixed).ToList();
+        List<PlaceOrder> sell_market = orders.Where(P => P.side == E_OrderSide.sell && P.type == E_OrderType.price_market).ToList();
+        List<PlaceOrder> sell_limit = orders.Where(P => P.side == E_OrderSide.sell && P.type == E_OrderType.price_fixed).ToList();
+        if (buy_market.Exists(P => P.total == null || P.total < 0))
+        {
+            res.code = E_Res_Code.field_error;
+            res.message = "市价买单,总额不能小于0";
+            return res;
+        }
+        if (sell_market.Exists(P => P.amount == null || P.amount < 0))
+        {
+            res.code = E_Res_Code.field_error;
+            res.message = "市价卖单,量不能小于0";
+            return res;
+        }
+        if (buy_limit.Exists(P => P.price == null || P.price < 0 || P.amount == null || P.amount <= 0) || sell_limit.Exists(P => P.price == null || P.price < 0 || P.amount == null || P.amount <= 0))
+        {
+            res.code = E_Res_Code.field_error;
+            res.message = "限价单,价格和量不能为小于0";
+            return res;
+        }
+        decimal freeze_base = orders.Where(P => P.side == E_OrderSide.sell).Sum(P => (decimal?)P.amount) ?? 0;
+        decimal freeze_quote = buy_limit.Sum(P => (decimal?)P.price * P.amount) ?? 0 + buy_market.Sum(P => P.total) ?? 0;
+        
 
+
+        foreach (var item in orders.Where(P => P.side == E_OrderSide.buy && P.type == E_OrderType.price_market))
+        {
+            Orders orderResult = new Orders();
+            orderResult.order_id = FactoryService.instance.constant.worker.NextId();
+            orderResult.market = info.market;
+            orderResult.symbol = info.symbol;
+            orderResult.client_id = item.client_id;
+            orderResult.uid = uid;
+            orderResult.price = item.price ?? 0;
+            orderResult.amount = item.amount;
+            orderResult.total = item.price ?? 0 * item.amount;
+            orderResult.create_time = DateTimeOffset.UtcNow;
+            orderResult.amount_unsold = item.amount;
+            orderResult.amount_done = 0;
+            orderResult.deal_last_time = null;
+            orderResult.side = item.side;
+            orderResult.state = E_OrderState.unsold;
+            orderResult.type = item.type;
+            orderResult.fee_rate = info.rate_market_buy * (1 + vip.rate_market);
+            orderResult.trigger_hanging_price = 0;
+            orderResult.trigger_cancel_price = 0;
+            orderResult.data = null;
+            orderResult.remarks = null;
+            res.data.Add(orderResult);
+            freeze_quote +=
+        }
+        foreach (var item in orders.Where(P => P.side == E_OrderSide.buy && P.type == E_OrderType.price_fixed))
+        {
+
+        }
+        foreach (var item in orders.Where(P => P.side == E_OrderSide.sell && P.type == E_OrderType.price_market))
+        {
+
+        }
+        foreach (var item in orders.Where(P => P.side == E_OrderSide.sell && P.type == E_OrderType.price_fixed))
+        {
+
+        }
+
+        freeze_quote += orders.Sum(P => P.amount);
 
 
 

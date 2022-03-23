@@ -22,7 +22,12 @@ public class PlaceOrder
     /// 挂单量
     /// </summary>
     /// <value></value>
-    public decimal amount { get; set; }
+    public decimal? amount { get; set; }
+    /// <summary>
+    /// 订单总额
+    /// </summary>
+    /// <value></value>
+    public decimal? total { get; set; }
     /// <summary>
     /// 交易方向
     /// </summary>

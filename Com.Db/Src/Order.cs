@@ -90,7 +90,7 @@ public class Orders
     /// 手续费率
     /// </summary>
     /// <value></value>
-    public decimal rate { get; set; }
+    public decimal fee_rate { get; set; }
     /// <summary>
     /// 触发挂单价格
     /// </summary>

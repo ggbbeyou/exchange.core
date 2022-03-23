@@ -33,4 +33,9 @@ public class Users
     /// </summary>
     /// <value></value>
     public string? email { get; set; }
+    /// <summary>
+    /// 用户等级
+    /// </summary>
+    /// <value></value>
+    public long vip { get; set; }
 }

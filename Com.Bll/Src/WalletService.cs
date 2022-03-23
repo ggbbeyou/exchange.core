@@ -123,13 +123,12 @@ public class WalletService
     /// <param name="coin_id_quote">报价币种id</param>
     /// <param name="buy_uid">买用户</param>
     /// <param name="sell_uid">卖用户</param>
-    /// <param name="settlement_uid">结算用户</param>
     /// <param name="rate_buy">买手续费</param>
     /// <param name="rate_sell">卖手续费</param>
     /// <param name="amount">成交量</param>
     /// <param name="price">成交价</param>
     /// <returns>是否成功</returns>
-    public bool Transaction(E_WalletType wallet_type, long coin_id_base, long coin_id_quote, long buy_uid, long sell_uid, long settlement_uid, decimal rate_buy, decimal rate_sell, decimal amount, decimal price)
+    public bool Transaction(E_WalletType wallet_type, long coin_id_base, long coin_id_quote, long buy_uid, long sell_uid, decimal rate_buy, decimal rate_sell, decimal amount, decimal price)
     {
         if (amount == 0 || price == 0)
         {
@@ -143,8 +142,7 @@ public class WalletService
                 Wallet? buy_quote = this.db.Wallet.Where(P => P.wallet_type == wallet_type && P.coin_id == coin_id_quote && P.user_id == buy_uid).SingleOrDefault();
                 Wallet? sell_base = this.db.Wallet.Where(P => P.wallet_type == wallet_type && P.coin_id == coin_id_base && P.user_id == sell_uid).SingleOrDefault();
                 Wallet? sell_quote = this.db.Wallet.Where(P => P.wallet_type == wallet_type && P.coin_id == coin_id_quote && P.user_id == sell_uid).SingleOrDefault();
-                Wallet? settlement_quote = this.db.Wallet.Where(P => P.wallet_type == wallet_type && P.coin_id == coin_id_quote && P.user_id == settlement_uid).SingleOrDefault();
-                if (buy_base == null || buy_quote == null || sell_base == null || sell_quote == null || settlement_quote == null)
+                if (buy_base == null || buy_quote == null || sell_base == null || sell_quote == null)
                 {
                     return false;
                 }
@@ -157,12 +155,10 @@ public class WalletService
                 sell_quote.available += quote_total;
                 buy_quote.freeze -= buy_fee;
                 sell_quote.freeze -= sell_fee;
-                settlement_quote.available += buy_fee + sell_fee;
                 buy_base.total = buy_base.available + buy_base.freeze;
                 buy_quote.total = buy_quote.available + buy_quote.freeze;
                 sell_base.total = sell_base.available + sell_base.freeze;
                 sell_quote.total = sell_quote.available + sell_quote.freeze;
-                settlement_quote.total = settlement_quote.available + settlement_quote.freeze;
                 this.db.SaveChanges();
                 transaction.Commit();
                 return true;

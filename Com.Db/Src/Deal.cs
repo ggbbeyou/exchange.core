@@ -97,32 +97,34 @@ public class Deal
     /// <value></value>
     public decimal ask_amount_done { get; set; }
     /// <summary>
+    /// 买手续费率
+    /// </summary>
+    /// <value></value>
+    public decimal fee_rate_buy { get; set; }
+    /// <summary>
+    /// 卖手续费率
+    /// </summary>
+    /// <value></value>
+    public decimal fee_rate_sell { get; set; }
+    /// <summary>
     /// 买手续费
     /// </summary>
     /// <value></value>
-    public decimal rate_buy { get; set; }
+    public decimal fee_buy { get; set; }
     /// <summary>
     /// 卖手续费
     /// </summary>
     /// <value></value>
-    public decimal rate_sell { get; set; }
+    public decimal fee_sell { get; set; }
+    /// <summary>
+    /// 手续费币种
+    /// </summary>
+    /// <value></value>
+    public decimal fee_coin { get; set; }
     /// <summary>
     /// 成交时间
     /// </summary>
     /// <value></value>
     public DateTimeOffset time { get; set; }
-    // /// <summary>
-    // /// 买订单
-    // /// </summary>
-    // /// <value></value>
-    // [NotMapped]
-    // [JsonIgnore]
-    // public Orders bid { get; set; } = null!;
-    // /// <summary>
-    // /// 卖订单
-    // /// </summary>
-    // /// <value></value>
-    // [NotMapped]
-    // [JsonIgnore]
-    // public Orders ask { get; set; } = null!;
+
 }

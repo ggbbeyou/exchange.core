@@ -72,17 +72,12 @@ public class MarketInfo
     /// 限价买手续费
     /// </summary>
     /// <value></value>
-    public decimal rate_fixed_buy { get; set; }
+    public decimal fee_fixed_buy { get; set; }
     /// <summary>
     /// 限价卖手续费
     /// </summary>
     /// <value></value>
-    public decimal rate_fixed_sell { get; set; }
-    /// <summary>
-    /// 结算账号
-    /// </summary>
-    /// <value></value>
-    public long settlement_uid { get; set; }
+    public decimal fee_fixed_sell { get; set; }   
     /// <summary>
     /// 作市账号
     /// </summary>

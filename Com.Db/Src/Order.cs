@@ -67,12 +67,12 @@ public class Orders
     /// <value></value>
     public decimal total { get; set; }
     /// <summary>
-    /// 未成交量/市价买总额
+    /// 未成交 买:总额,卖:总量
     /// </summary>
     /// <value></value>
     public decimal amount_unsold { get; set; }
     /// <summary>
-    /// 已成交量
+    /// 已成交量  买:总额,卖:总量
     /// </summary>
     /// <value></value>
     public decimal amount_done { get; set; }

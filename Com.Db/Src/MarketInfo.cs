@@ -47,17 +47,17 @@ public class MarketInfo
     /// 价格小数位数
     /// </summary>
     /// <value></value>
-    public decimal price_places { get; set; }
+    public int price_places { get; set; }
     /// <summary>
     /// 量小数位数
     /// </summary>
     /// <value></value>
-    public decimal amount_places { get; set; }
+    public int amount_places { get; set; }
     /// <summary>
     /// 交易量整数倍数
     /// </summary>
     /// <value></value>
-    public int amount_multiple { get; set; }
+    public decimal amount_multiple { get; set; }
     /// <summary>
     /// 市价买手续费
     /// </summary>
@@ -77,7 +77,7 @@ public class MarketInfo
     /// 限价卖手续费
     /// </summary>
     /// <value></value>
-    public decimal fee_limit_sell { get; set; }   
+    public decimal fee_limit_sell { get; set; }
     /// <summary>
     /// 作市账号
     /// </summary>

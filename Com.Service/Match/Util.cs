@@ -59,33 +59,36 @@ public static class Util
     /// <param name="bid">买单</param>
     /// <param name="ask">卖单</param>
     /// <param name="price">成交价</param>
+    /// <param name="amount_places">量的小数位数</param>
     /// <param name="trigger_side">触发方向</param>
     /// <param name="now">成交时间</param>
     /// <returns></returns>
-    public static Deal CreateDeal(long market, string symbol, Orders bid, Orders ask, decimal price, E_OrderSide trigger_side, List<Orders> orders)
+    public static Deal CreateDeal(long market, string symbol, Orders bid, Orders ask, decimal price, int amount_places, E_OrderSide trigger_side, List<Orders> orders)
     {
         DateTimeOffset now = DateTimeOffset.UtcNow;
+        decimal min = (decimal)Math.Pow(0.1, (double)price);
         decimal amount = 0;
-        if (bid.amount_unsold > ask.amount_unsold)
+        decimal bid_amount_unsold = bid.amount_unsold / price;
+        if (bid_amount_unsold > ask.amount_unsold)
         {
             amount = ask.amount_unsold;
             ask.state = E_OrderState.completed;
             bid.state = E_OrderState.partial;
         }
-        else if (bid.amount_unsold < ask.amount_unsold)
+        else if (bid_amount_unsold < ask.amount_unsold)
         {
-            amount = bid.amount_unsold;
+            amount = bid_amount_unsold;
             bid.state = E_OrderState.completed;
             ask.state = E_OrderState.partial;
         }
-        else if (bid.amount_unsold == ask.amount_unsold)
+        else if (bid_amount_unsold == ask.amount_unsold)
         {
-            amount = bid.amount_unsold;
+            amount = bid_amount_unsold;
             bid.state = E_OrderState.completed;
             ask.state = E_OrderState.completed;
         }
-        bid.amount_unsold -= amount;
-        bid.amount_done += amount;
+        bid.amount_unsold -= amount * price;
+        bid.amount_done += amount * price;
         bid.deal_last_time = now;
         ask.amount_unsold -= amount;
         ask.amount_done += amount;
@@ -97,6 +100,10 @@ public static class Util
         if (!orders.Exists(P => P.order_id == ask.order_id))
         {
             orders.Add(ask);
+        }
+        if (bid.amount_unsold <= min)
+        {
+            bid.trigger_cancel_price = price;
         }
         Deal deal = new Deal()
         {

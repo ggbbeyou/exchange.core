@@ -141,9 +141,9 @@ public class OrderController : Controller
         {
             PlaceOrder orderResult = new PlaceOrder();
             orderResult.side = r.Next(0, 2) == 0 ? E_OrderSide.buy : E_OrderSide.sell;
-            orderResult.type = r.Next(0, 2) == 0 ? E_OrderType.price_fixed : E_OrderType.price_market;
+            orderResult.type = r.Next(0, 2) == 0 ? E_OrderType.price_limit : E_OrderType.price_market;
             orderResult.client_id = null;
-            if (orderResult.type == E_OrderType.price_fixed)
+            if (orderResult.type == E_OrderType.price_limit)
             {
                 orderResult.price = (decimal)FactoryService.instance.constant.random.Next(1, 30);
             }
@@ -160,9 +160,9 @@ public class OrderController : Controller
         {
             PlaceOrder orderResult = new PlaceOrder();
             orderResult.side = r.Next(0, 2) == 0 ? E_OrderSide.buy : E_OrderSide.sell;
-            orderResult.type = r.Next(0, 2) == 0 ? E_OrderType.price_fixed : E_OrderType.price_market;
+            orderResult.type = r.Next(0, 2) == 0 ? E_OrderType.price_limit : E_OrderType.price_market;
             orderResult.client_id = null;
-            if (orderResult.type == E_OrderType.price_fixed)
+            if (orderResult.type == E_OrderType.price_limit)
             {
                 orderResult.price = (decimal)FactoryService.instance.constant.random.Next(1, 30);
             }

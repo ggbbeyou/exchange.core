@@ -26,32 +26,31 @@ public class WalletService
         var scope = FactoryService.instance.constant.provider.CreateScope();
         this.db = scope.ServiceProvider.GetService<DbContextEF>()!;
     }
-
     /// <summary>
     /// 资产冻结变更
     /// </summary>
     /// <param name="wallet_type">钱包类型</param>
-    /// <param name="uid"></param>
-    /// <param name="coin_id"></param>
-    /// <param name="freeze">正数:增加冻结,负数:减少冻结</param>
+    /// <param name="uid">用户</param>
+    /// <param name="coin_base">币种</param>
+    /// <param name="amount_base">正数:增加冻结,负数:减少冻结</param>
     /// <returns></returns>
-    public bool FreezeChange(E_WalletType wallet_type, long uid, long coin_id, decimal freeze)
+    public bool FreezeChange(E_WalletType wallet_type, long uid, long coin_base, decimal amount_base)
     {
-        Wallet? wallet = this.db.Wallet.Where(P => P.wallet_type == wallet_type && P.user_id == uid && P.coin_id == coin_id).SingleOrDefault();
-        if (wallet == null)
+        Wallet? wallet_base = this.db.Wallet.Where(P => P.wallet_type == wallet_type && P.user_id == uid && P.coin_id == coin_base).SingleOrDefault();
+        if (wallet_base == null)
         {
             return false;
         }
-        if (freeze > 0)
+        if (amount_base > 0)
         {
-            if (wallet.available < freeze)
+            if (wallet_base.available < amount_base)
             {
                 return false;
             }
         }
-        else if (freeze < 0)
+        else if (amount_base < 0)
         {
-            if (wallet.freeze < Math.Abs(freeze))
+            if (wallet_base.freeze < Math.Abs(amount_base))
             {
                 return false;
             }
@@ -60,8 +59,72 @@ public class WalletService
         {
             return false;
         }
-        wallet.freeze += freeze;
-        wallet.available -= freeze;
+        wallet_base.freeze += amount_base;
+        wallet_base.available -= amount_base;
+        return this.db.SaveChanges() > 0;
+    }
+
+
+    /// <summary>
+    /// 资产冻结变更
+    /// </summary>
+    /// <param name="wallet_type">钱包类型</param>
+    /// <param name="uid"></param>
+    /// <param name="coin_base"></param>
+    /// <param name="amount_base">正数:增加冻结,负数:减少冻结</param>
+    /// <returns></returns>
+    public bool FreezeChange(E_WalletType wallet_type, long uid, long coin_base, decimal amount_base, long coin_quote, decimal amount_quote)
+    {
+        Wallet? wallet_base = this.db.Wallet.Where(P => P.wallet_type == wallet_type && P.user_id == uid && P.coin_id == coin_base).SingleOrDefault();
+        if (wallet_base == null)
+        {
+            return false;
+        }
+        if (amount_base > 0)
+        {
+            if (wallet_base.available < amount_base)
+            {
+                return false;
+            }
+        }
+        else if (amount_base < 0)
+        {
+            if (wallet_base.freeze < Math.Abs(amount_base))
+            {
+                return false;
+            }
+        }
+        else
+        {
+            return false;
+        }
+        wallet_base.freeze += amount_base;
+        wallet_base.available -= amount_base;
+        Wallet? wallet_quote = this.db.Wallet.Where(P => P.wallet_type == wallet_type && P.user_id == uid && P.coin_id == coin_quote).SingleOrDefault();
+        if (wallet_quote == null)
+        {
+            return false;
+        }
+        if (amount_quote > 0)
+        {
+            if (wallet_quote.available < amount_quote)
+            {
+                return false;
+            }
+        }
+        else if (amount_quote < 0)
+        {
+            if (wallet_quote.freeze < Math.Abs(amount_quote))
+            {
+                return false;
+            }
+        }
+        else
+        {
+            return false;
+        }
+        wallet_quote.freeze += amount_quote;
+        wallet_quote.available -= amount_quote;
         return this.db.SaveChanges() > 0;
     }
 

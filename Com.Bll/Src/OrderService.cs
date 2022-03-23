@@ -62,6 +62,7 @@ public class OrderService
     public CallResponse<List<Orders>> PlaceOrder(string symbol, long uid, List<PlaceOrder> orders)
     {
         CallResponse<List<Orders>> res = new CallResponse<List<Orders>>();
+        FactoryService.instance.constant.stopwatch.Restart();
         res.success = false;
         res.code = E_Res_Code.fail;
         res.op = E_Op.place;
@@ -77,6 +78,7 @@ public class OrderService
         if (info == null)
         {
             res.code = E_Res_Code.no_symbol;
+            res.message = "未找到该交易对";
             return res;
         }
         res.market = info.market;
@@ -84,11 +86,13 @@ public class OrderService
         if (users == null)
         {
             res.code = E_Res_Code.no_user;
+            res.message = "未找到该用户";
             return res;
         }
         if (users.disabled || !users.transaction)
         {
             res.code = E_Res_Code.no_permission;
+            res.message = "用户禁止下单";
             return res;
         }
         Vip? vip = user_service.GetVip(users.vip);
@@ -97,9 +101,9 @@ public class OrderService
             vip = new Vip();
         }
         List<PlaceOrder> buy_market = orders.Where(P => P.side == E_OrderSide.buy && P.type == E_OrderType.price_market).ToList();
-        List<PlaceOrder> buy_limit = orders.Where(P => P.side == E_OrderSide.buy && P.type == E_OrderType.price_fixed).ToList();
+        List<PlaceOrder> buy_limit = orders.Where(P => P.side == E_OrderSide.buy && P.type == E_OrderType.price_limit).ToList();
         List<PlaceOrder> sell_market = orders.Where(P => P.side == E_OrderSide.sell && P.type == E_OrderType.price_market).ToList();
-        List<PlaceOrder> sell_limit = orders.Where(P => P.side == E_OrderSide.sell && P.type == E_OrderType.price_fixed).ToList();
+        List<PlaceOrder> sell_limit = orders.Where(P => P.side == E_OrderSide.sell && P.type == E_OrderType.price_limit).ToList();
         if (buy_market.Exists(P => P.total == null || P.total < 0))
         {
             res.code = E_Res_Code.field_error;
@@ -115,86 +119,125 @@ public class OrderService
         if (buy_limit.Exists(P => P.price == null || P.price < 0 || P.amount == null || P.amount <= 0) || sell_limit.Exists(P => P.price == null || P.price < 0 || P.amount == null || P.amount <= 0))
         {
             res.code = E_Res_Code.field_error;
-            res.message = "限价单,价格和量不能为小于0";
+            res.message = "限价单,价格和量都不能为小于0";
             return res;
         }
-        decimal rate_buy_market = 0;
-        decimal rate_sell_market = 0;
-        decimal rate_buy_limit = 0;
-        decimal rate_sell_limit = 0;
-
-
-
-
-
-        decimal freeze_base = orders.Where(P => P.side == E_OrderSide.sell).Sum(P => (decimal?)P.amount) ?? 0;
-        decimal freeze_quote = buy_limit.Sum(P => (decimal?)P.price * P.amount) ?? 0 + buy_market.Sum(P => P.total) ?? 0;
-
-
-
-        foreach (var item in orders.Where(P => P.side == E_OrderSide.buy && P.type == E_OrderType.price_market))
+        decimal coin_base = 0;
+        decimal coin_quote = 0;
+        decimal fee_base = 0;
+        decimal fee_quote = 0;
+        decimal rate_market_buy = info.rate_market_buy * (1 + vip.rate_market);
+        decimal rate_market_sell = info.rate_market_sell * (1 + vip.rate_market);
+        decimal rate_limit_buy = info.fee_limit_buy * (1 + vip.rate_limit);
+        decimal rate_limit_sell = info.fee_limit_sell * (1 + vip.rate_limit);
+        foreach (var item in orders)
         {
-            Orders orderResult = new Orders();
-            orderResult.order_id = FactoryService.instance.constant.worker.NextId();
-            orderResult.market = info.market;
-            orderResult.symbol = info.symbol;
-            orderResult.client_id = item.client_id;
-            orderResult.uid = uid;
-            orderResult.price = item.price ?? 0;
-            orderResult.amount = item.amount;
-            orderResult.total = item.price ?? 0 * item.amount;
-            orderResult.create_time = DateTimeOffset.UtcNow;
-            orderResult.amount_unsold = item.amount;
-            orderResult.amount_done = 0;
-            orderResult.deal_last_time = null;
-            orderResult.side = item.side;
-            orderResult.state = E_OrderState.unsold;
-            orderResult.type = item.type;
-            orderResult.fee_rate = info.rate_market_buy * (1 + vip.rate_market);
-            orderResult.trigger_hanging_price = 0;
-            orderResult.trigger_cancel_price = 0;
-            orderResult.data = null;
-            orderResult.remarks = null;
-            res.data.Add(orderResult);
-            freeze_quote +=
+            Orders order = new Orders();
+            order.order_id = FactoryService.instance.constant.worker.NextId();
+            order.client_id = item.client_id;
+            order.market = info.market;
+            order.symbol = info.symbol;
+            order.uid = uid;
+            order.side = item.side;
+            order.state = E_OrderState.unsold;
+            order.type = item.type;
+            if (order.type == E_OrderType.price_market)
+            {
+                order.price = 0;
+                if (order.side == E_OrderSide.buy)
+                {
+                    order.amount = 0;
+                    order.total = item.total ?? 0;
+                    order.amount_unsold = item.total ?? 0;
+                    order.fee_rate = rate_market_buy;
+                    coin_quote += order.total;
+                    fee_quote += order.total * order.fee_rate;
+                }
+                else if (order.side == E_OrderSide.sell)
+                {
+                    order.amount = item.amount ?? 0;
+                    order.total = 0;
+                    order.amount_unsold = item.amount ?? 0;
+                    order.fee_rate = rate_market_sell;
+                    coin_base += order.amount;
+                    fee_base += order.amount * order.fee_rate;
+                }
+            }
+            else if (order.type == E_OrderType.price_limit)
+            {
+                order.price = item.price ?? 0;
+                order.amount = item.amount ?? 0;
+                order.total = order.price * order.amount;
+                order.amount_unsold = order.amount;
+                if (order.side == E_OrderSide.buy)
+                {
+                    order.fee_rate = rate_limit_buy;
+                    coin_quote += order.total;
+                    fee_quote += order.total * order.fee_rate;
+                }
+                else if (order.side == E_OrderSide.sell)
+                {
+                    order.fee_rate = rate_limit_sell;
+                    coin_base += order.amount;
+                    fee_base += order.amount * order.fee_rate;
+                }
+            }
+            order.amount_done = 0;
+            order.trigger_hanging_price = 0;
+            order.trigger_cancel_price = 0;
+            order.create_time = DateTimeOffset.UtcNow;
+            order.deal_last_time = null;
+            order.data = null;
+            order.remarks = null;
+            res.data.Add(order);
         }
-        foreach (var item in orders.Where(P => P.side == E_OrderSide.buy && P.type == E_OrderType.price_fixed))
+        if (coin_base > 0 && coin_quote > 0)
         {
-
+            if (!wallet_service.FreezeChange(E_WalletType.main, uid, info.coin_id_base, coin_base + fee_base, info.coin_id_quote, coin_quote + fee_quote))
+            {
+                res.code = E_Res_Code.low_capital;
+                res.message = "基础币种余额不足";
+                return res;
+            }
         }
-        foreach (var item in orders.Where(P => P.side == E_OrderSide.sell && P.type == E_OrderType.price_market))
+        else if (coin_base > 0)
         {
-
+            if (!wallet_service.FreezeChange(E_WalletType.main, uid, info.coin_id_base, coin_base + fee_base))
+            {
+                res.code = E_Res_Code.low_capital;
+                res.message = "基础币种余额不足";
+                return res;
+            }
         }
-        foreach (var item in orders.Where(P => P.side == E_OrderSide.sell && P.type == E_OrderType.price_fixed))
+        else if (coin_quote > 0)
         {
-
+            if (!wallet_service.FreezeChange(E_WalletType.main, uid, info.coin_id_quote, coin_quote + fee_quote))
+            {
+                res.code = E_Res_Code.low_capital;
+                res.message = "报价币种余额不足";
+                return res;
+            }
         }
-
-        freeze_quote += orders.Sum(P => P.amount);
-
-
-
+        FactoryService.instance.constant.stopwatch.Stop();
+        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};校验/冻结资金{res.data.Count}条挂单记录");
         FactoryService.instance.constant.stopwatch.Restart();
-        db.Orders.AddRange(order);
+        db.Orders.AddRange(res.data);
         db.SaveChanges();
         FactoryService.instance.constant.stopwatch.Stop();
-        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};插入{order.Count}条订单到DB");
-
-        req.op = E_Op.place;
-        req.market = info.market;
-        req.data = order;
+        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};插入{res.data.Count}条订单到DB");
         FactoryService.instance.constant.stopwatch.Restart();
-        FactoryService.instance.constant.MqSend(FactoryService.instance.GetMqOrderPlace(info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(req)));
+        CallRequest<List<Orders>> call_req = new CallRequest<List<Orders>>();
+        call_req.op = E_Op.place;
+        call_req.market = info.market;
+        call_req.data = res.data;
+        FactoryService.instance.constant.MqSend(FactoryService.instance.GetMqOrderPlace(info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(call_req)));
         FactoryService.instance.constant.stopwatch.Stop();
-        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};插入{order.Count}条订单到Mq");
-        CallResponse<List<Orders>> res = new CallResponse<List<Orders>>();
+        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};插入{call_req.data.Count}条订单到Mq");
         res.op = E_Op.place;
         res.success = true;
         res.code = E_Res_Code.ok;
         res.market = info.market;
-        res.message = null;
-        res.data = order;
+        res.message = "挂单成功";
         return res;
     }
 

@@ -27,6 +27,6 @@ public class Vip
     /// 限价手续费
     /// </summary>
     /// <value></value>
-    public decimal rate_fixed { get; set; }
+    public decimal rate_limit { get; set; }
 
 }

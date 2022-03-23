@@ -269,7 +269,7 @@ public class MatchCore
                     market_bid.Add(order);
                 }
             }
-            else if (order.type == E_OrderType.price_fixed)
+            else if (order.type == E_OrderType.price_limit)
             {
                 //限价买单与市价卖单撮合
                 if (order.amount_unsold > 0 && market_ask.Count() > 0)
@@ -360,7 +360,7 @@ public class MatchCore
                     market_ask.Add(order);
                 }
             }
-            else if (order.type == E_OrderType.price_fixed)
+            else if (order.type == E_OrderType.price_limit)
             {
                 //限价卖单与市价买市撮合
                 if (order.amount_unsold > 0 && market_bid.Count() > 0)

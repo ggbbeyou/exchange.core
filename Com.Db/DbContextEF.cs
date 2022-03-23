@@ -173,8 +173,8 @@ public class DbContextEF : DbContext
             o.Property(P => P.amount_multiple).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("交易量整数倍数");
             o.Property(P => P.rate_market_buy).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("市价买手续费");
             o.Property(P => P.rate_market_sell).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("市价卖手续费");
-            o.Property(P => P.fee_fixed_buy).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("限价买手续费");
-            o.Property(P => P.fee_fixed_sell).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("限价卖手续费");
+            o.Property(P => P.fee_limit_buy).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("限价买手续费");
+            o.Property(P => P.fee_limit_sell).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("限价卖手续费");
             o.Property(P => P.market_uid).IsRequired().HasColumnType("bigint").HasComment("作市账号");
             o.ToTable(nameof(MarketInfo));
         });
@@ -185,25 +185,25 @@ public class DbContextEF : DbContext
             o.HasIndex(P => new { P.market, P.uid });
             o.HasIndex(P => new { P.create_time });
             o.Property(P => P.order_id).IsRequired().ValueGeneratedNever().HasColumnType("bigint").HasComment("订单ID");
+            o.Property(P => P.client_id).HasColumnType("nvarchar").HasMaxLength(50).HasComment("客户自定义订单id");
             o.Property(P => P.market).IsRequired().HasColumnType("bigint").HasComment("交易对");
             o.Property(P => P.symbol).HasColumnType("nvarchar").HasMaxLength(20).HasComment("交易对名称");
-            o.Property(P => P.client_id).HasColumnType("nvarchar").HasMaxLength(50).HasComment("客户自定义订单id");
             o.Property(P => P.uid).IsRequired().HasColumnType("bigint").HasComment("用户ID");
-            o.Property(P => P.price).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("成交价");
-            o.Property(P => P.amount).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("成交量");
-            o.Property(P => P.total).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("成交总额");
-            o.Property(P => P.create_time).IsRequired().HasColumnType("datetimeoffset").HasComment("挂单时间");
-            o.Property(P => P.amount_unsold).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("未成交量");
-            o.Property(P => P.amount_done).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("已成交挂单量");
-            o.Property(P => P.deal_last_time).HasColumnType("datetimeoffset").HasComment("最后成交时间");
             o.Property(P => P.side).IsRequired().HasColumnType("tinyint").HasComment("交易方向");
             o.Property(P => P.state).IsRequired().HasColumnType("tinyint").HasComment("成交状态");
             o.Property(P => P.type).IsRequired().HasColumnType("tinyint").HasComment("订单类型");
+            o.Property(P => P.price).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("成交价");
+            o.Property(P => P.amount).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("成交量");
+            o.Property(P => P.total).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("成交总额");
+            o.Property(P => P.amount_unsold).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("未成交量");
+            o.Property(P => P.amount_done).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("已成交挂单量");
             o.Property(P => P.fee_rate).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("手续费率");
-            o.Property(P => P.data).HasColumnType("nvarchar").HasMaxLength(200).HasComment("附加数据");
             o.Property(P => P.trigger_hanging_price).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("触发挂单价格");
-            o.Property(P => P.remarks).HasColumnType("nvarchar").HasMaxLength(200).HasComment("备注");
             o.Property(P => P.trigger_cancel_price).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("触发撤单价格");
+            o.Property(P => P.create_time).IsRequired().HasColumnType("datetimeoffset").HasComment("挂单时间");
+            o.Property(P => P.deal_last_time).HasColumnType("datetimeoffset").HasComment("最后成交时间");
+            o.Property(P => P.data).HasColumnType("nvarchar").HasMaxLength(200).HasComment("附加数据");
+            o.Property(P => P.remarks).HasColumnType("nvarchar").HasMaxLength(200).HasComment("备注");
             o.ToTable(nameof(Orders));
         });
         modelBuilder.Entity<Users>(o =>
@@ -242,7 +242,7 @@ public class DbContextEF : DbContext
             o.Property(P => P.id).IsRequired().ValueGeneratedNever().HasColumnType("bigint").HasComment("ID");
             o.Property(P => P.name).HasColumnType("nvarchar").HasMaxLength(20).HasComment("等级名称");
             o.Property(P => P.rate_market).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("市价手续费");
-            o.Property(P => P.rate_fixed).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("限价手续费");
+            o.Property(P => P.rate_limit).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("限价手续费");
             o.ToTable(nameof(Vip));
         });
         modelBuilder.Entity<Wallet>(o =>

@@ -14,5 +14,5 @@ public enum E_OrderType
     /// <summary>
     /// 限价
     /// </summary>
-    price_fixed = 2,
+    price_limit = 2,
 }

@@ -86,8 +86,16 @@ public class OrderService
             res.code = E_Res_Code.no_user;
             return res;
         }
-
-
+        if (users.disabled || !users.transaction)
+        {
+            res.code = E_Res_Code.no_permission;
+            return res;
+        }
+        Vip? vip = user_service.GetVip(users.vip);
+        if (vip == null)
+        {
+            vip = new Vip();
+        }
 
 
 

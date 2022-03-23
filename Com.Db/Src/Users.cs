@@ -24,6 +24,21 @@ public class Users
     /// <value></value>
     public string password { get; set; } = null!;
     /// <summary>
+    /// 禁用
+    /// </summary>
+    /// <value></value>
+    public bool disabled { get; set; }
+    /// <summary>
+    /// 是否交易
+    /// </summary>
+    /// <value></value>
+    public bool transaction { get; set; }
+    /// <summary>
+    /// 是否提现
+    /// </summary>
+    /// <value></value>
+    public bool withdrawal { get; set; }
+    /// <summary>
     /// 用户手机号码
     /// </summary>
     /// <value></value>

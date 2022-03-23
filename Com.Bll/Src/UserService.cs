@@ -38,6 +38,16 @@ public class UserService
         return this.db.Users.AsNoTracking().SingleOrDefault(P => P.user_id == uid);
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="symbol"></param>
+    /// <returns></returns>
+    public Vip? GetVip(long id)
+    {
+        return this.db.Vip.AsNoTracking().SingleOrDefault(P => P.id == id);
+    }
+
 
 
 

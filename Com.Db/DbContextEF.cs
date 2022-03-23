@@ -45,6 +45,11 @@ public class DbContextEF : DbContext
     /// <value></value>
     public DbSet<UsersApi> UsersApi { get; set; } = null!;
     /// <summary>
+    /// Vip
+    /// </summary>
+    /// <value></value>
+    public DbSet<Vip> Vip { get; set; } = null!;
+    /// <summary>
     /// 计账钱包基础信息
     /// </summary>
     /// <value></value>
@@ -208,6 +213,9 @@ public class DbContextEF : DbContext
             o.Property(P => P.user_id).IsRequired().ValueGeneratedNever().HasColumnType("bigint").HasComment("用户id");
             o.Property(P => P.user_name).HasColumnType("nvarchar").HasMaxLength(50).HasComment("用户名");
             o.Property(P => P.password).HasColumnType("nvarchar").HasMaxLength(500).HasComment("用户密码");
+            o.Property(P => P.disabled).IsRequired().HasColumnType("bit").HasComment("禁用");
+            o.Property(P => P.transaction).IsRequired().HasColumnType("bit").HasComment("是否交易");
+            o.Property(P => P.withdrawal).IsRequired().HasColumnType("bit").HasComment("是否提现");
             o.Property(P => P.phone).HasColumnType("nvarchar").HasMaxLength(500).HasComment("用户手机号码");
             o.Property(P => P.email).HasColumnType("nvarchar").HasMaxLength(500).HasComment("邮箱");
             o.Property(P => P.vip).IsRequired().HasColumnType("bigint").HasComment("用户等级");
@@ -228,6 +236,15 @@ public class DbContextEF : DbContext
             o.Property(P => P.last_login_ip).HasColumnType("nvarchar").HasMaxLength(50).HasComment("最后登录IP地址");
             o.ToTable(nameof(UsersApi));
         });
+        modelBuilder.Entity<Vip>(o =>
+        {
+            o.HasKey(p => p.id);
+            o.Property(P => P.id).IsRequired().ValueGeneratedNever().HasColumnType("bigint").HasComment("ID");
+            o.Property(P => P.name).HasColumnType("nvarchar").HasMaxLength(20).HasComment("等级名称");
+            o.Property(P => P.rate_market).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("市价手续费");
+            o.Property(P => P.rate_fixed).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("限价手续费");
+            o.ToTable(nameof(Vip));
+        });
         modelBuilder.Entity<Wallet>(o =>
         {
             o.HasKey(p => p.wallet_id);
@@ -242,15 +259,6 @@ public class DbContextEF : DbContext
             o.Property(P => P.available).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("可用");
             o.Property(P => P.freeze).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("冻结");
             o.ToTable(nameof(Wallet));
-        });
-        modelBuilder.Entity<Vip>(o =>
-        {
-            o.HasKey(p => p.id);
-            o.Property(P => P.id).IsRequired().ValueGeneratedNever().HasColumnType("bigint").HasComment("ID");
-            o.Property(P => P.name).HasColumnType("nvarchar").HasMaxLength(20).HasComment("等级名称");
-            o.Property(P => P.rate_market).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("市价手续费");
-            o.Property(P => P.rate_fixed).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("限价手续费");
-            o.ToTable(nameof(Vip));
         });
 
         base.OnModelCreating(modelBuilder);

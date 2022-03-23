@@ -16,21 +16,25 @@ public enum E_Res_Code
     /// </summary>
     fail = 1,
     /// <summary>
+    /// 无权限
+    /// </summary>
+    no_permission = 2,
+    /// <summary>
     /// 未找到该用户
     /// </summary>
-    no_user = 2,
+    no_user = 3,
     /// <summary>
     /// 未找到交易对
     /// </summary>
-    no_symbol = 3,
+    no_symbol = 4,
     /// <summary>
     /// 字段内容格式出错
     /// </summary>
-    field_error = 4,
+    field_error = 5,
     /// <summary>
     /// 资金不足
     /// </summary>
-    low_capital = 5,
+    low_capital = 6,
 
 
 }

@@ -118,9 +118,18 @@ public class OrderService
             res.message = "限价单,价格和量不能为小于0";
             return res;
         }
+        decimal rate_buy_market = 0;
+        decimal rate_sell_market = 0;
+        decimal rate_buy_limit = 0;
+        decimal rate_sell_limit = 0;
+
+
+
+
+
         decimal freeze_base = orders.Where(P => P.side == E_OrderSide.sell).Sum(P => (decimal?)P.amount) ?? 0;
         decimal freeze_quote = buy_limit.Sum(P => (decimal?)P.price * P.amount) ?? 0 + buy_market.Sum(P => P.total) ?? 0;
-        
+
 
 
         foreach (var item in orders.Where(P => P.side == E_OrderSide.buy && P.type == E_OrderType.price_market))

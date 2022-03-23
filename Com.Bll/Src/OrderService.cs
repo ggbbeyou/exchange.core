@@ -72,6 +72,25 @@ public class OrderService
             res.message = "client_id长度不能超过50";
             return res;
         }
+        if (orders.Where(P => P.side == E_OrderSide.buy && P.type == E_OrderType.price_market).ToList().Exists(P => P.total == null || P.total < 0))
+        {
+            res.code = E_Res_Code.field_error;
+            res.message = "市价买单,总额不能小于0";
+            return res;
+        }
+        if (orders.Where(P => P.side == E_OrderSide.sell && P.type == E_OrderType.price_market).ToList().Exists(P => P.amount == null || P.amount < 0))
+        {
+            res.code = E_Res_Code.field_error;
+            res.message = "市价卖单,量不能小于0";
+            return res;
+        }
+        if (orders.Where(P => P.side == E_OrderSide.buy && P.type == E_OrderType.price_limit).ToList().Exists(P => P.price == null || P.price < 0 || P.amount == null || P.amount <= 0) ||
+         orders.Where(P => P.side == E_OrderSide.sell && P.type == E_OrderType.price_limit).ToList().Exists(P => P.price == null || P.price < 0 || P.amount == null || P.amount <= 0))
+        {
+            res.code = E_Res_Code.field_error;
+            res.message = "限价单,价格和量都不能为小于0";
+            return res;
+        }
         MarketInfo? info = this.market_service.GetMarketBySymbol(symbol);
         if (info == null)
         {
@@ -97,25 +116,6 @@ public class OrderService
         if (vip == null)
         {
             vip = new Vip();
-        }
-        if (orders.Where(P => P.side == E_OrderSide.buy && P.type == E_OrderType.price_market).ToList().Exists(P => P.total == null || P.total < 0))
-        {
-            res.code = E_Res_Code.field_error;
-            res.message = "市价买单,总额不能小于0";
-            return res;
-        }
-        if (orders.Where(P => P.side == E_OrderSide.sell && P.type == E_OrderType.price_market).ToList().Exists(P => P.amount == null || P.amount < 0))
-        {
-            res.code = E_Res_Code.field_error;
-            res.message = "市价卖单,量不能小于0";
-            return res;
-        }
-        if (orders.Where(P => P.side == E_OrderSide.buy && P.type == E_OrderType.price_limit).ToList().Exists(P => P.price == null || P.price < 0 || P.amount == null || P.amount <= 0) ||
-         orders.Where(P => P.side == E_OrderSide.sell && P.type == E_OrderType.price_limit).ToList().Exists(P => P.price == null || P.price < 0 || P.amount == null || P.amount <= 0))
-        {
-            res.code = E_Res_Code.field_error;
-            res.message = "限价单,价格和量都不能为小于0";
-            return res;
         }
         decimal coin_base = 0;
         decimal coin_quote = 0;
@@ -163,15 +163,16 @@ public class OrderService
                 order.price = item.price ?? 0;
                 order.amount = item.amount ?? 0;
                 order.total = order.price * order.amount;
-                order.amount_unsold = order.amount;
                 if (order.side == E_OrderSide.buy)
                 {
+                    order.amount_unsold = order.total;
                     order.fee_rate = rate_limit_buy;
                     coin_quote += order.total;
                     fee_quote += order.total * order.fee_rate;
                 }
                 else if (order.side == E_OrderSide.sell)
                 {
+                    order.amount_unsold = order.amount;
                     order.fee_rate = rate_limit_sell;
                     coin_base += order.amount;
                     fee_base += order.amount * order.fee_rate;

@@ -16,8 +16,6 @@ using om.Api.Sdk.Models;
 
 namespace Com.Bll;
 
-
-
 /// <summary>
 /// Service:订单
 /// </summary>
@@ -100,23 +98,20 @@ public class OrderService
         {
             vip = new Vip();
         }
-        List<PlaceOrder> buy_market = orders.Where(P => P.side == E_OrderSide.buy && P.type == E_OrderType.price_market).ToList();
-        List<PlaceOrder> buy_limit = orders.Where(P => P.side == E_OrderSide.buy && P.type == E_OrderType.price_limit).ToList();
-        List<PlaceOrder> sell_market = orders.Where(P => P.side == E_OrderSide.sell && P.type == E_OrderType.price_market).ToList();
-        List<PlaceOrder> sell_limit = orders.Where(P => P.side == E_OrderSide.sell && P.type == E_OrderType.price_limit).ToList();
-        if (buy_market.Exists(P => P.total == null || P.total < 0))
+        if (orders.Where(P => P.side == E_OrderSide.buy && P.type == E_OrderType.price_market).ToList().Exists(P => P.total == null || P.total < 0))
         {
             res.code = E_Res_Code.field_error;
             res.message = "市价买单,总额不能小于0";
             return res;
         }
-        if (sell_market.Exists(P => P.amount == null || P.amount < 0))
+        if (orders.Where(P => P.side == E_OrderSide.sell && P.type == E_OrderType.price_market).ToList().Exists(P => P.amount == null || P.amount < 0))
         {
             res.code = E_Res_Code.field_error;
             res.message = "市价卖单,量不能小于0";
             return res;
         }
-        if (buy_limit.Exists(P => P.price == null || P.price < 0 || P.amount == null || P.amount <= 0) || sell_limit.Exists(P => P.price == null || P.price < 0 || P.amount == null || P.amount <= 0))
+        if (orders.Where(P => P.side == E_OrderSide.buy && P.type == E_OrderType.price_limit).ToList().Exists(P => P.price == null || P.price < 0 || P.amount == null || P.amount <= 0) ||
+         orders.Where(P => P.side == E_OrderSide.sell && P.type == E_OrderType.price_limit).ToList().Exists(P => P.price == null || P.price < 0 || P.amount == null || P.amount <= 0))
         {
             res.code = E_Res_Code.field_error;
             res.message = "限价单,价格和量都不能为小于0";

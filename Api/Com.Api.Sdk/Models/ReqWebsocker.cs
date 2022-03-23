@@ -1,7 +1,7 @@
 using System;
 using Com.Db.Enum;
 
-namespace Com.Api.Sdk;
+namespace Com.Api.Sdk.Models;
 
 /// <summary>
 /// 订阅请求

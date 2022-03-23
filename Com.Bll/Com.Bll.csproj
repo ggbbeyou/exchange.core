@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Com.Db\Com.Db.csproj" />
+    <ProjectReference Include="..\Api\Com.Api.Sdk\Com.Api.Sdk.csproj" />
   </ItemGroup>
 
   <ItemGroup>

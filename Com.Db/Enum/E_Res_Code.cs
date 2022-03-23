@@ -8,11 +8,29 @@ namespace Com.Db.Enum;
 public enum E_Res_Code
 {
     /// <summary>
-    /// 失败
-    /// </summary>
-    fail = 0,
-    /// <summary>
     /// 成功
     /// </summary>
-    ok = 1,
+    ok = 0,
+    /// <summary>
+    /// 失败
+    /// </summary>
+    fail = 1,
+    /// <summary>
+    /// 未找到该用户
+    /// </summary>
+    no_user = 2,
+    /// <summary>
+    /// 未找到交易对
+    /// </summary>
+    no_symbol = 3,
+    /// <summary>
+    /// 字段内容格式出错
+    /// </summary>
+    field_error = 4,
+    /// <summary>
+    /// 资金不足
+    /// </summary>
+    low_capital = 5,
+
+
 }

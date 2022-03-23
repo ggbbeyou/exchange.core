@@ -26,9 +26,17 @@ public class UserService
     {
         var scope = FactoryService.instance.constant.provider.CreateScope();
         this.db = scope.ServiceProvider.GetService<DbContextEF>()!;
-
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="symbol"></param>
+    /// <returns></returns>
+    public Users? GetUser(long uid)
+    {
+        return this.db.Users.AsNoTracking().SingleOrDefault(P => P.user_id == uid);
+    }
 
 
 

@@ -98,7 +98,7 @@ public class OrderController : Controller
                 orderResult.remarks = null;
                 matchOrders.Add(orderResult);
             }
-            Res<List<Orders>> res = this.order_service.PlaceOrder(market.market, user_id, matchOrders);
+            Res<List<Orders>> res = this.order_service.PlaceOrder(market, user_id, matchOrders);
             result.data = new List<Orders>();
             foreach (var item in res.data)
             {

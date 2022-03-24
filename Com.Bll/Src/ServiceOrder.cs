@@ -100,7 +100,6 @@ public class ServiceOrder
             res.message = "市价卖单,量不能小于0";
             return res;
         }
-
         if (orders.Where(P => P.side == E_OrderSide.buy && P.type == E_OrderType.price_limit).ToList().Exists(P => P.price == null || P.price < 0 || P.amount == null || P.amount <= 0) ||
          orders.Where(P => P.side == E_OrderSide.sell && P.type == E_OrderType.price_limit).ToList().Exists(P => P.price == null || P.price < 0 || P.amount == null || P.amount <= 0))
         {

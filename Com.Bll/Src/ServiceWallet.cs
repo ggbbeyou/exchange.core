@@ -126,7 +126,6 @@ public class ServiceWallet
         wallet_quote.freeze += amount_quote;
         wallet_quote.available -= amount_quote;
         return this.db.SaveChanges() > 0;
-
     }
 
     /// <summary>

@@ -14,18 +14,13 @@ namespace Com.Bll;
 public class ServiceWallet
 {
     /// <summary>
-    /// 数据库
-    /// </summary>
-    public DbContextEF db = null!;
-
-    /// <summary>
     /// 初始化
     /// </summary>
     public ServiceWallet()
     {
-        var scope = FactoryService.instance.constant.provider.CreateScope();
-        this.db = scope.ServiceProvider.GetService<DbContextEF>()!;
+
     }
+
     /// <summary>
     /// 资产冻结变更
     /// </summary>

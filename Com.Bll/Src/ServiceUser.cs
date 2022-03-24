@@ -13,19 +13,11 @@ namespace Com.Bll;
 /// </summary>
 public class ServiceUser
 {
-
-    /// <summary>
-    /// 数据库
-    /// </summary>
-    public DbContextEF db = null!;
-
     /// <summary>
     /// 初始化
     /// </summary>
     public ServiceUser()
     {
-        var scope = FactoryService.instance.constant.provider.CreateScope();
-        this.db = scope.ServiceProvider.GetService<DbContextEF>()!;
     }
 
     /// <summary>
@@ -35,7 +27,13 @@ public class ServiceUser
     /// <returns></returns>
     public Users? GetUser(long uid)
     {
-        return this.db.Users.AsNoTracking().SingleOrDefault(P => P.user_id == uid);
+        using (var scope = FactoryService.instance.constant.provider.CreateScope())
+        {
+            using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
+            {
+                return db.Users.AsNoTracking().SingleOrDefault(P => P.user_id == uid);
+            }
+        }
     }
 
     /// <summary>
@@ -45,7 +43,13 @@ public class ServiceUser
     /// <returns></returns>
     public Vip? GetVip(long id)
     {
-        return this.db.Vip.AsNoTracking().SingleOrDefault(P => P.id == id);
+        using (var scope = FactoryService.instance.constant.provider.CreateScope())
+        {
+            using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
+            {
+                return db.Vip.AsNoTracking().SingleOrDefault(P => P.id == id);
+            }
+        }
     }
 
 

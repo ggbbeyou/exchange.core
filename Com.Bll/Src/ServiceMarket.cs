@@ -13,25 +13,12 @@ namespace Com.Bll;
 /// </summary>
 public class ServiceMarket
 {
-
-    /// <summary>
-    /// 数据库
-    /// </summary>
-    public DbContextEF db = null!;
-
     /// <summary>
     /// 初始化
     /// </summary>
     public ServiceMarket()
     {
-        var scope = FactoryService.instance.constant.provider.CreateScope();
-        this.db = scope.ServiceProvider.GetService<DbContextEF>()!;
-
     }
-
-
-
-
 
     /// <summary>
     /// 
@@ -40,7 +27,13 @@ public class ServiceMarket
     /// <returns></returns>
     public Market? GetMarketBySymbol(string symbol)
     {
-        return this.db.Market.AsNoTracking().SingleOrDefault(P => P.symbol == symbol);
-    }
+        using (var scope = FactoryService.instance.constant.provider.CreateScope())
+        {
+            using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
+            {
+                return db.Market.AsNoTracking().SingleOrDefault(P => P.symbol == symbol);
+            }
+        }
 
+    }
 }

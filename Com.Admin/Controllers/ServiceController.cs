@@ -68,6 +68,7 @@ public class ServiceController : Controller
             if (deal != null)
             {
                 marketInfo.last_price = deal.price;
+                this.db.SaveChanges();
             }
             bool result = false;
             if (status == 1)

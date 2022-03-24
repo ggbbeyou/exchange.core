@@ -101,7 +101,7 @@ public class TestController : Controller
             coin_name_quote = usdt.coin_name,
             separator = "/",
             price_places = 2,
-            amount_multiple = 0,
+            amount_multiple = 0.00001m,
             fee_market_buy = 0.00003m,
             fee_market_sell = 0.00003m,
             fee_limit_buy = 0.001m,
@@ -119,7 +119,7 @@ public class TestController : Controller
             coin_name_quote = usdt.coin_name,
             separator = "/",
             price_places = 2,
-            amount_multiple = 0,
+            amount_multiple = 0.0002m,
             fee_market_buy = 0.00003m,
             fee_market_sell = 0.00003m,
             fee_limit_buy = 0.001m,
@@ -225,6 +225,8 @@ public class TestController : Controller
                 E_OrderType type = FactoryService.instance.constant.random.Next(0, 2) == 0 ? E_OrderType.price_limit : E_OrderType.price_market;
                 decimal amount = (decimal)FactoryService.instance.constant.random.NextDouble();
                 decimal price = (decimal)FactoryService.instance.constant.random.NextDouble();
+                price = Math.Round(price, market.price_places);
+                amount = Math.Round(amount / market.amount_multiple, 0, MidpointRounding.ToNegativeInfinity) * market.amount_multiple;
                 ReqOrder order = new ReqOrder()
                 {
                     client_id = FactoryService.instance.constant.worker.NextId().ToString(),

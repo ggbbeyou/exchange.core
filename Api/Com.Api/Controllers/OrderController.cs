@@ -38,11 +38,11 @@ public class OrderController : Controller
     /// 交易对基础信息
     /// </summary>
     /// <returns></returns>
-    public MarketInfoService market_info_db = new MarketInfoService();
+    public ServiceMarket market_info_db = new ServiceMarket();
     /// <summary>
     /// Service:订单
     /// </summary>
-    public OrderService order_service = new OrderService();
+    public ServiceOrder order_service = new ServiceOrder();
 
     /// <summary>
     /// 
@@ -68,7 +68,7 @@ public class OrderController : Controller
     {
         ReqCall<List<Orders>> result = new ReqCall<List<Orders>>();
         List<Orders> matchOrders = new List<Orders>();
-        MarketInfo? market = this.market_info_db.GetMarketBySymbol(symbol);
+        Market? market = this.market_info_db.GetMarketBySymbol(symbol);
         if (market == null)
         {
 

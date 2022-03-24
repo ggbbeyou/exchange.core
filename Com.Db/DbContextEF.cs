@@ -28,7 +28,7 @@ public class DbContextEF : DbContext
     /// 交易对基础信息
     /// </summary>
     /// <value></value>
-    public DbSet<MarketInfo> MarketInfo { get; set; } = null!;
+    public DbSet<Market> Market { get; set; } = null!;
     /// <summary>
     /// 订单表
     /// </summary>
@@ -157,7 +157,7 @@ public class DbContextEF : DbContext
             o.Property(P => P.time).IsRequired().HasColumnType("datetimeoffset").HasComment("更新时间");
             o.ToTable(nameof(Kline));
         });
-        modelBuilder.Entity<MarketInfo>(o =>
+        modelBuilder.Entity<Market>(o =>
         {
             o.HasKey(p => p.market);
             o.HasIndex(P => new { P.symbol }).IsUnique();
@@ -176,7 +176,7 @@ public class DbContextEF : DbContext
             o.Property(P => P.fee_limit_buy).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("限价买手续费");
             o.Property(P => P.fee_limit_sell).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("限价卖手续费");
             o.Property(P => P.market_uid).IsRequired().HasColumnType("bigint").HasComment("作市账号");
-            o.ToTable(nameof(MarketInfo));
+            o.ToTable(nameof(Market));
         });
         modelBuilder.Entity<Orders>(o =>
         {

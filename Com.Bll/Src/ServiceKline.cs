@@ -22,7 +22,7 @@ namespace Com.Bll;
 /// <summary>
 /// Service:K线
 /// </summary>
-public class KlineService
+public class ServiceKline
 {
 
     /// <summary>
@@ -32,12 +32,12 @@ public class KlineService
     /// <summary>
     /// DB:交易记录
     /// </summary>
-    private DealService deal_service = new DealService();
+    private ServiceDeal deal_service = new ServiceDeal();
 
     /// <summary>
     /// 初始化
     /// </summary>
-    public KlineService()
+    public ServiceKline()
     {
         var scope = FactoryService.instance.constant.provider.CreateScope();
         this.db = scope.ServiceProvider.GetService<DbContextEF>()!;

@@ -11,7 +11,7 @@ namespace Com.Bll;
 /// <summary>
 /// Db:交易对
 /// </summary>
-public class MarketInfoService
+public class ServiceMarket
 {
 
     /// <summary>
@@ -22,7 +22,7 @@ public class MarketInfoService
     /// <summary>
     /// 初始化
     /// </summary>
-    public MarketInfoService()
+    public ServiceMarket()
     {
         var scope = FactoryService.instance.constant.provider.CreateScope();
         this.db = scope.ServiceProvider.GetService<DbContextEF>()!;
@@ -38,9 +38,9 @@ public class MarketInfoService
     /// </summary>
     /// <param name="symbol"></param>
     /// <returns></returns>
-    public MarketInfo? GetMarketBySymbol(string symbol)
+    public Market? GetMarketBySymbol(string symbol)
     {
-        return this.db.MarketInfo.AsNoTracking().SingleOrDefault(P => P.symbol == symbol);
+        return this.db.Market.AsNoTracking().SingleOrDefault(P => P.symbol == symbol);
     }
 
 }

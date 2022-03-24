@@ -11,18 +11,18 @@ namespace Com.Bll;
 /// <summary>
 /// Service:深度行情
 /// </summary>
-public class DepthService
+public class ServiceDepth
 {
     /// <summary>
     /// 单例类的实例
     /// </summary>
     /// <returns></returns>
-    public static readonly DepthService instance = new DepthService();
+    public static readonly ServiceDepth instance = new ServiceDepth();
 
     /// <summary>
     /// 初始化
     /// </summary>
-    private DepthService()
+    private ServiceDepth()
     {
     }
 

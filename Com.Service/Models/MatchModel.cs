@@ -25,7 +25,7 @@ public class MatchModel
     /// 交易对基本信息
     /// </summary>
     /// <value></value>
-    public MarketInfo info { get; set; } = null!;
+    public Market info { get; set; } = null!;
     /// <summary>
     /// 撮合服务
     /// </summary>
@@ -46,7 +46,7 @@ public class MatchModel
     /// 初始化
     /// </summary>
     /// <param name="info"></param>
-    public MatchModel(MarketInfo info)
+    public MatchModel(Market info)
     {
         this.info = info;
         this.eventId = new EventId(1, info.symbol);

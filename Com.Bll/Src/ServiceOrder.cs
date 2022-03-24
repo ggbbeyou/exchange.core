@@ -19,7 +19,7 @@ namespace Com.Bll;
 /// <summary>
 /// Service:订单
 /// </summary>
-public class OrderService
+public class ServiceOrder
 {
     /// <summary>
     /// 数据库
@@ -29,22 +29,22 @@ public class OrderService
     /// 钱包服务
     /// </summary>
     /// <returns></returns>
-    public WalletService wallet_service = new WalletService();
+    public ServiceWallet wallet_service = new ServiceWallet();
     /// <summary>
     /// 交易对服务
     /// </summary>
     /// <returns></returns>
-    public MarketInfoService market_service = new MarketInfoService();
+    public ServiceMarket market_service = new ServiceMarket();
     /// <summary>
     /// 用户服务
     /// </summary>
     /// <returns></returns>
-    public UserService user_service = new UserService();
+    public ServiceUser user_service = new ServiceUser();
 
     /// <summary>
     /// 初始化
     /// </summary>
-    public OrderService()
+    public ServiceOrder()
     {
         var scope = FactoryService.instance.constant.provider.CreateScope();
         this.db = scope.ServiceProvider.GetService<DbContextEF>()!;
@@ -91,7 +91,7 @@ public class OrderService
             res.message = "限价单,价格和量都不能为小于0";
             return res;
         }
-        MarketInfo? info = this.market_service.GetMarketBySymbol(symbol);
+        Market? info = this.market_service.GetMarketBySymbol(symbol);
         if (info == null)
         {
             res.code = E_Res_Code.no_symbol;

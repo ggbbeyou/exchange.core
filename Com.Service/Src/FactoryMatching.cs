@@ -18,11 +18,11 @@ public class FactoryMatching
     /// <summary>
     /// Service:交易记录
     /// </summary>
-    public DealService deal_service = new DealService();
+    public ServiceDeal deal_service = new ServiceDeal();
     /// <summary>
     /// Service:K线
     /// </summary>
-    public KlineService kline_service = new KlineService();
+    public ServiceKline kline_service = new ServiceKline();
     /// <summary>
     /// 服务
     /// </summary>
@@ -43,7 +43,7 @@ public class FactoryMatching
     /// </summary>
     /// <param name="marketInfo"></param>
     /// <returns></returns>
-    public MarketInfo ServiceClearCache(MarketInfo info)
+    public Market ServiceClearCache(Market info)
     {
         //交易记录数据从DB同步到Redis 至少保存最近3个月记录
         long delete = this.deal_service.DeleteDeal(info.market, DateTimeOffset.UtcNow.AddMonths(-2));
@@ -53,7 +53,7 @@ public class FactoryMatching
     /// <summary>
     /// 服务:预热缓存
     /// </summary>
-    public MarketInfo ServiceWarmCache(MarketInfo info)
+    public Market ServiceWarmCache(Market info)
     {
         DateTimeOffset now = DateTimeOffset.UtcNow;
         now = now.AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond);
@@ -68,7 +68,7 @@ public class FactoryMatching
     /// 服务:启动服务
     /// </summary>
     /// <param name="info"></param>
-    public MarketInfo ServiceStart(MarketInfo info)
+    public Market ServiceStart(Market info)
     {
         if (!this.service.ContainsKey(info.market))
         {
@@ -86,7 +86,7 @@ public class FactoryMatching
     /// 服务:关闭服务
     /// </summary>
     /// <param name="info"></param>
-    public MarketInfo ServiceStop(MarketInfo info)
+    public Market ServiceStop(Market info)
     {
         if (this.service.ContainsKey(info.market))
         {

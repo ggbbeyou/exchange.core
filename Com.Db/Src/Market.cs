@@ -6,7 +6,7 @@ namespace Com.Db;
 /// <summary>
 /// 交易对基础信息
 /// </summary>
-public class MarketInfo
+public class Market
 {
     /// <summary>
     /// 交易对

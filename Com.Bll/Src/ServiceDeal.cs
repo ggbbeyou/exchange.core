@@ -15,7 +15,7 @@ namespace Com.Bll;
 /// <summary>
 /// Service:交易记录
 /// </summary>
-public class DealService
+public class ServiceDeal
 {
     /// <summary>
     /// 数据库
@@ -25,7 +25,7 @@ public class DealService
     /// <summary>
     /// 初始化
     /// </summary>
-    public DealService()
+    public ServiceDeal()
     {
         var scope = FactoryService.instance.constant.provider.CreateScope();
         this.db = scope.ServiceProvider.GetService<DbContextEF>()!;

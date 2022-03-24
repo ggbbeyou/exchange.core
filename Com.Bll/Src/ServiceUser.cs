@@ -11,7 +11,7 @@ namespace Com.Bll;
 /// <summary>
 /// Service:用户
 /// </summary>
-public class UserService
+public class ServiceUser
 {
 
     /// <summary>
@@ -22,7 +22,7 @@ public class UserService
     /// <summary>
     /// 初始化
     /// </summary>
-    public UserService()
+    public ServiceUser()
     {
         var scope = FactoryService.instance.constant.provider.CreateScope();
         this.db = scope.ServiceProvider.GetService<DbContextEF>()!;

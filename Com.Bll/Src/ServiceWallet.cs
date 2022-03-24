@@ -11,7 +11,7 @@ namespace Com.Bll;
 /// <summary>
 /// Service:计账钱包
 /// </summary>
-public class WalletService
+public class ServiceWallet
 {
     /// <summary>
     /// 数据库
@@ -21,7 +21,7 @@ public class WalletService
     /// <summary>
     /// 初始化
     /// </summary>
-    public WalletService()
+    public ServiceWallet()
     {
         var scope = FactoryService.instance.constant.provider.CreateScope();
         this.db = scope.ServiceProvider.GetService<DbContextEF>()!;

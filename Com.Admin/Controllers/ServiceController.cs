@@ -54,7 +54,7 @@ public class ServiceController : Controller
     public async Task<IActionResult> Manage(long market, int status)
     {
         Res<long> res = new Res<long>();
-        MarketInfo? marketInfo = this.db.MarketInfo.FirstOrDefault(P => P.market == market);
+        Market? marketInfo = this.db.Market.FirstOrDefault(P => P.market == market);
         if (marketInfo == null)
         {
             res.success = false;

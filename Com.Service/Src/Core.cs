@@ -34,17 +34,17 @@ public class Core
     /// 交易记录Db操作
     /// </summary>
     /// <returns></returns>
-    public DealService deal_service = new DealService();
+    public ServiceDeal deal_service = new ServiceDeal();
     /// <summary>
     /// 订单服务
     /// </summary>
     /// <returns></returns>
-    public OrderService order_service = new OrderService();
+    public ServiceOrder order_service = new ServiceOrder();
     /// <summary>
     /// K线服务
     /// </summary>
     /// <returns></returns>
-    public KlineService kline_service = new KlineService();
+    public ServiceKline kline_service = new ServiceKline();
     /// <summary>
     /// 秒表
     /// </summary>

@@ -45,7 +45,7 @@ public class GreeterImpl : ExchangeService.ExchangeServiceBase
         res.data = req.data;
         if (req.op == E_Op.service_clear_cache)
         {
-            MarketInfo? marketInfo = JsonConvert.DeserializeObject<MarketInfo>(req.data);
+            Market? marketInfo = JsonConvert.DeserializeObject<Market>(req.data);
             if (marketInfo == null)
             {
                 res.success = false;
@@ -55,13 +55,13 @@ public class GreeterImpl : ExchangeService.ExchangeServiceBase
                 reply.Message = JsonConvert.SerializeObject(res);
                 return reply;
             }
-            MarketInfo result = FactoryMatching.instance.ServiceClearCache(marketInfo);
+            Market result = FactoryMatching.instance.ServiceClearCache(marketInfo);
             res.message = $"服务(成功):清除所有缓存:{marketInfo.market}";
             FactoryService.instance.constant.logger.LogInformation($"服务(成功):清除所有缓存:{marketInfo.market}");
         }
         else if (req.op == E_Op.service_warm_cache)
         {
-            MarketInfo? marketInfo = JsonConvert.DeserializeObject<MarketInfo>(req.data);
+            Market? marketInfo = JsonConvert.DeserializeObject<Market>(req.data);
             if (marketInfo == null)
             {
                 res.success = false;
@@ -71,13 +71,13 @@ public class GreeterImpl : ExchangeService.ExchangeServiceBase
                 reply.Message = JsonConvert.SerializeObject(res);
                 return reply;
             }
-            MarketInfo result = FactoryMatching.instance.ServiceWarmCache(marketInfo);
+            Market result = FactoryMatching.instance.ServiceWarmCache(marketInfo);
             res.message = $"服务(成功):预热缓存:{marketInfo.market}";
             FactoryService.instance.constant.logger.LogInformation($"服务(成功):预热缓存:{marketInfo.market}");
         }
         else if (req.op == E_Op.service_start)
         {
-            MarketInfo? marketInfo = JsonConvert.DeserializeObject<MarketInfo>(req.data);
+            Market? marketInfo = JsonConvert.DeserializeObject<Market>(req.data);
             if (marketInfo == null)
             {
                 res.success = false;
@@ -93,7 +93,7 @@ public class GreeterImpl : ExchangeService.ExchangeServiceBase
         }
         else if (req.op == E_Op.service_stop)
         {
-            MarketInfo? marketInfo = JsonConvert.DeserializeObject<MarketInfo>(req.data);
+            Market? marketInfo = JsonConvert.DeserializeObject<Market>(req.data);
             if (marketInfo == null)
             {
                 res.success = false;
@@ -104,7 +104,7 @@ public class GreeterImpl : ExchangeService.ExchangeServiceBase
             }
             try
             {
-                MarketInfo result = FactoryMatching.instance.ServiceStop(marketInfo);
+                Market result = FactoryMatching.instance.ServiceStop(marketInfo);
                 res.data = JsonConvert.SerializeObject(result);
                 res.message = $"服务(成功):关闭服务:{marketInfo.market}";
                 FactoryService.instance.constant.logger.LogInformation($"服务(成功):关闭服务:{marketInfo.market}");

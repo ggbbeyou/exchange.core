@@ -6,7 +6,7 @@ namespace Com.Db;
 /// <summary>
 /// 区块钱包基础信息(暂时不用)
 /// </summary>
-public class BlockWallet
+public class WalletBlock
 {
     /// <summary>
     /// 钱包id

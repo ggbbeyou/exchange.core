@@ -37,7 +37,7 @@ public class WebSocketController : Controller
     /// 交易对基础信息
     /// </summary>
     /// <returns></returns>
-    public MarketInfoService market_info_service = new MarketInfoService();
+    public ServiceMarket market_info_service = new ServiceMarket();
     /// <summary>
     /// 临时变量
     /// </summary>
@@ -191,7 +191,7 @@ public class WebSocketController : Controller
                 }
                 else
                 {
-                    MarketInfo? market = this.market_info_service.GetMarketBySymbol(item.data);
+                    Market? market = this.market_info_service.GetMarketBySymbol(item.data);
                     if (market == null)
                     {
                         continue;
@@ -260,7 +260,7 @@ public class WebSocketController : Controller
                 }
                 else
                 {
-                    MarketInfo? market = this.market_info_service.GetMarketBySymbol(item.data);
+                    Market? market = this.market_info_service.GetMarketBySymbol(item.data);
                     if (market == null)
                     {
                         continue;

@@ -50,7 +50,7 @@ public class FactoryAdmin
     /// </summary>
     /// <param name="info"></param>
     /// <returns></returns>
-    public async Task<bool> ServiceClearCache(MarketInfo info)
+    public async Task<bool> ServiceClearCache(Market info)
     {
         try
         {
@@ -77,7 +77,7 @@ public class FactoryAdmin
     /// </summary>
     /// <param name="info"></param>
     /// <returns></returns>
-    public async Task<bool> ServiceWarmCache(MarketInfo info)
+    public async Task<bool> ServiceWarmCache(Market info)
     {
         try
         {
@@ -104,7 +104,7 @@ public class FactoryAdmin
     /// </summary>
     /// <param name="info"></param>
     /// <returns></returns>
-    public async Task<bool> ServiceStart(MarketInfo info)
+    public async Task<bool> ServiceStart(Market info)
     {
         try
         {
@@ -131,7 +131,7 @@ public class FactoryAdmin
     /// </summary>
     /// <param name="info"></param>
     /// <returns></returns>
-    public async Task<bool> ServiceStop(MarketInfo info)
+    public async Task<bool> ServiceStop(Market info)
     {
         try
         {

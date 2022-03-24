@@ -62,12 +62,12 @@ public class Market
     /// 市价买手续费
     /// </summary>
     /// <value></value>
-    public decimal rate_market_buy { get; set; }
+    public decimal fee_market_buy { get; set; }
     /// <summary>
     /// 市价卖手续费
     /// </summary>
     /// <value></value>
-    public decimal rate_market_sell { get; set; }
+    public decimal fee_market_sell { get; set; }
     /// <summary>
     /// 限价买手续费
     /// </summary>

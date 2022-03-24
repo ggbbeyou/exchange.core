@@ -39,6 +39,7 @@ public class OrderController : Controller
     /// </summary>
     /// <returns></returns>
     public ServiceMarket service_market = new ServiceMarket();
+
     /// <summary>
     /// Service:订单
     /// </summary>
@@ -55,7 +56,6 @@ public class OrderController : Controller
     {
 
     }
-
 
     /// <summary>
     /// 挂单
@@ -94,6 +94,6 @@ public class OrderController : Controller
     //       /////////////////////////////////////////////////
 
 
-   
+
 
 }

@@ -58,13 +58,78 @@ public class TestController : Controller
         this.db = db;
     }
 
+    /// <summary>
+    /// 初始化配置
+    /// </summary>
+    /// <returns></returns>
     public IActionResult Init()
     {
+        Coin usdt = new Coin()
+        {
+            coin_id = FactoryService.instance.constant.worker.NextId(),
+            coin_name = "usdt",
+            price_places = 8,
+            amount_places = 8,
+            contract = "",
+        };
         Coin btc = new Coin()
         {
-
+            coin_id = FactoryService.instance.constant.worker.NextId(),
+            coin_name = "btc",
+            price_places = 8,
+            amount_places = 8,
+            contract = "",
         };
-
+        Coin eth = new Coin()
+        {
+            coin_id = FactoryService.instance.constant.worker.NextId(),
+            coin_name = "eth",
+            price_places = 8,
+            amount_places = 8,
+            contract = "",
+        };
+        this.db.Coin.Add(usdt);
+        this.db.Coin.Add(btc);
+        this.db.Coin.Add(eth);
+        Market btcusdt = new Market()
+        {
+            market = FactoryService.instance.constant.worker.NextId(),
+            symbol = "btc/usdt",
+            coin_id_base = btc.coin_id,
+            coin_name_base = btc.coin_name,
+            coin_id_quote = usdt.coin_id,
+            coin_name_quote = usdt.coin_name,
+            separator = "/",
+            price_places = 2,
+            amount_places = 5,
+            amount_multiple = 0,
+            fee_market_buy = 0.00003m,
+            fee_market_sell = 0.00003m,
+            fee_limit_buy = 0.001m,
+            fee_limit_sell = 0.003m,
+            market_uid = 0,
+        };
+        Market ethusdt = new Market()
+        {
+            market = FactoryService.instance.constant.worker.NextId(),
+            symbol = "eth/usdt",
+            coin_id_base = eth.coin_id,
+            coin_name_base = eth.coin_name,
+            coin_id_quote = usdt.coin_id,
+            coin_name_quote = usdt.coin_name,
+            separator = "/",
+            price_places = 2,
+            amount_places = 4,
+            amount_multiple = 0,
+            fee_market_buy = 0.00003m,
+            fee_market_sell = 0.00003m,
+            fee_limit_buy = 0.001m,
+            fee_limit_sell = 0.003m,
+            market_uid = 0,
+        };
+        this.db.Market.Add(btcusdt);
+        this.db.Market.Add(ethusdt);
+        this.db.SaveChanges();
         return View();
     }
 

@@ -30,7 +30,7 @@ public class ReqOrder
     /// <value></value>
     public E_OrderType type { get; set; }
     /// <summary>
-    /// 挂单价(限价单必填,市价单无效)
+    /// 挂单价(限价单必填,市价单无效,db:市价为成交均价)
     /// </summary>
     /// <value></value>
     public decimal? price { get; set; }

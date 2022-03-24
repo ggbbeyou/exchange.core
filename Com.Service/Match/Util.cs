@@ -67,8 +67,9 @@ public static class Util
     {
         DateTimeOffset now = DateTimeOffset.UtcNow;
         decimal min = (decimal)Math.Pow(0.1, (double)amount_places) * price;
+        decimal bid_amount_unsold = Math.Round(bid.amount_unsold / price, amount_places, MidpointRounding.ToNegativeInfinity);
+        decimal leftover = bid.amount_unsold - (bid_amount_unsold * price);
         decimal amount = 0;
-        decimal bid_amount_unsold = bid.amount_unsold / price;
         if (bid_amount_unsold > ask.amount_unsold)
         {
             amount = ask.amount_unsold;
@@ -106,7 +107,7 @@ public static class Util
         {
             orders.Add(ask);
         }
-        if (bid.amount_unsold <= min)
+        if (bid.amount_unsold < min && leftover > 0)
         {
             bid.trigger_cancel_price = price;
         }

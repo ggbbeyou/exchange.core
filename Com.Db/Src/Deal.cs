@@ -27,7 +27,7 @@ public class Deal
     /// <value></value>
     public string symbol { get; set; } = null!;
     /// <summary>
-    /// 成交价
+    /// 成交均价
     /// </summary>
     /// <value></value>
     public decimal price { get; set; }

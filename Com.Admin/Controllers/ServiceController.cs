@@ -70,6 +70,13 @@ public class ServiceController : Controller
                 marketInfo.last_price = deal.price;
                 this.db.SaveChanges();
             }
+            if (marketInfo.last_price <= 0)
+            {
+                res.success = false;
+                res.code = E_Res_Code.fail;
+                res.message = "最后成交价不能小于0";
+                res.data = market;
+            }
             bool result = false;
             if (status == 1)
             {

@@ -122,16 +122,7 @@ public class FactoryConstant
         {
             this.logger.LogError(ex, $"MQ服务器连接不上");
         }
-    }
-
-    /// <summary>
-    /// 设置数据库上下文
-    /// </summary>
-    /// <param name="db"></param>
-    // public void SetDb(DbContextEF db)
-    // {
-    //     this.db = db;
-    // }
+    }    
 
     /// <summary>
     /// 上分布式锁

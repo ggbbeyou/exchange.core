@@ -26,10 +26,7 @@ public class Core
     /// </summary>
     /// <value></value>
     public MatchModel model { get; set; } = null!;
-    /// <summary>
-    /// 数据库
-    /// </summary>
-    public DbContextEF db = null!;
+    
     /// <summary>
     /// 交易记录Db操作
     /// </summary>
@@ -84,8 +81,6 @@ public class Core
         res_kline.success = true;
         res_kline.op = E_WebsockerOp.subscribe_date;
         res_kline.data = new List<Kline>();
-        var scope = FactoryService.instance.constant.provider.CreateScope();
-        this.db = scope.ServiceProvider.GetService<DbContextEF>()!;
         ReceiveMatchOrder();
     }
 

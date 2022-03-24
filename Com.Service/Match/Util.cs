@@ -90,6 +90,11 @@ public static class Util
         bid.amount_unsold -= amount * price;
         bid.amount_done += amount * price;
         bid.deal_last_time = now;
+        if (bid.type == E_OrderType.price_market)
+        {
+            bid.amount += amount;
+            bid.price = bid.amount_done / bid.amount;
+        }
         ask.amount_unsold -= amount;
         ask.amount_done += amount;
         ask.deal_last_time = now;

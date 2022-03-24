@@ -192,7 +192,7 @@ public class ServiceOrder
             if (!wallet_service.FreezeChange(E_WalletType.main, uid, info.coin_id_base, coin_base + fee_base ?? 0, info.coin_id_quote, coin_quote + fee_quote ?? 0))
             {
                 res.code = E_Res_Code.low_capital;
-                res.message = "基础币种余额不足";
+                res.message = "基础币种或报价币种余额不足";
                 return res;
             }
         }

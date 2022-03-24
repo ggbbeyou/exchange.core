@@ -24,11 +24,6 @@ namespace Com.Bll;
 /// </summary>
 public class ServiceKline
 {
-
-    /// <summary>
-    /// 数据库
-    /// </summary>
-    private DbContextEF db = null!;
     /// <summary>
     /// DB:交易记录
     /// </summary>
@@ -39,8 +34,6 @@ public class ServiceKline
     /// </summary>
     public ServiceKline()
     {
-        var scope = FactoryService.instance.constant.provider.CreateScope();
-        this.db = scope.ServiceProvider.GetService<DbContextEF>()!;
     }
 
     /// <summary>
@@ -51,7 +44,13 @@ public class ServiceKline
     /// <returns></returns>
     public Kline? GetLastKline(long market, E_KlineType type)
     {
-        return this.db.Kline.Where(P => P.market == market && P.type == type).OrderByDescending(P => P.time_start).AsNoTracking().SingleOrDefault();
+        using (var scope = FactoryService.instance.constant.provider.CreateScope())
+        {
+            using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
+            {
+                return db.Kline.Where(P => P.market == market && P.type == type).OrderByDescending(P => P.time_start).AsNoTracking().SingleOrDefault();
+            }
+        }
     }
 
     /// <summary>
@@ -64,7 +63,13 @@ public class ServiceKline
     /// <returns></returns>
     public List<Kline> GetKlines(long market, E_KlineType type, DateTimeOffset start, DateTimeOffset end)
     {
-        return this.db.Kline.Where(P => P.market == market && P.type == type && P.time_start >= start && P.time_start <= end).OrderBy(P => P.time_start).AsNoTracking().ToList();
+        using (var scope = FactoryService.instance.constant.provider.CreateScope())
+        {
+            using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
+            {
+                return db.Kline.Where(P => P.market == market && P.type == type && P.time_start >= start && P.time_start <= end).OrderBy(P => P.time_start).AsNoTracking().ToList();
+            }
+        }
     }
 
     /// <summary>
@@ -80,34 +85,40 @@ public class ServiceKline
         {
             return 0;
         }
-        List<Kline> db_kline = this.db.Kline.Where(P => P.market == market && P.type == klineType && P.time_start >= klines[0].time_start && P.time_end <= klines[klines.Count - 1].time_end).ToList();
-        foreach (var item in klines)
+        using (var scope = FactoryService.instance.constant.provider.CreateScope())
         {
-            Kline? kline = db_kline.FirstOrDefault(P => P.time_start == item.time_start);
-            if (kline == null)
+            using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
-                kline = new Kline();
-                kline.id = FactoryService.instance.constant.worker.NextId();
-                kline.time_start = item.time_start;
-                kline.time_end = item.time_end;
-                kline.time = item.time;
-                this.db.Kline.Add(kline);
+                List<Kline> db_kline = db.Kline.Where(P => P.market == market && P.type == klineType && P.time_start >= klines[0].time_start && P.time_end <= klines[klines.Count - 1].time_end).ToList();
+                foreach (var item in klines)
+                {
+                    Kline? kline = db_kline.FirstOrDefault(P => P.time_start == item.time_start);
+                    if (kline == null)
+                    {
+                        kline = new Kline();
+                        kline.id = FactoryService.instance.constant.worker.NextId();
+                        kline.time_start = item.time_start;
+                        kline.time_end = item.time_end;
+                        kline.time = item.time;
+                        db.Kline.Add(kline);
+                    }
+                    kline.market = market;
+                    kline.symbol = symbol;
+                    kline.type = klineType;
+                    kline.amount = item.amount;
+                    kline.count = item.count;
+                    kline.total = item.total;
+                    kline.open = item.open;
+                    kline.close = item.close;
+                    kline.low = item.low;
+                    kline.high = item.high;
+                    kline.time_start = item.time_start;
+                    kline.time_end = item.time_end;
+                    kline.time = item.time;
+                }
+                return db.SaveChanges();
             }
-            kline.market = market;
-            kline.symbol = symbol;
-            kline.type = klineType;
-            kline.amount = item.amount;
-            kline.count = item.count;
-            kline.total = item.total;
-            kline.open = item.open;
-            kline.close = item.close;
-            kline.low = item.low;
-            kline.high = item.high;
-            kline.time_start = item.time_start;
-            kline.time_end = item.time_end;
-            kline.time = item.time;
         }
-        return this.db.SaveChanges();
     }
 
     /// <summary>
@@ -131,199 +142,205 @@ public class ServiceKline
         }
         try
         {
-            switch (type)
+            using (var scope = FactoryService.instance.constant.provider.CreateScope())
             {
-                case E_KlineType.min1:
-                    return this.deal_service.GetKlinesMin1ByDeal(market, start, end);
-                case E_KlineType.min5:
-                    predicate = predicate.And(P => P.type == E_KlineType.min1);
-                    var sql5 = from kline in this.db.Kline.Where(predicate)
-                               orderby kline.time_start
-                               group kline by EF.Functions.DateDiffMinute(FactoryService.instance.system_init, kline.time_start) / 5 into g
-                               select new Kline
-                               {
-                                   market = market,
-                                   amount = g.Sum(P => P.amount),
-                                   count = g.Sum(P => P.count),
-                                   total = g.Sum(P => P.total),
-                                   open = g.OrderBy(P => P.time_start).First().open,
-                                   close = g.OrderBy(P => P.time_start).Last().close,
-                                   low = g.Min(P => P.low),
-                                   high = g.Max(P => P.high),
-                                   type = type,
-                                   time_start = FactoryService.instance.system_init.AddMinutes(g.Key * 5),
-                                   time_end = FactoryService.instance.system_init.AddMinutes((g.Key + 1) * 5).AddMilliseconds(-1),
-                                   time = DateTimeOffset.UtcNow,
-                               };
-                    return sql5.AsNoTracking().ToList();
-                case E_KlineType.min15:
-                    predicate = predicate.And(P => P.type == E_KlineType.min5);
-                    var sql15 = from kline in this.db.Kline.Where(predicate)
-                                orderby kline.time_start
-                                group kline by EF.Functions.DateDiffMinute(FactoryService.instance.system_init, kline.time_start) / 15 into g
-                                select new Kline
-                                {
-                                    market = market,
-                                    amount = g.Sum(P => P.amount),
-                                    count = g.Sum(P => P.count),
-                                    total = g.Sum(P => P.total),
-                                    open = g.OrderBy(P => P.time_start).First().open,
-                                    close = g.OrderBy(P => P.time_start).Last().close,
-                                    low = g.Min(P => P.low),
-                                    high = g.Max(P => P.high),
-                                    type = type,
-                                    time_start = FactoryService.instance.system_init.AddMinutes(g.Key * 15),
-                                    time_end = FactoryService.instance.system_init.AddMinutes((g.Key + 1) * 15).AddMilliseconds(-1),
-                                    time = DateTimeOffset.UtcNow,
-                                };
-                    return sql15.AsNoTracking().ToList();
-                case E_KlineType.min30:
-                    predicate = predicate.And(P => P.type == E_KlineType.min15);
-                    var sql30 = from kline in this.db.Kline.Where(predicate)
-                                orderby kline.time_start
-                                group kline by EF.Functions.DateDiffMinute(FactoryService.instance.system_init, kline.time_start) / 30 into g
-                                select new Kline
-                                {
-                                    market = market,
-                                    amount = g.Sum(P => P.amount),
-                                    count = g.Sum(P => P.count),
-                                    total = g.Sum(P => P.total),
-                                    open = g.OrderBy(P => P.time_start).First().open,
-                                    close = g.OrderBy(P => P.time_start).Last().close,
-                                    low = g.Min(P => P.low),
-                                    high = g.Max(P => P.high),
-                                    type = type,
-                                    time_start = FactoryService.instance.system_init.AddMinutes(g.Key * 30),
-                                    time_end = FactoryService.instance.system_init.AddMinutes((g.Key + 1) * 30).AddMilliseconds(-1),
-                                    time = DateTimeOffset.UtcNow,
-                                };
-                    return sql30.AsNoTracking().ToList();
-                case E_KlineType.hour1:
-                    predicate = predicate.And(P => P.type == E_KlineType.min30);
-                    var sqlhour1 = from kline in this.db.Kline.Where(predicate)
-                                   orderby kline.time_start
-                                   group kline by EF.Functions.DateDiffHour(FactoryService.instance.system_init, kline.time_start) into g
-                                   select new Kline
-                                   {
-                                       market = market,
-                                       amount = g.Sum(P => P.amount),
-                                       count = g.Sum(P => P.count),
-                                       total = g.Sum(P => P.total),
-                                       open = g.OrderBy(P => P.time_start).First().open,
-                                       close = g.OrderBy(P => P.time_start).Last().close,
-                                       low = g.Min(P => P.low),
-                                       high = g.Max(P => P.high),
-                                       type = type,
-                                       time_start = FactoryService.instance.system_init.AddHours(g.Key),
-                                       time_end = FactoryService.instance.system_init.AddHours(g.Key + 1).AddMilliseconds(-1),
-                                       time = DateTimeOffset.UtcNow,
-                                   };
-                    return sqlhour1.AsNoTracking().ToList();
-                case E_KlineType.hour6:
-                    predicate = predicate.And(P => P.type == E_KlineType.hour1);
-                    var sqlhour6 = from kline in this.db.Kline.Where(predicate)
-                                   orderby kline.time_start
-                                   group kline by EF.Functions.DateDiffHour(FactoryService.instance.system_init, kline.time_start) / 6 into g
-                                   select new Kline
-                                   {
-                                       market = market,
-                                       amount = g.Sum(P => P.amount),
-                                       count = g.Sum(P => P.count),
-                                       total = g.Sum(P => P.total),
-                                       open = g.OrderBy(P => P.time_start).First().open,
-                                       close = g.OrderBy(P => P.time_start).Last().close,
-                                       low = g.Min(P => P.low),
-                                       high = g.Max(P => P.high),
-                                       type = type,
-                                       time_start = FactoryService.instance.system_init.AddHours(g.Key * 6),
-                                       time_end = FactoryService.instance.system_init.AddHours((g.Key + 1) * 6).AddMilliseconds(-1),
-                                       time = DateTimeOffset.UtcNow,
-                                   };
-                    return sqlhour6.AsNoTracking().ToList();
-                case E_KlineType.hour12:
-                    predicate = predicate.And(P => P.type == E_KlineType.hour6);
-                    var sqlhour12 = from kline in this.db.Kline.Where(predicate)
-                                    orderby kline.time_start
-                                    group kline by EF.Functions.DateDiffHour(FactoryService.instance.system_init, kline.time_start) / 12 into g
-                                    select new Kline
-                                    {
-                                        market = market,
-                                        amount = g.Sum(P => P.amount),
-                                        count = g.Sum(P => P.count),
-                                        total = g.Sum(P => P.total),
-                                        open = g.OrderBy(P => P.time_start).First().open,
-                                        close = g.OrderBy(P => P.time_start).Last().close,
-                                        low = g.Min(P => P.low),
-                                        high = g.Max(P => P.high),
-                                        type = type,
-                                        time_start = FactoryService.instance.system_init.AddHours(g.Key * 12),
-                                        time_end = FactoryService.instance.system_init.AddHours((g.Key + 1) * 12).AddMilliseconds(-1),
-                                        time = DateTimeOffset.UtcNow,
-                                    };
-                    return sqlhour12.AsNoTracking().ToList();
-                case E_KlineType.day1:
-                    predicate = predicate.And(P => P.type == E_KlineType.hour12);
-                    var sqlday1 = from kline in this.db.Kline.Where(predicate)
-                                  orderby kline.time_start
-                                  group kline by EF.Functions.DateDiffDay(FactoryService.instance.system_init, kline.time_start) into g
-                                  select new Kline
-                                  {
-                                      market = market,
-                                      amount = g.Sum(P => P.amount),
-                                      count = g.Sum(P => P.count),
-                                      total = g.Sum(P => P.total),
-                                      open = g.OrderBy(P => P.time_start).First().open,
-                                      close = g.OrderBy(P => P.time_start).Last().close,
-                                      low = g.Min(P => P.low),
-                                      high = g.Max(P => P.high),
-                                      type = type,
-                                      time_start = FactoryService.instance.system_init.AddDays(g.Key),
-                                      time_end = FactoryService.instance.system_init.AddDays(g.Key + 1).AddMilliseconds(-1),
-                                      time = DateTimeOffset.UtcNow,
-                                  };
-                    return sqlday1.AsNoTracking().ToList();
-                case E_KlineType.week1:
-                    predicate = predicate.And(P => P.type == E_KlineType.day1);
-                    var sqlweek1 = from kline in this.db.Kline.Where(predicate)
-                                   orderby kline.time_start
-                                   group kline by EF.Functions.DateDiffWeek(FactoryService.instance.system_init, kline.time_start) into g
-                                   select new Kline
-                                   {
-                                       market = market,
-                                       amount = g.Sum(P => P.amount),
-                                       count = g.Sum(P => P.count),
-                                       total = g.Sum(P => P.total),
-                                       open = g.OrderBy(P => P.time_start).First().open,
-                                       close = g.OrderBy(P => P.time_start).Last().close,
-                                       low = g.Min(P => P.low),
-                                       high = g.Max(P => P.high),
-                                       type = type,
-                                       time_start = FactoryService.instance.system_init.AddDays(g.Key * 7),
-                                       time_end = FactoryService.instance.system_init.AddDays((g.Key + 1) * 7).AddMilliseconds(-1),
-                                       time = DateTimeOffset.UtcNow,
-                                   };
-                    return sqlweek1.AsNoTracking().ToList();
-                case E_KlineType.month1:
-                    predicate = predicate.And(P => P.type == E_KlineType.day1);
-                    var sqlmonth1 = from kline in this.db.Kline.Where(predicate)
-                                    orderby kline.time_start
-                                    group kline by EF.Functions.DateDiffMonth(FactoryService.instance.system_init, kline.time_start) into g
-                                    select new Kline
-                                    {
-                                        market = market,
-                                        amount = g.Sum(P => P.amount),
-                                        count = g.Sum(P => P.count),
-                                        total = g.Sum(P => P.total),
-                                        open = g.OrderBy(P => P.time_start).First().open,
-                                        close = g.OrderBy(P => P.time_start).Last().close,
-                                        low = g.Min(P => P.low),
-                                        high = g.Max(P => P.high),
-                                        type = type,
-                                        time_start = FactoryService.instance.system_init.AddMonths(g.Key),
-                                        time_end = FactoryService.instance.system_init.AddMonths(g.Key + 1).AddMilliseconds(-1),
-                                        time = DateTimeOffset.UtcNow,
-                                    };
-                    return sqlmonth1.AsNoTracking().ToList();
+                using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
+                {
+                    switch (type)
+                    {
+                        case E_KlineType.min1:
+                            return this.deal_service.GetKlinesMin1ByDeal(market, start, end);
+                        case E_KlineType.min5:
+                            predicate = predicate.And(P => P.type == E_KlineType.min1);
+                            var sql5 = from kline in db.Kline.Where(predicate)
+                                       orderby kline.time_start
+                                       group kline by EF.Functions.DateDiffMinute(FactoryService.instance.system_init, kline.time_start) / 5 into g
+                                       select new Kline
+                                       {
+                                           market = market,
+                                           amount = g.Sum(P => P.amount),
+                                           count = g.Sum(P => P.count),
+                                           total = g.Sum(P => P.total),
+                                           open = g.OrderBy(P => P.time_start).First().open,
+                                           close = g.OrderBy(P => P.time_start).Last().close,
+                                           low = g.Min(P => P.low),
+                                           high = g.Max(P => P.high),
+                                           type = type,
+                                           time_start = FactoryService.instance.system_init.AddMinutes(g.Key * 5),
+                                           time_end = FactoryService.instance.system_init.AddMinutes((g.Key + 1) * 5).AddMilliseconds(-1),
+                                           time = DateTimeOffset.UtcNow,
+                                       };
+                            return sql5.AsNoTracking().ToList();
+                        case E_KlineType.min15:
+                            predicate = predicate.And(P => P.type == E_KlineType.min5);
+                            var sql15 = from kline in db.Kline.Where(predicate)
+                                        orderby kline.time_start
+                                        group kline by EF.Functions.DateDiffMinute(FactoryService.instance.system_init, kline.time_start) / 15 into g
+                                        select new Kline
+                                        {
+                                            market = market,
+                                            amount = g.Sum(P => P.amount),
+                                            count = g.Sum(P => P.count),
+                                            total = g.Sum(P => P.total),
+                                            open = g.OrderBy(P => P.time_start).First().open,
+                                            close = g.OrderBy(P => P.time_start).Last().close,
+                                            low = g.Min(P => P.low),
+                                            high = g.Max(P => P.high),
+                                            type = type,
+                                            time_start = FactoryService.instance.system_init.AddMinutes(g.Key * 15),
+                                            time_end = FactoryService.instance.system_init.AddMinutes((g.Key + 1) * 15).AddMilliseconds(-1),
+                                            time = DateTimeOffset.UtcNow,
+                                        };
+                            return sql15.AsNoTracking().ToList();
+                        case E_KlineType.min30:
+                            predicate = predicate.And(P => P.type == E_KlineType.min15);
+                            var sql30 = from kline in db.Kline.Where(predicate)
+                                        orderby kline.time_start
+                                        group kline by EF.Functions.DateDiffMinute(FactoryService.instance.system_init, kline.time_start) / 30 into g
+                                        select new Kline
+                                        {
+                                            market = market,
+                                            amount = g.Sum(P => P.amount),
+                                            count = g.Sum(P => P.count),
+                                            total = g.Sum(P => P.total),
+                                            open = g.OrderBy(P => P.time_start).First().open,
+                                            close = g.OrderBy(P => P.time_start).Last().close,
+                                            low = g.Min(P => P.low),
+                                            high = g.Max(P => P.high),
+                                            type = type,
+                                            time_start = FactoryService.instance.system_init.AddMinutes(g.Key * 30),
+                                            time_end = FactoryService.instance.system_init.AddMinutes((g.Key + 1) * 30).AddMilliseconds(-1),
+                                            time = DateTimeOffset.UtcNow,
+                                        };
+                            return sql30.AsNoTracking().ToList();
+                        case E_KlineType.hour1:
+                            predicate = predicate.And(P => P.type == E_KlineType.min30);
+                            var sqlhour1 = from kline in db.Kline.Where(predicate)
+                                           orderby kline.time_start
+                                           group kline by EF.Functions.DateDiffHour(FactoryService.instance.system_init, kline.time_start) into g
+                                           select new Kline
+                                           {
+                                               market = market,
+                                               amount = g.Sum(P => P.amount),
+                                               count = g.Sum(P => P.count),
+                                               total = g.Sum(P => P.total),
+                                               open = g.OrderBy(P => P.time_start).First().open,
+                                               close = g.OrderBy(P => P.time_start).Last().close,
+                                               low = g.Min(P => P.low),
+                                               high = g.Max(P => P.high),
+                                               type = type,
+                                               time_start = FactoryService.instance.system_init.AddHours(g.Key),
+                                               time_end = FactoryService.instance.system_init.AddHours(g.Key + 1).AddMilliseconds(-1),
+                                               time = DateTimeOffset.UtcNow,
+                                           };
+                            return sqlhour1.AsNoTracking().ToList();
+                        case E_KlineType.hour6:
+                            predicate = predicate.And(P => P.type == E_KlineType.hour1);
+                            var sqlhour6 = from kline in db.Kline.Where(predicate)
+                                           orderby kline.time_start
+                                           group kline by EF.Functions.DateDiffHour(FactoryService.instance.system_init, kline.time_start) / 6 into g
+                                           select new Kline
+                                           {
+                                               market = market,
+                                               amount = g.Sum(P => P.amount),
+                                               count = g.Sum(P => P.count),
+                                               total = g.Sum(P => P.total),
+                                               open = g.OrderBy(P => P.time_start).First().open,
+                                               close = g.OrderBy(P => P.time_start).Last().close,
+                                               low = g.Min(P => P.low),
+                                               high = g.Max(P => P.high),
+                                               type = type,
+                                               time_start = FactoryService.instance.system_init.AddHours(g.Key * 6),
+                                               time_end = FactoryService.instance.system_init.AddHours((g.Key + 1) * 6).AddMilliseconds(-1),
+                                               time = DateTimeOffset.UtcNow,
+                                           };
+                            return sqlhour6.AsNoTracking().ToList();
+                        case E_KlineType.hour12:
+                            predicate = predicate.And(P => P.type == E_KlineType.hour6);
+                            var sqlhour12 = from kline in db.Kline.Where(predicate)
+                                            orderby kline.time_start
+                                            group kline by EF.Functions.DateDiffHour(FactoryService.instance.system_init, kline.time_start) / 12 into g
+                                            select new Kline
+                                            {
+                                                market = market,
+                                                amount = g.Sum(P => P.amount),
+                                                count = g.Sum(P => P.count),
+                                                total = g.Sum(P => P.total),
+                                                open = g.OrderBy(P => P.time_start).First().open,
+                                                close = g.OrderBy(P => P.time_start).Last().close,
+                                                low = g.Min(P => P.low),
+                                                high = g.Max(P => P.high),
+                                                type = type,
+                                                time_start = FactoryService.instance.system_init.AddHours(g.Key * 12),
+                                                time_end = FactoryService.instance.system_init.AddHours((g.Key + 1) * 12).AddMilliseconds(-1),
+                                                time = DateTimeOffset.UtcNow,
+                                            };
+                            return sqlhour12.AsNoTracking().ToList();
+                        case E_KlineType.day1:
+                            predicate = predicate.And(P => P.type == E_KlineType.hour12);
+                            var sqlday1 = from kline in db.Kline.Where(predicate)
+                                          orderby kline.time_start
+                                          group kline by EF.Functions.DateDiffDay(FactoryService.instance.system_init, kline.time_start) into g
+                                          select new Kline
+                                          {
+                                              market = market,
+                                              amount = g.Sum(P => P.amount),
+                                              count = g.Sum(P => P.count),
+                                              total = g.Sum(P => P.total),
+                                              open = g.OrderBy(P => P.time_start).First().open,
+                                              close = g.OrderBy(P => P.time_start).Last().close,
+                                              low = g.Min(P => P.low),
+                                              high = g.Max(P => P.high),
+                                              type = type,
+                                              time_start = FactoryService.instance.system_init.AddDays(g.Key),
+                                              time_end = FactoryService.instance.system_init.AddDays(g.Key + 1).AddMilliseconds(-1),
+                                              time = DateTimeOffset.UtcNow,
+                                          };
+                            return sqlday1.AsNoTracking().ToList();
+                        case E_KlineType.week1:
+                            predicate = predicate.And(P => P.type == E_KlineType.day1);
+                            var sqlweek1 = from kline in db.Kline.Where(predicate)
+                                           orderby kline.time_start
+                                           group kline by EF.Functions.DateDiffWeek(FactoryService.instance.system_init, kline.time_start) into g
+                                           select new Kline
+                                           {
+                                               market = market,
+                                               amount = g.Sum(P => P.amount),
+                                               count = g.Sum(P => P.count),
+                                               total = g.Sum(P => P.total),
+                                               open = g.OrderBy(P => P.time_start).First().open,
+                                               close = g.OrderBy(P => P.time_start).Last().close,
+                                               low = g.Min(P => P.low),
+                                               high = g.Max(P => P.high),
+                                               type = type,
+                                               time_start = FactoryService.instance.system_init.AddDays(g.Key * 7),
+                                               time_end = FactoryService.instance.system_init.AddDays((g.Key + 1) * 7).AddMilliseconds(-1),
+                                               time = DateTimeOffset.UtcNow,
+                                           };
+                            return sqlweek1.AsNoTracking().ToList();
+                        case E_KlineType.month1:
+                            predicate = predicate.And(P => P.type == E_KlineType.day1);
+                            var sqlmonth1 = from kline in db.Kline.Where(predicate)
+                                            orderby kline.time_start
+                                            group kline by EF.Functions.DateDiffMonth(FactoryService.instance.system_init, kline.time_start) into g
+                                            select new Kline
+                                            {
+                                                market = market,
+                                                amount = g.Sum(P => P.amount),
+                                                count = g.Sum(P => P.count),
+                                                total = g.Sum(P => P.total),
+                                                open = g.OrderBy(P => P.time_start).First().open,
+                                                close = g.OrderBy(P => P.time_start).Last().close,
+                                                low = g.Min(P => P.low),
+                                                high = g.Max(P => P.high),
+                                                type = type,
+                                                time_start = FactoryService.instance.system_init.AddMonths(g.Key),
+                                                time_end = FactoryService.instance.system_init.AddMonths(g.Key + 1).AddMilliseconds(-1),
+                                                time = DateTimeOffset.UtcNow,
+                                            };
+                            return sqlmonth1.AsNoTracking().ToList();
+                    }
+                }
             }
         }
         catch (System.Exception ex)

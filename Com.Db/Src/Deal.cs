@@ -57,11 +57,6 @@ public class Deal
     /// <value></value>
     public long bid_uid { get; set; }
     /// <summary>
-    /// 买单挂单量
-    /// </summary>
-    /// <value></value>
-    public decimal bid_amount { get; set; }
-    /// <summary>
     /// 买单未成交量
     /// </summary>
     /// <value></value>
@@ -81,11 +76,6 @@ public class Deal
     /// </summary>
     /// <value></value>
     public long ask_uid { get; set; }
-    /// <summary>
-    /// 卖单挂单量
-    /// </summary>
-    /// <value></value>
-    public decimal ask_amount { get; set; }
     /// <summary>
     /// 卖单未成交量
     /// </summary>

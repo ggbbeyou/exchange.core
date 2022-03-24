@@ -120,12 +120,10 @@ public class DbContextEF : DbContext
             o.Property(P => P.trigger_side).IsRequired().HasColumnType("tinyint").HasComment("成交触发方向");
             o.Property(P => P.bid_id).IsRequired().HasColumnType("bigint").HasComment("买单id");
             o.Property(P => P.bid_uid).IsRequired().HasColumnType("bigint").HasComment("买单用户id");
-            o.Property(P => P.bid_amount).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("买单挂单量");
             o.Property(P => P.bid_amount_unsold).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("买单未成交量");
             o.Property(P => P.bid_amount_done).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("买单已成交量");
             o.Property(P => P.ask_id).IsRequired().HasColumnType("bigint").HasComment("卖单id");
             o.Property(P => P.ask_uid).IsRequired().HasColumnType("bigint").HasComment("卖单用户id");
-            o.Property(P => P.ask_amount).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("卖单挂单量");
             o.Property(P => P.ask_amount_unsold).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("卖单未成交量");
             o.Property(P => P.ask_amount_done).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("卖单已成交量");
             o.Property(P => P.fee_rate_buy).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("买手续费率");

@@ -129,8 +129,7 @@ public class TestController : Controller
         };
         this.db.Market.Add(btcusdt);
         this.db.Market.Add(ethusdt);
-        this.db.SaveChanges();
-        return View();
+        return Json(this.db.SaveChanges());
     }
 
 

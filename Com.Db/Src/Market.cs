@@ -87,6 +87,5 @@ public class Market
     /// 最后的成交价
     /// </summary>
     /// <value></value>
-    [NotMapped]
     public decimal last_price { get; set; }
 }

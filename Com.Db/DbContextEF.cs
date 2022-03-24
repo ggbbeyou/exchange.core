@@ -176,6 +176,7 @@ public class DbContextEF : DbContext
             o.Property(P => P.fee_limit_buy).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("限价买手续费");
             o.Property(P => P.fee_limit_sell).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("限价卖手续费");
             o.Property(P => P.market_uid).IsRequired().HasColumnType("bigint").HasComment("作市账号");
+            o.Property(P => P.last_price).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("最后的成交价");
             o.ToTable(nameof(Market));
         });
         modelBuilder.Entity<Orders>(o =>

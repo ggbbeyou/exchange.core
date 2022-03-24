@@ -108,6 +108,7 @@ public class TestController : Controller
             fee_limit_buy = 0.001m,
             fee_limit_sell = 0.003m,
             market_uid = 0,
+            last_price = (decimal)FactoryService.instance.constant.random.NextDouble(),
         };
         Market ethusdt = new Market()
         {
@@ -126,6 +127,7 @@ public class TestController : Controller
             fee_limit_buy = 0.001m,
             fee_limit_sell = 0.003m,
             market_uid = 0,
+            last_price = (decimal)FactoryService.instance.constant.random.NextDouble(),
         };
         this.db.Market.Add(btcusdt);
         this.db.Market.Add(ethusdt);

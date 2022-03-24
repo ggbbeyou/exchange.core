@@ -75,7 +75,7 @@ public class ServiceOrder
         if (orders.Where(P => P.side == E_OrderSide.buy && P.type == E_OrderType.price_market).ToList().Exists(P => P.amount == null || P.amount < 0))
         {
             res.code = E_Res_Code.field_error;
-            res.message = "市价买单,总额不能小于0";
+            res.message = "市价买单,总额(amount)不能小于0";
             return res;
         }
         if (orders.Where(P => P.side == E_OrderSide.sell && P.type == E_OrderType.price_market).ToList().Exists(P => P.amount == null || P.amount < 0))
@@ -117,10 +117,10 @@ public class ServiceOrder
         {
             vip = new Vip();
         }
-        decimal coin_base = 0;
-        decimal coin_quote = 0;
-        decimal fee_base = 0;
-        decimal fee_quote = 0;
+        decimal? coin_base = 0;
+        decimal? coin_quote = 0;
+        decimal? fee_base = 0;
+        decimal? fee_quote = 0;
         decimal rate_market_buy = info.fee_market_buy * (1 + vip.fee_market);
         decimal rate_market_sell = info.fee_market_sell * (1 + vip.fee_market);
         decimal rate_limit_buy = info.fee_limit_buy * (1 + vip.fee_limit);
@@ -145,37 +145,37 @@ public class ServiceOrder
                     order.total = null;
                     order.amount_unsold = item.amount ?? 0;
                     order.fee_rate = rate_market_buy;
-                    coin_quote += item.amount ?? 0;
-                    fee_quote += order.fee_rate * item.amount ?? 0;
+                    coin_quote += item.amount;
+                    fee_quote += rate_market_buy * item.amount;
                 }
                 else if (order.side == E_OrderSide.sell)
                 {
-                    order.amount = item.amount ?? 0;
+                    order.amount = item.amount;
                     order.total = null;
                     order.amount_unsold = item.amount ?? 0;
                     order.fee_rate = rate_market_sell;
-                    coin_base += order.amount ?? 0;
-                    fee_base += order.fee_rate * order.amount ?? 0;
+                    coin_base += item.amount;
+                    fee_base += rate_market_sell * item.amount;
                 }
             }
             else if (order.type == E_OrderType.price_limit)
             {
-                order.price = item.price ?? 0;
-                order.amount = item.amount ?? 0;
-                order.total = order.price * order.amount;
+                order.price = item.price;
+                order.amount = item.amount;
+                order.total = item.price * item.amount;
                 if (order.side == E_OrderSide.buy)
                 {
                     order.amount_unsold = order.total ?? 0;
                     order.fee_rate = rate_limit_buy;
-                    coin_quote += order.total ?? 0;
-                    fee_quote += order.fee_rate * order.total ?? 0;
+                    coin_quote += order.total;
+                    fee_quote += rate_limit_buy * order.total;
                 }
                 else if (order.side == E_OrderSide.sell)
                 {
-                    order.amount_unsold = order.amount ?? 0;
+                    order.amount_unsold = item.amount ?? 0;
                     order.fee_rate = rate_limit_sell;
-                    coin_base += order.amount ?? 0;
-                    fee_base += order.fee_rate * order.amount ?? 0;
+                    coin_base += item.amount;
+                    fee_base += rate_limit_sell * item.amount;
                 }
             }
             order.amount_done = 0;
@@ -187,27 +187,27 @@ public class ServiceOrder
             order.remarks = null;
             res.data.Add(order);
         }
-        if (coin_base > 0 && coin_quote > 0)
+        if (coin_base != null && coin_quote != null && coin_base > 0 && coin_quote > 0)
         {
-            if (!wallet_service.FreezeChange(E_WalletType.main, uid, info.coin_id_base, coin_base + fee_base, info.coin_id_quote, coin_quote + fee_quote))
+            if (!wallet_service.FreezeChange(E_WalletType.main, uid, info.coin_id_base, coin_base + fee_base ?? 0, info.coin_id_quote, coin_quote + fee_quote ?? 0))
             {
                 res.code = E_Res_Code.low_capital;
                 res.message = "基础币种余额不足";
                 return res;
             }
         }
-        else if (coin_base > 0)
+        else if (coin_base != null && coin_base > 0)
         {
-            if (!wallet_service.FreezeChange(E_WalletType.main, uid, info.coin_id_base, coin_base + fee_base))
+            if (!wallet_service.FreezeChange(E_WalletType.main, uid, info.coin_id_base, coin_base + fee_base ?? 0))
             {
                 res.code = E_Res_Code.low_capital;
                 res.message = "基础币种余额不足";
                 return res;
             }
         }
-        else if (coin_quote > 0)
+        else if (coin_quote != null && coin_quote > 0)
         {
-            if (!wallet_service.FreezeChange(E_WalletType.main, uid, info.coin_id_quote, coin_quote + fee_quote))
+            if (!wallet_service.FreezeChange(E_WalletType.main, uid, info.coin_id_quote, coin_quote + fee_quote ?? 0))
             {
                 res.code = E_Res_Code.low_capital;
                 res.message = "报价币种余额不足";

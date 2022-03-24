@@ -24,22 +24,27 @@ public class ServiceOrder
     /// <summary>
     /// 数据库
     /// </summary>
-    public DbContextEF db = null!;
+    private DbContextEF db = null!;
+    /// <summary>
+    /// 秒表
+    /// </summary>
+    /// <returns></returns>
+    private Stopwatch stopwatch = new Stopwatch();
     /// <summary>
     /// 钱包服务
     /// </summary>
     /// <returns></returns>
-    public ServiceWallet wallet_service = new ServiceWallet();
+    private ServiceWallet wallet_service = new ServiceWallet();
     /// <summary>
     /// 交易对服务
     /// </summary>
     /// <returns></returns>
-    public ServiceMarket market_service = new ServiceMarket();
+    private ServiceMarket market_service = new ServiceMarket();
     /// <summary>
     /// 用户服务
     /// </summary>
     /// <returns></returns>
-    public ServiceUser user_service = new ServiceUser();
+    private ServiceUser user_service = new ServiceUser();
 
     /// <summary>
     /// 初始化
@@ -60,6 +65,7 @@ public class ServiceOrder
     public ResCall<List<Orders>> PlaceOrder(string symbol, long uid, List<ReqOrder> orders)
     {
         ResCall<List<Orders>> res = new ResCall<List<Orders>>();
+        this.stopwatch.Restart();
         FactoryService.instance.constant.stopwatch.Restart();
         res.success = false;
         res.code = E_Res_Code.fail;
@@ -215,12 +221,12 @@ public class ServiceOrder
             }
         }
         FactoryService.instance.constant.stopwatch.Stop();
-        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};校验/冻结资金{res.data.Count}条挂单记录");
+        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};挂单=>校验/冻结资金{res.data.Count}条挂单记录");
         FactoryService.instance.constant.stopwatch.Restart();
         db.Orders.AddRange(res.data);
         db.SaveChanges();
         FactoryService.instance.constant.stopwatch.Stop();
-        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};插入{res.data.Count}条订单到DB");
+        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};挂单=>插入{res.data.Count}条订单到DB");
         FactoryService.instance.constant.stopwatch.Restart();
         ReqCall<List<Orders>> call_req = new ReqCall<List<Orders>>();
         call_req.op = E_Op.place;
@@ -228,12 +234,14 @@ public class ServiceOrder
         call_req.data = res.data;
         FactoryService.instance.constant.MqSend(FactoryService.instance.GetMqOrderPlace(info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(call_req)));
         FactoryService.instance.constant.stopwatch.Stop();
-        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};插入{call_req.data.Count}条订单到Mq");
+        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};挂单=>插入{call_req.data.Count}条订单到Mq");
         res.op = E_Op.place;
         res.success = true;
         res.code = E_Res_Code.ok;
         res.market = info.market;
         res.message = "挂单成功";
+        this.stopwatch.Stop();
+        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{this.stopwatch.Elapsed.ToString()};挂单=>总耗时.{call_req.data.Count}条订单");
         return res;
     }
 

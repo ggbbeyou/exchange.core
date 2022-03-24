@@ -205,49 +205,61 @@ public class TestController : Controller
     }
 
 
+    /// <summary>
+    /// 模拟下单
+    /// </summary>
+    /// <returns></returns>
     [HttpPost]
     public IActionResult PlaceOrderText()
     {
-        // List<PlaceOrder> orders = new List<PlaceOrder>();
-        // Random r = new Random();
-        // for (int i = 0; i < 500; i++)
-        // {
-        //     PlaceOrder orderResult = new PlaceOrder();
-        //     orderResult.side = r.Next(0, 2) == 0 ? E_OrderSide.buy : E_OrderSide.sell;
-        //     orderResult.type = r.Next(0, 2) == 0 ? E_OrderType.price_limit : E_OrderType.price_market;
-        //     orderResult.client_id = null;
-        //     if (orderResult.type == E_OrderType.price_limit)
-        //     {
-        //         orderResult.price = (decimal)FactoryService.instance.constant.random.Next(1, 30);
-        //     }
-        //     else
-        //     {
-        //         orderResult.price = null;
-        //     }
-        //     orderResult.amount = (decimal)FactoryService.instance.constant.random.Next(1, 30);
-        //     orders.Add(orderResult);
-        // }
-        // PlaceOrder("eth/usdt", orders);
-        // List<PlaceOrder> orders1 = new List<PlaceOrder>();
-        // for (int i = 0; i < 500; i++)
-        // {
-        //     PlaceOrder orderResult = new PlaceOrder();
-        //     orderResult.side = r.Next(0, 2) == 0 ? E_OrderSide.buy : E_OrderSide.sell;
-        //     orderResult.type = r.Next(0, 2) == 0 ? E_OrderType.price_limit : E_OrderType.price_market;
-        //     orderResult.client_id = null;
-        //     if (orderResult.type == E_OrderType.price_limit)
-        //     {
-        //         orderResult.price = (decimal)FactoryService.instance.constant.random.Next(1, 30);
-        //     }
-        //     else
-        //     {
-        //         orderResult.price = null;
-        //     }
-        //     orderResult.amount = (decimal)FactoryService.instance.constant.random.Next(1, 30);
-        //     orders1.Add(orderResult);
-        // }
-        // PlaceOrder("btc/usdt", orders);
-        return Json(new { });
+        List<Users> users = this.db.Users.ToList();
+        List<Market> markets = this.db.Market.ToList();
+        for (int i = 0; i < 10; i++)
+        {
+            Users user = users[FactoryService.instance.constant.random.Next(0, 11)];
+            Market market = markets[FactoryService.instance.constant.random.Next(0, 2)];
+            List<ReqOrder> reqOrders = new List<ReqOrder>();
+            for (int j = 0; j < 500; j++)
+            {
+                E_OrderSide side = FactoryService.instance.constant.random.Next(0, 2) == 0 ? E_OrderSide.buy : E_OrderSide.sell;
+                E_OrderType type = FactoryService.instance.constant.random.Next(0, 2) == 0 ? E_OrderType.price_limit : E_OrderType.price_market;
+                decimal amount = (decimal)FactoryService.instance.constant.random.Next(1, 30);
+                decimal price = (decimal)FactoryService.instance.constant.random.Next(100, 300);
+                decimal total = amount * price;
+                ReqOrder order = new ReqOrder()
+                {
+                    client_id = FactoryService.instance.constant.worker.NextId().ToString(),
+                    symbol = market.symbol,
+                    side = side,
+                    type = type,
+                    price = price,
+                    amount = amount,
+                    total = total,
+                    trigger_hanging_price = 0,
+                    trigger_cancel_price = 0,
+                    data = null,
+                };
+                if (type == E_OrderType.price_market)
+                {
+                    order.price = null;
+                    if (side == E_OrderSide.buy)
+                    {
+                        order.amount = null;
+                    }
+                    else if (side == E_OrderSide.sell)
+                    {
+                        order.total = null;
+                    }
+                }
+                else if (type == E_OrderType.price_limit)
+                {
+                    order.total = null;
+                }
+                reqOrders.Add(order);
+            }
+            order_service.PlaceOrder(market.symbol, user.user_id, reqOrders);
+        }
+        return Json("");
     }
 
 }

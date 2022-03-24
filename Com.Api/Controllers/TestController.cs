@@ -217,7 +217,7 @@ public class TestController : Controller
         for (int i = 0; i < 10000; i++)
         {
             Users user = users[FactoryService.instance.constant.random.Next(0, 10)];
-            Market market = markets[FactoryService.instance.constant.random.Next(0, 2)];
+            Market market = markets[FactoryService.instance.constant.random.Next(0, 3)];
             List<ReqOrder> reqOrders = new List<ReqOrder>();
             for (int j = 0; j < 500; j++)
             {

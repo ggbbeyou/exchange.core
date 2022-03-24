@@ -214,7 +214,7 @@ public class TestController : Controller
     {
         List<Users> users = this.db.Users.ToList();
         List<Market> markets = this.db.Market.ToList();
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 10000; i++)
         {
             Users user = users[FactoryService.instance.constant.random.Next(0, 10)];
             Market market = markets[FactoryService.instance.constant.random.Next(0, 2)];
@@ -223,8 +223,8 @@ public class TestController : Controller
             {
                 E_OrderSide side = FactoryService.instance.constant.random.Next(0, 1) == 0 ? E_OrderSide.buy : E_OrderSide.sell;
                 E_OrderType type = FactoryService.instance.constant.random.Next(0, 1) == 0 ? E_OrderType.price_limit : E_OrderType.price_market;
-                decimal amount = (decimal)FactoryService.instance.constant.random.Next(1, 30);
-                decimal price = (decimal)FactoryService.instance.constant.random.Next(100, 300);
+                decimal amount = (decimal)FactoryService.instance.constant.random.NextDouble();
+                decimal price = (decimal)FactoryService.instance.constant.random.NextDouble();
                 decimal total = amount * price;
                 ReqOrder order = new ReqOrder()
                 {

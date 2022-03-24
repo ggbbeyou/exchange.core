@@ -169,8 +169,8 @@ public class TestController : Controller
                 user_name = user.user_name,
                 coin_id = usdt.coin_id,
                 coin_name = usdt.coin_name,
-                total = 5_000_000,
-                available = 5_000_000,
+                total = 5_000_000_000,
+                available = 5_000_000_000,
                 freeze = 0,
             };
             Wallet wallet_btc = new Wallet()
@@ -181,8 +181,8 @@ public class TestController : Controller
                 user_name = user.user_name,
                 coin_id = btc.coin_id,
                 coin_name = btc.coin_name,
-                total = 10_000,
-                available = 10_000,
+                total = 10_000_000,
+                available = 10_000_000,
                 freeze = 0,
             };
             Wallet wallet_eth = new Wallet()
@@ -193,8 +193,8 @@ public class TestController : Controller
                 user_name = user.user_name,
                 coin_id = eth.coin_id,
                 coin_name = eth.coin_name,
-                total = 50_000,
-                available = 50_000,
+                total = 50_000_000,
+                available = 50_000_000,
                 freeze = 0,
             };
             this.db.Wallet.Add(wallet_usdt);

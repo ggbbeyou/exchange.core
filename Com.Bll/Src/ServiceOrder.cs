@@ -146,7 +146,7 @@ public class ServiceOrder
                     order.amount_unsold = item.total ?? 0;
                     order.fee_rate = rate_market_buy;
                     coin_quote += order.total ?? 0;
-                    fee_quote += order.total ?? 0 * order.fee_rate;
+                    fee_quote += order.fee_rate * order.total ?? 0;
                 }
                 else if (order.side == E_OrderSide.sell)
                 {
@@ -155,7 +155,7 @@ public class ServiceOrder
                     order.amount_unsold = item.amount ?? 0;
                     order.fee_rate = rate_market_sell;
                     coin_base += order.amount ?? 0;
-                    fee_base += order.amount ?? 0 * order.fee_rate;
+                    fee_base += order.fee_rate * order.amount ?? 0;
                 }
             }
             else if (order.type == E_OrderType.price_limit)
@@ -168,14 +168,14 @@ public class ServiceOrder
                     order.amount_unsold = order.total ?? 0;
                     order.fee_rate = rate_limit_buy;
                     coin_quote += order.total ?? 0;
-                    fee_quote += order.total ?? 0 * order.fee_rate;
+                    fee_quote += order.fee_rate * order.total ?? 0;
                 }
                 else if (order.side == E_OrderSide.sell)
                 {
                     order.amount_unsold = order.amount ?? 0;
                     order.fee_rate = rate_limit_sell;
                     coin_base += order.amount ?? 0;
-                    fee_base += order.amount ?? 0 * order.fee_rate;
+                    fee_base += order.fee_rate * order.amount ?? 0;
                 }
             }
             order.amount_done = 0;

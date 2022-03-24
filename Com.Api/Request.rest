@@ -5,5 +5,5 @@ POST {{baseUrl}}/Test/Init HTTP/1.1
 
 
 ###
-
+POST {{baseUrl}}/Test/PlaceOrderText HTTP/1.1
 

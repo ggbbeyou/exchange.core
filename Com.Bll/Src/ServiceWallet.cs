@@ -98,8 +98,6 @@ public class ServiceWallet
         {
             return false;
         }
-        wallet_base.freeze += amount_base;
-        wallet_base.available -= amount_base;
         Wallet? wallet_quote = this.db.Wallet.Where(P => P.wallet_type == wallet_type && P.user_id == uid && P.coin_id == coin_quote).SingleOrDefault();
         if (wallet_quote == null)
         {
@@ -123,9 +121,12 @@ public class ServiceWallet
         {
             return false;
         }
+        wallet_base.freeze += amount_base;
+        wallet_base.available -= amount_base;
         wallet_quote.freeze += amount_quote;
         wallet_quote.available -= amount_quote;
         return this.db.SaveChanges() > 0;
+
     }
 
     /// <summary>

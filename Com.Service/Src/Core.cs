@@ -2,7 +2,7 @@ using System.Diagnostics;
 using System.Text;
 using Com.Bll;
 using Com.Db;
-using Com.Db.Enum;
+using Com.Api.Sdk.Enum;
 using Com.Db.Model;
 using Com.Service.Match;
 using Com.Service.Models;
@@ -12,6 +12,7 @@ using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using StackExchange.Redis;
+using Com.Api.Sdk.Models;
 
 namespace Com.Service;
 
@@ -183,7 +184,7 @@ public class Core
                 res_kline.data.Add(JsonConvert.DeserializeObject<Kline>(item.Value)!);
                 FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(res_kline.channel, this.model.info.market), JsonConvert.SerializeObject(res_kline));
             }
-            Ticker? ticker = deal_service.Get24HoursTicker(this.model.info.market);
+            ResTicker? ticker = deal_service.Get24HoursTicker(this.model.info.market);
             deal_service.PushTicker(ticker);
             FactoryService.instance.constant.stopwatch.Stop();
             FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};Mq,Redis=>推送K线记录和聚合行情");

@@ -1,6 +1,6 @@
 using System.Text;
 using Com.Db;
-using Com.Db.Enum;
+using Com.Api.Sdk.Enum;
 using Com.Db.Model;
 using Grpc.Net.Client;
 using Microsoft.Extensions.Configuration;

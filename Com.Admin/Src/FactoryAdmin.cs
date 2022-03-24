@@ -1,6 +1,6 @@
 using System.Text;
 using Com.Db;
-using Com.Db.Enum;
+using Com.Api.Sdk.Enum;
 using Com.Db.Model;
 using Grpc.Net.Client;
 using GrpcExchange;
@@ -56,7 +56,7 @@ public class FactoryAdmin
         {
             GrpcChannel channel = GrpcChannel.ForAddress(FactoryService.instance.constant.config.GetValue<string>("manage_url"));
             var client = new ExchangeService.ExchangeServiceClient(channel);
-            CallRequest<string> req = new CallRequest<string>();
+            ReqCall<string> req = new ReqCall<string>();
             req.op = E_Op.service_clear_cache;
             req.market = info.market;
             req.data = JsonConvert.SerializeObject(info);
@@ -83,7 +83,7 @@ public class FactoryAdmin
         {
             GrpcChannel channel = GrpcChannel.ForAddress(FactoryService.instance.constant.config.GetValue<string>("manage_url"));
             var client = new ExchangeService.ExchangeServiceClient(channel);
-            CallRequest<string> req = new CallRequest<string>();
+            ReqCall<string> req = new ReqCall<string>();
             req.op = E_Op.service_warm_cache;
             req.market = info.market;
             req.data = JsonConvert.SerializeObject(info);
@@ -110,7 +110,7 @@ public class FactoryAdmin
         {
             GrpcChannel channel = GrpcChannel.ForAddress(FactoryService.instance.constant.config.GetValue<string>("manage_url"));
             var client = new ExchangeService.ExchangeServiceClient(channel);
-            CallRequest<string> req = new CallRequest<string>();
+            ReqCall<string> req = new ReqCall<string>();
             req.op = E_Op.service_start;
             req.market = info.market;
             req.data = JsonConvert.SerializeObject(info);
@@ -137,7 +137,7 @@ public class FactoryAdmin
         {
             GrpcChannel channel = GrpcChannel.ForAddress(FactoryService.instance.constant.config.GetValue<string>("manage_url"));
             var client = new ExchangeService.ExchangeServiceClient(channel);
-            CallRequest<string> req = new CallRequest<string>();
+            ReqCall<string> req = new ReqCall<string>();
             req.op = E_Op.service_stop;
             req.market = info.market;
             req.data = JsonConvert.SerializeObject(info);

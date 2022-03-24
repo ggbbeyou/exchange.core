@@ -1,12 +1,12 @@
 using System;
-using Com.Db.Enum;
+using Com.Api.Sdk.Enum;
 
-namespace Com.Db.Model;
+namespace Com.Api.Sdk.Models;
 
 /// <summary>
 /// 聚合行情
 /// </summary>
-public class Ticker
+public class ResTicker
 {
     /// <summary>
     /// 交易对
@@ -28,27 +28,6 @@ public class Ticker
     /// </summary>
     /// <value></value>
     public decimal price_change_percent { get; set; }
-
-    // /// <summary>
-    // /// 卖1价
-    // /// </summary>
-    // /// <value></value>
-    // public decimal ask1_price { get; set; }
-    // /// <summary>
-    // /// 买1量
-    // /// </summary>
-    // /// <value></value>
-    // public decimal ask1_volume { get; set; }
-    // /// <summary>
-    // /// 买1价
-    // /// </summary>
-    // /// <value></value>
-    // public decimal bid1_price { get; set; }
-    // /// <summary>
-    // /// 买1量
-    // /// </summary>
-    // /// <value></value>
-    // public decimal bid1_volume { get; set; }
     /// <summary>
     /// 24小时内开盘价
     /// </summary>

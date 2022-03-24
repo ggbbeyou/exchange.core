@@ -1,12 +1,12 @@
 using System;
-using Com.Db.Enum;
+using Com.Api.Sdk.Enum;
 
 namespace Com.Db.Model;
 
 /// <summary>
 /// 响应操作动作
 /// </summary>
-public class Res<T> 
+public class Res<T>
 {
     /// <summary>
     /// 是否成功
@@ -17,7 +17,7 @@ public class Res<T>
     /// 返回编号
     /// </summary>
     /// <value></value>
-    public E_Res_Code code { get; set; }  
+    public E_Res_Code code { get; set; }
     /// <summary>
     /// 响应消息
     /// </summary>

@@ -1,5 +1,4 @@
 using System;
-using Com.Db.Enum;
 
 namespace Com.Db.Model;
 
@@ -8,5 +7,9 @@ namespace Com.Db.Model;
 /// </summary>
 public class Req<T>
 {
-    
+    /// <summary>
+    /// 数据
+    /// </summary>
+    /// <value></value>
+    public T data { get; set; } = default!;
 }

@@ -1,9 +1,10 @@
 using Com.Db;
-using Com.Db.Enum;
+using Com.Api.Sdk.Enum;
 using Com.Db.Model;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using StackExchange.Redis;
+using Com.Api.Sdk.Models;
 
 namespace Com.Bll;
 
@@ -31,15 +32,14 @@ public class DepthService
     /// <param name="bid"></param>
     /// <param name="orderbook"></param>
     /// <returns></returns>
-    public Dictionary<E_WebsockerChannel, Depth> ConvertDepth(long market, string symbol, (List<BaseOrderBook> bid, List<BaseOrderBook> ask) orderbook)
+    public Dictionary<E_WebsockerChannel, ResDepth> ConvertDepth(long market, string symbol, (List<OrderBook> bid, List<OrderBook> ask) orderbook)
     {
-        Dictionary<E_WebsockerChannel, Depth> depths = new Dictionary<E_WebsockerChannel, Depth>();
-        depths.Add(E_WebsockerChannel.books10, new Depth());
-        depths.Add(E_WebsockerChannel.books50, new Depth());
-        depths.Add(E_WebsockerChannel.books200, new Depth());
+        Dictionary<E_WebsockerChannel, ResDepth> depths = new Dictionary<E_WebsockerChannel, ResDepth>();
+        depths.Add(E_WebsockerChannel.books10, new ResDepth());
+        depths.Add(E_WebsockerChannel.books50, new ResDepth());
+        depths.Add(E_WebsockerChannel.books200, new ResDepth());
         foreach (var item in depths)
         {
-            item.Value.market = market;
             item.Value.symbol = symbol;
             item.Value.timestamp = DateTimeOffset.UtcNow;
             switch (item.Key)
@@ -85,15 +85,14 @@ public class DepthService
     /// <param name="bid"></param>
     /// <param name="orderbook"></param>
     /// <returns></returns>
-    public Dictionary<E_WebsockerChannel, Depth> ConvertDepth(long market, string symbol, (List<(int index, BaseOrderBook orderbook)> bid, List<(int index, BaseOrderBook orderbook)> ask) orderbook)
+    public Dictionary<E_WebsockerChannel, ResDepth> ConvertDepth(long market, string symbol, (List<(int index, OrderBook orderbook)> bid, List<(int index, OrderBook orderbook)> ask) orderbook)
     {
-        Dictionary<E_WebsockerChannel, Depth> depths = new Dictionary<E_WebsockerChannel, Depth>();
-        depths.Add(E_WebsockerChannel.books10_inc, new Depth());
-        depths.Add(E_WebsockerChannel.books50_inc, new Depth());
-        depths.Add(E_WebsockerChannel.books200_inc, new Depth());
+        Dictionary<E_WebsockerChannel, ResDepth> depths = new Dictionary<E_WebsockerChannel, ResDepth>();
+        depths.Add(E_WebsockerChannel.books10_inc, new ResDepth());
+        depths.Add(E_WebsockerChannel.books50_inc, new ResDepth());
+        depths.Add(E_WebsockerChannel.books200_inc, new ResDepth());
         foreach (var item in depths)
         {
-            item.Value.market = market;
             item.Value.symbol = symbol;
             item.Value.timestamp = DateTimeOffset.UtcNow;
             switch (item.Key)
@@ -131,20 +130,20 @@ public class DepthService
     /// (全部)深度行情保存到redis并且推送到MQ
     /// </summary>
     /// <param name="depth"></param>
-    public void Push(Dictionary<E_WebsockerChannel, Depth> depths, bool all)
+    public void Push(long market, Dictionary<E_WebsockerChannel, ResDepth> depths, bool all)
     {
-        ResWebsocker<Depth> resWebsocker = new ResWebsocker<Depth>();
+        ResWebsocker<ResDepth> resWebsocker = new ResWebsocker<ResDepth>();
         resWebsocker.success = true;
         resWebsocker.op = E_WebsockerOp.subscribe_date;
         foreach (var item in depths)
         {
             if (all)
             {
-                FactoryService.instance.constant.redis.HashSet(FactoryService.instance.GetRedisDepth(item.Value.market), item.Key.ToString(), JsonConvert.SerializeObject(item.Value));
+                FactoryService.instance.constant.redis.HashSet(FactoryService.instance.GetRedisDepth(market), item.Key.ToString(), JsonConvert.SerializeObject(item.Value));
             }
             resWebsocker.channel = item.Key;
             resWebsocker.data = item.Value;
-            FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(item.Key, item.Value.market), JsonConvert.SerializeObject(resWebsocker));
+            FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(item.Key, market), JsonConvert.SerializeObject(resWebsocker));
         }
     }
 
@@ -157,10 +156,10 @@ public class DepthService
     /// <param name="bid"></param>
     /// <param name="book_new"></param>
     /// <returns></returns>
-    public (List<(int, BaseOrderBook)> bid, List<(int, BaseOrderBook)> ask) DiffOrderBook((List<BaseOrderBook> bid, List<BaseOrderBook> ask) book_old, (List<BaseOrderBook> bid, List<BaseOrderBook> ask) book_new)
+    public (List<(int, OrderBook)> bid, List<(int, OrderBook)> ask) DiffOrderBook((List<OrderBook> bid, List<OrderBook> ask) book_old, (List<OrderBook> bid, List<OrderBook> ask) book_new)
     {
-        List<(int index, BaseOrderBook orderbook)> bid_diff = new List<(int index, BaseOrderBook orderbook)>();
-        List<(int index, BaseOrderBook orderbook)> ask_diff = new List<(int index, BaseOrderBook orderbook)>();
+        List<(int index, OrderBook orderbook)> bid_diff = new List<(int index, OrderBook orderbook)>();
+        List<(int index, OrderBook orderbook)> ask_diff = new List<(int index, OrderBook orderbook)>();
         if (book_old.bid == null || book_old.bid.Count == 0)
         {
             for (int i = 0; i < book_new.bid.Count; i++)
@@ -192,16 +191,16 @@ public class DepthService
     /// <param name="book_old"></param>
     /// <param name="book_new"></param>
     /// <returns></returns>
-    public List<(int index, BaseOrderBook orderbook)> DiffOrderBook(List<BaseOrderBook> book_old, List<BaseOrderBook> book_new)
+    public List<(int index, OrderBook orderbook)> DiffOrderBook(List<OrderBook> book_old, List<OrderBook> book_new)
     {
-        List<(int index, BaseOrderBook orderbook)> diff = new List<(int index, BaseOrderBook orderbook)>();
+        List<(int index, OrderBook orderbook)> diff = new List<(int index, OrderBook orderbook)>();
         for (int i = 0; i < book_old.Count; i++)
         {
-            BaseOrderBook item = book_old[i];
-            BaseOrderBook? book = book_new.FirstOrDefault(x => x.price == item.price);
+            OrderBook item = book_old[i];
+            OrderBook? book = book_new.FirstOrDefault(x => x.price == item.price);
             if (book == null)
             {
-                diff.Add((-i - 1, new BaseOrderBook()
+                diff.Add((-i - 1, new OrderBook()
                 {
                     market = item.market,
                     symbol = item.symbol,
@@ -214,7 +213,7 @@ public class DepthService
             }
             else
             {
-                diff.Add((book_new.IndexOf(book) + 1, new BaseOrderBook()
+                diff.Add((book_new.IndexOf(book) + 1, new OrderBook()
                 {
                     market = book.market,
                     symbol = book.symbol,
@@ -226,10 +225,10 @@ public class DepthService
                 }));
             }
         }
-        List<BaseOrderBook> add = book_new.Where(P => !diff.Select(T => T.orderbook.price).Contains(P.price)).ToList();
+        List<OrderBook> add = book_new.Where(P => !diff.Select(T => T.orderbook.price).Contains(P.price)).ToList();
         foreach (var item in add)
         {
-            diff.Add((book_new.IndexOf(item) + 1, new BaseOrderBook()
+            diff.Add((book_new.IndexOf(item) + 1, new OrderBook()
             {
                 market = item.market,
                 symbol = item.symbol,

@@ -1,15 +1,10 @@
-namespace Com.Db.Model;
+namespace Com.Api.Sdk.Models;
 
 /// <summary>
 /// orderbook
 /// </summary>
-public class Depth
-{
-    /// <summary>
-    /// 交易对
-    /// </summary>
-    /// <value></value>
-    public long market { get; set; }
+public class ResDepth
+{   
     /// <summary>
     /// 交易对
     /// </summary>

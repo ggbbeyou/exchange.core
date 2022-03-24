@@ -1,6 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
-using Com.Db.Enum;
+using Com.Api.Sdk.Enum;
 
 namespace Com.Db;
 

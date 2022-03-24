@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 using Com.Bll;
 using Com.Db;
-using Com.Db.Enum;
+using Com.Api.Sdk.Enum;
 using Com.Db.Model;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;

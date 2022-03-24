@@ -1,5 +1,5 @@
 using Com.Db;
-using Com.Db.Enum;
+using Com.Api.Sdk.Enum;
 using Com.Db.Model;
 using Newtonsoft.Json;
 using System.Text;
@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Data.Entity;
 using System.Linq.Expressions;
 using LinqKit;
-using om.Api.Sdk.Models;
+using Com.Api.Sdk.Models;
 
 namespace Com.Bll;
 
@@ -57,9 +57,9 @@ public class OrderService
     /// <param name="uid">用户id</param>
     /// <param name="order">订单列表</param>
     /// <returns></returns>
-    public CallResponse<List<Orders>> PlaceOrder(string symbol, long uid, List<PlaceOrder> orders)
+    public ResCall<List<Orders>> PlaceOrder(string symbol, long uid, List<ReqOrder> orders)
     {
-        CallResponse<List<Orders>> res = new CallResponse<List<Orders>>();
+        ResCall<List<Orders>> res = new ResCall<List<Orders>>();
         FactoryService.instance.constant.stopwatch.Restart();
         res.success = false;
         res.code = E_Res_Code.fail;
@@ -145,8 +145,8 @@ public class OrderService
                     order.total = item.total ?? 0;
                     order.amount_unsold = item.total ?? 0;
                     order.fee_rate = rate_market_buy;
-                    coin_quote += order.total;
-                    fee_quote += order.total * order.fee_rate;
+                    coin_quote += order.total ?? 0;
+                    fee_quote += order.total ?? 0 * order.fee_rate;
                 }
                 else if (order.side == E_OrderSide.sell)
                 {
@@ -154,8 +154,8 @@ public class OrderService
                     order.total = 0;
                     order.amount_unsold = item.amount ?? 0;
                     order.fee_rate = rate_market_sell;
-                    coin_base += order.amount;
-                    fee_base += order.amount * order.fee_rate;
+                    coin_base += order.amount ?? 0;
+                    fee_base += order.amount ?? 0 * order.fee_rate;
                 }
             }
             else if (order.type == E_OrderType.price_limit)
@@ -165,17 +165,17 @@ public class OrderService
                 order.total = order.price * order.amount;
                 if (order.side == E_OrderSide.buy)
                 {
-                    order.amount_unsold = order.total;
+                    order.amount_unsold = order.total ?? 0;
                     order.fee_rate = rate_limit_buy;
-                    coin_quote += order.total;
-                    fee_quote += order.total * order.fee_rate;
+                    coin_quote += order.total ?? 0;
+                    fee_quote += order.total ?? 0 * order.fee_rate;
                 }
                 else if (order.side == E_OrderSide.sell)
                 {
-                    order.amount_unsold = order.amount;
+                    order.amount_unsold = order.amount ?? 0;
                     order.fee_rate = rate_limit_sell;
-                    coin_base += order.amount;
-                    fee_base += order.amount * order.fee_rate;
+                    coin_base += order.amount ?? 0;
+                    fee_base += order.amount ?? 0 * order.fee_rate;
                 }
             }
             order.amount_done = 0;
@@ -222,7 +222,7 @@ public class OrderService
         FactoryService.instance.constant.stopwatch.Stop();
         FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};插入{res.data.Count}条订单到DB");
         FactoryService.instance.constant.stopwatch.Restart();
-        CallRequest<List<Orders>> call_req = new CallRequest<List<Orders>>();
+        ReqCall<List<Orders>> call_req = new ReqCall<List<Orders>>();
         call_req.op = E_Op.place;
         call_req.market = info.market;
         call_req.data = res.data;
@@ -245,14 +245,14 @@ public class OrderService
     /// <param name="type">1:按交易对全部撤单,2:按交易对和用户全部撤单,3:按用户和订单id撤单,4:按用户和用户订单id撤单</param>
     /// <param name="order">订单列表</param>
     /// <returns></returns>
-    public CallResponse<KeyValuePair<long, List<long>>> CancelOrder(long market, long uid, int type, List<long> order)
+    public ResCall<KeyValuePair<long, List<long>>> CancelOrder(long market, long uid, int type, List<long> order)
     {
-        CallRequest<KeyValuePair<long, List<long>>> req = new CallRequest<KeyValuePair<long, List<long>>>();
+        ReqCall<KeyValuePair<long, List<long>>> req = new ReqCall<KeyValuePair<long, List<long>>>();
         req.op = E_Op.place;
         req.market = market;
         req.data = new KeyValuePair<long, List<long>>(uid, order);
         FactoryService.instance.constant.MqSend(FactoryService.instance.GetMqOrderPlace(market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(req)));
-        CallResponse<KeyValuePair<long, List<long>>> res = new CallResponse<KeyValuePair<long, List<long>>>();
+        ResCall<KeyValuePair<long, List<long>>> res = new ResCall<KeyValuePair<long, List<long>>>();
         res.op = E_Op.place;
         res.success = true;
         res.code = E_Res_Code.ok;

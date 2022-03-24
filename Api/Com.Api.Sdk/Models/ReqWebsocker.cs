@@ -1,18 +1,18 @@
 using System;
-using Com.Db.Enum;
+using Com.Api.Sdk.Enum;
 
 namespace Com.Api.Sdk.Models;
 
 /// <summary>
 /// 订阅请求
 /// </summary>
-public class ReqWebsocker<ReqChannel>
+public class ReqWebsocker
 {
     // <summary>
-    /// 操作，subscribe unsubscribe
+    /// 操作
     /// </summary>
     /// <value></value>
-    public string op { get; set; } = "subscribe";
+    public E_WebsockerOp op { get; set; }
     /// <summary>
     /// 请求订阅的频道列表
     /// </summary>
@@ -26,21 +26,13 @@ public class ReqWebsocker<ReqChannel>
 public class ReqChannel
 {
     // <summary>
-    /// 频道  
-    /// login:ciphertext
-    /// account,
-    /// ticker:symbol,
-    /// orders:symbol,
-    /// trades:symbol,
-    /// books50-l2-tbt:symbol,
-    /// tickers:symbol
-    /// 
+    /// 频道
     /// </summary>
     /// <value></value>
-    public string channel { get; set; } = null!;
+    public E_WebsockerChannel channel { get; set; }
     /// <summary>
-    /// 数据
+    /// 数据 交易对或其它数据
     /// </summary>
     /// <value></value>
-    public string? data { get; set; }
+    public string data { get; set; } = null!;
 }

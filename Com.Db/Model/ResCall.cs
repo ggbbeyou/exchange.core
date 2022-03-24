@@ -1,13 +1,13 @@
 
 
-using Com.Db.Enum;
+using Com.Api.Sdk.Enum;
 
 namespace Com.Db.Model;
 
 /// <summary>
 /// web调用结果
 /// </summary>
-public class CallResponse<T> : Res<T>
+public class ResCall<T> : Res<T>
 {
     /// <summary>
     /// 操作   

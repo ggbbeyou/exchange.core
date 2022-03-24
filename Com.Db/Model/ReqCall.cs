@@ -1,13 +1,13 @@
 
 
-using Com.Db.Enum;
+using Com.Api.Sdk.Enum;
 
 namespace Com.Db.Model;
 
 /// <summary>
 /// 请求操作动作
 /// </summary>
-public class CallRequest<T> : Req<T>
+public class ReqCall<T> : Req<T>
 {
     /// <summary>
     /// 操作   
@@ -19,9 +19,5 @@ public class CallRequest<T> : Req<T>
     /// </summary>
     /// <value></value>
     public long market { get; set; }
-    /// <summary>
-    /// 数据
-    /// </summary>
-    /// <value></value>
-    public T data { get; set; } = default!;
+   
 }

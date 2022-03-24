@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Com.Bll;
 using Com.Db;
-using Com.Db.Enum;
+using Com.Api.Sdk.Enum;
 using Com.Db.Model;
 using Com.Service.Models;
 using Microsoft.Extensions.Configuration;
@@ -12,6 +12,7 @@ using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using Snowflake;
+using Com.Api.Sdk.Models;
 
 namespace Com.Service.Match;
 
@@ -47,7 +48,7 @@ public class MQ
     /// <summary>
     /// 上次深度行情
     /// </summary>
-    (List<BaseOrderBook> bid, List<BaseOrderBook> ask) orderbook_old;
+    (List<OrderBook> bid, List<OrderBook> ask) orderbook_old;
     /// <summary>
     /// 临时变量
     /// </summary>
@@ -100,7 +101,7 @@ public class MQ
             else
             {
                 string json = Encoding.UTF8.GetString(e);
-                CallRequest<List<Orders>>? req = JsonConvert.DeserializeObject<CallRequest<List<Orders>>>(json);
+                ReqCall<List<Orders>>? req = JsonConvert.DeserializeObject<ReqCall<List<Orders>>>(json);
                 if (req != null && req.op == E_Op.place && req.data != null && req.data.Count > 0)
                 {
                     deal_order.Clear();
@@ -131,11 +132,11 @@ public class MQ
                     if (deal.Count() > 0 || cancel_deal.Count > 0)
                     {
                         FactoryService.instance.constant.stopwatch.Restart();
-                        (List<BaseOrderBook> bid, List<BaseOrderBook> ask) orderbook = this.model.match_core.GetOrderBook();
-                        Dictionary<E_WebsockerChannel, Depth> depths = DepthService.instance.ConvertDepth(this.model.info.market, this.model.info.symbol, orderbook);
-                        DepthService.instance.Push(depths, true);
-                        (List<(int index, BaseOrderBook orderbook)> bid, List<(int index, BaseOrderBook orderbook)> ask) diff = DepthService.instance.DiffOrderBook(this.orderbook_old, orderbook);
-                        Dictionary<E_WebsockerChannel, Depth> depths_diff = DepthService.instance.ConvertDepth(this.model.info.market, this.model.info.symbol, diff);
+                        (List<OrderBook> bid, List<OrderBook> ask) orderbook = this.model.match_core.GetOrderBook();
+                        Dictionary<E_WebsockerChannel, ResDepth> depths = DepthService.instance.ConvertDepth(this.model.info.market, this.model.info.symbol, orderbook);
+                        DepthService.instance.Push(this.model.info.market, depths, true);
+                        (List<(int index, OrderBook orderbook)> bid, List<(int index, OrderBook orderbook)> ask) diff = DepthService.instance.DiffOrderBook(this.orderbook_old, orderbook);
+                        Dictionary<E_WebsockerChannel, ResDepth> depths_diff = DepthService.instance.ConvertDepth(this.model.info.market, this.model.info.symbol, diff);
                         foreach (var item in depths_diff)
                         {
                             if (item.Key == E_WebsockerChannel.books10_inc)
@@ -163,7 +164,7 @@ public class MQ
                                 }
                             }
                         }
-                        DepthService.instance.Push(depths_diff, false);
+                        DepthService.instance.Push(this.model.info.market, depths_diff, false);
                         this.orderbook_old = orderbook;
                         FactoryService.instance.constant.stopwatch.Stop();
                         FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};推送深度行情");
@@ -189,7 +190,7 @@ public class MQ
             else
             {
                 string json = Encoding.UTF8.GetString(e);
-                CallRequest<(long uid, List<long> order_id)>? req = JsonConvert.DeserializeObject<CallRequest<(long, List<long>)>>(json);
+                ReqCall<(long uid, List<long> order_id)>? req = JsonConvert.DeserializeObject<ReqCall<(long, List<long>)>>(json);
                 if (req != null && req.op == E_Op.place)
                 {
                     this.mutex.WaitOne();
@@ -215,9 +216,9 @@ public class MQ
                     {
                         FactoryService.instance.constant.MqTask(FactoryService.instance.GetMqOrderDeal(this.model.info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject((new List<Orders>(), new List<Deal>(), cancel))));
                         FactoryService.instance.constant.stopwatch.Restart();
-                        (List<BaseOrderBook> bid, List<BaseOrderBook> ask) orderbook = this.model.match_core.GetOrderBook();
-                        Dictionary<E_WebsockerChannel, Depth> depths = DepthService.instance.ConvertDepth(this.model.info.market, this.model.info.symbol, orderbook);
-                        DepthService.instance.Push(depths, true);
+                        (List<OrderBook> bid, List<OrderBook> ask) orderbook = this.model.match_core.GetOrderBook();
+                        Dictionary<E_WebsockerChannel, ResDepth> depths = DepthService.instance.ConvertDepth(this.model.info.market, this.model.info.symbol, orderbook);
+                        DepthService.instance.Push(this.model.info.market, depths, true);
                         // (List<BaseOrderBook> bid, List<BaseOrderBook> ask) diff = DepthService.instance.DiffOrderBook(this.orderbook_old, orderbook);
                         // Dictionary<E_WebsockerChannel, Depth> depths_diff = DepthService.instance.ConvertDepth(this.model.info.market, this.model.info.symbol, diff);
                         // DepthService.instance.PushDiff(depths_diff);

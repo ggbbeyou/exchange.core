@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 using Snowflake.Core;
 using Com.Bll;
 using Com.Db;
-using Com.Db.Enum;
+using Com.Api.Sdk.Enum;
 using Com.Db.Model;
 using System.Data;
 using Com.Bll.Util;
@@ -33,7 +33,7 @@ public class HomeController : Controller
     /// <param name="logger"></param>
     public HomeController(IServiceProvider provider, IConfiguration configuration, IHostEnvironment environment, ILogger<HomeController> logger)
     {
-      
+
     }
 
     public IActionResult Index()

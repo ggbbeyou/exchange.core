@@ -3,11 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 using Com.Api.Models;
 using Com.Bll;
 using Com.Db;
-using Com.Db.Enum;
+using Com.Api.Sdk.Enum;
 using Com.Db.Model;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
+using Com.Api.Sdk.Models;
 
 namespace Com.Api.Controllers;
 
@@ -63,9 +64,9 @@ public class OrderController : Controller
     /// <param name="orders"></param>
     /// <returns></returns>
     [HttpPost]
-    public IActionResult PlaceOrder(string symbol, List<PlaceOrder> orders)
+    public IActionResult PlaceOrder(string symbol, List<ReqOrder> orders)
     {
-        CallRequest<List<Orders>> result = new CallRequest<List<Orders>>();
+        ReqCall<List<Orders>> result = new ReqCall<List<Orders>>();
         List<Orders> matchOrders = new List<Orders>();
         MarketInfo? market = this.market_info_db.GetMarketBySymbol(symbol);
         if (market == null)
@@ -86,7 +87,7 @@ public class OrderController : Controller
                 orderResult.amount = item.amount;
                 orderResult.total = item.price ?? 0 * item.amount;
                 orderResult.create_time = DateTimeOffset.UtcNow;
-                orderResult.amount_unsold = item.amount;
+                // orderResult.amount_unsold = item.amount;
                 orderResult.amount_done = 0;
                 orderResult.deal_last_time = null;
                 orderResult.side = item.side;
@@ -98,12 +99,12 @@ public class OrderController : Controller
                 orderResult.remarks = null;
                 matchOrders.Add(orderResult);
             }
-            Res<List<Orders>> res = this.order_service.PlaceOrder(market, user_id, matchOrders);
+            // Res<List<Orders>> res = this.order_service.PlaceOrder(market, user_id, matchOrders);
             result.data = new List<Orders>();
-            foreach (var item in res.data)
-            {
-                result.data.Add(item);
-            }
+            // foreach (var item in res.data)
+            // {
+            //     result.data.Add(item);
+            // }
         }
         return Json(result);
     }
@@ -118,12 +119,12 @@ public class OrderController : Controller
     [HttpPost]
     public IActionResult OrderCancel(long market, int type, List<long> data)
     {
-        CallResponse<bool> call_res = new CallResponse<bool>();
+        ResCall<bool> call_res = new ResCall<bool>();
         if (type != 2 || type != 3 || type != 4 || type != 5)
         {
             return Json(call_res);
         }
-        CallResponse<KeyValuePair<long, List<long>>> res = this.order_service.CancelOrder(market, user_id, type, data);
+        ResCall<KeyValuePair<long, List<long>>> res = this.order_service.CancelOrder(market, user_id, type, data);
         return Json(res);
     }
 
@@ -135,45 +136,45 @@ public class OrderController : Controller
     [HttpPost]
     public IActionResult PlaceOrderText()
     {
-        List<PlaceOrder> orders = new List<PlaceOrder>();
-        Random r = new Random();
-        for (int i = 0; i < 500; i++)
-        {
-            PlaceOrder orderResult = new PlaceOrder();
-            orderResult.side = r.Next(0, 2) == 0 ? E_OrderSide.buy : E_OrderSide.sell;
-            orderResult.type = r.Next(0, 2) == 0 ? E_OrderType.price_limit : E_OrderType.price_market;
-            orderResult.client_id = null;
-            if (orderResult.type == E_OrderType.price_limit)
-            {
-                orderResult.price = (decimal)FactoryService.instance.constant.random.Next(1, 30);
-            }
-            else
-            {
-                orderResult.price = null;
-            }
-            orderResult.amount = (decimal)FactoryService.instance.constant.random.Next(1, 30);
-            orders.Add(orderResult);
-        }
-        PlaceOrder("eth/usdt", orders);
-        List<PlaceOrder> orders1 = new List<PlaceOrder>();
-        for (int i = 0; i < 500; i++)
-        {
-            PlaceOrder orderResult = new PlaceOrder();
-            orderResult.side = r.Next(0, 2) == 0 ? E_OrderSide.buy : E_OrderSide.sell;
-            orderResult.type = r.Next(0, 2) == 0 ? E_OrderType.price_limit : E_OrderType.price_market;
-            orderResult.client_id = null;
-            if (orderResult.type == E_OrderType.price_limit)
-            {
-                orderResult.price = (decimal)FactoryService.instance.constant.random.Next(1, 30);
-            }
-            else
-            {
-                orderResult.price = null;
-            }
-            orderResult.amount = (decimal)FactoryService.instance.constant.random.Next(1, 30);
-            orders1.Add(orderResult);
-        }
-        PlaceOrder("btc/usdt", orders);
+        // List<PlaceOrder> orders = new List<PlaceOrder>();
+        // Random r = new Random();
+        // for (int i = 0; i < 500; i++)
+        // {
+        //     PlaceOrder orderResult = new PlaceOrder();
+        //     orderResult.side = r.Next(0, 2) == 0 ? E_OrderSide.buy : E_OrderSide.sell;
+        //     orderResult.type = r.Next(0, 2) == 0 ? E_OrderType.price_limit : E_OrderType.price_market;
+        //     orderResult.client_id = null;
+        //     if (orderResult.type == E_OrderType.price_limit)
+        //     {
+        //         orderResult.price = (decimal)FactoryService.instance.constant.random.Next(1, 30);
+        //     }
+        //     else
+        //     {
+        //         orderResult.price = null;
+        //     }
+        //     orderResult.amount = (decimal)FactoryService.instance.constant.random.Next(1, 30);
+        //     orders.Add(orderResult);
+        // }
+        // PlaceOrder("eth/usdt", orders);
+        // List<PlaceOrder> orders1 = new List<PlaceOrder>();
+        // for (int i = 0; i < 500; i++)
+        // {
+        //     PlaceOrder orderResult = new PlaceOrder();
+        //     orderResult.side = r.Next(0, 2) == 0 ? E_OrderSide.buy : E_OrderSide.sell;
+        //     orderResult.type = r.Next(0, 2) == 0 ? E_OrderType.price_limit : E_OrderType.price_market;
+        //     orderResult.client_id = null;
+        //     if (orderResult.type == E_OrderType.price_limit)
+        //     {
+        //         orderResult.price = (decimal)FactoryService.instance.constant.random.Next(1, 30);
+        //     }
+        //     else
+        //     {
+        //         orderResult.price = null;
+        //     }
+        //     orderResult.amount = (decimal)FactoryService.instance.constant.random.Next(1, 30);
+        //     orders1.Add(orderResult);
+        // }
+        // PlaceOrder("btc/usdt", orders);
         return Json(new { });
     }
 

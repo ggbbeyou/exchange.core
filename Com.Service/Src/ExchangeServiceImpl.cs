@@ -1,6 +1,6 @@
 using Com.Bll;
 using Com.Db;
-using Com.Db.Enum;
+using Com.Api.Sdk.Enum;
 using Com.Db.Model;
 using Grpc.Core;
 using GrpcExchange;
@@ -27,10 +27,10 @@ public class GreeterImpl : ExchangeService.ExchangeServiceBase
     public override async Task<Reply> UnaryCall(Request request, ServerCallContext context)
     {
         Reply reply = new Reply();
-        CallResponse<string> res = new CallResponse<string>();
+        ResCall<string> res = new ResCall<string>();
         res.success = true;
         res.code = E_Res_Code.ok;
-        CallRequest<string>? req = JsonConvert.DeserializeObject<CallRequest<string>>(request.Json);
+        ReqCall<string>? req = JsonConvert.DeserializeObject<ReqCall<string>>(request.Json);
         if (req == null)
         {
             res.success = false;

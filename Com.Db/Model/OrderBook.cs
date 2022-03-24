@@ -1,12 +1,12 @@
 using System;
-using Com.Db.Enum;
+using Com.Api.Sdk.Enum;
 
 namespace Com.Db.Model;
 
 /// <summary>
 /// 盘口
 /// </summary>
-public class BaseOrderBook
+public class OrderBook
 {
     /// <summary>
     /// 交易对

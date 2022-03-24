@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Com.Api.Models;
 using Com.Bll;
 using Com.Db;
-using Com.Db.Enum;
+using Com.Api.Sdk.Enum;
 using Com.Db.Model;
 using System.Net.WebSockets;
 using Newtonsoft.Json;
@@ -11,6 +11,7 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using Microsoft.AspNetCore.Authorization;
 using StackExchange.Redis;
+using Com.Api.Sdk.Models;
 
 namespace Com.Api.Controllers;
 
@@ -228,10 +229,10 @@ public class WebSocketController : Controller
                                 key_depth = E_WebsockerChannel.books200.ToString();
                             }
                             RedisValue rv = FactoryService.instance.constant.redis.HashGet(FactoryService.instance.GetRedisDepth(market.market), key_depth);
-                            Depth? depth = JsonConvert.DeserializeObject<Depth>(rv);
+                            ResDepth? depth = JsonConvert.DeserializeObject<ResDepth>(rv);
                             if (depth != null)
                             {
-                                ResWebsocker<Depth> depth_res = new ResWebsocker<Depth>();
+                                ResWebsocker<ResDepth> depth_res = new ResWebsocker<ResDepth>();
                                 depth_res.success = true;
                                 depth_res.op = E_WebsockerOp.subscribe_date;
                                 depth_res.channel = item.channel;

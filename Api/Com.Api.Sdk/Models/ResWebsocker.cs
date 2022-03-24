@@ -1,10 +1,10 @@
 using System;
 
-using Com.Db.Enum;
+using Com.Api.Sdk.Enum;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace Com.Db.Model;
+namespace Com.Api.Sdk.Models;
 
 /// <summary>
 /// 订阅响应
@@ -17,7 +17,7 @@ public class ResWebsocker<T>
     /// <value></value>
     public bool success { get; set; } = true;
     // <summary>
-    /// 操作，subscribe unsubscribe 
+    /// 操作
     /// </summary>
     /// <value></value>
     [JsonConverter(typeof(StringEnumConverter))]

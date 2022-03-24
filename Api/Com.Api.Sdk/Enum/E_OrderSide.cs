@@ -1,6 +1,6 @@
 using System;
 
-namespace Com.Db.Enum;
+namespace Com.Api.Sdk.Enum;
 
 /// <summary>
 /// 订单买卖方向

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using Com.Db;
-using Com.Db.Enum;
+using Com.Api.Sdk.Enum;
 using Com.Service.Match;
 using Microsoft.Extensions.Logging;
 

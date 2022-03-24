@@ -27,7 +27,7 @@
 
 
 using Com.Db;
-using Com.Db.Enum;
+using Com.Api.Sdk.Enum;
 using Com.Db.Model;
 using Com.Service.Models;
 
@@ -202,14 +202,14 @@ public class MatchCore
     /// <param name="bid"></param>
     /// <param name="GetOrderBook("></param>
     /// <returns></returns>
-    public (List<BaseOrderBook> bid, List<BaseOrderBook> ask) GetOrderBook()
+    public (List<OrderBook> bid, List<OrderBook> ask) GetOrderBook()
     {
         var bids = from b in fixed_bid
                    group b by new { b.market, b.symbol, b.price } into g
-                   select new BaseOrderBook { market = g.Key.market, symbol = g.Key.symbol, price = g.Key.price, amount = g.Sum(p => p.amount_unsold), count = g.Count(), direction = E_OrderSide.buy, last_time = g.Max(p => p.deal_last_time ?? DateTimeOffset.UtcNow) };
+                   select new OrderBook { market = g.Key.market, symbol = g.Key.symbol, price = g.Key.price ?? 0, amount = g.Sum(p => p.amount_unsold), count = g.Count(), direction = E_OrderSide.buy, last_time = g.Max(p => p.deal_last_time ?? DateTimeOffset.UtcNow) };
         var asks = from a in fixed_ask
                    group a by new { a.market, a.symbol, a.price } into g
-                   select new BaseOrderBook { market = g.Key.market, symbol = g.Key.symbol, price = g.Key.price, amount = g.Sum(p => p.amount_unsold), count = g.Count(), direction = E_OrderSide.sell, last_time = g.Max(p => p.deal_last_time ?? DateTimeOffset.UtcNow) };
+                   select new OrderBook { market = g.Key.market, symbol = g.Key.symbol, price = g.Key.price ?? 0, amount = g.Sum(p => p.amount_unsold), count = g.Count(), direction = E_OrderSide.sell, last_time = g.Max(p => p.deal_last_time ?? DateTimeOffset.UtcNow) };
         return (bids.ToList(), asks.ToList());
     }
 
@@ -252,10 +252,10 @@ public class MatchCore
                 {
                     for (int i = 0; i < fixed_ask.Count; i++)
                     {
-                        Deal deal = Util.CreateDeal(this.model.info.market, this.model.info.symbol, order, fixed_ask[i], fixed_ask[i].price, this.model.info.amount_places, E_OrderSide.buy, orders);
+                        Deal deal = Util.CreateDeal(this.model.info.market, this.model.info.symbol, order, fixed_ask[i], fixed_ask[i].price ?? 0, this.model.info.amount_places, E_OrderSide.buy, orders);
                         deals.Add(deal);
                         cancels.AddRange(Trigger(deal.price));
-                        this.last_price = fixed_ask[i].price;
+                        this.last_price = fixed_ask[i].price ?? 0;
                         if (order.amount_unsold <= 0)
                         {
                             break;
@@ -276,7 +276,7 @@ public class MatchCore
                 {
                     for (int i = 0; i < market_ask.Count; i++)
                     {
-                        Deal deal = Util.CreateDeal(this.model.info.market, this.model.info.symbol, order, market_ask[i], order.price, this.model.info.amount_places, E_OrderSide.buy, orders);
+                        Deal deal = Util.CreateDeal(this.model.info.market, this.model.info.symbol, order, market_ask[i], order.price ?? 0, this.model.info.amount_places, E_OrderSide.buy, orders);
                         deals.Add(deal);
                         cancels.AddRange(Trigger(deal.price));
                         if (order.amount_unsold <= 0)
@@ -284,7 +284,7 @@ public class MatchCore
                             break;
                         }
                     }
-                    this.last_price = order.price;
+                    this.last_price = order.price ?? 0;
                     market_ask.RemoveAll(P => P.state == E_OrderState.completed);
                 }
                 //限价买单与限价卖单撮合
@@ -293,7 +293,7 @@ public class MatchCore
                     for (int i = 0; i < fixed_ask.Count; i++)
                     {
                         //使用撮合价规则
-                        decimal new_price = Util.GetNewPrice(order.price, fixed_ask[i].price, this.last_price);
+                        decimal new_price = Util.GetNewPrice(order.price ?? 0, fixed_ask[i].price ?? 0, this.last_price);
                         if (new_price <= 0)
                         {
                             break;
@@ -343,10 +343,10 @@ public class MatchCore
                 {
                     for (int i = 0; i < fixed_bid.Count; i++)
                     {
-                        Deal deal = Util.CreateDeal(this.model.info.market, this.model.info.symbol, fixed_bid[i], order, fixed_bid[i].price, this.model.info.amount_places, E_OrderSide.sell, orders);
+                        Deal deal = Util.CreateDeal(this.model.info.market, this.model.info.symbol, fixed_bid[i], order, fixed_bid[i].price ?? 0, this.model.info.amount_places, E_OrderSide.sell, orders);
                         deals.Add(deal);
                         cancels.AddRange(Trigger(deal.price));
-                        this.last_price = fixed_bid[i].price;
+                        this.last_price = fixed_bid[i].price ?? 0;
                         if (order.amount_unsold <= 0)
                         {
                             break;
@@ -367,7 +367,7 @@ public class MatchCore
                 {
                     for (int i = 0; i < market_bid.Count; i++)
                     {
-                        Deal deal = Util.CreateDeal(this.model.info.market, this.model.info.symbol, market_bid[i], order, order.price, this.model.info.amount_places, E_OrderSide.sell, orders);
+                        Deal deal = Util.CreateDeal(this.model.info.market, this.model.info.symbol, market_bid[i], order, order.price ?? 0, this.model.info.amount_places, E_OrderSide.sell, orders);
                         deals.Add(deal);
                         cancels.AddRange(Trigger(deal.price));
                         if (order.amount_unsold <= 0)
@@ -375,7 +375,7 @@ public class MatchCore
                             break;
                         }
                     }
-                    this.last_price = order.price;
+                    this.last_price = order.price ?? 0;
                     market_bid.RemoveAll(P => P.state == E_OrderState.completed);
                 }
                 //限价卖单与限价买单撮合
@@ -384,7 +384,7 @@ public class MatchCore
                     for (int i = 0; i < fixed_bid.Count; i++)
                     {
                         //使用撮合价规则
-                        decimal new_price = Util.GetNewPrice(fixed_bid[i].price, order.price, this.last_price);
+                        decimal new_price = Util.GetNewPrice(fixed_bid[i].price ?? 0, order.price ?? 0, this.last_price);
                         if (new_price <= 0)
                         {
                             break;

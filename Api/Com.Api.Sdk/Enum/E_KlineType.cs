@@ -1,6 +1,6 @@
 using System;
 
-namespace Com.Db.Enum;
+namespace Com.Api.Sdk.Enum;
 
 /// <summary>
 /// K线类型

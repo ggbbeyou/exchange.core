@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
-using Com.Db.Enum;
+using Com.Api.Sdk.Enum;
 
 namespace Com.Db;
 

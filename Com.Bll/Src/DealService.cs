@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
 using Com.Db;
-using Com.Db.Enum;
+using Com.Api.Sdk.Enum;
 using Com.Db.Model;
 using LinqKit;
 using Microsoft.EntityFrameworkCore;
@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using StackExchange.Redis;
+using Com.Api.Sdk.Models;
 
 namespace Com.Bll;
 
@@ -171,14 +172,14 @@ public class DealService
     /// </summary>
     /// <param name="market"></param>
     /// <returns></returns>
-    public Ticker? Get24HoursTicker(long market)
+    public ResTicker? Get24HoursTicker(long market)
     {
         try
         {
             var sql = from deal in this.db.Deal
                       where deal.market == market && deal.time >= DateTimeOffset.UtcNow.AddDays(-1)
                       group deal by new { deal.market, deal.symbol } into g
-                      select new Ticker
+                      select new ResTicker
                       {
                           market = g.Key.market,
                           symbol = g.Key.symbol,
@@ -208,11 +209,11 @@ public class DealService
     /// 深度行情保存到redis并且推送到MQ
     /// </summary>
     /// <param name="depth"></param>
-    public void PushTicker(Ticker? ticker)
+    public void PushTicker(ResTicker? ticker)
     {
         if (ticker != null)
         {
-            ResWebsocker<Ticker> resWebsocker = new ResWebsocker<Ticker>();
+            ResWebsocker<ResTicker> resWebsocker = new ResWebsocker<ResTicker>();
             resWebsocker.success = true;
             resWebsocker.op = E_WebsockerOp.subscribe_date;
             resWebsocker.channel = E_WebsockerChannel.tickers;

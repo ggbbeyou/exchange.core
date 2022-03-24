@@ -1,12 +1,13 @@
 using System;
 using System.Security.Cryptography;
 using System.Text;
-using Com.Db.Enum;
+
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using WebSocketSharp;
 using System.Timers;
 using Newtonsoft.Json;
+using Com.Api.Sdk.Models;
 
 namespace Com.Api.Sdk;
 
@@ -220,16 +221,16 @@ public class Subscribe
         this.logger.LogError($"WebSocket error: {e.Message}");
     }
 
-    /// <summary>
-    /// 发送
-    /// </summary>
-    /// <param name = "obj" ></ param >
-    public void Send<K>(K obj) where K : ReqWebsocker<ReqChannel>
-    {
-        if (_WebSocket.ReadyState == WebSocketState.Open)
-        {
-            _WebSocket.Send(JsonConvert.SerializeObject(obj));
-        }
-    }
+    // /// <summary>
+    // /// 发送
+    // /// </summary>
+    // /// <param name = "obj" ></ param >
+    // public void Send<K>(K obj) where K : ReqWebsocker<ReqChannel>
+    // {
+    //     if (_WebSocket.ReadyState == WebSocketState.Open)
+    //     {
+    //         _WebSocket.Send(JsonConvert.SerializeObject(obj));
+    //     }
+    // }
 
 }

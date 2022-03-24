@@ -22,11 +22,11 @@ public class Vip
     /// 市价手续费
     /// </summary>
     /// <value></value>
-    public decimal rate_market { get; set; }
+    public decimal fee_market { get; set; }
     /// <summary>
     /// 限价手续费
     /// </summary>
     /// <value></value>
-    public decimal rate_limit { get; set; }
+    public decimal fee_limit { get; set; }
 
 }

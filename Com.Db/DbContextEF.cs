@@ -241,8 +241,8 @@ public class DbContextEF : DbContext
             o.HasKey(p => p.id);
             o.Property(P => P.id).IsRequired().ValueGeneratedNever().HasColumnType("bigint").HasComment("ID");
             o.Property(P => P.name).HasColumnType("nvarchar").HasMaxLength(20).HasComment("等级名称");
-            o.Property(P => P.rate_market).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("市价手续费");
-            o.Property(P => P.rate_limit).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("限价手续费");
+            o.Property(P => P.fee_market).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("市价手续费");
+            o.Property(P => P.fee_limit).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("限价手续费");
             o.ToTable(nameof(Vip));
         });
         modelBuilder.Entity<Wallet>(o =>

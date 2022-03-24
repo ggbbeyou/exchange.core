@@ -121,10 +121,10 @@ public class ServiceOrder
         decimal coin_quote = 0;
         decimal fee_base = 0;
         decimal fee_quote = 0;
-        decimal rate_market_buy = info.fee_market_buy * (1 + vip.rate_market);
-        decimal rate_market_sell = info.fee_market_sell * (1 + vip.rate_market);
-        decimal rate_limit_buy = info.fee_limit_buy * (1 + vip.rate_limit);
-        decimal rate_limit_sell = info.fee_limit_sell * (1 + vip.rate_limit);
+        decimal rate_market_buy = info.fee_market_buy * (1 + vip.fee_market);
+        decimal rate_market_sell = info.fee_market_sell * (1 + vip.fee_market);
+        decimal rate_limit_buy = info.fee_limit_buy * (1 + vip.fee_limit);
+        decimal rate_limit_sell = info.fee_limit_sell * (1 + vip.fee_limit);
         foreach (var item in orders)
         {
             Orders order = new Orders();

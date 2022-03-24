@@ -129,6 +129,24 @@ public class TestController : Controller
         };
         this.db.Market.Add(btcusdt);
         this.db.Market.Add(ethusdt);
+        Vip vip1 = new Vip()
+        {
+            id = FactoryService.instance.constant.worker.NextId(),
+            name = "vip1",
+            fee_market = 0.001m,
+            fee_limit = 0.001m,
+        };
+        Vip vip2 = new Vip()
+        {
+            id = FactoryService.instance.constant.worker.NextId(),
+            name = "vip2",
+            fee_market = 0.002m,
+            fee_limit = 0.002m,
+        };
+        
+
+        this.db.Vip.Add(vip1);
+        this.db.Vip.Add(vip2);
         return Json(this.db.SaveChanges());
     }
 

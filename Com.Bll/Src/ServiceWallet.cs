@@ -36,32 +36,38 @@ public class ServiceWallet
     /// <returns></returns>
     public bool FreezeChange(E_WalletType wallet_type, long uid, long coin_base, decimal amount_base)
     {
-        Wallet? wallet_base = this.db.Wallet.Where(P => P.wallet_type == wallet_type && P.user_id == uid && P.coin_id == coin_base).SingleOrDefault();
-        if (wallet_base == null)
+        using (var scope = FactoryService.instance.constant.provider.CreateScope())
         {
-            return false;
-        }
-        if (amount_base > 0)
-        {
-            if (wallet_base.available < amount_base)
+            using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
-                return false;
+                Wallet? wallet_base = db.Wallet.Where(P => P.wallet_type == wallet_type && P.user_id == uid && P.coin_id == coin_base).SingleOrDefault();
+                if (wallet_base == null)
+                {
+                    return false;
+                }
+                if (amount_base > 0)
+                {
+                    if (wallet_base.available < amount_base)
+                    {
+                        return false;
+                    }
+                }
+                else if (amount_base < 0)
+                {
+                    if (wallet_base.freeze < Math.Abs(amount_base))
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+                wallet_base.freeze += amount_base;
+                wallet_base.available -= amount_base;
+                return db.SaveChanges() > 0;
             }
         }
-        else if (amount_base < 0)
-        {
-            if (wallet_base.freeze < Math.Abs(amount_base))
-            {
-                return false;
-            }
-        }
-        else
-        {
-            return false;
-        }
-        wallet_base.freeze += amount_base;
-        wallet_base.available -= amount_base;
-        return this.db.SaveChanges() > 0;
     }
 
 
@@ -75,57 +81,63 @@ public class ServiceWallet
     /// <returns></returns>
     public bool FreezeChange(E_WalletType wallet_type, long uid, long coin_base, decimal amount_base, long coin_quote, decimal amount_quote)
     {
-        Wallet? wallet_base = this.db.Wallet.Where(P => P.wallet_type == wallet_type && P.user_id == uid && P.coin_id == coin_base).SingleOrDefault();
-        if (wallet_base == null)
+        using (var scope = FactoryService.instance.constant.provider.CreateScope())
         {
-            return false;
-        }
-        if (amount_base > 0)
-        {
-            if (wallet_base.available < amount_base)
+            using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
-                return false;
+                Wallet? wallet_base = db.Wallet.Where(P => P.wallet_type == wallet_type && P.user_id == uid && P.coin_id == coin_base).SingleOrDefault();
+                if (wallet_base == null)
+                {
+                    return false;
+                }
+                if (amount_base > 0)
+                {
+                    if (wallet_base.available < amount_base)
+                    {
+                        return false;
+                    }
+                }
+                else if (amount_base < 0)
+                {
+                    if (wallet_base.freeze < Math.Abs(amount_base))
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+                Wallet? wallet_quote = db.Wallet.Where(P => P.wallet_type == wallet_type && P.user_id == uid && P.coin_id == coin_quote).SingleOrDefault();
+                if (wallet_quote == null)
+                {
+                    return false;
+                }
+                if (amount_quote > 0)
+                {
+                    if (wallet_quote.available < amount_quote)
+                    {
+                        return false;
+                    }
+                }
+                else if (amount_quote < 0)
+                {
+                    if (wallet_quote.freeze < Math.Abs(amount_quote))
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+                wallet_base.freeze += amount_base;
+                wallet_base.available -= amount_base;
+                wallet_quote.freeze += amount_quote;
+                wallet_quote.available -= amount_quote;
+                return db.SaveChanges() > 0;
             }
         }
-        else if (amount_base < 0)
-        {
-            if (wallet_base.freeze < Math.Abs(amount_base))
-            {
-                return false;
-            }
-        }
-        else
-        {
-            return false;
-        }
-        Wallet? wallet_quote = this.db.Wallet.Where(P => P.wallet_type == wallet_type && P.user_id == uid && P.coin_id == coin_quote).SingleOrDefault();
-        if (wallet_quote == null)
-        {
-            return false;
-        }
-        if (amount_quote > 0)
-        {
-            if (wallet_quote.available < amount_quote)
-            {
-                return false;
-            }
-        }
-        else if (amount_quote < 0)
-        {
-            if (wallet_quote.freeze < Math.Abs(amount_quote))
-            {
-                return false;
-            }
-        }
-        else
-        {
-            return false;
-        }
-        wallet_base.freeze += amount_base;
-        wallet_base.available -= amount_base;
-        wallet_quote.freeze += amount_quote;
-        wallet_quote.available -= amount_quote;
-        return this.db.SaveChanges() > 0;
     }
 
     /// <summary>
@@ -143,37 +155,43 @@ public class ServiceWallet
         {
             return false;
         }
-        using (var transaction = this.db.Database.BeginTransaction())
+        using (var scope = FactoryService.instance.constant.provider.CreateScope())
         {
-            try
+            using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
-                Wallet? wallet_from = this.db.Wallet.Where(P => P.wallet_type == wallet_type && P.coin_id == coin_id && P.user_id == from).SingleOrDefault();
-                Wallet? wallet_to = this.db.Wallet.Where(P => P.wallet_type == wallet_type && P.coin_id == coin_id && P.user_id == to).SingleOrDefault();
-                if (wallet_from == null || wallet_to == null)
+                using (var transaction = db.Database.BeginTransaction())
                 {
-                    return false;
+                    try
+                    {
+                        Wallet? wallet_from = db.Wallet.Where(P => P.wallet_type == wallet_type && P.coin_id == coin_id && P.user_id == from).SingleOrDefault();
+                        Wallet? wallet_to = db.Wallet.Where(P => P.wallet_type == wallet_type && P.coin_id == coin_id && P.user_id == to).SingleOrDefault();
+                        if (wallet_from == null || wallet_to == null)
+                        {
+                            return false;
+                        }
+                        if (amount > 0 && wallet_from.available < amount)
+                        {
+                            return false;
+                        }
+                        else if (amount < 0 && wallet_to.available < Math.Abs(amount))
+                        {
+                            return false;
+                        }
+                        wallet_from.available -= amount;
+                        wallet_from.total = wallet_from.available + wallet_from.freeze;
+                        wallet_to.available += amount;
+                        wallet_to.total = wallet_to.available + wallet_to.freeze;
+                        db.SaveChanges();
+                        transaction.Commit();
+                        return true;
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        FactoryService.instance.constant.logger.LogError(ex, ex.Message);
+                        return false;
+                    }
                 }
-                if (amount > 0 && wallet_from.available < amount)
-                {
-                    return false;
-                }
-                else if (amount < 0 && wallet_to.available < Math.Abs(amount))
-                {
-                    return false;
-                }
-                wallet_from.available -= amount;
-                wallet_from.total = wallet_from.available + wallet_from.freeze;
-                wallet_to.available += amount;
-                wallet_to.total = wallet_to.available + wallet_to.freeze;
-                this.db.SaveChanges();
-                transaction.Commit();
-                return true;
-            }
-            catch (Exception ex)
-            {
-                transaction.Rollback();
-                FactoryService.instance.constant.logger.LogError(ex, ex.Message);
-                return false;
             }
         }
     }
@@ -197,40 +215,46 @@ public class ServiceWallet
         {
             return false;
         }
-        using (var transaction = this.db.Database.BeginTransaction())
+        using (var scope = FactoryService.instance.constant.provider.CreateScope())
         {
-            try
+            using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
-                Wallet? buy_base = this.db.Wallet.Where(P => P.wallet_type == wallet_type && P.coin_id == coin_id_base && P.user_id == buy_uid).SingleOrDefault();
-                Wallet? buy_quote = this.db.Wallet.Where(P => P.wallet_type == wallet_type && P.coin_id == coin_id_quote && P.user_id == buy_uid).SingleOrDefault();
-                Wallet? sell_base = this.db.Wallet.Where(P => P.wallet_type == wallet_type && P.coin_id == coin_id_base && P.user_id == sell_uid).SingleOrDefault();
-                Wallet? sell_quote = this.db.Wallet.Where(P => P.wallet_type == wallet_type && P.coin_id == coin_id_quote && P.user_id == sell_uid).SingleOrDefault();
-                if (buy_base == null || buy_quote == null || sell_base == null || sell_quote == null)
+                using (var transaction = db.Database.BeginTransaction())
                 {
-                    return false;
+                    try
+                    {
+                        Wallet? buy_base = db.Wallet.Where(P => P.wallet_type == wallet_type && P.coin_id == coin_id_base && P.user_id == buy_uid).SingleOrDefault();
+                        Wallet? buy_quote = db.Wallet.Where(P => P.wallet_type == wallet_type && P.coin_id == coin_id_quote && P.user_id == buy_uid).SingleOrDefault();
+                        Wallet? sell_base = db.Wallet.Where(P => P.wallet_type == wallet_type && P.coin_id == coin_id_base && P.user_id == sell_uid).SingleOrDefault();
+                        Wallet? sell_quote = db.Wallet.Where(P => P.wallet_type == wallet_type && P.coin_id == coin_id_quote && P.user_id == sell_uid).SingleOrDefault();
+                        if (buy_base == null || buy_quote == null || sell_base == null || sell_quote == null)
+                        {
+                            return false;
+                        }
+                        decimal quote_total = amount * price;
+                        decimal buy_fee = quote_total * rate_buy;
+                        decimal sell_fee = quote_total * rate_sell;
+                        buy_base.available += amount;
+                        sell_base.freeze -= amount;
+                        buy_quote.freeze -= quote_total;
+                        sell_quote.available += quote_total;
+                        buy_quote.freeze -= buy_fee;
+                        sell_quote.freeze -= sell_fee;
+                        buy_base.total = buy_base.available + buy_base.freeze;
+                        buy_quote.total = buy_quote.available + buy_quote.freeze;
+                        sell_base.total = sell_base.available + sell_base.freeze;
+                        sell_quote.total = sell_quote.available + sell_quote.freeze;
+                        db.SaveChanges();
+                        transaction.Commit();
+                        return true;
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        FactoryService.instance.constant.logger.LogError(ex, ex.Message);
+                        return false;
+                    }
                 }
-                decimal quote_total = amount * price;
-                decimal buy_fee = quote_total * rate_buy;
-                decimal sell_fee = quote_total * rate_sell;
-                buy_base.available += amount;
-                sell_base.freeze -= amount;
-                buy_quote.freeze -= quote_total;
-                sell_quote.available += quote_total;
-                buy_quote.freeze -= buy_fee;
-                sell_quote.freeze -= sell_fee;
-                buy_base.total = buy_base.available + buy_base.freeze;
-                buy_quote.total = buy_quote.available + buy_quote.freeze;
-                sell_base.total = sell_base.available + sell_base.freeze;
-                sell_quote.total = sell_quote.available + sell_quote.freeze;
-                this.db.SaveChanges();
-                transaction.Commit();
-                return true;
-            }
-            catch (Exception ex)
-            {
-                transaction.Rollback();
-                FactoryService.instance.constant.logger.LogError(ex, ex.Message);
-                return false;
             }
         }
     }

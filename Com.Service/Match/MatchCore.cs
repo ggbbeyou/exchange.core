@@ -176,10 +176,6 @@ public class MatchCore
     /// <returns></returns>
     public List<Orders> Trigger(decimal price)
     {
-        if (price <= 0)
-        {
-            return new List<Orders>();
-        }
         List<Orders> cancel = new List<Orders>();
         List<Orders> bid_market = this.market_bid.Where(P => P.trigger_cancel_price > 0 && P.trigger_cancel_price >= price).ToList();
         bid_market.ForEach(P => { P.state = E_OrderState.cancel; P.deal_last_time = DateTimeOffset.UtcNow; P.remarks = "买单高于撤单触发价,或市价买价余额不足时,系统自动撤单"; });

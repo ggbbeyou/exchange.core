@@ -22,9 +22,9 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build-Api",
-            "program": "${workspaceFolder}/Api/Com.Api/bin/Debug/net6.0/Com.Api.dll",
+            "program": "${workspaceFolder}/Com.Api/bin/Debug/net6.0/Com.Api.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/Api/Com.Api",
+            "cwd": "${workspaceFolder}/Com.Api",
             "stopAtEntry": false,
             "serverReadyAction": {
                 "action": "openExternally",

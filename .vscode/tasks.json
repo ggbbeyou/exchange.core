@@ -19,12 +19,12 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/Api/Com.Api/Com.Api.csproj",
+                "${workspaceFolder}/Com.Api/Com.Api.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
             "problemMatcher": "$msCompile"
-        }, 
+        },
         {
             "label": "build-Admin",
             "command": "dotnet",

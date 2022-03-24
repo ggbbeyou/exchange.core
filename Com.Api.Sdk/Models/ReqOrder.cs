@@ -35,15 +35,10 @@ public class ReqOrder
     /// <value></value>
     public decimal? price { get; set; }
     /// <summary>
-    /// 挂单量(限价单必填,市价单无效)
+    /// 限价单:挂单量,市价单:总额,db:量
     /// </summary>
     /// <value></value>
     public decimal? amount { get; set; }
-    /// <summary>
-    /// 订单总额(市价买单必填,其它都无效)
-    /// </summary>
-    /// <value></value>
-    public decimal? total { get; set; }
     /// <summary>
     /// 触发挂单价格
     /// </summary>

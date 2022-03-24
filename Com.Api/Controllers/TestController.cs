@@ -227,7 +227,6 @@ public class TestController : Controller
                 E_OrderType type = FactoryService.instance.constant.random.Next(0, 2) == 0 ? E_OrderType.price_limit : E_OrderType.price_market;
                 decimal amount = (decimal)FactoryService.instance.constant.random.NextDouble();
                 decimal price = (decimal)FactoryService.instance.constant.random.NextDouble();
-                decimal total = amount * price;
                 ReqOrder order = new ReqOrder()
                 {
                     client_id = FactoryService.instance.constant.worker.NextId().ToString(),
@@ -236,7 +235,6 @@ public class TestController : Controller
                     type = type,
                     price = price,
                     amount = amount,
-                    total = total,
                     trigger_hanging_price = 0,
                     trigger_cancel_price = 0,
                     data = null,
@@ -250,12 +248,12 @@ public class TestController : Controller
                     }
                     else if (side == E_OrderSide.sell)
                     {
-                        order.total = null;
+
                     }
                 }
                 else if (type == E_OrderType.price_limit)
                 {
-                    order.total = null;
+
                 }
                 reqOrders.Add(order);
             }

@@ -21,6 +21,11 @@ public class ResOrder : ReqOrder
     /// <value></value>
     public E_OrderState state { get; set; }
     /// <summary>
+    /// 订单总额(市价买单必填,其它都无效)
+    /// </summary>
+    /// <value></value>
+    public decimal? total { get; set; }
+    /// <summary>
     /// 未成交 买:总额,卖:交易量
     /// </summary>
     /// <value></value>

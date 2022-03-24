@@ -72,7 +72,7 @@ public class ServiceOrder
             res.message = "client_id长度不能超过50";
             return res;
         }
-        if (orders.Where(P => P.side == E_OrderSide.buy && P.type == E_OrderType.price_market).ToList().Exists(P => P.total == null || P.total < 0))
+        if (orders.Where(P => P.side == E_OrderSide.buy && P.type == E_OrderType.price_market).ToList().Exists(P => P.amount == null || P.amount < 0))
         {
             res.code = E_Res_Code.field_error;
             res.message = "市价买单,总额不能小于0";
@@ -142,11 +142,11 @@ public class ServiceOrder
                 if (order.side == E_OrderSide.buy)
                 {
                     order.amount = null;
-                    order.total = item.total ?? 0;
-                    order.amount_unsold = item.total ?? 0;
+                    order.total = null;
+                    order.amount_unsold = item.amount ?? 0;
                     order.fee_rate = rate_market_buy;
-                    coin_quote += order.total ?? 0;
-                    fee_quote += order.fee_rate * order.total ?? 0;
+                    coin_quote += item.amount ?? 0;
+                    fee_quote += order.fee_rate * item.amount ?? 0;
                 }
                 else if (order.side == E_OrderSide.sell)
                 {

@@ -14,7 +14,7 @@
 
 
   <ItemGroup>
-    <ProjectReference Include="..\Api\Com.Api.Sdk\Com.Api.Sdk.csproj" />
+    <ProjectReference Include="..\Com.Api.Sdk\Com.Api.Sdk.csproj" />
   </ItemGroup>
 
 </Project>

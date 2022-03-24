@@ -2,7 +2,6 @@ using System.Text;
 using Com.Db;
 using Com.Api.Sdk.Enum;
 using Com.Db.Model;
-using Grpc.Net.Client;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;

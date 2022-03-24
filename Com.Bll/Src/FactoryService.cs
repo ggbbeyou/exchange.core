@@ -25,31 +25,6 @@ public class FactoryService
     /// 常用接口
     /// </summary>
     public FactoryConstant constant = null!;
-    // /// <summary>
-    // /// DB:交易记录
-    // /// </summary>
-    // public DealDb deal_db = new DealDb();
-    // /// <summary>
-    // /// DB:K线
-    // /// </summary>
-    // public KilneDb kilne_db = new KilneDb();
-    // /// <summary>
-    // /// 交易对基础信息
-    // /// </summary>
-    // /// <returns></returns>
-    // public MarketInfoDb market_info_db = new MarketInfoDb();
-    // /// <summary>
-    // /// Service:订单
-    // /// </summary>
-    // public OrderService order_service = new OrderService();
-    // /// <summary>
-    // /// Service:交易记录
-    // /// </summary>
-    // public DealService deal_service = new DealService();
-    // /// <summary>
-    // /// Service:K线
-    // /// </summary>
-    // public KlineService kline_service = new KlineService();
     /// <summary>
     /// 系统初始化时间  初始化  注:2017-1-1 此时是一年第一天，一年第一月，一年第一个星期日(星期日是一个星期开始的第一天)
     /// </summary>   
@@ -151,7 +126,7 @@ public class FactoryService
     public string GetMqOrderCancel(long market)
     {
         return string.Format("order_cancel_{0}", market);
-    }  
+    }
 
     /// <summary>
     /// MQ:订阅

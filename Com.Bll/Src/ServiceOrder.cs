@@ -22,10 +22,6 @@ namespace Com.Bll;
 public class ServiceOrder
 {
     /// <summary>
-    /// 数据库
-    /// </summary>
-    private DbContextEF db = null!;
-    /// <summary>
     /// 秒表
     /// </summary>
     /// <returns></returns>
@@ -51,8 +47,6 @@ public class ServiceOrder
     /// </summary>
     public ServiceOrder()
     {
-        var scope = FactoryService.instance.constant.provider.CreateScope();
-        this.db = scope.ServiceProvider.GetService<DbContextEF>()!;
     }
 
     /// <summary>
@@ -285,9 +279,11 @@ public class ServiceOrder
     {
         using (var scope = FactoryService.instance.constant.provider.CreateScope())
         {
-            DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!;
-            db.Orders.UpdateRange(data);
-            db.SaveChanges();
+            using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
+            {
+                db.Orders.UpdateRange(data);
+                db.SaveChanges();
+            }
         }
     }
 

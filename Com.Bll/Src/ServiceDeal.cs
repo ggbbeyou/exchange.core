@@ -18,17 +18,10 @@ namespace Com.Bll;
 public class ServiceDeal
 {
     /// <summary>
-    /// 数据库
-    /// </summary>
-    public DbContextEF db = null!;
-
-    /// <summary>
     /// 初始化
     /// </summary>
     public ServiceDeal()
     {
-        var scope = FactoryService.instance.constant.provider.CreateScope();
-        this.db = scope.ServiceProvider.GetService<DbContextEF>()!;
     }
 
     /// <summary>
@@ -49,7 +42,13 @@ public class ServiceDeal
         {
             predicate = predicate.And(P => P.time <= end);
         }
-        return this.db.Deal.Where(predicate).OrderBy(P => P.time).AsNoTracking().ToList();
+        using (var scope = FactoryService.instance.constant.provider.CreateScope())
+        {
+            using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
+            {
+                return db.Deal.Where(predicate).OrderBy(P => P.time).AsNoTracking().ToList();
+            }
+        }
     }
 
     /// <summary>
@@ -58,23 +57,29 @@ public class ServiceDeal
     /// <param name="deals"></param>
     public int AddOrUpdateDeal(List<Deal> deals)
     {
-        List<Deal> temp = this.db.Deal.Where(P => deals.Select(Q => Q.trade_id).Contains(P.trade_id)).ToList();
-        foreach (var deal in deals)
+        using (var scope = FactoryService.instance.constant.provider.CreateScope())
         {
-            var temp_deal = temp.FirstOrDefault(P => P.trade_id == deal.trade_id);
-            if (temp_deal != null)
+            using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
-                temp_deal.price = deal.price;
-                temp_deal.amount = deal.amount;
-                temp_deal.total = deal.total;
-                temp_deal.time = deal.time;
-            }
-            else
-            {
-                this.db.Deal.Add(deal);
+                List<Deal> temp = db.Deal.Where(P => deals.Select(Q => Q.trade_id).Contains(P.trade_id)).ToList();
+                foreach (var deal in deals)
+                {
+                    var temp_deal = temp.FirstOrDefault(P => P.trade_id == deal.trade_id);
+                    if (temp_deal != null)
+                    {
+                        temp_deal.price = deal.price;
+                        temp_deal.amount = deal.amount;
+                        temp_deal.total = deal.total;
+                        temp_deal.time = deal.time;
+                    }
+                    else
+                    {
+                        db.Deal.Add(deal);
+                    }
+                }
+                return db.SaveChanges();
             }
         }
-        return this.db.SaveChanges();
     }
 
 
@@ -98,24 +103,30 @@ public class ServiceDeal
         }
         try
         {
-            var sql = from deal in this.db.Deal.Where(predicate)
-                      group deal by EF.Functions.DateDiffMinute(FactoryService.instance.system_init, deal.time) into g
-                      select new Kline
-                      {
-                          market = market,
-                          amount = g.Sum(P => P.amount),
-                          count = g.Count(),
-                          total = g.Sum(P => P.total),
-                          open = g.OrderBy(P => P.time).First().price,
-                          close = g.OrderBy(P => P.time).Last().price,
-                          low = g.Min(P => P.price),
-                          high = g.Max(P => P.price),
-                          type = E_KlineType.min1,
-                          time_start = FactoryService.instance.system_init.AddMinutes(g.Key),
-                          time_end = FactoryService.instance.system_init.AddMinutes(g.Key + 1).AddMilliseconds(-1),
-                          time = DateTimeOffset.UtcNow,
-                      };
-            return sql.AsNoTracking().ToList();
+            using (var scope = FactoryService.instance.constant.provider.CreateScope())
+            {
+                using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
+                {
+                    var sql = from deal in db.Deal.Where(predicate)
+                              group deal by EF.Functions.DateDiffMinute(FactoryService.instance.system_init, deal.time) into g
+                              select new Kline
+                              {
+                                  market = market,
+                                  amount = g.Sum(P => P.amount),
+                                  count = g.Count(),
+                                  total = g.Sum(P => P.total),
+                                  open = g.OrderBy(P => P.time).First().price,
+                                  close = g.OrderBy(P => P.time).Last().price,
+                                  low = g.Min(P => P.price),
+                                  high = g.Max(P => P.price),
+                                  type = E_KlineType.min1,
+                                  time_start = FactoryService.instance.system_init.AddMinutes(g.Key),
+                                  time_end = FactoryService.instance.system_init.AddMinutes(g.Key + 1).AddMilliseconds(-1),
+                                  time = DateTimeOffset.UtcNow,
+                              };
+                    return sql.AsNoTracking().ToList();
+                }
+            }
         }
         catch (Exception ex)
         {
@@ -140,25 +151,31 @@ public class ServiceDeal
         }
         try
         {
-            var sql = from deal in this.db.Deal.Where(predicate)
-                      group deal by new { deal.market, deal.symbol } into g
-                      select new Kline
-                      {
-                          market = g.Key.market,
-                          symbol = g.Key.symbol,
-                          amount = g.Sum(P => P.amount),
-                          count = g.Count(),
-                          total = g.Sum(P => P.total),
-                          open = g.OrderBy(P => P.time).First().price,
-                          close = g.OrderBy(P => P.time).Last().price,
-                          low = g.Min(P => P.price),
-                          high = g.Max(P => P.price),
-                          type = type,
-                          time_start = start,
-                          time_end = g.OrderBy(P => P.time).Last().time,
-                          time = DateTimeOffset.UtcNow,
-                      };
-            return sql.AsNoTracking().SingleOrDefault();
+            using (var scope = FactoryService.instance.constant.provider.CreateScope())
+            {
+                using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
+                {
+                    var sql = from deal in db.Deal.Where(predicate)
+                              group deal by new { deal.market, deal.symbol } into g
+                              select new Kline
+                              {
+                                  market = g.Key.market,
+                                  symbol = g.Key.symbol,
+                                  amount = g.Sum(P => P.amount),
+                                  count = g.Count(),
+                                  total = g.Sum(P => P.total),
+                                  open = g.OrderBy(P => P.time).First().price,
+                                  close = g.OrderBy(P => P.time).Last().price,
+                                  low = g.Min(P => P.price),
+                                  high = g.Max(P => P.price),
+                                  type = type,
+                                  time_start = start,
+                                  time_end = g.OrderBy(P => P.time).Last().time,
+                                  time = DateTimeOffset.UtcNow,
+                              };
+                    return sql.AsNoTracking().SingleOrDefault();
+                }
+            }
         }
         catch (Exception ex)
         {
@@ -176,27 +193,33 @@ public class ServiceDeal
     {
         try
         {
-            var sql = from deal in this.db.Deal
-                      where deal.market == market && deal.time >= DateTimeOffset.UtcNow.AddDays(-1)
-                      group deal by new { deal.market, deal.symbol } into g
-                      select new ResTicker
-                      {
-                          market = g.Key.market,
-                          symbol = g.Key.symbol,
-                          price_change = g.Average(P => P.price),
-                          price_change_percent = 0,
-                          open = g.OrderBy(P => P.time).First().price,
-                          close = g.OrderBy(P => P.time).Last().price,
-                          low = g.Min(P => P.price),
-                          high = g.Max(P => P.price),
-                          close_amount = g.OrderBy(P => P.time).Last().amount,
-                          close_time = g.OrderBy(P => P.time).Last().time,
-                          volume = g.Sum(P => P.amount),
-                          volume_currency = g.Sum(P => P.total),
-                          count = g.Count(),
-                          time = DateTimeOffset.UtcNow,
-                      };
-            return sql.AsNoTracking().SingleOrDefault();
+            using (var scope = FactoryService.instance.constant.provider.CreateScope())
+            {
+                using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
+                {
+                    var sql = from deal in db.Deal
+                              where deal.market == market && deal.time >= DateTimeOffset.UtcNow.AddDays(-1)
+                              group deal by new { deal.market, deal.symbol } into g
+                              select new ResTicker
+                              {
+                                  market = g.Key.market,
+                                  symbol = g.Key.symbol,
+                                  price_change = g.Average(P => P.price),
+                                  price_change_percent = 0,
+                                  open = g.OrderBy(P => P.time).First().price,
+                                  close = g.OrderBy(P => P.time).Last().price,
+                                  low = g.Min(P => P.price),
+                                  high = g.Max(P => P.price),
+                                  close_amount = g.OrderBy(P => P.time).Last().amount,
+                                  close_time = g.OrderBy(P => P.time).Last().time,
+                                  volume = g.Sum(P => P.amount),
+                                  volume_currency = g.Sum(P => P.total),
+                                  count = g.Count(),
+                                  time = DateTimeOffset.UtcNow,
+                              };
+                    return sql.AsNoTracking().SingleOrDefault();
+                }
+            }
         }
         catch (Exception ex)
         {

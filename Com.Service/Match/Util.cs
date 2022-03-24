@@ -63,11 +63,10 @@ public static class Util
     /// <param name="trigger_side">触发方向</param>
     /// <param name="now">成交时间</param>
     /// <returns></returns>
-    public static Deal CreateDeal(long market, string symbol, Orders bid, Orders ask, decimal price, int amount_places, E_OrderSide trigger_side, List<Orders> orders)
+    public static Deal CreateDeal(long market, string symbol, Orders bid, Orders ask, decimal price, Market info, E_OrderSide trigger_side, List<Orders> orders)
     {
         DateTimeOffset now = DateTimeOffset.UtcNow;
-        decimal min = (decimal)Math.Pow(0.1, (double)amount_places) * price;
-        decimal bid_amount_unsold = Math.Round(bid.amount_unsold / price, amount_places, MidpointRounding.ToNegativeInfinity);
+        decimal bid_amount_unsold = Math.Round(bid.amount_unsold / price / info.amount_multiple, 0) * info.amount_multiple;
         decimal leftover = bid.amount_unsold - (bid_amount_unsold * price);
         decimal amount = 0;
         if (bid_amount_unsold > ask.amount_unsold)
@@ -107,9 +106,10 @@ public static class Util
         {
             orders.Add(ask);
         }
-        if (bid.amount_unsold < min && leftover > 0)
+        if (bid.amount_unsold < info.amount_multiple && leftover > 0)
         {
             bid.trigger_cancel_price = price;
+            bid.state = E_OrderState.partial;
         }
         Deal deal = new Deal()
         {

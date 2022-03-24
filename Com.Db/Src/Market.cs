@@ -49,12 +49,7 @@ public class Market
     /// <value></value>
     public int price_places { get; set; }
     /// <summary>
-    /// 量小数位数
-    /// </summary>
-    /// <value></value>
-    public int amount_places { get; set; }
-    /// <summary>
-    /// 交易量整数倍数
+    /// 交易量最小整数倍数
     /// </summary>
     /// <value></value>
     public decimal amount_multiple { get; set; }

@@ -66,7 +66,7 @@ public static class Util
     public static Deal CreateDeal(long market, string symbol, Orders bid, Orders ask, decimal price, int amount_places, E_OrderSide trigger_side, List<Orders> orders)
     {
         DateTimeOffset now = DateTimeOffset.UtcNow;
-        decimal min = (decimal)Math.Pow(0.1, (double)price);
+        decimal min = (decimal)Math.Pow(0.1, (double)amount_places) * price;
         decimal amount = 0;
         decimal bid_amount_unsold = bid.amount_unsold / price;
         if (bid_amount_unsold > ask.amount_unsold)

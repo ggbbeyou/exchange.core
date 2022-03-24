@@ -143,10 +143,64 @@ public class TestController : Controller
             fee_market = 0.002m,
             fee_limit = 0.002m,
         };
-        
-
         this.db.Vip.Add(vip1);
         this.db.Vip.Add(vip2);
+
+        for (int i = 0; i < 10; i++)
+        {
+            Users user = new Users()
+            {
+                user_id = FactoryService.instance.constant.worker.NextId(),
+                user_name = "user" + i,
+                password = "123456",
+                disabled = false,
+                transaction = true,
+                withdrawal = false,
+                phone = null,
+                email = null,
+                vip = vip1.id,
+            };
+            this.db.Users.Add(user);
+            Wallet wallet_usdt = new Wallet()
+            {
+                wallet_id = FactoryService.instance.constant.worker.NextId(),
+                wallet_type = E_WalletType.main,
+                user_id = user.user_id,
+                user_name = user.user_name,
+                coin_id = usdt.coin_id,
+                coin_name = usdt.coin_name,
+                total = 5_000_000,
+                available = 5_000_000,
+                freeze = 0,
+            };
+            Wallet wallet_btc = new Wallet()
+            {
+                wallet_id = FactoryService.instance.constant.worker.NextId(),
+                wallet_type = E_WalletType.main,
+                user_id = user.user_id,
+                user_name = user.user_name,
+                coin_id = btc.coin_id,
+                coin_name = btc.coin_name,
+                total = 10_000,
+                available = 10_000,
+                freeze = 0,
+            };
+            Wallet wallet_eth = new Wallet()
+            {
+                wallet_id = FactoryService.instance.constant.worker.NextId(),
+                wallet_type = E_WalletType.main,
+                user_id = user.user_id,
+                user_name = user.user_name,
+                coin_id = eth.coin_id,
+                coin_name = eth.coin_name,
+                total = 50_000,
+                available = 50_000,
+                freeze = 0,
+            };
+            this.db.Wallet.Add(wallet_usdt);
+            this.db.Wallet.Add(wallet_btc);
+            this.db.Wallet.Add(wallet_eth);
+        }
         return Json(this.db.SaveChanges());
     }
 

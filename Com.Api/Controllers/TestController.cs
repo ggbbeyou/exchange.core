@@ -224,9 +224,21 @@ public class TestController : Controller
                 E_OrderSide side = FactoryService.instance.constant.random.Next(0, 2) == 0 ? E_OrderSide.buy : E_OrderSide.sell;
                 E_OrderType type = FactoryService.instance.constant.random.Next(0, 2) == 0 ? E_OrderType.price_limit : E_OrderType.price_market;
                 decimal amount = (decimal)FactoryService.instance.constant.random.NextDouble();
-                decimal price = (decimal)FactoryService.instance.constant.random.NextDouble();
-                price = Math.Round(price, market.price_places);
-
+                decimal? price = (decimal)FactoryService.instance.constant.random.NextDouble();
+                price = Math.Round(price ?? 0, market.price_places);
+                if (type == E_OrderType.price_market)
+                {
+                    price = null;
+                    if (side == E_OrderSide.buy)
+                    {
+                        amount = Math.Round(amount, market.price_places);
+                    }
+                }
+                if (side == E_OrderSide.sell)
+                {
+                    amount = Math.Round(amount / market.amount_multiple, 0, MidpointRounding.ToNegativeInfinity) * market.amount_multiple;
+                    amount = (decimal)(double)amount;
+                }
                 ReqOrder order = new ReqOrder()
                 {
                     client_id = FactoryService.instance.constant.worker.NextId().ToString(),
@@ -239,19 +251,7 @@ public class TestController : Controller
                     trigger_cancel_price = 0,
                     data = null,
                 };
-                if (type == E_OrderType.price_market)
-                {
-                    order.price = null;
-                    if (side == E_OrderSide.buy)
-                    {
-                        amount = Math.Round(amount, market.price_places);
-                    }
-                }
-                if (side == E_OrderSide.sell)
-                {
-                    amount = Math.Round(amount / market.amount_multiple, 0, MidpointRounding.ToNegativeInfinity) * market.amount_multiple;
-                    order.amount = (decimal)(double)amount;
-                }
+
                 reqOrders.Add(order);
             }
             order_service.PlaceOrder(market.symbol, user.user_id, reqOrders);

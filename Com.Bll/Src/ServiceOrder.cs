@@ -87,7 +87,7 @@ public class ServiceOrder
             res.message = "市价买单,总额(amount)不能小于0";
             return res;
         }
-        if (market_buy.Exists(P => Math.Round(P.amount ?? 0, info.price_places, MidpointRounding.ToNegativeInfinity) == P.amount))
+        if (market_buy.Exists(P => Math.Round(P.amount ?? 0, info.price_places, MidpointRounding.ToNegativeInfinity) != P.amount))
         {
             res.code = E_Res_Code.field_error;
             res.message = $"市价买单,总额(amount)精度不对,总额小数位:{info.price_places}";

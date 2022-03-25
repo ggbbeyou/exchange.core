@@ -30,6 +30,7 @@ using Com.Db;
 using Com.Api.Sdk.Enum;
 using Com.Db.Model;
 using Com.Service.Models;
+using Com.Bll;
 
 namespace Com.Service.Match;
 
@@ -227,7 +228,8 @@ public class MatchCore
         List<Orders> orders = new List<Orders>();
         List<Deal> deals = new List<Deal>();
         List<Orders> cancels = new List<Orders>();
-        if (order.market != this.model.info.market || order.amount <= 0 || order.amount_unsold <= 0 || order.state == E_OrderState.completed || order.state == E_OrderState.cancel)
+        decimal? price = null;
+        if (order.market != this.model.info.market || order.amount_unsold <= 0 || order.state == E_OrderState.completed || order.state == E_OrderState.cancel)
         {
             return (orders, deals, cancels);
         }
@@ -237,40 +239,36 @@ public class MatchCore
             if (order.type == E_OrderType.price_market)
             {
                 //市价买单与市价卖市撮合
-                if (order.amount_unsold > 0 && market_ask.Count() > 0)
+                if ((order.state == E_OrderState.unsold || order.state == E_OrderState.partial) && this.market_ask.Count() > 0)
                 {
-                    for (int i = 0; i < market_ask.Count; i++)
+                    for (int i = 0; i < this.market_ask.Count; i++)
                     {
-                        Deal deal = Util.CreateDeal(this.model.info.market, this.model.info.symbol, order, market_ask[i], this.last_price, this.model.info, E_OrderSide.buy, orders);
-                        deals.Add(deal);
-                        cancels.AddRange(Trigger(deal.price));
-                        if (order.amount_unsold <= 0)
+                        price = CreateDeal(order, this.market_ask[i], this.last_price, E_OrderSide.buy, orders, deals, cancels);
+                        if (order.state == E_OrderState.completed || order.state == E_OrderState.cancel)
                         {
                             break;
                         }
                     }
-                    market_ask.RemoveAll(P => P.state == E_OrderState.completed);
+                    this.market_ask.RemoveAll(P => P.state == E_OrderState.completed || P.state == E_OrderState.cancel);
                 }
                 //市价买单与限价卖单撮合
-                if (order.amount_unsold > 0 && fixed_ask.Count() > 0)
+                if ((order.state == E_OrderState.unsold || order.state == E_OrderState.partial) && this.fixed_ask.Count() > 0)
                 {
-                    for (int i = 0; i < fixed_ask.Count; i++)
+                    for (int i = 0; i < this.fixed_ask.Count; i++)
                     {
-                        Deal deal = Util.CreateDeal(this.model.info.market, this.model.info.symbol, order, fixed_ask[i], fixed_ask[i].price ?? 0, this.model.info, E_OrderSide.buy, orders);
-                        deals.Add(deal);
-                        cancels.AddRange(Trigger(deal.price));
-                        this.last_price = fixed_ask[i].price ?? 0;
-                        if (order.amount_unsold <= 0)
+                        price = CreateDeal(order, this.fixed_ask[i], this.fixed_ask[i].price ?? 0, E_OrderSide.buy, orders, deals, cancels);
+                        this.last_price = price ?? this.last_price;
+                        if (order.state == E_OrderState.completed || order.state == E_OrderState.cancel)
                         {
                             break;
                         }
                     }
-                    fixed_ask.RemoveAll(P => P.state == E_OrderState.completed);
+                    this.fixed_ask.RemoveAll(P => P.state == E_OrderState.completed || P.state == E_OrderState.cancel);
                 }
                 //市价买单没成交部分添加到市价买单最后,(时间优先原则)
-                if (order.amount_unsold > 0)
+                if (order.state == E_OrderState.unsold || order.state == E_OrderState.partial)
                 {
-                    market_bid.Add(order);
+                    this.market_bid.Add(order);
                 }
             }
             else if (order.type == E_OrderType.price_limit)
@@ -280,42 +278,36 @@ public class MatchCore
                 {
                     for (int i = 0; i < market_ask.Count; i++)
                     {
-                        Deal deal = Util.CreateDeal(this.model.info.market, this.model.info.symbol, order, market_ask[i], order.price ?? 0, this.model.info, E_OrderSide.buy, orders);
-                        deals.Add(deal);
-                        cancels.AddRange(Trigger(deal.price));
-                        if (order.amount_unsold <= 0)
+                        price = CreateDeal(order, market_ask[i], order.price ?? 0, E_OrderSide.buy, orders, deals, cancels);
+                        if (order.state == E_OrderState.completed || order.state == E_OrderState.cancel)
                         {
                             break;
                         }
                     }
-                    this.last_price = order.price ?? 0;
-                    market_ask.RemoveAll(P => P.state == E_OrderState.completed);
+                    this.last_price = price ?? this.last_price;
+                    market_ask.RemoveAll(P => P.state == E_OrderState.completed || P.state == E_OrderState.cancel);
                 }
                 //限价买单与限价卖单撮合
                 if (order.amount_unsold > 0 && fixed_ask.Count() > 0)
                 {
                     for (int i = 0; i < fixed_ask.Count; i++)
                     {
-                        //使用撮合价规则
-                        decimal new_price = Util.GetNewPrice(order.price ?? 0, fixed_ask[i].price ?? 0, this.last_price);
+                        decimal new_price = GetNewPrice(order.price ?? 0, fixed_ask[i].price ?? 0, this.last_price);
                         if (new_price <= 0)
                         {
                             break;
                         }
-                        Deal deal = Util.CreateDeal(this.model.info.market, this.model.info.symbol, order, fixed_ask[i], new_price, this.model.info, E_OrderSide.buy, orders);
-                        deals.Add(deal);
-                        cancels.AddRange(Trigger(deal.price));
-                        this.last_price = new_price;
-                        //量全部处理完了
-                        if (order.amount_unsold <= 0)
+                        price = CreateDeal(order, fixed_ask[i], new_price, E_OrderSide.buy, orders, deals, cancels);
+                        this.last_price = price ?? this.last_price;
+                        if (order.state == E_OrderState.completed || order.state == E_OrderState.cancel)
                         {
                             break;
                         }
                     }
-                    fixed_ask.RemoveAll(P => P.state == E_OrderState.completed);
+                    fixed_ask.RemoveAll(P => P.state == E_OrderState.completed || P.state == E_OrderState.cancel);
                 }
                 //限价买单没成交部分添加到限价买单相应的位置,(价格优先,时间优先原则)
-                if (order.amount_unsold > 0)
+                if (order.state == E_OrderState.unsold || order.state == E_OrderState.partial)
                 {
                     fixed_bid.Add(order);
                     fixed_bid = fixed_bid.OrderByDescending(P => P.price).ThenBy(P => P.create_time).ToList();
@@ -332,34 +324,30 @@ public class MatchCore
                     //市价卖单与市价买单撮合
                     for (int i = 0; i < market_bid.Count; i++)
                     {
-                        Deal deal = Util.CreateDeal(this.model.info.market, this.model.info.symbol, market_bid[i], order, this.last_price, this.model.info, E_OrderSide.sell, orders);
-                        deals.Add(deal);
-                        cancels.AddRange(Trigger(deal.price));
-                        if (order.amount_unsold <= 0)
+                        price = CreateDeal(market_bid[i], order, this.last_price, E_OrderSide.sell, orders, deals, cancels);
+                        if (order.state == E_OrderState.completed || order.state == E_OrderState.cancel)
                         {
                             break;
                         }
                     }
-                    market_bid.RemoveAll(P => P.state == E_OrderState.completed);
+                    market_bid.RemoveAll(P => P.state == E_OrderState.completed || P.state == E_OrderState.cancel);
                 }
                 //市价卖单与限价买单撮合
                 if (order.amount_unsold > 0 && fixed_bid.Count() > 0)
                 {
                     for (int i = 0; i < fixed_bid.Count; i++)
                     {
-                        Deal deal = Util.CreateDeal(this.model.info.market, this.model.info.symbol, fixed_bid[i], order, fixed_bid[i].price ?? 0, this.model.info, E_OrderSide.sell, orders);
-                        deals.Add(deal);
-                        cancels.AddRange(Trigger(deal.price));
-                        this.last_price = fixed_bid[i].price ?? 0;
-                        if (order.amount_unsold <= 0)
+                        price = CreateDeal(fixed_bid[i], order, fixed_bid[i].price ?? 0, E_OrderSide.sell, orders, deals, cancels);
+                        this.last_price = price ?? this.last_price;
+                        if (order.state == E_OrderState.completed || order.state == E_OrderState.cancel)
                         {
                             break;
                         }
                     }
-                    fixed_bid.RemoveAll(P => P.state == E_OrderState.completed);
+                    fixed_bid.RemoveAll(P => P.state == E_OrderState.completed || P.state == E_OrderState.cancel);
                 }
                 //市价卖单没成交部分添加到市价卖单最后,(时间优先原则)
-                if (order.amount_unsold > 0)
+                if (order.state == E_OrderState.unsold || order.state == E_OrderState.partial)
                 {
                     market_ask.Add(order);
                 }
@@ -371,16 +359,14 @@ public class MatchCore
                 {
                     for (int i = 0; i < market_bid.Count; i++)
                     {
-                        Deal deal = Util.CreateDeal(this.model.info.market, this.model.info.symbol, market_bid[i], order, order.price ?? 0, this.model.info, E_OrderSide.sell, orders);
-                        deals.Add(deal);
-                        cancels.AddRange(Trigger(deal.price));
-                        if (order.amount_unsold <= 0)
+                        price = CreateDeal(market_bid[i], order, order.price ?? 0, E_OrderSide.sell, orders, deals, cancels);
+                        if (order.state == E_OrderState.completed || order.state == E_OrderState.cancel)
                         {
                             break;
                         }
                     }
-                    this.last_price = order.price ?? 0;
-                    market_bid.RemoveAll(P => P.state == E_OrderState.completed);
+                    this.last_price = price ?? this.last_price;
+                    market_bid.RemoveAll(P => P.state == E_OrderState.completed || P.state == E_OrderState.cancel);
                 }
                 //限价卖单与限价买单撮合
                 if (order.amount_unsold > 0 && fixed_bid.Count() > 0)
@@ -388,39 +374,169 @@ public class MatchCore
                     for (int i = 0; i < fixed_bid.Count; i++)
                     {
                         //使用撮合价规则
-                        decimal new_price = Util.GetNewPrice(fixed_bid[i].price ?? 0, order.price ?? 0, this.last_price);
+                        decimal new_price = GetNewPrice(fixed_bid[i].price ?? 0, order.price ?? 0, this.last_price);
                         if (new_price <= 0)
                         {
                             break;
                         }
-                        Deal deal = Util.CreateDeal(this.model.info.market, this.model.info.symbol, fixed_bid[i], order, new_price, this.model.info, E_OrderSide.sell, orders);
-                        deals.Add(deal);
-                        cancels.AddRange(Trigger(deal.price));
-                        this.last_price = new_price;
-                        if (order.amount_unsold <= 0)
+                        price = CreateDeal(fixed_bid[i], order, new_price, E_OrderSide.sell, orders, deals, cancels);
+                        this.last_price = price ?? this.last_price;
+                        if (order.state == E_OrderState.completed || order.state == E_OrderState.cancel)
                         {
                             break;
                         }
                     }
-                    fixed_bid.RemoveAll(P => P.state == E_OrderState.completed);
+                    fixed_bid.RemoveAll(P => P.state == E_OrderState.completed || P.state == E_OrderState.cancel);
                 }
                 //限价卖单没成交部分添加到限价卖单相应的位置,(价格优先,时间优先原则)
-                if (order.amount_unsold > 0)
+                if (order.state == E_OrderState.unsold || order.state == E_OrderState.partial)
                 {
                     fixed_ask.Add(order);
                     fixed_ask = fixed_ask.OrderBy(P => P.price).ThenBy(P => P.create_time).ToList();
                 }
             }
         }
-        int a = deals.Count;
-        int b = deals.Select(P => P.trade_id).Distinct().Count();
-        if (a != b)
-        {
-
-        }
         return (orders, deals, cancels);
     }
 
+    /// <summary>
+    /// 创建成交
+    /// </summary>
+    /// <param name="bid">买单</param>
+    /// <param name="ask">卖单</param>
+    /// <param name="price">成交价</param>
+    /// <param name="trigger_side">触发方向</param>
+    /// <param name="orders">影响的订单</param>
+    /// <param name="deals">生成成交记录</param>
+    /// <param name="cancels">自动撤单</param>
+    /// <returns>最新成交价</returns>
+    public decimal? CreateDeal(Orders bid, Orders ask, decimal price, E_OrderSide trigger_side, List<Orders> orders, List<Deal> deals, List<Orders> cancels)
+    {
+        if (price <= 0 || bid.state == E_OrderState.cancel || bid.state == E_OrderState.completed || ask.state == E_OrderState.cancel || ask.state == E_OrderState.completed)
+        {
+            return null;
+        }
+        DateTimeOffset now = DateTimeOffset.UtcNow;
+        decimal bid_amount_unsold = Math.Round(bid.amount_unsold / price / this.model.info.amount_multiple, 0, MidpointRounding.ToNegativeInfinity) * this.model.info.amount_multiple;
+        decimal leftover = bid.amount_unsold - (bid_amount_unsold * price);
+        decimal amount = 0;
+        if (bid_amount_unsold > ask.amount_unsold)
+        {
+            amount = ask.amount_unsold;
+            ask.state = E_OrderState.completed;
+            bid.state = E_OrderState.partial;
+        }
+        else if (bid_amount_unsold < ask.amount_unsold)
+        {
+            amount = bid_amount_unsold;
+            bid.state = E_OrderState.completed;
+            ask.state = E_OrderState.partial;
+        }
+        else if (bid_amount_unsold == ask.amount_unsold)
+        {
+            amount = bid_amount_unsold;
+            bid.state = E_OrderState.completed;
+            ask.state = E_OrderState.completed;
+        }
+        if (amount <= 0)
+        {
+            return null;
+        }
+        bid.amount_unsold -= amount * price;
+        bid.amount_done += amount * price;
+        bid.deal_last_time = now;
+        if (bid.type == E_OrderType.price_market)
+        {
+            bid.amount += amount;
+            bid.price = bid.amount_done / bid.amount;
+        }
+        ask.amount_unsold -= amount;
+        ask.amount_done += amount;
+        ask.deal_last_time = now;
+        Deal deal = new Deal()
+        {
+            trade_id = FactoryService.instance.constant.worker.NextId(),
+            market = this.model.info.market,
+            symbol = this.model.info.symbol,
+            price = price,
+            amount = amount,
+            total = amount * price,
+            trigger_side = trigger_side,
+            bid_id = bid.order_id,
+            bid_uid = bid.uid,
+            bid_amount_unsold = bid.amount_unsold,
+            bid_amount_done = bid.amount_done,
+            ask_id = ask.order_id,
+            ask_uid = ask.uid,
+            ask_amount_unsold = ask.amount_unsold,
+            ask_amount_done = ask.amount_done,
+            fee_rate_buy = bid.fee_rate,
+            fee_rate_sell = ask.fee_rate,
+            time = now,
+        };
+        deals.Add(deal);
+        if (!orders.Exists(P => P.order_id == bid.order_id))
+        {
+            orders.Add(bid);
+        }
+        if (!orders.Exists(P => P.order_id == ask.order_id))
+        {
+            orders.Add(ask);
+        }
+        if (bid.amount_unsold / price < this.model.info.amount_multiple || bid.amount_unsold == leftover)
+        {
+            bid.trigger_cancel_price = price;
+            bid.state = E_OrderState.cancel;
+            cancels.Add(bid);
+        }
+        if (ask.amount_unsold < this.model.info.amount_multiple)
+        {
+            ask.trigger_cancel_price = price;
+            ask.state = E_OrderState.cancel;
+            cancels.Add(ask);
+        }
+        return price;
+    }
+
+    /// <summary>
+    /// 获取最新成交价
+    /// 撮合价格
+    /// 买入价:A,卖出价:B,前一价:C,最新价:D
+    /// 前提:A>=B
+    /// 规则:
+    /// A<=C    D=A
+    /// B>=C    D=B
+    /// B<C<A   D=C
+    ///价格优先,时间优先
+    /// </summary>
+    /// <param name="bid">买入价</param>
+    /// <param name="ask">卖出价</param>
+    /// <param name="last">最后价格</param>
+    /// <returns>最新价</returns>
+    public decimal GetNewPrice(decimal bid, decimal ask, decimal last)
+    {
+        if (bid == 0 || ask == 0 || last == 0)
+        {
+            return 0;
+        }
+        if (bid < ask)
+        {
+            return 0;
+        }
+        if (bid <= last)
+        {
+            return bid;
+        }
+        else if (ask >= last)
+        {
+            return ask;
+        }
+        else if (ask < last && last < bid)
+        {
+            return last;
+        }
+        return 0;
+    }
 
 
 }

@@ -84,6 +84,46 @@ public class MatchCore
     }
 
     /// <summary>
+    /// 获取最新成交价
+    /// 撮合价格
+    /// 买入价:A,卖出价:B,前一价:C,最新价:D
+    /// 前提:A>=B
+    /// 规则:
+    /// A<=C    D=A
+    /// B>=C    D=B
+    /// B<C<A   D=C
+    ///价格优先,时间优先
+    /// </summary>
+    /// <param name="bid">买入价</param>
+    /// <param name="ask">卖出价</param>
+    /// <param name="last">最后价格</param>
+    /// <returns>最新价</returns>
+    public decimal GetNewPrice(decimal bid, decimal ask, decimal last)
+    {
+        if (bid == 0 || ask == 0 || last == 0)
+        {
+            return 0;
+        }
+        if (bid < ask)
+        {
+            return 0;
+        }
+        if (bid <= last)
+        {
+            return bid;
+        }
+        else if (ask >= last)
+        {
+            return ask;
+        }
+        else if (ask < last && last < bid)
+        {
+            return last;
+        }
+        return 0;
+    }
+
+    /// <summary>
     /// 撤消订单
     /// </summary>
     /// <param name="order_id">订单ID</param>
@@ -171,33 +211,6 @@ public class MatchCore
         this.market_ask.Clear();
         this.fixed_bid.Clear();
         this.fixed_ask.Clear();
-        return cancel;
-    }
-
-    /// <summary>
-    /// 价格变动后触发后续动作(触发撤单)
-    /// </summary>
-    /// <param name="price">最后成交价格</param>
-    /// <returns></returns>
-    public List<Orders> Trigger(decimal price)
-    {
-        List<Orders> cancel = new List<Orders>();
-        List<Orders> bid_market = this.market_bid.Where(P => (P.state == E_OrderState.unsold || P.state == E_OrderState.partial) && P.trigger_cancel_price > 0 && P.trigger_cancel_price >= price).ToList();
-        this.market_bid.RemoveAll(P => bid_market.Select(P => P.order_id).Contains(P.order_id));
-        bid_market.ForEach(P => { P.state = E_OrderState.cancel; P.deal_last_time = DateTimeOffset.UtcNow; P.remarks = "买单高于撤单触发价,或市价买价余额不足时,系统自动撤单"; });
-        cancel.AddRange(bid_market);
-        List<Orders> ask_market = this.market_ask.Where(P => (P.state == E_OrderState.unsold || P.state == E_OrderState.partial) && P.trigger_cancel_price > 0 && P.trigger_cancel_price <= price).ToList();
-        this.market_ask.RemoveAll(P => ask_market.Select(P => P.order_id).Contains(P.order_id));
-        ask_market.ForEach(P => { P.state = E_OrderState.cancel; P.deal_last_time = DateTimeOffset.UtcNow; P.remarks = "卖单已低于撤单触发价,系统自动撤单"; });
-        cancel.AddRange(ask_market);
-        List<Orders> bid_fixed = this.fixed_bid.Where(P => (P.state == E_OrderState.unsold || P.state == E_OrderState.partial) && P.trigger_cancel_price > 0 && P.trigger_cancel_price >= price).ToList();
-        this.fixed_bid.RemoveAll(P => bid_fixed.Select(P => P.order_id).Contains(P.order_id));
-        bid_fixed.ForEach(P => { P.state = E_OrderState.cancel; P.deal_last_time = DateTimeOffset.UtcNow; P.remarks = "买单高于撤单触发价,系统自动撤单"; });
-        cancel.AddRange(bid_fixed);
-        List<Orders> ask_fixed = this.fixed_ask.Where(P => (P.state == E_OrderState.unsold || P.state == E_OrderState.partial) && P.trigger_cancel_price > 0 && P.trigger_cancel_price <= price).ToList();
-        this.fixed_ask.RemoveAll(P => ask_fixed.Select(P => P.order_id).Contains(P.order_id));
-        ask_fixed.ForEach(P => { P.state = E_OrderState.cancel; P.deal_last_time = DateTimeOffset.UtcNow; P.remarks = "卖单已低于撤单触发价,系统自动撤单"; });
-        cancel.AddRange(ask_fixed);
         return cancel;
     }
 
@@ -495,45 +508,7 @@ public class MatchCore
         return price;
     }
 
-    /// <summary>
-    /// 获取最新成交价
-    /// 撮合价格
-    /// 买入价:A,卖出价:B,前一价:C,最新价:D
-    /// 前提:A>=B
-    /// 规则:
-    /// A<=C    D=A
-    /// B>=C    D=B
-    /// B<C<A   D=C
-    ///价格优先,时间优先
-    /// </summary>
-    /// <param name="bid">买入价</param>
-    /// <param name="ask">卖出价</param>
-    /// <param name="last">最后价格</param>
-    /// <returns>最新价</returns>
-    public decimal GetNewPrice(decimal bid, decimal ask, decimal last)
-    {
-        if (bid == 0 || ask == 0 || last == 0)
-        {
-            return 0;
-        }
-        if (bid < ask)
-        {
-            return 0;
-        }
-        if (bid <= last)
-        {
-            return bid;
-        }
-        else if (ask >= last)
-        {
-            return ask;
-        }
-        else if (ask < last && last < bid)
-        {
-            return last;
-        }
-        return 0;
-    }
+
 
 
 }

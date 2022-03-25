@@ -31,7 +31,7 @@ using System.Text;
 using Com.Bll;
 using Com.Db;
 using Com.Api.Sdk.Enum;
-using Com.Db.Model;
+
 using Com.Service.Match;
 using Com.Service.Models;
 using Microsoft.Extensions.DependencyInjection;

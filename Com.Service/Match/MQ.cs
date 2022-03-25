@@ -4,7 +4,7 @@ using System.Text;
 using Com.Bll;
 using Com.Db;
 using Com.Api.Sdk.Enum;
-using Com.Db.Model;
+
 using Com.Service.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -13,6 +13,7 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using Snowflake;
 using Com.Api.Sdk.Models;
+using Com.Bll.Models;
 
 namespace Com.Service.Match;
 

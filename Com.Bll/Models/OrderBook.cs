@@ -1,7 +1,7 @@
 using System;
 using Com.Api.Sdk.Enum;
 
-namespace Com.Db.Model;
+namespace Com.Bll.Models;
 
 /// <summary>
 /// 盘口

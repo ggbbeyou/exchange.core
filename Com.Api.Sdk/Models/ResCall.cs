@@ -2,7 +2,7 @@
 
 using Com.Api.Sdk.Enum;
 
-namespace Com.Db.Model;
+namespace Com.Api.Sdk.Models;
 
 /// <summary>
 /// web调用结果

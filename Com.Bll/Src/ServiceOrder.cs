@@ -1,6 +1,6 @@
 using Com.Db;
 using Com.Api.Sdk.Enum;
-using Com.Db.Model;
+
 using Newtonsoft.Json;
 using System.Text;
 using RabbitMQ.Client;

@@ -1,7 +1,6 @@
 using System.Linq.Expressions;
 using Com.Db;
 using Com.Api.Sdk.Enum;
-using Com.Db.Model;
 using LinqKit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

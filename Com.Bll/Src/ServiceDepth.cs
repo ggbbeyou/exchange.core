@@ -1,10 +1,11 @@
 using Com.Db;
 using Com.Api.Sdk.Enum;
-using Com.Db.Model;
+
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using StackExchange.Redis;
 using Com.Api.Sdk.Models;
+using Com.Bll.Models;
 
 namespace Com.Bll;
 

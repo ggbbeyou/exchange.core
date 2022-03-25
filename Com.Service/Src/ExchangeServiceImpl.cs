@@ -1,7 +1,7 @@
 using Com.Bll;
 using Com.Db;
 using Com.Api.Sdk.Enum;
-using Com.Db.Model;
+
 using Grpc.Core;
 using GrpcExchange;
 using Microsoft.Extensions.Configuration;
@@ -9,6 +9,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Newtonsoft.Json;
+using Com.Api.Sdk.Models;
 
 namespace Com.Service;
 

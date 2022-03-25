@@ -4,7 +4,7 @@ using Com.Api.Models;
 using Com.Bll;
 using Com.Db;
 using Com.Api.Sdk.Enum;
-using Com.Db.Model;
+
 using System.Net.WebSockets;
 using Newtonsoft.Json;
 using RabbitMQ.Client;

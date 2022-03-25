@@ -2,7 +2,7 @@
 
 using Com.Api.Sdk.Enum;
 
-namespace Com.Db.Model;
+namespace Com.Api.Sdk.Models;
 
 /// <summary>
 /// 请求操作动作

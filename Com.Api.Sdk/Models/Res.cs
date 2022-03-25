@@ -1,7 +1,7 @@
 using System;
 using Com.Api.Sdk.Enum;
 
-namespace Com.Db.Model;
+namespace Com.Api.Sdk.Models;
 
 /// <summary>
 /// 响应操作动作

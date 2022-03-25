@@ -1,7 +1,7 @@
 using System.Text;
 using Com.Db;
 using Com.Api.Sdk.Enum;
-using Com.Db.Model;
+
 using Grpc.Net.Client;
 using GrpcExchange;
 using Microsoft.Extensions.Configuration;
@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using StackExchange.Redis;
+using Com.Api.Sdk.Models;
 
 namespace Com.Bll;
 

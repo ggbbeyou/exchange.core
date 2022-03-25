@@ -28,9 +28,10 @@
 
 using Com.Db;
 using Com.Api.Sdk.Enum;
-using Com.Db.Model;
+
 using Com.Service.Models;
 using Com.Bll;
+using Com.Bll.Models;
 
 namespace Com.Service.Match;
 

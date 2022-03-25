@@ -214,7 +214,7 @@ public class TestController : Controller
     {
         List<Users> users = this.db.Users.ToList();
         List<Market> markets = this.db.Market.ToList();
-        for (int i = 0; i < 10000; i++)
+        for (int i = 0; i < 10; i++)
         {
             Users user = users[FactoryService.instance.constant.random.Next(0, 10)];
             Market market = markets[FactoryService.instance.constant.random.Next(0, 2)];

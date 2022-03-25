@@ -274,7 +274,7 @@ public class MatchCore
             else if (order.type == E_OrderType.price_limit)
             {
                 //限价买单与市价卖单撮合
-                if (order.amount_unsold > 0 && market_ask.Count() > 0)
+                if ((order.state == E_OrderState.unsold || order.state == E_OrderState.partial) && market_ask.Count() > 0)
                 {
                     for (int i = 0; i < market_ask.Count; i++)
                     {
@@ -288,7 +288,7 @@ public class MatchCore
                     market_ask.RemoveAll(P => P.state == E_OrderState.completed || P.state == E_OrderState.cancel);
                 }
                 //限价买单与限价卖单撮合
-                if (order.amount_unsold > 0 && fixed_ask.Count() > 0)
+                if ((order.state == E_OrderState.unsold || order.state == E_OrderState.partial) && fixed_ask.Count() > 0)
                 {
                     for (int i = 0; i < fixed_ask.Count; i++)
                     {
@@ -319,7 +319,7 @@ public class MatchCore
             //先市价成交,再限价成交
             if (order.type == E_OrderType.price_market)
             {
-                if (order.amount_unsold > 0 && market_bid.Count() > 0)
+                if ((order.state == E_OrderState.unsold || order.state == E_OrderState.partial) && market_bid.Count() > 0)
                 {
                     //市价卖单与市价买单撮合
                     for (int i = 0; i < market_bid.Count; i++)
@@ -333,7 +333,7 @@ public class MatchCore
                     market_bid.RemoveAll(P => P.state == E_OrderState.completed || P.state == E_OrderState.cancel);
                 }
                 //市价卖单与限价买单撮合
-                if (order.amount_unsold > 0 && fixed_bid.Count() > 0)
+                if ((order.state == E_OrderState.unsold || order.state == E_OrderState.partial) && fixed_bid.Count() > 0)
                 {
                     for (int i = 0; i < fixed_bid.Count; i++)
                     {
@@ -355,7 +355,7 @@ public class MatchCore
             else if (order.type == E_OrderType.price_limit)
             {
                 //限价卖单与市价买市撮合
-                if (order.amount_unsold > 0 && market_bid.Count() > 0)
+                if ((order.state == E_OrderState.unsold || order.state == E_OrderState.partial) && market_bid.Count() > 0)
                 {
                     for (int i = 0; i < market_bid.Count; i++)
                     {
@@ -369,11 +369,10 @@ public class MatchCore
                     market_bid.RemoveAll(P => P.state == E_OrderState.completed || P.state == E_OrderState.cancel);
                 }
                 //限价卖单与限价买单撮合
-                if (order.amount_unsold > 0 && fixed_bid.Count() > 0)
+                if ((order.state == E_OrderState.unsold || order.state == E_OrderState.partial) && fixed_bid.Count() > 0)
                 {
                     for (int i = 0; i < fixed_bid.Count; i++)
                     {
-                        //使用撮合价规则
                         decimal new_price = GetNewPrice(fixed_bid[i].price ?? 0, order.price ?? 0, this.last_price);
                         if (new_price <= 0)
                         {

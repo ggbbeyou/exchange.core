@@ -67,7 +67,17 @@ public class OrderController : Controller
     public IActionResult PlaceOrder(string symbol, List<ReqOrder> orders)
     {
         //判断用户api是否有交易权限
-        return Json(service_order.PlaceOrder(symbol, user_id, orders));
+        ResCall<List<Orders>> res = service_order.PlaceOrder(symbol, user_id, orders);
+        ResCall<List<ResOrder>> result = new ResCall<List<ResOrder>>()
+        {
+            success = res.success,
+            code = res.code,
+            message = res.message,
+            op = res.op,
+            market = res.market,
+            data = res.data.ConvertAll(P => (ResOrder)P)
+        };
+        return Json(result);
     }
 
     /// <summary>

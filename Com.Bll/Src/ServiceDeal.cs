@@ -61,22 +61,7 @@ public class ServiceDeal
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
-                List<Deal> temp = db.Deal.Where(P => deals.Select(Q => Q.trade_id).Contains(P.trade_id)).ToList();
-                foreach (var deal in deals)
-                {
-                    var temp_deal = temp.FirstOrDefault(P => P.trade_id == deal.trade_id);
-                    if (temp_deal != null)
-                    {
-                        temp_deal.price = deal.price;
-                        temp_deal.amount = deal.amount;
-                        temp_deal.total = deal.total;
-                        temp_deal.time = deal.time;
-                    }
-                    else
-                    {
-                        db.Deal.Add(deal);
-                    }
-                }
+                db.Deal.AddRange(deals);
                 return db.SaveChanges();
             }
         }

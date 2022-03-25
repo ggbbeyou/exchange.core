@@ -107,7 +107,7 @@ public class TestController : Controller
             fee_limit_buy = 0.001m,
             fee_limit_sell = 0.003m,
             market_uid = 0,
-            last_price = (decimal)FactoryService.instance.constant.random.NextDouble(),
+            last_price = Math.Round((decimal)FactoryService.instance.constant.random.NextDouble(), 2),
         };
         Market ethusdt = new Market()
         {
@@ -125,7 +125,7 @@ public class TestController : Controller
             fee_limit_buy = 0.001m,
             fee_limit_sell = 0.003m,
             market_uid = 0,
-            last_price = (decimal)FactoryService.instance.constant.random.NextDouble(),
+            last_price = Math.Round((decimal)FactoryService.instance.constant.random.NextDouble(), 2),
         };
         this.db.Market.Add(btcusdt);
         this.db.Market.Add(ethusdt);
@@ -226,6 +226,10 @@ public class TestController : Controller
                 decimal amount = (decimal)FactoryService.instance.constant.random.NextDouble();
                 decimal? price = (decimal)FactoryService.instance.constant.random.NextDouble();
                 price = Math.Round(price ?? 0, market.price_places);
+                if (amount == 0 || price == 0)
+                {
+                    continue;
+                }
                 if (type == E_OrderType.price_market)
                 {
                     price = null;
@@ -234,10 +238,13 @@ public class TestController : Controller
                         amount = Math.Round(amount, market.price_places);
                     }
                 }
+                else if (type == E_OrderType.price_limit)
+                {
+                    amount = Math.Round(amount / market.amount_multiple, 0, MidpointRounding.ToNegativeInfinity) * market.amount_multiple;
+                }
                 if (side == E_OrderSide.sell)
                 {
                     amount = Math.Round(amount / market.amount_multiple, 0, MidpointRounding.ToNegativeInfinity) * market.amount_multiple;
-                    amount = (decimal)(double)amount;
                 }
                 ReqOrder order = new ReqOrder()
                 {

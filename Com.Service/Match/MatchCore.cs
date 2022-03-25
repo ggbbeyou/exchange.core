@@ -166,6 +166,10 @@ public class MatchCore
         cancel.AddRange(this.fixed_bid);
         cancel.AddRange(this.fixed_ask);
         cancel.ForEach(P => { P.state = E_OrderState.cancel; P.deal_last_time = DateTimeOffset.UtcNow; });
+        this.market_bid.Clear();
+        this.market_ask.Clear();
+        this.fixed_bid.Clear();
+        this.fixed_ask.Clear();
         return cancel;
     }
 
@@ -178,15 +182,19 @@ public class MatchCore
     {
         List<Orders> cancel = new List<Orders>();
         List<Orders> bid_market = this.market_bid.Where(P => (P.state == E_OrderState.unsold || P.state == E_OrderState.partial) && P.trigger_cancel_price > 0 && P.trigger_cancel_price >= price).ToList();
+        this.market_bid.RemoveAll(P => bid_market.Select(P => P.order_id).Contains(P.order_id));
         bid_market.ForEach(P => { P.state = E_OrderState.cancel; P.deal_last_time = DateTimeOffset.UtcNow; P.remarks = "买单高于撤单触发价,或市价买价余额不足时,系统自动撤单"; });
         cancel.AddRange(bid_market);
         List<Orders> ask_market = this.market_ask.Where(P => (P.state == E_OrderState.unsold || P.state == E_OrderState.partial) && P.trigger_cancel_price > 0 && P.trigger_cancel_price <= price).ToList();
+        this.market_ask.RemoveAll(P => ask_market.Select(P => P.order_id).Contains(P.order_id));
         ask_market.ForEach(P => { P.state = E_OrderState.cancel; P.deal_last_time = DateTimeOffset.UtcNow; P.remarks = "卖单已低于撤单触发价,系统自动撤单"; });
         cancel.AddRange(ask_market);
         List<Orders> bid_fixed = this.fixed_bid.Where(P => (P.state == E_OrderState.unsold || P.state == E_OrderState.partial) && P.trigger_cancel_price > 0 && P.trigger_cancel_price >= price).ToList();
+        this.fixed_bid.RemoveAll(P => bid_fixed.Select(P => P.order_id).Contains(P.order_id));
         bid_fixed.ForEach(P => { P.state = E_OrderState.cancel; P.deal_last_time = DateTimeOffset.UtcNow; P.remarks = "买单高于撤单触发价,系统自动撤单"; });
         cancel.AddRange(bid_fixed);
         List<Orders> ask_fixed = this.fixed_ask.Where(P => (P.state == E_OrderState.unsold || P.state == E_OrderState.partial) && P.trigger_cancel_price > 0 && P.trigger_cancel_price <= price).ToList();
+        this.fixed_ask.RemoveAll(P => ask_fixed.Select(P => P.order_id).Contains(P.order_id));
         ask_fixed.ForEach(P => { P.state = E_OrderState.cancel; P.deal_last_time = DateTimeOffset.UtcNow; P.remarks = "卖单已低于撤单触发价,系统自动撤单"; });
         cancel.AddRange(ask_fixed);
         return cancel;

@@ -60,8 +60,8 @@ public class OrderController : Controller
     /// <summary>
     /// 挂单
     /// </summary>
-    /// <param name="market"></param>
-    /// <param name="orders"></param>
+    /// <param name="symbol">交易对</param>
+    /// <param name="orders">订单数据</param>
     /// <returns></returns>
     [HttpPost]
     public IActionResult PlaceOrder(string symbol, List<ReqOrder> orders)

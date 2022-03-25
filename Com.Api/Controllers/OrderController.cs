@@ -73,19 +73,19 @@ public class OrderController : Controller
     {
         //判断用户api是否有交易权限
         ResCall<List<ResOrder>> result = new ResCall<List<ResOrder>>();
-        Users? users = user_service.GetUser(uid);
-        if (users == null)
-        {
-            result.code = E_Res_Code.no_user;
-            result.message = "未找到该用户";
-            return Json(result);
-        }
-        if (users.disabled || !users.transaction)
-        {
-            result.code = E_Res_Code.no_permission;
-            result.message = "用户禁止下单";
-            return Json(result);
-        }
+        // Users? users = user_service.GetUser(uid);
+        // if (users == null)
+        // {
+        //     result.code = E_Res_Code.no_user;
+        //     result.message = "未找到该用户";
+        //     return Json(result);
+        // }
+        // if (users.disabled || !users.transaction)
+        // {
+        //     result.code = E_Res_Code.no_permission;
+        //     result.message = "用户禁止下单";
+        //     return Json(result);
+        // }
         ResCall<List<Orders>> res = service_order.PlaceOrder(symbol, uid, orders);
         result = new ResCall<List<ResOrder>>()
         {

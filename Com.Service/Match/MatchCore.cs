@@ -482,15 +482,13 @@ public class MatchCore
         {
             orders.Add(ask);
         }
-        if (bid.state != E_OrderState.completed && (bid.amount_unsold / price < this.model.info.amount_multiple || bid.amount_unsold == leftover))
+        if ((bid.state == E_OrderState.unsold || bid.state == E_OrderState.partial) && ((bid.trigger_cancel_price > 0 && bid.trigger_cancel_price >= price) || bid.amount_unsold / price < this.model.info.amount_multiple || bid.amount_unsold == leftover))
         {
-            bid.trigger_cancel_price = price;
             bid.state = E_OrderState.cancel;
             cancels.Add(bid);
         }
-        if (ask.state != E_OrderState.completed && (ask.amount_unsold < this.model.info.amount_multiple))
+        if ((ask.state == E_OrderState.unsold || ask.state == E_OrderState.partial) && ((bid.trigger_cancel_price > 0 && ask.trigger_cancel_price <= price) || ask.amount_unsold < this.model.info.amount_multiple))
         {
-            ask.trigger_cancel_price = price;
             ask.state = E_OrderState.cancel;
             cancels.Add(ask);
         }

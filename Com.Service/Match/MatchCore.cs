@@ -189,7 +189,7 @@ public class MatchCore
         List<Orders> ask_fixed = this.fixed_ask.Where(P => (P.state == E_OrderState.unsold || P.state == E_OrderState.partial) && P.trigger_cancel_price > 0 && P.trigger_cancel_price <= price).ToList();
         ask_fixed.ForEach(P => { P.state = E_OrderState.cancel; P.deal_last_time = DateTimeOffset.UtcNow; P.remarks = "卖单已低于撤单触发价,系统自动撤单"; });
         cancel.AddRange(ask_fixed);
-        return cancel.ToList();
+        return cancel;
     }
 
     /// <summary>
@@ -403,6 +403,12 @@ public class MatchCore
                     fixed_ask = fixed_ask.OrderBy(P => P.price).ThenBy(P => P.create_time).ToList();
                 }
             }
+        }
+        int a = deals.Count;
+        int b = deals.Select(P => P.trade_id).Distinct().Count();
+        if (a != b)
+        {
+
         }
         return (orders, deals, cancels);
     }

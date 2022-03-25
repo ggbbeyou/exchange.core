@@ -106,10 +106,15 @@ public static class Util
         {
             orders.Add(ask);
         }
-        if (bid.amount_unsold < info.amount_multiple && leftover > 0)
+        if (bid.amount_unsold / price < info.amount_multiple || bid.amount_unsold == leftover)
         {
             bid.trigger_cancel_price = price;
             bid.state = E_OrderState.partial;
+        }
+        if (ask.amount_unsold < info.amount_multiple)
+        {
+            ask.trigger_cancel_price = price;
+            ask.state = E_OrderState.partial;
         }
         Deal deal = new Deal()
         {

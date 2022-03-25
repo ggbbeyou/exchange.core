@@ -31,7 +31,7 @@ public class ServiceMarket
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
-                return db.Market.AsNoTracking().SingleOrDefault(P => P.symbol == symbol);
+                return db.Market.AsNoTracking().FirstOrDefault(P => P.symbol == symbol);
             }
         }
 

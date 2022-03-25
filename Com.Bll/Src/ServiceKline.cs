@@ -48,7 +48,7 @@ public class ServiceKline
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
-                return db.Kline.Where(P => P.market == market && P.type == type).OrderByDescending(P => P.time_start).AsNoTracking().SingleOrDefault();
+                return db.Kline.Where(P => P.market == market && P.type == type).OrderByDescending(P => P.time_start).AsNoTracking().FirstOrDefault();
             }
         }
     }
@@ -631,7 +631,7 @@ public class ServiceKline
                        time_end = g.Last().time,
                        time = DateTimeOffset.UtcNow,
                    };
-        return min1.SingleOrDefault();
+        return min1.FirstOrDefault();
     }
 
 

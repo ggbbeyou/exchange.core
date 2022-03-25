@@ -158,7 +158,7 @@ public class ServiceDeal
                                   time_end = g.OrderBy(P => P.time).Last().time,
                                   time = DateTimeOffset.UtcNow,
                               };
-                    return sql.AsNoTracking().SingleOrDefault();
+                    return sql.AsNoTracking().FirstOrDefault();
                 }
             }
         }
@@ -202,7 +202,7 @@ public class ServiceDeal
                                   count = g.Count(),
                                   time = DateTimeOffset.UtcNow,
                               };
-                    return sql.AsNoTracking().SingleOrDefault();
+                    return sql.AsNoTracking().FirstOrDefault();
                 }
             }
         }

@@ -21,7 +21,7 @@ public class OrderController : Controller
     /// 登录玩家id
     /// </summary>
     /// <value></value>
-    public int user_id
+    public int uid
     {
         get
         {
@@ -33,6 +33,11 @@ public class OrderController : Controller
             return 5;
         }
     }
+    /// <summary>
+    /// 用户服务
+    /// </summary>
+    /// <returns></returns>
+    private ServiceUser user_service = new ServiceUser();
 
     /// <summary>
     /// 交易对基础信息
@@ -67,8 +72,22 @@ public class OrderController : Controller
     public IActionResult PlaceOrder(string symbol, List<ReqOrder> orders)
     {
         //判断用户api是否有交易权限
-        ResCall<List<Orders>> res = service_order.PlaceOrder(symbol, user_id, orders);
-        ResCall<List<ResOrder>> result = new ResCall<List<ResOrder>>()
+        ResCall<List<ResOrder>> result = new ResCall<List<ResOrder>>();
+        Users? users = user_service.GetUser(uid);
+        if (users == null)
+        {
+            result.code = E_Res_Code.no_user;
+            result.message = "未找到该用户";
+            return Json(result);
+        }
+        if (users.disabled || !users.transaction)
+        {
+            result.code = E_Res_Code.no_permission;
+            result.message = "用户禁止下单";
+            return Json(result);
+        }
+        ResCall<List<Orders>> res = service_order.PlaceOrder(symbol, uid, orders);
+        result = new ResCall<List<ResOrder>>()
         {
             success = res.success,
             code = res.code,
@@ -95,7 +114,7 @@ public class OrderController : Controller
         {
             return Json(call_res);
         }
-        ResCall<KeyValuePair<long, List<long>>> res = this.service_order.CancelOrder(market, user_id, type, data);
+        ResCall<KeyValuePair<long, List<long>>> res = this.service_order.CancelOrder(market, uid, type, data);
         return Json(res);
     }
 

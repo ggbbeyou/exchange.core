@@ -108,6 +108,7 @@ public class TestController : Controller
             fee_limit_sell = 0.003m,
             market_uid = 0,
             last_price = Math.Round((decimal)FactoryService.instance.constant.random.NextDouble(), 2),
+            service_url = "http://localhost:8080",
         };
         Market ethusdt = new Market()
         {
@@ -126,6 +127,7 @@ public class TestController : Controller
             fee_limit_sell = 0.003m,
             market_uid = 0,
             last_price = Math.Round((decimal)FactoryService.instance.constant.random.NextDouble(), 2),
+            service_url = "http://localhost:8080",
         };
         this.db.Market.Add(btcusdt);
         this.db.Market.Add(ethusdt);

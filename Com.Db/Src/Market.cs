@@ -88,4 +88,9 @@ public class Market
     /// </summary>
     /// <value></value>
     public decimal last_price { get; set; }
+    /// <summary>
+    /// 服务地址
+    /// </summary>
+    /// <value></value>
+    public string service_url { get; set; } = null!;
 }

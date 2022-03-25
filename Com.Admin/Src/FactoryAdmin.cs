@@ -40,7 +40,7 @@ public class FactoryAdmin
     {
         try
         {
-            GrpcChannel channel = GrpcChannel.ForAddress(FactoryService.instance.constant.config.GetValue<string>("manage_url"));
+            GrpcChannel channel = GrpcChannel.ForAddress(info.service_url);
             var client = new ExchangeService.ExchangeServiceClient(channel);
             ReqCall<string> req = new ReqCall<string>();
             req.op = E_Op.service_get_status;
@@ -67,7 +67,7 @@ public class FactoryAdmin
     {
         try
         {
-            GrpcChannel channel = GrpcChannel.ForAddress(FactoryService.instance.constant.config.GetValue<string>("manage_url"));
+            GrpcChannel channel = GrpcChannel.ForAddress(info.service_url);
             var client = new ExchangeService.ExchangeServiceClient(channel);
             ReqCall<string> req = new ReqCall<string>();
             req.op = E_Op.service_clear_cache;
@@ -94,7 +94,7 @@ public class FactoryAdmin
     {
         try
         {
-            GrpcChannel channel = GrpcChannel.ForAddress(FactoryService.instance.constant.config.GetValue<string>("manage_url"));
+            GrpcChannel channel = GrpcChannel.ForAddress(info.service_url);
             var client = new ExchangeService.ExchangeServiceClient(channel);
             ReqCall<string> req = new ReqCall<string>();
             req.op = E_Op.service_warm_cache;
@@ -121,7 +121,7 @@ public class FactoryAdmin
     {
         try
         {
-            GrpcChannel channel = GrpcChannel.ForAddress(FactoryService.instance.constant.config.GetValue<string>("manage_url"));
+            GrpcChannel channel = GrpcChannel.ForAddress(info.service_url);
             var client = new ExchangeService.ExchangeServiceClient(channel);
             ReqCall<string> req = new ReqCall<string>();
             req.op = E_Op.service_start;
@@ -148,7 +148,7 @@ public class FactoryAdmin
     {
         try
         {
-            GrpcChannel channel = GrpcChannel.ForAddress(FactoryService.instance.constant.config.GetValue<string>("manage_url"));
+            GrpcChannel channel = GrpcChannel.ForAddress(info.service_url);
             var client = new ExchangeService.ExchangeServiceClient(channel);
             ReqCall<string> req = new ReqCall<string>();
             req.op = E_Op.service_stop;

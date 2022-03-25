@@ -162,9 +162,9 @@ public class DbContextEF : DbContext
             o.Property(P => P.market).IsRequired().ValueGeneratedNever().HasColumnType("bigint").HasComment("交易对");
             o.Property(P => P.symbol).HasColumnType("nvarchar").HasMaxLength(20).HasComment("交易对名称");
             o.Property(P => P.coin_id_base).IsRequired().ValueGeneratedNever().HasColumnType("bigint").HasComment("基础币种id");
-            o.Property(P => P.coin_name_base).HasColumnType("nvarchar").HasMaxLength(20).HasComment("基础币种名");
+            o.Property(P => P.coin_name_base).IsRequired().HasColumnType("nvarchar").HasMaxLength(20).HasComment("基础币种名");
             o.Property(P => P.coin_id_quote).IsRequired().ValueGeneratedNever().HasColumnType("bigint").HasComment("报价币种id");
-            o.Property(P => P.coin_name_quote).HasColumnType("nvarchar").HasMaxLength(20).HasComment("报价币种名");
+            o.Property(P => P.coin_name_quote).IsRequired().HasColumnType("nvarchar").HasMaxLength(20).HasComment("报价币种名");
             o.Property(P => P.separator).HasColumnType("nvarchar").HasMaxLength(10).HasComment("分隔符");
             o.Property(P => P.status).IsRequired().HasColumnType("int").HasComment("状态 1:清除缓存,2:预热缓存,3:服务启动,4:服务停止");
             o.Property(P => P.price_places).IsRequired().HasColumnType("int").HasComment("价格小数位数");
@@ -175,6 +175,7 @@ public class DbContextEF : DbContext
             o.Property(P => P.fee_limit_sell).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("限价卖手续费");
             o.Property(P => P.market_uid).IsRequired().HasColumnType("bigint").HasComment("作市账号");
             o.Property(P => P.last_price).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("最后的成交价");
+            o.Property(P => P.service_url).IsRequired().HasColumnType("nvarchar").HasMaxLength(50).HasComment("服务地址");
             o.ToTable(nameof(Market));
         });
         modelBuilder.Entity<Orders>(o =>

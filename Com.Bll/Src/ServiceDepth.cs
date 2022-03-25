@@ -148,6 +148,15 @@ public class ServiceDepth
     }
 
     /// <summary>
+    /// 删除redis中的深度行情
+    /// </summary>
+    /// <param name="market"></param>
+    public void DeleteRedisDepth(long market)
+    {
+        FactoryService.instance.constant.redis.KeyDelete(FactoryService.instance.GetRedisDepth(market));
+    }
+
+    /// <summary>
     /// (部分)深度差异
     /// </summary>
     /// <param name="bid"></param>

@@ -1,3 +1,4 @@
+using Com.Api.Sdk.Enum;
 using Com.Bll;
 using Com.Db;
 using Com.Service.Match;
@@ -64,7 +65,6 @@ public class FactoryMatching
         return info;
     }
 
-
     /// <summary>
     /// 服务:清除所有缓存
     /// </summary>
@@ -72,8 +72,31 @@ public class FactoryMatching
     /// <returns></returns>
     public Market ServiceClearCache(Market info)
     {
+        FactoryService.instance.constant.i_model.ExchangeDelete(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.min1, info.market), false);
+        FactoryService.instance.constant.i_model.ExchangeDelete(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.min5, info.market), false);
+        FactoryService.instance.constant.i_model.ExchangeDelete(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.min15, info.market), false);
+        FactoryService.instance.constant.i_model.ExchangeDelete(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.min30, info.market), false);
+        FactoryService.instance.constant.i_model.ExchangeDelete(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.hour1, info.market), false);
+        FactoryService.instance.constant.i_model.ExchangeDelete(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.hour6, info.market), false);
+        FactoryService.instance.constant.i_model.ExchangeDelete(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.hour12, info.market), false);
+        FactoryService.instance.constant.i_model.ExchangeDelete(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.day1, info.market), false);
+        FactoryService.instance.constant.i_model.ExchangeDelete(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.week1, info.market), false);
+        FactoryService.instance.constant.i_model.ExchangeDelete(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.month1, info.market), false);
+        FactoryService.instance.constant.i_model.ExchangeDelete(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.tickers, info.market), false);
+        FactoryService.instance.constant.i_model.ExchangeDelete(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.trades, info.market), false);
+        FactoryService.instance.constant.i_model.ExchangeDelete(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.books10, info.market), false);
+        FactoryService.instance.constant.i_model.ExchangeDelete(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.books50, info.market), false);
+        FactoryService.instance.constant.i_model.ExchangeDelete(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.books200, info.market), false);
+        FactoryService.instance.constant.i_model.ExchangeDelete(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.books10_inc, info.market), false);
+        FactoryService.instance.constant.i_model.ExchangeDelete(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.books50_inc, info.market), false);
+        FactoryService.instance.constant.i_model.ExchangeDelete(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.books200_inc, info.market), false);
+        FactoryService.instance.constant.i_model.QueueDelete(FactoryService.instance.GetMqOrderPlace(info.market), false, false);
+        FactoryService.instance.constant.i_model.QueueDelete(FactoryService.instance.GetMqOrderCancel(info.market), false, false);
+        FactoryService.instance.constant.i_model.QueueDelete(FactoryService.instance.GetMqOrderDeal(info.market), false, false);
         //交易记录数据从DB同步到Redis 至少保存最近3个月记录
         long delete = this.deal_service.DeleteDeal(info.market, DateTimeOffset.UtcNow.AddMonths(-2));
+        ServiceDepth.instance.DeleteRedisDepth(info.market);
+        kline_service.DeleteRedisKline(info.market);
         return info;
     }
 
@@ -88,6 +111,7 @@ public class FactoryMatching
         DateTimeOffset end = now.AddMilliseconds(-1);
         this.kline_service.DBtoRedised(info.market, info.symbol, end);
         this.kline_service.DBtoRedising(info.market, info.symbol);
+
         return info;
     }
 

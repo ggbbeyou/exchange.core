@@ -634,6 +634,19 @@ public class ServiceKline
         return min1.FirstOrDefault();
     }
 
+    /// <summary>
+    /// 删除redis数据
+    /// </summary>
+    /// <param name="market"></param>
+    public void DeleteRedisKline(long market)
+    {
+        FactoryService.instance.constant.redis.KeyDelete(FactoryService.instance.GetRedisKlineing(market));
+        foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
+        {
+            FactoryService.instance.constant.redis.KeyDelete(FactoryService.instance.GetRedisKline(market, cycle));
+        }
+    }
+
 
 
 }

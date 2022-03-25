@@ -22,11 +22,6 @@ public class FactoryAdmin
     /// </summary>
     /// <returns></returns>
     public static readonly FactoryAdmin instance = new FactoryAdmin();
-    /// <summary>
-    /// 常用接口
-    /// </summary>
-    // public FactoryConstant constant = null!;
-
 
     /// <summary>
     /// private构造方法
@@ -37,13 +32,31 @@ public class FactoryAdmin
     }
 
     /// <summary>
-    /// 初始化方法
+    /// 服务:获取服务状态
     /// </summary>
-    /// <param name="constant"></param>
-    // public void Init(FactoryConstant constant)
-    // {
-    //     this.constant = constant;
-    // }
+    /// <param name="info"></param>
+    /// <returns></returns>
+    public async Task<bool> ServiceGetStatus(Market info)
+    {
+        try
+        {
+            GrpcChannel channel = GrpcChannel.ForAddress(FactoryService.instance.constant.config.GetValue<string>("manage_url"));
+            var client = new ExchangeService.ExchangeServiceClient(channel);
+            ReqCall<string> req = new ReqCall<string>();
+            req.op = E_Op.service_get_status;
+            req.market = info.market;
+            req.data = JsonConvert.SerializeObject(info);
+            string json = JsonConvert.SerializeObject(req);
+            var reply = await client.UnaryCallAsync(new Request { Json = json });
+            channel.ShutdownAsync().Wait();
+            return true;
+        }
+        catch (System.Exception ex)
+        {
+            FactoryService.instance.constant.logger.LogError(ex, "服务:获取服务状态");
+        }
+        return false;
+    }
 
     /// <summary>
     /// 服务:清除所有缓存

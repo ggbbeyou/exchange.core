@@ -44,6 +44,11 @@ public class Market
     /// <value></value>
     public string separator { get; set; } = "/";
     /// <summary>
+    /// 状态 1:清除缓存,2:预热缓存,3:服务启动,4:服务停止
+    /// </summary>
+    /// <value></value>
+    public int status { get; set; }
+    /// <summary>
     /// 价格小数位数
     /// </summary>
     /// <value></value>

@@ -43,7 +43,23 @@ public class GreeterImpl : ExchangeService.ExchangeServiceBase
         res.op = req.op;
         res.market = req.market;
         res.data = req.data;
-        if (req.op == E_Op.service_clear_cache)
+        if (req.op == E_Op.service_get_status)
+        {
+            Market? marketInfo = JsonConvert.DeserializeObject<Market>(req.data);
+            if (marketInfo == null)
+            {
+                res.success = false;
+                res.code = E_Res_Code.fail;
+                res.message = $"服务(失败):获取服务状态,未获取到请求参数:{request.Json}";
+                FactoryService.instance.constant.logger.LogError($"服务(失败):获取服务状态,未获取到请求参数:{request.Json}");
+                reply.Message = JsonConvert.SerializeObject(res);
+                return reply;
+            }
+            Market result = FactoryMatching.instance.ServiceGetStatus(marketInfo);
+            res.message = $"服务(成功):获取服务状态:{marketInfo.market}";
+            FactoryService.instance.constant.logger.LogInformation($"服务(成功):获取服务状态:{marketInfo.market}");
+        }
+        else if (req.op == E_Op.service_clear_cache)
         {
             Market? marketInfo = JsonConvert.DeserializeObject<Market>(req.data);
             if (marketInfo == null)

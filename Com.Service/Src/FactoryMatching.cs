@@ -39,6 +39,33 @@ public class FactoryMatching
     }
 
     /// <summary>
+    /// 服务:获取服务状态
+    /// </summary>
+    /// <param name="marketInfo"></param>
+    /// <returns></returns>
+    public Market ServiceGetStatus(Market info)
+    {
+        if (this.service.ContainsKey(info.market))
+        {
+            if (this.service[info.market].run)
+            {
+                info.status = 3;
+            }
+            else
+            {
+                info.status = 4;
+            }
+        }
+        else
+        {
+            info.status = 4;
+        }
+        this.service[info.market].run = true;
+        return info;
+    }
+
+
+    /// <summary>
     /// 服务:清除所有缓存
     /// </summary>
     /// <param name="marketInfo"></param>

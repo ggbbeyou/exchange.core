@@ -48,7 +48,7 @@ public class ServiceController : Controller
     /// 服务管理
     /// </summary>
     /// <param name="market">交易对</param>
-    /// <param name="status">状态 1:清除缓存,2:预热缓存,3:服务启动,4:服务停止</param>
+    /// <param name="status">状态 0:获取状态,1:清除缓存,2:预热缓存,3:服务启动,4:服务停止</param>
     /// <returns></returns>
     [HttpPost]
     public async Task<IActionResult> Manage(long market, int status)
@@ -78,7 +78,11 @@ public class ServiceController : Controller
                 res.data = market;
             }
             bool result = false;
-            if (status == 1)
+            if (status == 0)
+            {
+                result = await FactoryAdmin.instance.ServiceGetStatus(marketInfo);
+            }
+            else if (status == 1)
             {
                 result = await FactoryAdmin.instance.ServiceClearCache(marketInfo);
             }

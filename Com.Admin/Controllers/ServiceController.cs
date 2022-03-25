@@ -81,6 +81,8 @@ public class ServiceController : Controller
             if (status == 0)
             {
                 result = await FactoryAdmin.instance.ServiceGetStatus(marketInfo);
+                marketInfo.status = result ? 3 : 4;
+                this.db.SaveChanges();
             }
             else if (status == 1)
             {

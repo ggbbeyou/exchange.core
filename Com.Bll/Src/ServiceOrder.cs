@@ -107,13 +107,13 @@ public class ServiceOrder
             res.message = "限价单,价格和量都不能为小于0";
             return res;
         }
-        if (orders.Where(P => P.type == E_OrderType.price_limit).ToList().Exists(P => Math.Round(P.price ?? 0, info.price_places, MidpointRounding.ToNegativeInfinity) == P.price))
+        if (orders.Where(P => P.type == E_OrderType.price_limit).ToList().Exists(P => Math.Round(P.price ?? 0, info.price_places, MidpointRounding.ToNegativeInfinity) != P.price))
         {
             res.code = E_Res_Code.field_error;
             res.message = $"限价单价格精度不对,价格小数位:{info.price_places}";
             return res;
         }
-        if (orders.Where(P => P.side == E_OrderSide.sell).ToList().Exists(P => Math.Round((P.amount ?? 0) / info.amount_multiple, 0, MidpointRounding.ToNegativeInfinity) * info.amount_multiple == P.amount))
+        if (orders.Where(P => P.side == E_OrderSide.sell).ToList().Exists(P => Math.Round((P.amount ?? 0) / info.amount_multiple, 0, MidpointRounding.ToNegativeInfinity) * info.amount_multiple != P.amount))
         {
             res.code = E_Res_Code.field_error;
             res.message = $"卖单量必须是{info.amount_multiple}的整数倍";

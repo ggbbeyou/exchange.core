@@ -226,7 +226,7 @@ public class TestController : Controller
                 decimal amount = (decimal)FactoryService.instance.constant.random.NextDouble();
                 decimal price = (decimal)FactoryService.instance.constant.random.NextDouble();
                 price = Math.Round(price, market.price_places);
-                amount = Math.Round(amount / market.amount_multiple, 0, MidpointRounding.ToNegativeInfinity) * market.amount_multiple;
+
                 ReqOrder order = new ReqOrder()
                 {
                     client_id = FactoryService.instance.constant.worker.NextId().ToString(),
@@ -244,16 +244,13 @@ public class TestController : Controller
                     order.price = null;
                     if (side == E_OrderSide.buy)
                     {
-                        order.amount = null;
-                    }
-                    else if (side == E_OrderSide.sell)
-                    {
-
+                        amount = Math.Round(amount, market.price_places);
                     }
                 }
-                else if (type == E_OrderType.price_limit)
+                if (side == E_OrderSide.sell)
                 {
-
+                    amount = Math.Round(amount / market.amount_multiple, 0, MidpointRounding.ToNegativeInfinity) * market.amount_multiple;
+                    order.amount = (decimal)(double)amount;
                 }
                 reqOrders.Add(order);
             }

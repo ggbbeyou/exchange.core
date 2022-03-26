@@ -127,10 +127,10 @@ public class Core
             string json = Encoding.UTF8.GetString(b);
             (List<Orders> orders, List<Deal> deals, List<Orders> cancels) deals = JsonConvert.DeserializeObject<(List<Orders> orders, List<Deal> deals, List<Orders> cancels)>(json);
             this.stopwatch.Restart();
-            ReceiveDealOrder(deals.orders, deals.deals, deals.cancels);
+            bool result = ReceiveDealOrder(deals.orders, deals.deals, deals.cancels);
             this.stopwatch.Stop();
-            FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{this.stopwatch.Elapsed.ToString()};撮合后续处理总时间,成交记录:{deals.deals.Count}");
-            return true;
+            FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{this.stopwatch.Elapsed.ToString()};撮合后续处理总时间(结果{result}),成交记录:{deals.deals.Count}");
+            return result;
         });
     }
 
@@ -138,7 +138,7 @@ public class Core
     /// 接收到成交订单
     /// </summary>
     /// <param name="deals"></param>
-    private void ReceiveDealOrder(List<Orders> orders, List<Deal> deals, List<Orders> cancels)
+    private bool ReceiveDealOrder(List<Orders> orders, List<Deal> deals, List<Orders> cancels)
     {
         if (deals.Count > 0)
         {
@@ -242,6 +242,7 @@ public class Core
             FactoryService.instance.constant.stopwatch.Stop();
             FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};Mq=>推送撤单订单");
         }
+        return true;
     }
 
 }

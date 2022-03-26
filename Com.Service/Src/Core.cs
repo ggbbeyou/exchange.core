@@ -147,6 +147,10 @@ public class Core
             result = wallet_service.Transaction(E_WalletType.main, this.model.info, deals);
             FactoryService.instance.constant.stopwatch.Stop();
             FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};DB=>成交记录{deals.Count}条,实际资产转移(结果{result})");
+            if (!result)
+            {
+                return false;
+            }
             FactoryService.instance.constant.stopwatch.Restart();
             int deal_add = deal_service.AddOrUpdateDeal(deals);
             result = deal_add > 0 && result;

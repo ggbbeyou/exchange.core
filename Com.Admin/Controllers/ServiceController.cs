@@ -81,24 +81,54 @@ public class ServiceController : Controller
             bool result = false;
             if (status == 0)
             {
-                result = await FactoryAdmin.instance.ServiceGetStatus(marketInfo);               
+                result = await FactoryAdmin.instance.ServiceGetStatus(marketInfo);
                 this.db.SaveChanges();
             }
             else if (status == 1)
             {
                 result = await FactoryAdmin.instance.ServiceClearCache(marketInfo);
+                if (result)
+                {
+                    marketInfo.status = 1;
+                    this.db.SaveChanges();
+                }
             }
             else if (status == 2)
             {
                 result = await FactoryAdmin.instance.ServiceWarmCache(marketInfo);
+                if (result)
+                {
+                    marketInfo.status = 2;
+                    this.db.SaveChanges();
+                }
             }
             else if (status == 3)
             {
-                result = await FactoryAdmin.instance.ServiceStart(marketInfo);
+                if (marketInfo.status == 1)
+                {
+                    res.success = false;
+                    res.code = E_Res_Code.fail;
+                    res.message = "清除缓存后必须先预热缓存";
+                    res.data = market;
+                }
+                else
+                {
+                    result = await FactoryAdmin.instance.ServiceStart(marketInfo);
+                    if (result)
+                    {
+                        marketInfo.status = 3;
+                        this.db.SaveChanges();
+                    }
+                }
             }
             else if (status == 4)
             {
                 result = await FactoryAdmin.instance.ServiceStop(marketInfo);
+                if (result)
+                {
+                    marketInfo.status = 4;
+                    this.db.SaveChanges();
+                }
             }
             if (result)
             {

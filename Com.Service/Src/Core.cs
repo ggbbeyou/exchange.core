@@ -143,12 +143,15 @@ public class Core
         if (deals.Count > 0)
         {
             FactoryService.instance.constant.stopwatch.Restart();
-            foreach (var item in deals)
+            var deal_group = from d in deals
+                             group d by new { d.bid_uid, d.ask_uid, d.fee_rate_buy, d.fee_rate_sell, d.price } into g
+                             select new { g.Key, amount = g.Sum(d => d.amount) };
+            foreach (var item in deal_group)
             {
-                wallet_service.Transaction(E_WalletType.main, this.model.info.coin_id_base, this.model.info.coin_id_quote, item.bid_uid, item.ask_uid, item.fee_rate_buy, item.fee_rate_sell, item.amount, item.price);
+                wallet_service.Transaction(E_WalletType.main, this.model.info.coin_id_base, this.model.info.coin_id_quote, item.Key.bid_uid, item.Key.ask_uid, item.Key.fee_rate_buy, item.Key.fee_rate_sell, item.amount, item.Key.price);
             }
             FactoryService.instance.constant.stopwatch.Stop();
-            FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};DB=>成交记录{deals.Count}条,资产转移");
+            FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};DB=>成交记录{deals.Count}条,实际资产转移");
             FactoryService.instance.constant.stopwatch.Restart();
             deal_service.AddOrUpdateDeal(deals);
             FactoryService.instance.constant.stopwatch.Stop();

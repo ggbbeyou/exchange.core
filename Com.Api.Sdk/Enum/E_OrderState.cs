@@ -22,5 +22,9 @@ public enum E_OrderState
     /// <summary>
     /// 撤单或部分撤单
     /// </summary>
-    cancel = 3
+    cancel = 3,
+    /// <summary>
+    /// 暂不进撮合订单(触发单)
+    /// </summary>
+    not_atch = 4,
 }

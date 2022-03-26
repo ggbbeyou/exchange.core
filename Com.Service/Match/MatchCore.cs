@@ -32,6 +32,9 @@ using Com.Api.Sdk.Enum;
 using Com.Service.Models;
 using Com.Bll;
 using Com.Bll.Models;
+using Com.Api.Sdk.Models;
+using System.Text;
+using Newtonsoft.Json;
 
 namespace Com.Service.Match;
 
@@ -264,7 +267,7 @@ public class MatchCore
         {
             return (orders, deals, cancels);
         }
-        if (order.trigger_hanging_price > 0)
+        if (order.state == E_OrderState.not_atch && order.trigger_hanging_price > 0)
         {
             this.trigger.Add(order);
             return (orders, deals, cancels);
@@ -528,11 +531,17 @@ public class MatchCore
             ask.state = E_OrderState.cancel;
             cancels.Add(ask);
         }
-        this.market_bid.AddRange(this.trigger.Where(P => P.type == E_OrderType.price_market && P.side == E_OrderSide.buy && P.trigger_hanging_price <= price).ToList());
-        this.market_ask.AddRange(this.trigger.Where(P => P.type == E_OrderType.price_market && P.side == E_OrderSide.sell && P.trigger_hanging_price >= price).ToList());
-        this.fixed_bid.AddRange(this.trigger.Where(P => P.type == E_OrderType.price_limit && P.side == E_OrderSide.buy && P.trigger_hanging_price <= price).ToList());
-        this.fixed_ask.AddRange(this.trigger.Where(P => P.type == E_OrderType.price_limit && P.side == E_OrderSide.sell && P.trigger_hanging_price >= price).ToList());
-        this.trigger.RemoveAll(P => (P.side == E_OrderSide.buy && P.trigger_hanging_price <= price) || (P.side == E_OrderSide.sell && P.trigger_hanging_price >= price));
+        List<Orders> trigger_order = trigger.Where(P => (P.side == E_OrderSide.buy && P.trigger_hanging_price <= price) || (P.side == E_OrderSide.sell && P.trigger_hanging_price >= price)).ToList();
+        this.trigger.RemoveAll(P => trigger_order.Select(T => T.order_id).Contains(P.order_id));
+        trigger_order.ForEach(P =>
+        {
+            P.state = E_OrderState.unsold;
+        });
+        ReqCall<List<Orders>> call_req = new ReqCall<List<Orders>>();
+        call_req.op = E_Op.place;
+        call_req.market = this.model.info.market;
+        call_req.data = trigger_order;
+        FactoryService.instance.constant.MqSend(FactoryService.instance.GetMqOrderPlace(this.model.info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(call_req)));
         return price;
     }
 }

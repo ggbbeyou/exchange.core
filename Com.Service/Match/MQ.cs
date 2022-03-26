@@ -113,6 +113,11 @@ public class MQ
                     {
                         this.mutex.WaitOne();
                         (List<Orders> orders, List<Deal> deals, List<Orders> cancels) match = this.model.match_core.Match(item);
+                        if (match.orders.Count == 0 && match.deals.Count == 0 && match.cancels.Count == 0)
+                        {
+                            this.mutex.ReleaseMutex();
+                            continue;
+                        }
                         deal.AddRange(match.deals);
                         foreach (var item1 in match.orders)
                         {

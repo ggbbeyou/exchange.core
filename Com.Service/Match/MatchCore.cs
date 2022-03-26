@@ -73,6 +73,12 @@ public class MatchCore
     /// <typeparam name="Order">订单</typeparam>
     /// <returns></returns>
     public List<Orders> fixed_ask = new List<Orders>();
+    /// <summary>
+    /// 触发单
+    /// </summary>
+    /// <typeparam name="Orders"></typeparam>
+    /// <returns></returns>
+    public List<Orders> trigger = new List<Orders>();
 
     /// <summary>
     /// 初始化
@@ -245,6 +251,11 @@ public class MatchCore
         decimal? price = null;
         if (order.market != this.model.info.market || order.amount_unsold <= 0 || order.state == E_OrderState.completed || order.state == E_OrderState.cancel)
         {
+            return (orders, deals, cancels);
+        }
+        if (order.trigger_hanging_price > 0)
+        {
+            this.trigger.Add(order);
             return (orders, deals, cancels);
         }
         if (order.side == E_OrderSide.buy)
@@ -506,6 +517,11 @@ public class MatchCore
             ask.state = E_OrderState.cancel;
             cancels.Add(ask);
         }
+        this.market_bid.AddRange(this.trigger.Where(P => P.type == E_OrderType.price_market && P.side == E_OrderSide.buy && P.trigger_hanging_price <= price).ToList());
+        this.market_ask.AddRange(this.trigger.Where(P => P.type == E_OrderType.price_market && P.side == E_OrderSide.sell && P.trigger_hanging_price >= price).ToList());
+        this.fixed_bid.AddRange(this.trigger.Where(P => P.type == E_OrderType.price_limit && P.side == E_OrderSide.buy && P.trigger_hanging_price <= price).ToList());
+        this.fixed_ask.AddRange(this.trigger.Where(P => P.type == E_OrderType.price_limit && P.side == E_OrderSide.sell && P.trigger_hanging_price >= price).ToList());
+        this.trigger.RemoveAll(P => (P.side == E_OrderSide.buy && P.trigger_hanging_price <= price) || (P.side == E_OrderSide.sell && P.trigger_hanging_price >= price));
         return price;
     }
 

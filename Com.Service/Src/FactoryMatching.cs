@@ -112,7 +112,7 @@ public class FactoryMatching
     /// </summary>
     public Market ServiceWarmCache(Market info)
     {
-        if (this.service.ContainsKey(info.market) && !this.service[info.market].run)
+        if (this.service.ContainsKey(info.market) && !this.service[info.market].run && info.status == 1)
         {
             this.service[info.market].match_core.CancelOrder();
             DateTimeOffset now = DateTimeOffset.UtcNow;
@@ -140,7 +140,10 @@ public class FactoryMatching
             model.core = new Core(model);
             this.service.Add(info.market, model);
         }
-        this.service[info.market].run = true;
+        if (this.service[info.market].run == false && (info.status == 2 || info.status == 4))
+        {
+            this.service[info.market].run = true;
+        }
         return info;
     }
 

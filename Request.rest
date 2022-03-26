@@ -6,8 +6,8 @@
 POST {{baseUrl}}/Service/Manage HTTP/1.1
 Content-Type: application/x-www-form-urlencoded
 
-market=1507585928523288576
-&status=1
+market=1507585928527482880
+&status=3
 
 
 ###

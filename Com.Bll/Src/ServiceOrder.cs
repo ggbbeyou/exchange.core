@@ -313,6 +313,61 @@ public class ServiceOrder
         }
     }
 
+    /// <summary>
+    /// DB未完成挂单重要推送到mq和redis
+    /// </summary>
+    /// <param name="market"></param>
+    /// <returns></returns>
+    public bool PushOrderToMqRedis(long market)
+    {
+        (List<Orders> mq, List<Orders> redis) orders = GetNoCompletedOrders(market);
+        if (orders.mq.Count > 0)
+        {
+            ReqCall<List<Orders>> call_req = new ReqCall<List<Orders>>();
+            call_req.op = E_Op.place;
+            call_req.market = market;
+            call_req.data = orders.mq;
+            FactoryService.instance.constant.MqSend(FactoryService.instance.GetMqOrderPlace(market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(call_req)));
+        }
+        if (orders.redis.Count > 0)
+        {
+            List<Orders> buy = orders.redis.Where(P => P.side == E_OrderSide.buy).ToList();
+            SortedSetEntry[] entries_buy = new SortedSetEntry[buy.Count];
+            for (int i = 0; i < buy.Count; i++)
+            {
+                entries_buy[i] = new SortedSetEntry(JsonConvert.SerializeObject(buy[i]), (double)buy[i].trigger_hanging_price);
+            }
+            FactoryService.instance.constant.redis.SortedSetAdd(FactoryService.instance.GetRedisTrigger(market, E_OrderSide.buy), entries_buy);
+            List<Orders> sell = orders.redis.Where(P => P.side == E_OrderSide.sell).ToList();
+            SortedSetEntry[] entries_sell = new SortedSetEntry[sell.Count];
+            for (int i = 0; i < sell.Count; i++)
+            {
+                entries_sell[i] = new SortedSetEntry(JsonConvert.SerializeObject(sell[i]), (double)sell[i].trigger_hanging_price);
+            }
+            FactoryService.instance.constant.redis.SortedSetAdd(FactoryService.instance.GetRedisTrigger(market, E_OrderSide.sell), entries_sell);
+        }
+        return true;
+    }
+
+    /// <summary>
+    /// 获取未成交订单
+    /// </summary>
+    /// <param name="market"></param>
+    /// <returns></returns>
+    private (List<Orders> mq, List<Orders> redis) GetNoCompletedOrders(long market)
+    {
+        using (var scope = FactoryService.instance.constant.provider.CreateScope())
+        {
+            using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
+            {
+                List<Orders> orders = db.Orders.Where(P => P.market == market && (P.state == E_OrderState.unsold || P.state == E_OrderState.partial)).OrderBy(P => P.create_time).ToList();
+                List<Orders> mq = orders.Where(P => P.trigger_hanging_price == 0).ToList();
+                List<Orders> redis = orders.Where(P => P.trigger_hanging_price != 0).ToList();
+                return (mq, redis);
+            }
+        }
+    }
+
 
 
 

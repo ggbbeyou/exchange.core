@@ -60,7 +60,7 @@ public class FactoryService
     /// <summary>
     /// redis hast 深度行情 depth:{market}
     /// </summary>
-    /// <param name="market"></param>
+    /// <param name="market">交易对</param>
     /// <returns></returns>
     public string GetRedisDepth(long market)
     {
@@ -70,7 +70,6 @@ public class FactoryService
     /// <summary>
     /// redis hast 深度行情 depth
     /// </summary>
-    /// <param name="market"></param>
     /// <returns></returns>
     public string GetRedisTicker()
     {
@@ -95,6 +94,17 @@ public class FactoryService
     public string GetRedisKlineing(long market)
     {
         return string.Format("klineing:{0}", market);
+    }
+
+    /// <summary>
+    /// redis(zset)键 触发单
+    /// </summary>
+    /// <param name="market">交易对</param>
+    /// <param name="side">交易方向</param>
+    /// <returns></returns>
+    public string GetRedisTrigger(long market, E_OrderSide side)
+    {
+        return string.Format("trigger:{0}:{1}", market, side);
     }
 
     /// <summary>

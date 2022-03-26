@@ -67,6 +67,16 @@ public class Deal
     /// <value></value>
     public long ask_uid { get; set; }
     /// <summary>
+    /// 买单用户名
+    /// </summary>
+    /// <value></value>
+    public string bid_name { get; set; } = null!;
+    /// <summary>
+    /// 卖单用户名
+    /// </summary>
+    /// <value></value>
+    public string ask_name { get; set; } = null!;
+    /// <summary>
     /// 买单未成交量
     /// </summary>
     /// <value></value>

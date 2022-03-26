@@ -192,7 +192,7 @@ public class ServiceWallet
     }
 
     /// <summary>
-    /// 撮合成交后资产变动
+    /// 撮合成交后资产变动(暂时不用)
     /// </summary>
     /// <param name="wallet_type">钱包类型</param>
     /// <param name="coin_id_base">基础币种id</param>
@@ -267,11 +267,12 @@ public class ServiceWallet
     /// <param name="amount">成交量</param>
     /// <param name="price">成交价</param>
     /// <returns>是否成功</returns>
-    public bool Transaction(E_WalletType wallet_type, Market market, List<Deal> deals)
+    public (bool result, List<Running> running) Transaction(E_WalletType wallet_type, Market market, List<Deal> deals)
     {
+        List<Running> runnings = new List<Running>();
         if (deals == null || deals.Count == 0)
         {
-            return true;
+            return (true, runnings);
         }
         using (var scope = FactoryService.instance.constant.provider.CreateScope())
         {
@@ -281,6 +282,7 @@ public class ServiceWallet
                 {
                     try
                     {
+
                         List<long> user_id = deals.Select(T => T.bid_uid).ToList();
                         user_id.AddRange(deals.Select(T => T.ask_uid).ToList());
                         user_id = user_id.Distinct().ToList();
@@ -295,7 +297,7 @@ public class ServiceWallet
                             Wallet? sell_quote = wallets.Where(P => P.coin_id == market.coin_id_quote && P.user_id == item.ask_uid).FirstOrDefault();
                             if (buy_base == null || buy_quote == null || sell_base == null || sell_quote == null)
                             {
-                                return false;
+                                return (true, runnings);
                             }
                             buy_base.available += item.amount;
                             sell_base.freeze -= (item.amount + item.fee_sell);
@@ -305,28 +307,113 @@ public class ServiceWallet
                             buy_quote.total = buy_quote.available + buy_quote.freeze;
                             sell_base.total = sell_base.available + sell_base.freeze;
                             sell_quote.total = sell_quote.available + sell_quote.freeze;
+                            runnings.Add(new Running
+                            {
+                                id = FactoryService.instance.constant.worker.NextId(),
+                                coin_id = market.coin_id_base,
+                                coin_name = market.coin_name_base,
+                                wallet_from = sell_base.wallet_id,
+                                wallet_to = buy_base.wallet_id,
+                                wallet_type_from = E_WalletType.main,
+                                wallet_type_to = E_WalletType.main,
+                                uid_from = sell_base.user_id,
+                                uid_to = buy_base.user_id,
+                                user_name_from = sell_base.user_name,
+                                user_name_to = buy_base.user_name,
+                                amount = item.amount,
+                                operation_uid = 0,
+                                time = DateTimeOffset.UtcNow,
+                            });
+                            runnings.Add(new Running
+                            {
+                                id = FactoryService.instance.constant.worker.NextId(),
+                                coin_id = market.coin_id_quote,
+                                coin_name = market.coin_name_quote,
+                                wallet_from = buy_quote.wallet_id,
+                                wallet_to = sell_quote.wallet_id,
+                                wallet_type_from = E_WalletType.main,
+                                wallet_type_to = E_WalletType.main,
+                                uid_from = buy_quote.user_id,
+                                uid_to = sell_quote.user_id,
+                                user_name_from = buy_quote.user_name,
+                                user_name_to = sell_quote.user_name,
+                                amount = item.total,
+                                operation_uid = 0,
+                                time = DateTimeOffset.UtcNow,
+                            });
                             if (settlement_base != null)
                             {
                                 settlement_base.available += item.fee_sell;
                                 settlement_base.total = settlement_base.available + settlement_base.freeze;
+                                runnings.Add(new Running
+                                {
+                                    id = FactoryService.instance.constant.worker.NextId(),
+                                    coin_id = market.coin_id_base,
+                                    coin_name = market.coin_name_base,
+                                    wallet_from = sell_base.wallet_id,
+                                    wallet_to = settlement_base.wallet_id,
+                                    wallet_type_from = E_WalletType.main,
+                                    wallet_type_to = E_WalletType.fee,
+                                    uid_from = sell_base.user_id,
+                                    uid_to = settlement_base.user_id,
+                                    user_name_from = sell_base.user_name,
+                                    user_name_to = settlement_base.user_name,
+                                    amount = item.amount,
+                                    operation_uid = settlement_base.user_id,
+                                    time = DateTimeOffset.UtcNow,
+                                });
                             }
                             if (settlement_quote != null)
                             {
                                 settlement_quote.available += item.fee_buy;
                                 settlement_quote.total = settlement_quote.available + settlement_quote.freeze;
+                                runnings.Add(new Running
+                                {
+                                    id = FactoryService.instance.constant.worker.NextId(),
+                                    coin_id = market.coin_id_quote,
+                                    coin_name = market.coin_name_quote,
+                                    wallet_from = buy_quote.wallet_id,
+                                    wallet_to = settlement_quote.wallet_id,
+                                    wallet_type_from = E_WalletType.main,
+                                    wallet_type_to = E_WalletType.main,
+                                    uid_from = buy_quote.user_id,
+                                    uid_to = settlement_quote.user_id,
+                                    user_name_from = buy_quote.user_name,
+                                    user_name_to = settlement_quote.user_name,
+                                    amount = item.total,
+                                    operation_uid = settlement_quote.user_id,
+                                    time = DateTimeOffset.UtcNow,
+                                });
                             }
                         }
                         db.SaveChanges();
                         transaction.Commit();
-                        return true;
+                        return (true, runnings);
                     }
                     catch (Exception ex)
                     {
+                        runnings.Clear();
                         transaction.Rollback();
                         FactoryService.instance.constant.logger.LogError(ex, ex.Message);
-                        return false;
+                        return (false, runnings);
                     }
                 }
+            }
+        }
+    }
+
+    /// <summary>
+    /// 添加资金流水
+    /// </summary>
+    /// <param name="runnings"></param>
+    public void AddRunning(List<Running> runnings)
+    {
+        using (var scope = FactoryService.instance.constant.provider.CreateScope())
+        {
+            using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
+            {
+                db.Runnings.AddRange(runnings);
+                db.SaveChanges();
             }
         }
     }

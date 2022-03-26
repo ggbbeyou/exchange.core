@@ -23,6 +23,11 @@ public class Orders : ResOrder
     /// <value></value>
     public long uid { get; set; }
     /// <summary>
+    /// 用户名
+    /// </summary>
+    /// <value></value>
+    public string user_name { get; set; } = null!;
+    /// <summary>
     /// 订单总额(市价买单必填,其它都无效)
     /// </summary>
     /// <value></value>

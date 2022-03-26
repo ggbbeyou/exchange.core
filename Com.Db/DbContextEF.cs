@@ -35,6 +35,11 @@ public class DbContextEF : DbContext
     /// <value></value>
     public DbSet<Orders> Orders { get; set; } = null!;
     /// <summary>
+    /// 钱包流水
+    /// </summary>
+    /// <value></value>
+    public DbSet<Running> Runnings { get; set; } = null!;
+    /// <summary>
     /// 用户基础信息
     /// </summary>
     /// <value></value>
@@ -120,6 +125,8 @@ public class DbContextEF : DbContext
             o.Property(P => P.trigger_side).IsRequired().HasColumnType("tinyint").HasComment("成交触发方向");
             o.Property(P => P.bid_id).IsRequired().HasColumnType("bigint").HasComment("买单id");
             o.Property(P => P.ask_id).IsRequired().HasColumnType("bigint").HasComment("卖单id");
+            o.Property(P => P.bid_name).IsRequired().HasColumnType("nvarchar").HasMaxLength(50).HasComment("买用户名");
+            o.Property(P => P.ask_name).IsRequired().HasColumnType("nvarchar").HasMaxLength(50).HasComment("卖用户名");
             o.Property(P => P.bid_uid).IsRequired().HasColumnType("bigint").HasComment("买单用户id");
             o.Property(P => P.ask_uid).IsRequired().HasColumnType("bigint").HasComment("卖单用户id");
             o.Property(P => P.bid_amount_unsold).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("买单未成交量");
@@ -191,6 +198,7 @@ public class DbContextEF : DbContext
             o.Property(P => P.market).IsRequired().HasColumnType("bigint").HasComment("交易对");
             o.Property(P => P.symbol).HasColumnType("nvarchar").HasMaxLength(20).HasComment("交易对名称");
             o.Property(P => P.uid).IsRequired().HasColumnType("bigint").HasComment("用户ID");
+            o.Property(P => P.user_name).IsRequired().HasColumnType("nvarchar").HasMaxLength(50).HasComment("用户名");
             o.Property(P => P.side).IsRequired().HasColumnType("tinyint").HasComment("交易方向");
             o.Property(P => P.state).IsRequired().HasColumnType("tinyint").HasComment("成交状态");
             o.Property(P => P.type).IsRequired().HasColumnType("tinyint").HasComment("订单类型");
@@ -213,7 +221,7 @@ public class DbContextEF : DbContext
             o.HasKey(p => p.user_id);
             o.HasIndex(P => new { P.user_name }).IsUnique();
             o.Property(P => P.user_id).IsRequired().ValueGeneratedNever().HasColumnType("bigint").HasComment("用户id");
-            o.Property(P => P.user_name).HasColumnType("nvarchar").HasMaxLength(50).HasComment("用户名");
+            o.Property(P => P.user_name).IsRequired().HasColumnType("nvarchar").HasMaxLength(50).HasComment("用户名");
             o.Property(P => P.password).HasColumnType("nvarchar").HasMaxLength(500).HasComment("用户密码");
             o.Property(P => P.disabled).IsRequired().HasColumnType("bit").HasComment("禁用");
             o.Property(P => P.transaction).IsRequired().HasColumnType("bit").HasComment("是否交易");

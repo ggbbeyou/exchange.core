@@ -145,11 +145,14 @@ public class MatchCore
         this.fixed_bid.RemoveAll(P => cancel_fixed_bid.Select(P => P.order_id).Contains(P.order_id));
         List<Orders> cancel_fixed_ask = this.fixed_ask.Where(P => P.uid == uid && order_id.Contains(P.order_id)).ToList();
         this.fixed_ask.RemoveAll(P => cancel_fixed_ask.Select(P => P.order_id).Contains(P.order_id));
+        List<Orders> cancel_trigger = this.trigger.Where(P => P.uid == uid && order_id.Contains(P.order_id)).ToList();
+        this.trigger.RemoveAll(P => cancel_trigger.Select(P => P.order_id).Contains(P.order_id));
         List<Orders> cancel = new List<Orders>();
         cancel.AddRange(cancel_market_bid);
         cancel.AddRange(cancel_market_ask);
         cancel.AddRange(cancel_fixed_bid);
         cancel.AddRange(cancel_fixed_ask);
+        cancel.AddRange(cancel_trigger);
         cancel.ForEach(P => { P.state = E_OrderState.cancel; P.deal_last_time = DateTimeOffset.UtcNow; });
         return cancel;
     }
@@ -169,11 +172,14 @@ public class MatchCore
         this.fixed_bid.RemoveAll(P => cancel_fixed_bid.Select(P => P.order_id).Contains(P.order_id));
         List<Orders> cancel_fixed_ask = this.fixed_ask.Where(P => P.uid == uid).ToList();
         this.fixed_ask.RemoveAll(P => cancel_fixed_ask.Select(P => P.order_id).Contains(P.order_id));
+        List<Orders> cancel_trigger = this.trigger.Where(P => P.uid == uid).ToList();
+        this.trigger.RemoveAll(P => cancel_trigger.Select(P => P.order_id).Contains(P.order_id));
         List<Orders> cancel = new List<Orders>();
         cancel.AddRange(cancel_market_bid);
         cancel.AddRange(cancel_market_ask);
         cancel.AddRange(cancel_fixed_bid);
         cancel.AddRange(cancel_fixed_ask);
+        cancel.AddRange(cancel_trigger);
         cancel.ForEach(P => { P.state = E_OrderState.cancel; P.deal_last_time = DateTimeOffset.UtcNow; });
         return cancel;
     }
@@ -193,11 +199,14 @@ public class MatchCore
         this.fixed_bid.RemoveAll(P => cancel_fixed_bid.Select(P => P.order_id).Contains(P.order_id));
         List<Orders> cancel_fixed_ask = this.fixed_ask.Where(P => P.uid == uid && client_id.Contains(P.order_id)).ToList();
         this.fixed_ask.RemoveAll(P => cancel_fixed_ask.Select(P => P.order_id).Contains(P.order_id));
+        List<Orders> cancel_trigger = this.trigger.Where(P => P.uid == uid && client_id.Contains(P.order_id)).ToList();
+        this.trigger.RemoveAll(P => cancel_trigger.Select(P => P.order_id).Contains(P.order_id));
         List<Orders> cancel = new List<Orders>();
         cancel.AddRange(cancel_market_bid);
         cancel.AddRange(cancel_market_ask);
         cancel.AddRange(cancel_fixed_bid);
         cancel.AddRange(cancel_fixed_ask);
+        cancel.AddRange(cancel_trigger);
         cancel.ForEach(P => { P.state = E_OrderState.cancel; P.deal_last_time = DateTimeOffset.UtcNow; });
         return cancel;
     }
@@ -213,11 +222,13 @@ public class MatchCore
         cancel.AddRange(this.market_ask);
         cancel.AddRange(this.fixed_bid);
         cancel.AddRange(this.fixed_ask);
+        cancel.AddRange(this.trigger);
         cancel.ForEach(P => { P.state = E_OrderState.cancel; P.deal_last_time = DateTimeOffset.UtcNow; });
         this.market_bid.Clear();
         this.market_ask.Clear();
         this.fixed_bid.Clear();
         this.fixed_ask.Clear();
+        this.trigger.Clear();
         return cancel;
     }
 

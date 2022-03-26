@@ -524,8 +524,4 @@ public class MatchCore
         this.trigger.RemoveAll(P => (P.side == E_OrderSide.buy && P.trigger_hanging_price <= price) || (P.side == E_OrderSide.sell && P.trigger_hanging_price >= price));
         return price;
     }
-
-
-
-
 }

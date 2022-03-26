@@ -97,17 +97,6 @@ public class FactoryService
     }
 
     /// <summary>
-    /// redis(zset)键 触发单
-    /// </summary>
-    /// <param name="market">交易对</param>
-    /// <param name="side">交易方向</param>
-    /// <returns></returns>
-    public string GetRedisTrigger(long market, E_OrderSide side)
-    {
-        return string.Format("trigger:{0}:{1}", market, side);
-    }
-
-    /// <summary>
     /// MQ:发送历史成交记录
     /// </summary>
     /// <param name="market"></param>

@@ -11,4 +11,8 @@ public enum E_WalletType
     /// 主钱包
     /// </summary>
     main = 0,
+    /// <summary>
+    /// 收手续费钱包
+    /// </summary>
+    fee = 0,
 }

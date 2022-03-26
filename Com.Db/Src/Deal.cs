@@ -27,7 +27,7 @@ public class Deal
     /// <value></value>
     public string symbol { get; set; } = null!;
     /// <summary>
-    /// 成交均价
+    /// 成交价
     /// </summary>
     /// <value></value>
     public decimal price { get; set; }
@@ -52,35 +52,35 @@ public class Deal
     /// <value></value>
     public long bid_id { get; set; }
     /// <summary>
-    /// 买单用户id
-    /// </summary>
-    /// <value></value>
-    public long bid_uid { get; set; }
-    /// <summary>
-    /// 买单未成交量
-    /// </summary>
-    /// <value></value>
-    public decimal bid_amount_unsold { get; set; }
-    /// <summary>
-    /// 买单已成交量
-    /// </summary>
-    /// <value></value>
-    public decimal bid_amount_done { get; set; }
-    /// <summary>
     /// 卖单id
     /// </summary>
     /// <value></value>
     public long ask_id { get; set; }
+    /// <summary>
+    /// 买单用户id
+    /// </summary>
+    /// <value></value>
+    public long bid_uid { get; set; }
     /// <summary>
     /// 卖单用户id
     /// </summary>
     /// <value></value>
     public long ask_uid { get; set; }
     /// <summary>
+    /// 买单未成交量
+    /// </summary>
+    /// <value></value>
+    public decimal bid_amount_unsold { get; set; }
+    /// <summary>
     /// 卖单未成交量
     /// </summary>
     /// <value></value>
     public decimal ask_amount_unsold { get; set; }
+    /// <summary>
+    /// 买单已成交量
+    /// </summary>
+    /// <value></value>
+    public decimal bid_amount_done { get; set; }
     /// <summary>
     /// 卖单已成交量
     /// </summary>
@@ -107,10 +107,15 @@ public class Deal
     /// <value></value>
     public decimal fee_sell { get; set; }
     /// <summary>
-    /// 手续费币种
+    /// 买手续费币种
     /// </summary>
     /// <value></value>
-    public decimal fee_coin { get; set; }
+    public long fee_coin_buy { get; set; }
+    /// <summary>
+    /// 卖手续费币种
+    /// </summary>
+    /// <value></value>
+    public long fee_coin_sell { get; set; }
     /// <summary>
     /// 成交时间
     /// </summary>

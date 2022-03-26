@@ -84,6 +84,11 @@ public class Market
     /// <value></value>
     public long market_uid { get; set; }
     /// <summary>
+    /// 结算账号
+    /// </summary>
+    /// <value></value>
+    public long settlement_uid { get; set; }
+    /// <summary>
     /// 最后的成交价
     /// </summary>
     /// <value></value>

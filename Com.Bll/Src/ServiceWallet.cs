@@ -285,6 +285,8 @@ public class ServiceWallet
                         user_id.AddRange(deals.Select(T => T.ask_uid).ToList());
                         user_id = user_id.Distinct().ToList();
                         List<Wallet> wallets = db.Wallet.Where(P => P.wallet_type == wallet_type && user_id.Contains(P.user_id) && (P.coin_id == market.coin_id_base || P.coin_id == market.coin_id_quote)).ToList();
+                        Wallet? settlement_base = db.Wallet.Where(P => P.wallet_type == E_WalletType.fee && P.user_id == market.settlement_uid && P.coin_id == market.coin_id_base).FirstOrDefault();
+                        Wallet? settlement_quote = db.Wallet.Where(P => P.wallet_type == E_WalletType.fee && P.user_id == market.settlement_uid && P.coin_id == market.coin_id_quote).FirstOrDefault();
                         foreach (var item in deals)
                         {
                             Wallet? buy_base = wallets.Where(P => P.coin_id == market.coin_id_base && P.user_id == item.bid_uid).FirstOrDefault();
@@ -295,19 +297,24 @@ public class ServiceWallet
                             {
                                 return false;
                             }
-                            decimal quote_total = item.amount * item.price;
-                            decimal buy_fee = quote_total * item.fee_rate_buy;
-                            decimal sell_fee = quote_total * item.fee_rate_sell;
                             buy_base.available += item.amount;
-                            sell_base.freeze -= item.amount;
-                            buy_quote.freeze -= quote_total;
-                            sell_quote.available += quote_total;
-                            buy_quote.freeze -= buy_fee;
-                            sell_quote.freeze -= sell_fee;
+                            sell_base.freeze -= (item.amount + item.fee_sell);
+                            buy_quote.freeze -= (item.total + item.fee_buy);
+                            sell_quote.available += item.total;
                             buy_base.total = buy_base.available + buy_base.freeze;
                             buy_quote.total = buy_quote.available + buy_quote.freeze;
                             sell_base.total = sell_base.available + sell_base.freeze;
                             sell_quote.total = sell_quote.available + sell_quote.freeze;
+                            if (settlement_base != null)
+                            {
+                                settlement_base.available += item.fee_sell;
+                                settlement_base.total = settlement_base.available + settlement_base.freeze;
+                            }
+                            if (settlement_quote != null)
+                            {
+                                settlement_quote.available += item.fee_buy;
+                                settlement_quote.total = settlement_quote.available + settlement_quote.freeze;
+                            }
                         }
                         db.SaveChanges();
                         transaction.Commit();

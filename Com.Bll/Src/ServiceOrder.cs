@@ -54,9 +54,10 @@ public class ServiceOrder
     /// </summary>
     /// <param name="symbol">交易对</param>
     /// <param name="uid">用户id</param>
+    /// <param name="user_name">用户名</param>
     /// <param name="order">订单列表</param>
     /// <returns></returns>
-    public ResCall<List<Orders>> PlaceOrder(string symbol, long uid, List<ReqOrder> orders)
+    public ResCall<List<Orders>> PlaceOrder(string symbol, long uid, string user_name, List<ReqOrder> orders)
     {
         ResCall<List<Orders>> res = new ResCall<List<Orders>>();
         this.stopwatch.Restart();
@@ -159,6 +160,7 @@ public class ServiceOrder
             order.market = info.market;
             order.symbol = info.symbol;
             order.uid = uid;
+            order.user_name = user_name;
             order.side = item.side;
             order.state = order.trigger_hanging_price > 0 ? E_OrderState.not_match : E_OrderState.unsold;
             order.type = item.type;

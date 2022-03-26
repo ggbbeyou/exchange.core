@@ -263,7 +263,7 @@ public class TestController : Controller
 
                 reqOrders.Add(order);
             }
-            order_service.PlaceOrder(market.symbol, user.user_id, reqOrders);
+            order_service.PlaceOrder(market.symbol, user.user_id, user.user_name, reqOrders);
         }
         return Json("");
     }

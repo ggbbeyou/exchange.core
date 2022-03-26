@@ -504,6 +504,8 @@ public class MatchCore
             ask_id = ask.order_id,
             bid_uid = bid.uid,
             ask_uid = ask.uid,
+            bid_name = bid.user_name,
+            ask_name = ask.user_name,
             bid_amount_unsold = bid.amount_unsold,
             ask_amount_unsold = ask.amount_unsold,
             bid_amount_done = bid.amount_done,

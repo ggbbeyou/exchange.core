@@ -33,6 +33,18 @@ public class OrderController : Controller
             return 5;
         }
     }
+    public string user_name
+    {
+        get
+        {
+            Claim? claim = User.Claims.FirstOrDefault(P => P.Type == JwtRegisteredClaimNames.Aud);
+            if (claim != null)
+            {
+                return (claim.Value);
+            }
+            return "";
+        }
+    }
     /// <summary>
     /// 用户服务
     /// </summary>
@@ -86,7 +98,7 @@ public class OrderController : Controller
         //     result.message = "用户禁止下单";
         //     return Json(result);
         // }
-        ResCall<List<Orders>> res = service_order.PlaceOrder(symbol, uid, orders);
+        ResCall<List<Orders>> res = service_order.PlaceOrder(symbol, uid, user_name, orders);
         result = new ResCall<List<ResOrder>>()
         {
             success = res.success,

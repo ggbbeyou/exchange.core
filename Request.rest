@@ -1,4 +1,6 @@
-###
+### 管理服务
+
+
 @baseUrl = http://localhost:5105
 
 POST {{baseUrl}}/Service/Manage HTTP/1.1
@@ -9,3 +11,16 @@ market=1507297916635713536
 
 
 ###
+
+
+
+
+###  api 接口
+@baseUrl1 = http://localhost:5210
+
+POST {{baseUrl1}}/Test/Init HTTP/1.1
+
+
+###
+POST {{baseUrl1}}/Test/PlaceOrderText HTTP/1.1
+

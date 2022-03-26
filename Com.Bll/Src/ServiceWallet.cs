@@ -375,7 +375,7 @@ public class ServiceWallet
                                     wallet_from = buy_quote.wallet_id,
                                     wallet_to = settlement_quote.wallet_id,
                                     wallet_type_from = E_WalletType.main,
-                                    wallet_type_to = E_WalletType.main,
+                                    wallet_type_to = E_WalletType.fee,
                                     uid_from = buy_quote.user_id,
                                     uid_to = settlement_quote.user_id,
                                     user_name_from = buy_quote.user_name,

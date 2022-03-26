@@ -138,7 +138,7 @@ public class Core
     /// 接收到成交订单
     /// </summary>
     /// <param name="deals"></param>
-    private async void ReceiveDealOrder(List<Orders> orders, List<Deal> deals, List<Orders> cancels)
+    private void ReceiveDealOrder(List<Orders> orders, List<Deal> deals, List<Orders> cancels)
     {
         if (deals.Count > 0)
         {

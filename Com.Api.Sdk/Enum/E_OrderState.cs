@@ -26,5 +26,5 @@ public enum E_OrderState
     /// <summary>
     /// 暂不进撮合订单(触发单)
     /// </summary>
-    not_atch = 4,
+    not_match = 4,
 }

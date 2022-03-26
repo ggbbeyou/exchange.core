@@ -267,7 +267,7 @@ public class MatchCore
         {
             return (orders, deals, cancels);
         }
-        if (order.state == E_OrderState.not_atch && order.trigger_hanging_price > 0)
+        if (order.state == E_OrderState.not_match && order.trigger_hanging_price > 0)
         {
             this.trigger.Add(order);
             return (orders, deals, cancels);

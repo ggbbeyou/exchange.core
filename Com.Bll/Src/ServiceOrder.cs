@@ -160,7 +160,7 @@ public class ServiceOrder
             order.symbol = info.symbol;
             order.uid = uid;
             order.side = item.side;
-            order.state = order.trigger_hanging_price > 0 ? E_OrderState.not_atch : E_OrderState.unsold;
+            order.state = order.trigger_hanging_price > 0 ? E_OrderState.not_match : E_OrderState.unsold;
             order.type = item.type;
             if (order.type == E_OrderType.price_market)
             {

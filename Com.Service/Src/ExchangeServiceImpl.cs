@@ -57,6 +57,7 @@ public class GreeterImpl : ExchangeService.ExchangeServiceBase
                 return reply;
             }
             Market result = FactoryMatching.instance.ServiceGetStatus(marketInfo);
+            res.data = JsonConvert.SerializeObject(result);
             res.message = $"服务(成功):获取服务状态:{marketInfo.market}";
             FactoryService.instance.constant.logger.LogInformation($"服务(成功):获取服务状态:{marketInfo.market}");
         }
@@ -139,7 +140,6 @@ public class GreeterImpl : ExchangeService.ExchangeServiceBase
             //其它操作
         }
         reply.Message = JsonConvert.SerializeObject(res);
-        await Task.Delay(TimeSpan.FromSeconds(1));
         return reply;
     }
 

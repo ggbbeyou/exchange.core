@@ -49,6 +49,16 @@ public class FactoryAdmin
             req.data = JsonConvert.SerializeObject(info);
             string json = JsonConvert.SerializeObject(req);
             var reply = await client.UnaryCallAsync(new Request { Json = json });
+            ResCall<string>? res = JsonConvert.DeserializeObject<ResCall<string>>(reply.Message);
+            if (res != null)
+            {
+                Market? resinfo = JsonConvert.DeserializeObject<Market>(res.data);
+                if (resinfo != null)
+                {
+                    info.status = resinfo.status;
+                    
+                }
+            }
             channel.ShutdownAsync().Wait();
             return true;
         }

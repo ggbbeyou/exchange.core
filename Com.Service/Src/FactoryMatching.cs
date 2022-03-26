@@ -61,7 +61,6 @@ public class FactoryMatching
         {
             info.status = 4;
         }
-        this.service[info.market].run = true;
         return info;
     }
 

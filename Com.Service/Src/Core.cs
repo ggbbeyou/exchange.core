@@ -140,22 +140,18 @@ public class Core
     /// <param name="deals"></param>
     private bool ReceiveDealOrder(List<Orders> orders, List<Deal> deals, List<Orders> cancels)
     {
+        bool result = false;
         if (deals.Count > 0)
         {
             FactoryService.instance.constant.stopwatch.Restart();
-            var deal_group = from d in deals
-                             group d by new { d.bid_uid, d.ask_uid, d.fee_rate_buy, d.fee_rate_sell, d.price } into g
-                             select new { g.Key, amount = g.Sum(d => d.amount) };
-            foreach (var item in deal_group)
-            {
-                wallet_service.Transaction(E_WalletType.main, this.model.info.coin_id_base, this.model.info.coin_id_quote, item.Key.bid_uid, item.Key.ask_uid, item.Key.fee_rate_buy, item.Key.fee_rate_sell, item.amount, item.Key.price);
-            }
+            result = wallet_service.Transaction(E_WalletType.main, this.model.info, deals);
             FactoryService.instance.constant.stopwatch.Stop();
-            FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};DB=>成交记录{deals.Count}条,实际资产转移");
+            FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};DB=>成交记录{deals.Count}条,实际资产转移(结果{result})");
             FactoryService.instance.constant.stopwatch.Restart();
-            deal_service.AddOrUpdateDeal(deals);
+            int deal_add = deal_service.AddOrUpdateDeal(deals);
+            result = deal_add > 0 && result;
             FactoryService.instance.constant.stopwatch.Stop();
-            FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};DB=>插入{deals.Count}条成交记录");
+            FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};DB=>记录:{deals.Count},实际插入{deal_add}条成交记录");
         }
         if (orders.Count > 0)
         {

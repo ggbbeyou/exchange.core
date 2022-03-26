@@ -71,6 +71,11 @@ public class Core
     /// <returns></returns>
     public ServiceKline kline_service = new ServiceKline();
     /// <summary>
+    /// 钱包服务
+    /// </summary>
+    /// <returns></returns>
+    private ServiceWallet wallet_service = new ServiceWallet();
+    /// <summary>
     /// 秒表
     /// </summary>
     /// <returns></returns>
@@ -133,10 +138,17 @@ public class Core
     /// 接收到成交订单
     /// </summary>
     /// <param name="deals"></param>
-    private void ReceiveDealOrder(List<Orders> orders, List<Deal> deals, List<Orders> cancels)
+    private async void ReceiveDealOrder(List<Orders> orders, List<Deal> deals, List<Orders> cancels)
     {
         if (deals.Count > 0)
         {
+            FactoryService.instance.constant.stopwatch.Restart();
+            foreach (var item in deals)
+            {
+                wallet_service.Transaction(E_WalletType.main, this.model.info.coin_id_base, this.model.info.coin_id_quote, item.bid_uid, item.ask_uid, item.fee_rate_buy, item.fee_rate_sell, item.amount, item.price);
+            }
+            FactoryService.instance.constant.stopwatch.Stop();
+            FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};DB=>成交记录{deals.Count}条,资产转移");
             FactoryService.instance.constant.stopwatch.Restart();
             deal_service.AddOrUpdateDeal(deals);
             FactoryService.instance.constant.stopwatch.Stop();

@@ -323,7 +323,7 @@ public class ServiceWallet
                                 amount = item.amount,
                                 operation_uid = 0,
                                 time = item.time,
-                                remarks = null,
+                                remarks = "卖币成交",
                             });
                             runnings.Add(new Running
                             {
@@ -342,7 +342,7 @@ public class ServiceWallet
                                 amount = item.total,
                                 operation_uid = 0,
                                 time = item.time,
-                                remarks = null,
+                                remarks = "买币成交",
                             });
                             if (settlement_base != null)
                             {
@@ -365,7 +365,7 @@ public class ServiceWallet
                                     amount = item.amount,
                                     operation_uid = settlement_base.user_id,
                                     time = item.time,
-                                    remarks = null,
+                                    remarks = "卖币手续费",
                                 });
                             }
                             if (settlement_quote != null)
@@ -389,7 +389,7 @@ public class ServiceWallet
                                     amount = item.total,
                                     operation_uid = settlement_quote.user_id,
                                     time = item.time,
-                                    remarks = null,
+                                    remarks = "买币手续费",
                                 });
                             }
                         }

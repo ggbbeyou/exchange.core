@@ -49,19 +49,19 @@ public class ServiceController : Controller
     /// 服务管理
     /// </summary>
     /// <param name="market">交易对</param>
-    /// <param name="status">状态 0:获取状态,1:清除缓存,2:预热缓存,3:服务启动,4:服务停止</param>
+    /// <param name="status">状态 0:获取状态,1:服务启动,2:服务停止</param>
     /// <returns></returns>
     [HttpPost]
     public async Task<IActionResult> Manage(long market, int status)
     {
-        Res<long> res = new Res<long>();
+        Res<bool?> res = new Res<bool?>();
         Market? marketInfo = this.db.Market.FirstOrDefault(P => P.market == market);
         if (marketInfo == null)
         {
             res.success = false;
             res.code = E_Res_Code.fail;
             res.message = "交易对不存在";
-            res.data = market;
+            res.data = null;
         }
         else
         {
@@ -69,73 +69,33 @@ public class ServiceController : Controller
             if (deal != null)
             {
                 marketInfo.last_price = deal.price;
-                this.db.SaveChanges();
             }
             if (marketInfo.last_price <= 0)
             {
                 res.success = false;
                 res.code = E_Res_Code.fail;
                 res.message = "最后成交价不能小于0";
-                res.data = market;
+                res.data = null;
             }
-            bool result = false;
-            if (status == 0)
+            else
             {
-                result = await FactoryAdmin.instance.ServiceGetStatus(marketInfo);
+                if (status == 0)
+                {
+                    marketInfo.status = await FactoryAdmin.instance.ServiceGetStatus(marketInfo);
+                }
+                else if (status == 1)
+                {
+                    marketInfo.status = await FactoryAdmin.instance.ServiceStart(marketInfo);
+                }
+                else if (status == 2)
+                {
+                    marketInfo.status = await FactoryAdmin.instance.ServiceStop(marketInfo);
+                }
                 this.db.SaveChanges();
-            }
-            else if (status == 1)
-            {
-                result = await FactoryAdmin.instance.ServiceClearCache(marketInfo);
-                if (result)
-                {
-                    marketInfo.status = 1;
-                    this.db.SaveChanges();
-                }
-            }
-            else if (status == 2)
-            {
-                result = await FactoryAdmin.instance.ServiceWarmCache(marketInfo);
-                if (result)
-                {
-                    marketInfo.status = 2;
-                    this.db.SaveChanges();
-                }
-            }
-            else if (status == 3)
-            {
-                if (marketInfo.status == 1)
-                {
-                    res.success = false;
-                    res.code = E_Res_Code.fail;
-                    res.message = "清除缓存后必须先预热缓存";
-                    res.data = market;
-                }
-                else
-                {
-                    result = await FactoryAdmin.instance.ServiceStart(marketInfo);
-                    if (result)
-                    {
-                        marketInfo.status = 3;
-                        this.db.SaveChanges();
-                    }
-                }
-            }
-            else if (status == 4)
-            {
-                result = await FactoryAdmin.instance.ServiceStop(marketInfo);
-                if (result)
-                {
-                    marketInfo.status = 4;
-                    this.db.SaveChanges();
-                }
-            }
-            if (result)
-            {
                 res.success = true;
                 res.code = E_Res_Code.ok;
                 res.message = "操作成功";
-                res.data = market;
+                res.data = marketInfo.status;
             }
         }
         return Json(res);

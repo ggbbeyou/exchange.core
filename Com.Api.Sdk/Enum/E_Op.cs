@@ -14,11 +14,11 @@ public enum E_Op
     /// <summary>
     /// 服务初始化  动作:清除缓存
     /// </summary>
-    service_clear_cache = 1,
+    // service_clear_cache = 1,
     /// <summary>
     /// 服务初始化  动作:预热缓存,如同步K线或成交记录到redis
     /// </summary>
-    service_warm_cache = 2,
+    // service_warm_cache = 2,
     /// <summary>
     /// 服务启动  动作:启动服务,如启动撮合成交后续动作
     /// </summary>

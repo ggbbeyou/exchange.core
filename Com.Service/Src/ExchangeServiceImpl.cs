@@ -44,7 +44,7 @@ public class GreeterImpl : ExchangeService.ExchangeServiceBase
         res.op = req.op;
         res.market = req.market;
         res.data = req.data;
-        if (req.op == E_Op.service_get_status)
+        if (req.op == E_Op.service_get_status || req.op == E_Op.service_start || req.op == E_Op.service_stop)
         {
             Market? marketInfo = JsonConvert.DeserializeObject<Market>(req.data);
             if (marketInfo == null)
@@ -56,83 +56,25 @@ public class GreeterImpl : ExchangeService.ExchangeServiceBase
                 reply.Message = JsonConvert.SerializeObject(res);
                 return reply;
             }
-            Market result = FactoryMatching.instance.ServiceGetStatus(marketInfo);
-            res.data = JsonConvert.SerializeObject(result);
-            res.message = $"服务(成功):获取服务状态:{marketInfo.market}";
-            FactoryService.instance.constant.logger.LogInformation($"服务(成功):获取服务状态:{marketInfo.market}");
-        }
-        else if (req.op == E_Op.service_clear_cache)
-        {
-            Market? marketInfo = JsonConvert.DeserializeObject<Market>(req.data);
-            if (marketInfo == null)
+            if (req.op == E_Op.service_get_status)
             {
-                res.success = false;
-                res.code = E_Res_Code.fail;
-                res.message = $"服务(失败):清除所有缓存,未获取到请求参数:{request.Json}";
-                FactoryService.instance.constant.logger.LogError($"服务(失败):清除所有缓存,未获取到请求参数:{request.Json}");
-                reply.Message = JsonConvert.SerializeObject(res);
-                return reply;
+                marketInfo = FactoryMatching.instance.ServiceGetStatus(marketInfo);
+                res.data = JsonConvert.SerializeObject(marketInfo);
+                res.message = $"服务(成功):获取服务状态:{marketInfo.market}";
+                FactoryService.instance.constant.logger.LogInformation($"服务(成功):获取服务状态:{marketInfo.market}");
             }
-            Market result = FactoryMatching.instance.ServiceClearCache(marketInfo);
-            res.message = $"服务(成功):清除所有缓存:{marketInfo.market}";
-            FactoryService.instance.constant.logger.LogInformation($"服务(成功):清除所有缓存:{marketInfo.market}");
-        }
-        else if (req.op == E_Op.service_warm_cache)
-        {
-            Market? marketInfo = JsonConvert.DeserializeObject<Market>(req.data);
-            if (marketInfo == null)
+            else if (req.op == E_Op.service_start)
             {
-                res.success = false;
-                res.code = E_Res_Code.fail;
-                res.message = $"服务(失败):预热缓存:,未获取到请求参数:{request.Json}";
-                FactoryService.instance.constant.logger.LogError($"服务(失败):预热缓存:,未获取到请求参数:{request.Json}");
-                reply.Message = JsonConvert.SerializeObject(res);
-                return reply;
+                marketInfo = FactoryMatching.instance.ServiceStart(marketInfo);
+                res.message = $"服务(成功):启动服务:{marketInfo.market}";
+                FactoryService.instance.constant.logger.LogInformation($"服务(成功):启动服务:{marketInfo.market}");
             }
-            Market result = FactoryMatching.instance.ServiceWarmCache(marketInfo);
-            res.message = $"服务(成功):预热缓存:{marketInfo.market}";
-            FactoryService.instance.constant.logger.LogInformation($"服务(成功):预热缓存:{marketInfo.market}");
-        }
-        else if (req.op == E_Op.service_start)
-        {
-            Market? marketInfo = JsonConvert.DeserializeObject<Market>(req.data);
-            if (marketInfo == null)
+            else if (req.op == E_Op.service_stop)
             {
-                res.success = false;
-                res.code = E_Res_Code.fail;
-                res.message = $"服务(失败):启动服务:,未获取到请求参数:{request.Json}";
-                FactoryService.instance.constant.logger.LogError($"服务(失败):启动服务:,未获取到请求参数:{request.Json}");
-                reply.Message = JsonConvert.SerializeObject(res);
-                return reply;
-            }
-            FactoryMatching.instance.ServiceStart(marketInfo);
-            res.message = $"服务(成功):启动服务:{marketInfo.market}";
-            FactoryService.instance.constant.logger.LogInformation($"服务(成功):启动服务:{marketInfo.market}");
-        }
-        else if (req.op == E_Op.service_stop)
-        {
-            Market? marketInfo = JsonConvert.DeserializeObject<Market>(req.data);
-            if (marketInfo == null)
-            {
-                res.success = false;
-                res.code = E_Res_Code.fail;
-                res.message = $"服务(失败):关闭服务,未获取到请求参数:{request.Json}";
-                FactoryService.instance.constant.logger.LogError($"服务(失败):关闭服务,未获取到请求参数:{request.Json}");
-                return reply;
-            }
-            try
-            {
-                Market result = FactoryMatching.instance.ServiceStop(marketInfo);
-                res.data = JsonConvert.SerializeObject(result);
+                marketInfo = FactoryMatching.instance.ServiceStop(marketInfo);
+                res.data = JsonConvert.SerializeObject(marketInfo);
                 res.message = $"服务(成功):关闭服务:{marketInfo.market}";
                 FactoryService.instance.constant.logger.LogInformation($"服务(成功):关闭服务:{marketInfo.market}");
-            }
-            catch (System.Exception ex)
-            {
-                res.success = false;
-                res.code = E_Res_Code.fail;
-                res.message = ex.Message;
-                return reply;
             }
         }
         else

@@ -52,76 +52,11 @@ public class FactoryMatching
     {
         if (this.service.ContainsKey(info.market))
         {
-            if (this.service[info.market].run)
-            {
-                info.status = 3;
-            }
-            else
-            {
-                info.status = 4;
-            }
+            info.status = this.service[info.market].run;
         }
         else
         {
-            info.status = 4;
-        }
-        return info;
-    }
-
-    /// <summary>
-    /// 服务:清除所有缓存
-    /// </summary>
-    /// <param name="marketInfo"></param>
-    /// <returns></returns>
-    public Market ServiceClearCache(Market info)
-    {
-        if (this.service.ContainsKey(info.market) && !this.service[info.market].run)
-        {
-            this.service[info.market].match_core.CancelOrder();
-            // FactoryService.instance.constant.i_model.ExchangeDelete(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.min1, info.market), false);
-            // FactoryService.instance.constant.i_model.ExchangeDelete(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.min5, info.market), false);
-            // FactoryService.instance.constant.i_model.ExchangeDelete(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.min15, info.market), false);
-            // FactoryService.instance.constant.i_model.ExchangeDelete(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.min30, info.market), false);
-            // FactoryService.instance.constant.i_model.ExchangeDelete(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.hour1, info.market), false);
-            // FactoryService.instance.constant.i_model.ExchangeDelete(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.hour6, info.market), false);
-            // FactoryService.instance.constant.i_model.ExchangeDelete(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.hour12, info.market), false);
-            // FactoryService.instance.constant.i_model.ExchangeDelete(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.day1, info.market), false);
-            // FactoryService.instance.constant.i_model.ExchangeDelete(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.week1, info.market), false);
-            // FactoryService.instance.constant.i_model.ExchangeDelete(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.month1, info.market), false);
-            // FactoryService.instance.constant.i_model.ExchangeDelete(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.tickers, info.market), false);
-            // FactoryService.instance.constant.i_model.ExchangeDelete(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.trades, info.market), false);
-            // FactoryService.instance.constant.i_model.ExchangeDelete(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.books10, info.market), false);
-            // FactoryService.instance.constant.i_model.ExchangeDelete(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.books50, info.market), false);
-            // FactoryService.instance.constant.i_model.ExchangeDelete(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.books200, info.market), false);
-            // FactoryService.instance.constant.i_model.ExchangeDelete(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.books10_inc, info.market), false);
-            // FactoryService.instance.constant.i_model.ExchangeDelete(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.books50_inc, info.market), false);
-            // FactoryService.instance.constant.i_model.ExchangeDelete(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.books200_inc, info.market), false);
-            FactoryService.instance.constant.i_model.QueuePurge(FactoryService.instance.GetMqOrderPlace(info.market));
-            FactoryService.instance.constant.i_model.QueuePurge(FactoryService.instance.GetMqOrderCancel(info.market));
-            FactoryService.instance.constant.i_model.QueuePurge(FactoryService.instance.GetMqOrderDeal(info.market));
-            //交易记录数据从DB同步到Redis 至少保存最近3个月记录
-            long delete = this.deal_service.DeleteDeal(info.market, DateTimeOffset.UtcNow.AddMonths(-2));
-            ServiceDepth.instance.DeleteRedisDepth(info.market);
-            kline_service.DeleteRedisKline(info.market);
-        }
-        return info;
-    }
-
-    /// <summary>
-    /// 服务:预热缓存
-    /// </summary>
-    public Market ServiceWarmCache(Market info)
-    {
-        if (this.service.ContainsKey(info.market) && !this.service[info.market].run && info.status == 1)
-        {
-            this.service[info.market].match_core.CancelOrder();
-            DateTimeOffset now = DateTimeOffset.UtcNow;
-            now = now.AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond);
-            this.deal_service.DealDbToRedis(info.market, now.AddMonths(-2));
-            DateTimeOffset end = now.AddMilliseconds(-1);
-            this.kline_service.DBtoRedised(info.market, info.symbol, end);
-            this.kline_service.DBtoRedising(info.market, info.symbol);
-            order_service.PushOrderToMqRedis(info.market);
+            info.status = false;
         }
         return info;
     }
@@ -140,9 +75,12 @@ public class FactoryMatching
             model.core = new Core(model);
             this.service.Add(info.market, model);
         }
-        if (this.service[info.market].run == false && (info.status == 2 || info.status == 4))
+        if (this.service[info.market].run == false)
         {
+            ServiceClearCache(info);
+            ServiceWarmCache(info);
             this.service[info.market].run = true;
+            info.status = true;
         }
         return info;
     }
@@ -156,10 +94,47 @@ public class FactoryMatching
         if (this.service.ContainsKey(info.market))
         {
             this.service[info.market].run = false;
+            ServiceClearCache(info);
             this.service[info.market].match_core.CancelOrder();
+            this.service.Remove(info.market);
+            info.status = false;
         }
         return info;
     }
+
+    /// <summary>
+    /// 服务:清除所有缓存
+    /// </summary>
+    /// <param name="marketInfo"></param>
+    /// <returns></returns>
+    private bool ServiceClearCache(Market info)
+    {
+        FactoryService.instance.constant.i_model.QueuePurge(FactoryService.instance.GetMqOrderPlace(info.market));
+        FactoryService.instance.constant.i_model.QueuePurge(FactoryService.instance.GetMqOrderCancel(info.market));
+        FactoryService.instance.constant.i_model.QueuePurge(FactoryService.instance.GetMqOrderDeal(info.market));
+        //交易记录数据从DB同步到Redis 至少保存最近3个月记录
+        long delete = this.deal_service.DeleteDeal(info.market, DateTimeOffset.UtcNow.AddMonths(-2));
+        ServiceDepth.instance.DeleteRedisDepth(info.market);
+        kline_service.DeleteRedisKline(info.market);
+        return true;
+    }
+
+    /// <summary>
+    /// 服务:预热缓存
+    /// </summary>
+    private bool ServiceWarmCache(Market info)
+    {
+        DateTimeOffset now = DateTimeOffset.UtcNow;
+        now = now.AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond);
+        this.deal_service.DealDbToRedis(info.market, now.AddMonths(-2));
+        DateTimeOffset end = now.AddMilliseconds(-1);
+        this.kline_service.DBtoRedised(info.market, info.symbol, end);
+        this.kline_service.DBtoRedising(info.market, info.symbol);
+        order_service.PushOrderToMqRedis(info.market);
+        return true;
+    }
+
+
 
 
 }

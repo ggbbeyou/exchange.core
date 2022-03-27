@@ -538,16 +538,19 @@ public class MatchCore
             cancels.Add(ask);
         }
         List<Orders> trigger_order = trigger.Where(P => (P.side == E_OrderSide.buy && P.trigger_hanging_price <= price) || (P.side == E_OrderSide.sell && P.trigger_hanging_price >= price)).ToList();
-        this.trigger.RemoveAll(P => trigger_order.Select(T => T.order_id).Contains(P.order_id));
-        trigger_order.ForEach(P =>
+        if (trigger_order.Count > 0)
         {
-            P.state = E_OrderState.unsold;
-        });
-        ReqCall<List<Orders>> call_req = new ReqCall<List<Orders>>();
-        call_req.op = E_Op.place;
-        call_req.market = this.model.info.market;
-        call_req.data = trigger_order;
-        FactoryService.instance.constant.MqSend(FactoryService.instance.GetMqOrderPlace(this.model.info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(call_req)));
+            this.trigger.RemoveAll(P => trigger_order.Select(T => T.order_id).Contains(P.order_id));
+            trigger_order.ForEach(P =>
+            {
+                P.state = E_OrderState.unsold;
+            });
+            ReqCall<List<Orders>> call_req = new ReqCall<List<Orders>>();
+            call_req.op = E_Op.place;
+            call_req.market = this.model.info.market;
+            call_req.data = trigger_order;
+            FactoryService.instance.constant.MqSend(FactoryService.instance.GetMqOrderPlace(this.model.info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(call_req)));
+        }
         return price;
     }
 }

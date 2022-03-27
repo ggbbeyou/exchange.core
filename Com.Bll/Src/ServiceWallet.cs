@@ -323,7 +323,7 @@ public class ServiceWallet
                                 amount = item.amount,
                                 operation_uid = 0,
                                 time = item.time,
-                                remarks = "卖币成交",
+                                remarks = "卖币成交,基础币种:卖方支付给买方",
                             });
                             runnings.Add(new Running
                             {
@@ -342,9 +342,9 @@ public class ServiceWallet
                                 amount = item.total,
                                 operation_uid = 0,
                                 time = item.time,
-                                remarks = "买币成交",
+                                remarks = "买币成交,报价币种:买方支付给卖方",
                             });
-                            if (settlement_base != null)
+                            if (settlement_base != null && item.fee_sell > 0)
                             {
                                 settlement_base.available += item.fee_sell;
                                 settlement_base.total = settlement_base.available + settlement_base.freeze;
@@ -362,13 +362,13 @@ public class ServiceWallet
                                     uid_to = settlement_base.user_id,
                                     user_name_from = sell_base.user_name,
                                     user_name_to = settlement_base.user_name,
-                                    amount = item.amount,
+                                    amount = item.fee_sell,
                                     operation_uid = settlement_base.user_id,
                                     time = item.time,
                                     remarks = "卖币手续费",
                                 });
                             }
-                            if (settlement_quote != null)
+                            if (settlement_quote != null && item.fee_buy > 0)
                             {
                                 settlement_quote.available += item.fee_buy;
                                 settlement_quote.total = settlement_quote.available + settlement_quote.freeze;
@@ -386,7 +386,7 @@ public class ServiceWallet
                                     uid_to = settlement_quote.user_id,
                                     user_name_from = buy_quote.user_name,
                                     user_name_to = settlement_quote.user_name,
-                                    amount = item.total,
+                                    amount = item.fee_buy,
                                     operation_uid = settlement_quote.user_id,
                                     time = item.time,
                                     remarks = "买币手续费",

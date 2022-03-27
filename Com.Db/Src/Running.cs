@@ -15,6 +15,11 @@ public class Running
     /// <value></value>
     public long id { get; set; }
     /// <summary>
+    /// 关联id
+    /// </summary>
+    /// <value></value>
+    public long relation_id { get; set; }
+    /// <summary>
     /// 币id
     /// </summary>
     /// <value></value>
@@ -79,5 +84,10 @@ public class Running
     /// </summary>
     /// <value></value>
     public DateTimeOffset time { get; set; }
+    /// <summary>
+    /// 备注
+    /// </summary>
+    /// <value></value>
+    public string? remarks { get; set; }
 
 }

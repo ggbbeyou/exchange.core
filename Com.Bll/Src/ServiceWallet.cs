@@ -282,7 +282,6 @@ public class ServiceWallet
                 {
                     try
                     {
-
                         List<long> user_id = deals.Select(T => T.bid_uid).ToList();
                         user_id.AddRange(deals.Select(T => T.ask_uid).ToList());
                         user_id = user_id.Distinct().ToList();
@@ -310,6 +309,7 @@ public class ServiceWallet
                             runnings.Add(new Running
                             {
                                 id = FactoryService.instance.constant.worker.NextId(),
+                                relation_id = item.trade_id,
                                 coin_id = market.coin_id_base,
                                 coin_name = market.coin_name_base,
                                 wallet_from = sell_base.wallet_id,
@@ -322,11 +322,13 @@ public class ServiceWallet
                                 user_name_to = buy_base.user_name,
                                 amount = item.amount,
                                 operation_uid = 0,
-                                time = DateTimeOffset.UtcNow,
+                                time = item.time,
+                                remarks = null,
                             });
                             runnings.Add(new Running
                             {
                                 id = FactoryService.instance.constant.worker.NextId(),
+                                relation_id = item.trade_id,
                                 coin_id = market.coin_id_quote,
                                 coin_name = market.coin_name_quote,
                                 wallet_from = buy_quote.wallet_id,
@@ -339,7 +341,8 @@ public class ServiceWallet
                                 user_name_to = sell_quote.user_name,
                                 amount = item.total,
                                 operation_uid = 0,
-                                time = DateTimeOffset.UtcNow,
+                                time = item.time,
+                                remarks = null,
                             });
                             if (settlement_base != null)
                             {
@@ -348,6 +351,7 @@ public class ServiceWallet
                                 runnings.Add(new Running
                                 {
                                     id = FactoryService.instance.constant.worker.NextId(),
+                                    relation_id = item.trade_id,
                                     coin_id = market.coin_id_base,
                                     coin_name = market.coin_name_base,
                                     wallet_from = sell_base.wallet_id,
@@ -360,7 +364,8 @@ public class ServiceWallet
                                     user_name_to = settlement_base.user_name,
                                     amount = item.amount,
                                     operation_uid = settlement_base.user_id,
-                                    time = DateTimeOffset.UtcNow,
+                                    time = item.time,
+                                    remarks = null,
                                 });
                             }
                             if (settlement_quote != null)
@@ -370,6 +375,7 @@ public class ServiceWallet
                                 runnings.Add(new Running
                                 {
                                     id = FactoryService.instance.constant.worker.NextId(),
+                                    relation_id = item.trade_id,
                                     coin_id = market.coin_id_quote,
                                     coin_name = market.coin_name_quote,
                                     wallet_from = buy_quote.wallet_id,
@@ -382,7 +388,8 @@ public class ServiceWallet
                                     user_name_to = settlement_quote.user_name,
                                     amount = item.total,
                                     operation_uid = settlement_quote.user_id,
-                                    time = DateTimeOffset.UtcNow,
+                                    time = item.time,
+                                    remarks = null,
                                 });
                             }
                         }

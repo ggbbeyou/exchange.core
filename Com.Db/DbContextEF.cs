@@ -221,6 +221,7 @@ public class DbContextEF : DbContext
             o.HasKey(p => p.id);
             o.HasIndex(P => new { P.coin_id, P.uid_from, P.uid_to, P.time });
             o.Property(P => P.id).IsRequired().ValueGeneratedNever().HasColumnType("bigint").HasComment("id");
+            o.Property(P => P.relation_id).IsRequired().HasColumnType("tinyint").HasComment("关联id");
             o.Property(P => P.coin_id).IsRequired().HasColumnType("tinyint").HasComment("币id");
             o.Property(P => P.coin_name).HasColumnType("nvarchar").HasMaxLength(20).HasComment("币名称");
             o.Property(P => P.wallet_from).IsRequired().HasColumnType("bigint").HasComment("来源 钱包id");
@@ -234,6 +235,7 @@ public class DbContextEF : DbContext
             o.Property(P => P.amount).HasColumnType("decimal").HasPrecision(28, 16).HasComment("量");
             o.Property(P => P.operation_uid).IsRequired().HasColumnType("tinyint").HasComment("操作人 0:系统");
             o.Property(P => P.time).IsRequired().HasColumnType("datetimeoffset").HasComment("时间");
+            o.Property(P => P.remarks).HasColumnType("nvarchar").HasMaxLength(200).HasComment("备注");
             o.ToTable(nameof(Running));
         });
         modelBuilder.Entity<Users>(o =>

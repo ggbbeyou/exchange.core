@@ -66,6 +66,7 @@ public class GreeterImpl : ExchangeService.ExchangeServiceBase
             else if (req.op == E_Op.service_start)
             {
                 marketInfo = FactoryMatching.instance.ServiceStart(marketInfo);
+                res.data = JsonConvert.SerializeObject(marketInfo);
                 res.message = $"服务(成功):启动服务:{marketInfo.market}";
                 FactoryService.instance.constant.logger.LogInformation($"服务(成功):启动服务:{marketInfo.market}");
             }

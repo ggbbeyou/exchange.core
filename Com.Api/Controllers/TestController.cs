@@ -64,6 +64,7 @@ public class TestController : Controller
     /// <returns></returns>
     public IActionResult Init()
     {
+        List<Coin> coins = new List<Coin>();
         Coin usdt = new Coin()
         {
             coin_id = FactoryService.instance.constant.worker.NextId(),
@@ -91,7 +92,9 @@ public class TestController : Controller
         this.db.Coin.Add(usdt);
         this.db.Coin.Add(btc);
         this.db.Coin.Add(eth);
-
+        coins.Add(usdt);
+        coins.Add(btc);
+        coins.Add(eth);
 
         Vip vip1 = new Vip()
         {
@@ -191,7 +194,8 @@ public class TestController : Controller
             vip = vip1.id,
         };
         this.db.Users.Add(settlement_eth_usdt);
-        foreach (var item in this.db.Coin.ToList())
+
+        foreach (var item in coins)
         {
             this.db.Wallet.Add(new Wallet()
             {
@@ -199,8 +203,8 @@ public class TestController : Controller
                 wallet_type = E_WalletType.fee,
                 user_id = settlement_btc_usdt.user_id,
                 user_name = settlement_btc_usdt.user_name,
-                coin_id = usdt.coin_id,
-                coin_name = usdt.coin_name,
+                coin_id = item.coin_id,
+                coin_name = item.coin_name,
                 total = 0,
                 available = 0,
                 freeze = 0,
@@ -211,8 +215,8 @@ public class TestController : Controller
                 wallet_type = E_WalletType.fee,
                 user_id = settlement_eth_usdt.user_id,
                 user_name = settlement_eth_usdt.user_name,
-                coin_id = usdt.coin_id,
-                coin_name = usdt.coin_name,
+                coin_id = item.coin_id,
+                coin_name = item.coin_name,
                 total = 0,
                 available = 0,
                 freeze = 0,
@@ -223,8 +227,8 @@ public class TestController : Controller
                 wallet_type = E_WalletType.recharge,
                 user_id = settlement_btc_usdt.user_id,
                 user_name = settlement_btc_usdt.user_name,
-                coin_id = usdt.coin_id,
-                coin_name = usdt.coin_name,
+                coin_id = item.coin_id,
+                coin_name = item.coin_name,
                 total = 100_000_000_000,
                 available = 100_000_000_000,
                 freeze = 0,
@@ -235,8 +239,8 @@ public class TestController : Controller
                 wallet_type = E_WalletType.recharge,
                 user_id = settlement_eth_usdt.user_id,
                 user_name = settlement_eth_usdt.user_name,
-                coin_id = usdt.coin_id,
-                coin_name = usdt.coin_name,
+                coin_id = item.coin_id,
+                coin_name = item.coin_name,
                 total = 100_000_000_000,
                 available = 100_000_000_000,
                 freeze = 0,
@@ -247,8 +251,8 @@ public class TestController : Controller
                 wallet_type = E_WalletType.withdraw,
                 user_id = settlement_btc_usdt.user_id,
                 user_name = settlement_btc_usdt.user_name,
-                coin_id = usdt.coin_id,
-                coin_name = usdt.coin_name,
+                coin_id = item.coin_id,
+                coin_name = item.coin_name,
                 total = 0,
                 available = 0,
                 freeze = 0,
@@ -259,8 +263,8 @@ public class TestController : Controller
                 wallet_type = E_WalletType.withdraw,
                 user_id = settlement_eth_usdt.user_id,
                 user_name = settlement_eth_usdt.user_name,
-                coin_id = usdt.coin_id,
-                coin_name = usdt.coin_name,
+                coin_id = item.coin_id,
+                coin_name = item.coin_name,
                 total = 0,
                 available = 0,
                 freeze = 0,

@@ -75,7 +75,7 @@ public class MQ
         {
             if (!this.model.run)
             {
-                Task.Delay(1000 * 10);
+                Thread.Sleep(1000 * 10);
                 return false;
             }
             else
@@ -126,7 +126,7 @@ public class MQ
         {
             if (!this.model.run)
             {
-                Task.Delay(1000 * 10);
+                Thread.Sleep(1000 * 10);
                 return false;
             }
             else

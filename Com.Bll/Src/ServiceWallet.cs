@@ -412,7 +412,7 @@ public class ServiceWallet
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
-                db.Runnings.AddRange(runnings);
+                db.Running.AddRange(runnings);
                 db.SaveChanges();
             }
         }

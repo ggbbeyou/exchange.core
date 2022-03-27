@@ -38,7 +38,7 @@ public class DbContextEF : DbContext
     /// 钱包流水
     /// </summary>
     /// <value></value>
-    public DbSet<Running> Runnings { get; set; } = null!;
+    public DbSet<Running> Running { get; set; } = null!;
     /// <summary>
     /// 用户基础信息
     /// </summary>

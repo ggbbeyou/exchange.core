@@ -9,6 +9,10 @@ namespace Com.Db;
 /// </summary>
 public class Running
 {
+    /// <summary>
+    /// id
+    /// </summary>
+    /// <value></value>
     public long id { get; set; }
     /// <summary>
     /// 币id

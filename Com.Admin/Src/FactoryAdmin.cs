@@ -37,8 +37,9 @@ public class FactoryAdmin
     /// </summary>
     /// <param name="info"></param>
     /// <returns>服务状态</returns>
-    public async Task<bool> ServiceGetStatus(Market info)
+    public async Task<bool?> ServiceGetStatus(Market info)
     {
+        bool? status = null;
         try
         {
             GrpcChannel channel = GrpcChannel.ForAddress(info.service_url);
@@ -56,16 +57,16 @@ public class FactoryAdmin
                 if (resinfo != null)
                 {
                     info.status = resinfo.status;
+                    status = resinfo.status;
                 }
             }
             channel.ShutdownAsync().Wait();
-            return true;
         }
         catch (System.Exception ex)
         {
             FactoryService.instance.constant.logger.LogError(ex, "服务:获取服务状态");
         }
-        return info.status;
+        return status;
     }
 
     /// <summary>
@@ -73,8 +74,9 @@ public class FactoryAdmin
     /// </summary>
     /// <param name="info"></param>
     /// <returns>服务状态</returns>
-    public async Task<bool> ServiceStart(Market info)
+    public async Task<bool?> ServiceStart(Market info)
     {
+        bool? status = null;
         try
         {
             GrpcChannel channel = GrpcChannel.ForAddress(info.service_url);
@@ -92,6 +94,7 @@ public class FactoryAdmin
                 if (resinfo != null)
                 {
                     info.status = resinfo.status;
+                    status = resinfo.status;
                 }
             }
             channel.ShutdownAsync().Wait();
@@ -101,7 +104,7 @@ public class FactoryAdmin
         {
             FactoryService.instance.constant.logger.LogError(ex, "服务:启动服务");
         }
-        return info.status;
+        return status;
     }
 
     /// <summary>
@@ -109,8 +112,9 @@ public class FactoryAdmin
     /// </summary>
     /// <param name="info"></param>
     /// <returns>服务状态</returns>
-    public async Task<bool> ServiceStop(Market info)
+    public async Task<bool?> ServiceStop(Market info)
     {
+        bool? status = null;
         try
         {
             GrpcChannel channel = GrpcChannel.ForAddress(info.service_url);
@@ -128,16 +132,16 @@ public class FactoryAdmin
                 if (resinfo != null)
                 {
                     info.status = resinfo.status;
+                    status = resinfo.status;
                 }
             }
             channel.ShutdownAsync().Wait();
-            return true;
         }
         catch (System.Exception ex)
         {
             FactoryService.instance.constant.logger.LogError(ex, "服务:停止服务");
         }
-        return info.status;
+        return status;
     }
 
 }

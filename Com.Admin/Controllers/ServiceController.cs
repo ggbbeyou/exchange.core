@@ -81,15 +81,15 @@ public class ServiceController : Controller
             {
                 if (status == 0)
                 {
-                    marketInfo.status = await FactoryAdmin.instance.ServiceGetStatus(marketInfo);
+                    marketInfo.status = await FactoryAdmin.instance.ServiceGetStatus(marketInfo) ?? marketInfo.status;
                 }
                 else if (status == 1)
                 {
-                    marketInfo.status = await FactoryAdmin.instance.ServiceStart(marketInfo);
+                    marketInfo.status = await FactoryAdmin.instance.ServiceStart(marketInfo) ?? marketInfo.status;
                 }
                 else if (status == 2)
                 {
-                    marketInfo.status = await FactoryAdmin.instance.ServiceStop(marketInfo);
+                    marketInfo.status = await FactoryAdmin.instance.ServiceStop(marketInfo) ?? marketInfo.status;
                 }
                 this.db.SaveChanges();
                 res.success = true;

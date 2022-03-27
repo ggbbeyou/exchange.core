@@ -91,46 +91,8 @@ public class TestController : Controller
         this.db.Coin.Add(usdt);
         this.db.Coin.Add(btc);
         this.db.Coin.Add(eth);
-        Market btcusdt = new Market()
-        {
-            market = FactoryService.instance.constant.worker.NextId(),
-            symbol = "btc/usdt",
-            coin_id_base = btc.coin_id,
-            coin_name_base = btc.coin_name,
-            coin_id_quote = usdt.coin_id,
-            coin_name_quote = usdt.coin_name,
-            separator = "/",
-            price_places = 2,
-            amount_multiple = 0.00001m,
-            fee_market_buy = 0.00003m,
-            fee_market_sell = 0.00003m,
-            fee_limit_buy = 0.001m,
-            fee_limit_sell = 0.003m,
-            market_uid = 0,
-            last_price = Math.Round((decimal)FactoryService.instance.constant.random.NextDouble(), 2),
-            service_url = "http://localhost:8080",
-        };
-        Market ethusdt = new Market()
-        {
-            market = FactoryService.instance.constant.worker.NextId(),
-            symbol = "eth/usdt",
-            coin_id_base = eth.coin_id,
-            coin_name_base = eth.coin_name,
-            coin_id_quote = usdt.coin_id,
-            coin_name_quote = usdt.coin_name,
-            separator = "/",
-            price_places = 2,
-            amount_multiple = 0.0002m,
-            fee_market_buy = 0.00003m,
-            fee_market_sell = 0.00003m,
-            fee_limit_buy = 0.001m,
-            fee_limit_sell = 0.003m,
-            market_uid = 0,
-            last_price = Math.Round((decimal)FactoryService.instance.constant.random.NextDouble(), 2),
-            service_url = "http://localhost:8080",
-        };
-        this.db.Market.Add(btcusdt);
-        this.db.Market.Add(ethusdt);
+
+
         Vip vip1 = new Vip()
         {
             id = FactoryService.instance.constant.worker.NextId(),
@@ -203,6 +165,149 @@ public class TestController : Controller
             this.db.Wallet.Add(wallet_btc);
             this.db.Wallet.Add(wallet_eth);
         }
+        Users settlement_btc_usdt = new Users()
+        {
+            user_id = FactoryService.instance.constant.worker.NextId(),
+            user_name = "settlement_btc/usdt",
+            password = "123456",
+            disabled = false,
+            transaction = true,
+            withdrawal = false,
+            phone = null,
+            email = null,
+            vip = vip1.id,
+        };
+        this.db.Users.Add(settlement_btc_usdt);
+        Users settlement_eth_usdt = new Users()
+        {
+            user_id = FactoryService.instance.constant.worker.NextId(),
+            user_name = "settlement_eth/usdt",
+            password = "123456",
+            disabled = false,
+            transaction = true,
+            withdrawal = false,
+            phone = null,
+            email = null,
+            vip = vip1.id,
+        };
+        this.db.Users.Add(settlement_eth_usdt);
+        foreach (var item in this.db.Coin.ToList())
+        {
+            this.db.Wallet.Add(new Wallet()
+            {
+                wallet_id = FactoryService.instance.constant.worker.NextId(),
+                wallet_type = E_WalletType.fee,
+                user_id = settlement_btc_usdt.user_id,
+                user_name = settlement_btc_usdt.user_name,
+                coin_id = usdt.coin_id,
+                coin_name = usdt.coin_name,
+                total = 0,
+                available = 0,
+                freeze = 0,
+            });
+            this.db.Wallet.Add(new Wallet()
+            {
+                wallet_id = FactoryService.instance.constant.worker.NextId(),
+                wallet_type = E_WalletType.fee,
+                user_id = settlement_eth_usdt.user_id,
+                user_name = settlement_eth_usdt.user_name,
+                coin_id = usdt.coin_id,
+                coin_name = usdt.coin_name,
+                total = 0,
+                available = 0,
+                freeze = 0,
+            });
+            this.db.Wallet.Add(new Wallet()
+            {
+                wallet_id = FactoryService.instance.constant.worker.NextId(),
+                wallet_type = E_WalletType.recharge,
+                user_id = settlement_btc_usdt.user_id,
+                user_name = settlement_btc_usdt.user_name,
+                coin_id = usdt.coin_id,
+                coin_name = usdt.coin_name,
+                total = 100_000_000_000,
+                available = 100_000_000_000,
+                freeze = 0,
+            });
+            this.db.Wallet.Add(new Wallet()
+            {
+                wallet_id = FactoryService.instance.constant.worker.NextId(),
+                wallet_type = E_WalletType.recharge,
+                user_id = settlement_eth_usdt.user_id,
+                user_name = settlement_eth_usdt.user_name,
+                coin_id = usdt.coin_id,
+                coin_name = usdt.coin_name,
+                total = 100_000_000_000,
+                available = 100_000_000_000,
+                freeze = 0,
+            });
+            this.db.Wallet.Add(new Wallet()
+            {
+                wallet_id = FactoryService.instance.constant.worker.NextId(),
+                wallet_type = E_WalletType.withdraw,
+                user_id = settlement_btc_usdt.user_id,
+                user_name = settlement_btc_usdt.user_name,
+                coin_id = usdt.coin_id,
+                coin_name = usdt.coin_name,
+                total = 0,
+                available = 0,
+                freeze = 0,
+            });
+            this.db.Wallet.Add(new Wallet()
+            {
+                wallet_id = FactoryService.instance.constant.worker.NextId(),
+                wallet_type = E_WalletType.withdraw,
+                user_id = settlement_eth_usdt.user_id,
+                user_name = settlement_eth_usdt.user_name,
+                coin_id = usdt.coin_id,
+                coin_name = usdt.coin_name,
+                total = 0,
+                available = 0,
+                freeze = 0,
+            });
+        }
+        Market btcusdt = new Market()
+        {
+            market = FactoryService.instance.constant.worker.NextId(),
+            symbol = "btc/usdt",
+            coin_id_base = btc.coin_id,
+            coin_name_base = btc.coin_name,
+            coin_id_quote = usdt.coin_id,
+            coin_name_quote = usdt.coin_name,
+            separator = "/",
+            price_places = 2,
+            amount_multiple = 0.00001m,
+            fee_market_buy = 0.00003m,
+            fee_market_sell = 0.00003m,
+            fee_limit_buy = 0.001m,
+            fee_limit_sell = 0.003m,
+            market_uid = 0,
+            settlement_uid = settlement_btc_usdt.user_id,
+            last_price = Math.Round((decimal)FactoryService.instance.constant.random.NextDouble(), 2),
+            service_url = "http://localhost:8080",
+        };
+        Market ethusdt = new Market()
+        {
+            market = FactoryService.instance.constant.worker.NextId(),
+            symbol = "eth/usdt",
+            coin_id_base = eth.coin_id,
+            coin_name_base = eth.coin_name,
+            coin_id_quote = usdt.coin_id,
+            coin_name_quote = usdt.coin_name,
+            separator = "/",
+            price_places = 2,
+            amount_multiple = 0.0002m,
+            fee_market_buy = 0.00003m,
+            fee_market_sell = 0.00003m,
+            fee_limit_buy = 0.001m,
+            fee_limit_sell = 0.003m,
+            market_uid = 0,
+            settlement_uid = settlement_eth_usdt.user_id,
+            last_price = Math.Round((decimal)FactoryService.instance.constant.random.NextDouble(), 2),
+            service_url = "http://localhost:8080",
+        };
+        this.db.Market.Add(btcusdt);
+        this.db.Market.Add(ethusdt);
         return Json(this.db.SaveChanges());
     }
 

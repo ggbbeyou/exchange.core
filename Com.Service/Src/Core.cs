@@ -140,39 +140,39 @@ public class Core
     /// <param name="deals"></param>
     private bool ReceiveDealOrder(List<Orders> orders, List<Deal> deals, List<Orders> cancels)
     {
-        bool result = false;
+
         if (deals.Count > 0)
         {
             FactoryService.instance.constant.stopwatch.Restart();
             (bool result, List<Running> running) transaction = wallet_service.Transaction(E_WalletType.main, this.model.info, deals);
             wallet_service.AddRunning(transaction.running);
             FactoryService.instance.constant.stopwatch.Stop();
-            FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};DB=>成交记录{deals.Count}条,实际资产转移(结果{result})");
+            FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};DB=>成交记录{deals.Count}条,实际资产转移(结果{transaction.result})");
             if (!transaction.result)
             {
+                FactoryService.instance.constant.logger.LogError(this.model.eventId, $"DB=>成交记录{deals.Count}条,实际资产转移失败");
                 return false;
             }
             FactoryService.instance.constant.stopwatch.Restart();
             int deal_add = deal_service.AddOrUpdateDeal(deals);
-            result = deal_add > 0 && result;
             FactoryService.instance.constant.stopwatch.Stop();
             FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};DB=>记录:{deals.Count},实际插入{deal_add}条成交记录");
-        }
-        if (orders.Count > 0)
-        {
-            FactoryService.instance.constant.stopwatch.Restart();
-            order_service.UpdateOrder(orders);
-            FactoryService.instance.constant.stopwatch.Stop();
-            FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};DB=>更新{orders.Count}条订单记录");
-            FactoryService.instance.constant.stopwatch.Restart();
-            var uid_order = orders.GroupBy(P => P.uid).ToList();
-            foreach (var item in uid_order)
+            if (orders.Count > 0 && transaction.result && deal_add > 0)
             {
-                res_order.data = item.ToList();
-                FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.orders, this.model.info.market, item.Key), JsonConvert.SerializeObject(item.ToList()));
+                FactoryService.instance.constant.stopwatch.Restart();
+                order_service.UpdateOrder(orders);
+                FactoryService.instance.constant.stopwatch.Stop();
+                FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};DB=>更新{orders.Count}条订单记录");
+                FactoryService.instance.constant.stopwatch.Restart();
+                var uid_order = orders.GroupBy(P => P.uid).ToList();
+                foreach (var item in uid_order)
+                {
+                    res_order.data = item.ToList();
+                    FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.orders, this.model.info.market, item.Key), JsonConvert.SerializeObject(item.ToList()));
+                }
+                FactoryService.instance.constant.stopwatch.Stop();
+                FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};Mq=>推送订单更新");
             }
-            FactoryService.instance.constant.stopwatch.Stop();
-            FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};Mq=>推送订单更新");
         }
         if (deals.Count > 0)
         {

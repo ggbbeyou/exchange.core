@@ -111,7 +111,7 @@ public class Subscribe
             {
                 this.logger.LogTrace("WebSocket reconnecting...");
                 _WebSocket.Close();
-                System.Threading.Thread.Sleep(100);
+                Task.Delay(100);
                 _WebSocket.Connect();
             }
             else if (elapsedSecond > RENEW_WAIT_SECOND)

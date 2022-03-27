@@ -167,10 +167,10 @@ public class ServiceOrder
             if (order.type == E_OrderType.price_market)
             {
                 order.price = null;
+                order.total = null;
                 if (order.side == E_OrderSide.buy)
                 {
                     order.amount = null;
-                    order.total = null;
                     order.amount_unsold = item.amount ?? 0;
                     order.fee_rate = rate_market_buy;
                     coin_quote += item.amount;
@@ -179,7 +179,6 @@ public class ServiceOrder
                 else if (order.side == E_OrderSide.sell)
                 {
                     order.amount = item.amount;
-                    order.total = null;
                     order.amount_unsold = item.amount ?? 0;
                     order.fee_rate = rate_market_sell;
                     coin_base += item.amount;

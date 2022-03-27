@@ -65,7 +65,7 @@ public class FactoryAdmin
         {
             FactoryService.instance.constant.logger.LogError(ex, "服务:获取服务状态");
         }
-        return false;
+        return info.status;
     }
 
     /// <summary>

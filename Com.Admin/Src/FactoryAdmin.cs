@@ -98,7 +98,6 @@ public class FactoryAdmin
                 }
             }
             channel.ShutdownAsync().Wait();
-            return true;
         }
         catch (System.Exception ex)
         {

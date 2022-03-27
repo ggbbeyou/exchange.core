@@ -140,6 +140,7 @@ public class GreeterImpl : ExchangeService.ExchangeServiceBase
             //其它操作
         }
         reply.Message = JsonConvert.SerializeObject(res);
+        await Task.CompletedTask;
         return reply;
     }
 

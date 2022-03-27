@@ -207,11 +207,11 @@ public class ServiceOrder
                 }
             }
             order.amount_done = 0;
-            order.trigger_hanging_price = 0;
-            order.trigger_cancel_price = 0;
+            order.trigger_hanging_price = item.trigger_hanging_price;
+            order.trigger_cancel_price = item.trigger_cancel_price;
             order.create_time = DateTimeOffset.UtcNow;
             order.deal_last_time = null;
-            order.data = null;
+            order.data = item.data;
             order.remarks = null;
             res.data.Add(order);
         }

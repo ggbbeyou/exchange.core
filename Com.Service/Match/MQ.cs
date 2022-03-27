@@ -37,11 +37,6 @@ public class MQ
     /// <value></value>
     public string? consumerTags_order_cancel;
     /// <summary>
-    /// MQ基本属性
-    /// </summary>
-    /// <returns></returns>
-    private IBasicProperties props = FactoryService.instance.constant.i_model.CreateBasicProperties();
-    /// <summary>
     /// 互斥锁
     /// </summary>
     /// <returns></returns>
@@ -53,21 +48,15 @@ public class MQ
     /// <summary>
     /// 临时变量
     /// </summary>
+    /// <typeparam name="Orders"></typeparam>
+    /// <returns></returns>
+    private List<Orders> orders = new List<Orders>();
+    /// <summary>
+    /// 临时变量
+    /// </summary>
     /// <typeparam name="MatchDeal"></typeparam>
     /// <returns></returns>
     private List<Deal> deal = new List<Deal>();
-    /// <summary>
-    /// 临时变量
-    /// </summary>
-    /// <typeparam name="Orders"></typeparam>
-    /// <returns></returns>
-    private List<Orders> deal_order = new List<Orders>();
-    /// <summary>
-    /// 临时变量
-    /// </summary>
-    /// <typeparam name="MatchOrder"></typeparam>
-    /// <returns></returns>
-    private List<Orders> cancel_deal = new List<Orders>();
     /// <summary>
     /// 临时变量
     /// </summary>
@@ -82,7 +71,6 @@ public class MQ
     public MQ(MatchModel model)
     {
         this.model = model;
-        props.DeliveryMode = 2;
         OrderCancel();
         OrderReceive();
     }
@@ -105,81 +93,38 @@ public class MQ
                 ReqCall<List<Orders>>? req = JsonConvert.DeserializeObject<ReqCall<List<Orders>>>(json);
                 if (req != null && req.op == E_Op.place && req.data != null && req.data.Count > 0)
                 {
-                    deal_order.Clear();
+                    this.mutex.WaitOne();
+                    orders.Clear();
                     deal.Clear();
-                    cancel_deal.Clear();
+                    cancel.Clear();
                     FactoryService.instance.constant.stopwatch.Restart();
                     foreach (Orders item in req.data)
                     {
-                        this.mutex.WaitOne();
                         (List<Orders> orders, List<Deal> deals, List<Orders> cancels) match = this.model.match_core.Match(item);
                         if (match.orders.Count == 0 && match.deals.Count == 0 && match.cancels.Count == 0)
                         {
-                            this.mutex.ReleaseMutex();
                             continue;
                         }
                         deal.AddRange(match.deals);
                         foreach (var item1 in match.orders)
                         {
-                            if (!deal_order.Exists(P => P.order_id == item1.order_id))
+                            if (!orders.Exists(P => P.order_id == item1.order_id))
                             {
-                                deal_order.Add(item1);
+                                orders.Add(item1);
                             }
                         }
                         cancel.AddRange(match.cancels);
-                        this.mutex.ReleaseMutex();
                     }
                     FactoryService.instance.constant.stopwatch.Stop();
                     FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};撮合订单{req.data.Count}条");
-                    if (deal.Count() > 0 || deal.Count() > 0 || cancel_deal.Count() > 0)
-                    {
-                        FactoryService.instance.constant.MqTask(FactoryService.instance.GetMqOrderDeal(this.model.info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject((deal_order, deal, cancel_deal))));
-                    }
-                    if (deal.Count() > 0 || cancel_deal.Count > 0)
-                    {
-                        FactoryService.instance.constant.stopwatch.Restart();
-                        (List<OrderBook> bid, List<OrderBook> ask) orderbook = this.model.match_core.GetOrderBook();
-                        Dictionary<E_WebsockerChannel, ResDepth> depths = ServiceDepth.instance.ConvertDepth(this.model.info.market, this.model.info.symbol, orderbook);
-                        ServiceDepth.instance.Push(this.model.info.market, depths, true);
-                        (List<(int index, OrderBook orderbook)> bid, List<(int index, OrderBook orderbook)> ask) diff = ServiceDepth.instance.DiffOrderBook(this.orderbook_old, orderbook);
-                        Dictionary<E_WebsockerChannel, ResDepth> depths_diff = ServiceDepth.instance.ConvertDepth(this.model.info.market, this.model.info.symbol, diff);
-                        foreach (var item in depths_diff)
-                        {
-                            if (item.Key == E_WebsockerChannel.books10_inc)
-                            {
-                                if (depths.ContainsKey(E_WebsockerChannel.books10))
-                                {
-                                    item.Value.total_bid = depths[E_WebsockerChannel.books10].total_bid;
-                                    item.Value.total_ask = depths[E_WebsockerChannel.books10].total_ask;
-                                }
-                            }
-                            else if (item.Key == E_WebsockerChannel.books50_inc)
-                            {
-                                if (depths.ContainsKey(E_WebsockerChannel.books50))
-                                {
-                                    item.Value.total_bid = depths[E_WebsockerChannel.books50].total_bid;
-                                    item.Value.total_ask = depths[E_WebsockerChannel.books50].total_ask;
-                                }
-                            }
-                            else if (item.Key == E_WebsockerChannel.books200_inc)
-                            {
-                                if (depths.ContainsKey(E_WebsockerChannel.books200))
-                                {
-                                    item.Value.total_bid = depths[E_WebsockerChannel.books200].total_bid;
-                                    item.Value.total_ask = depths[E_WebsockerChannel.books200].total_ask;
-                                }
-                            }
-                        }
-                        ServiceDepth.instance.Push(this.model.info.market, depths_diff, false);
-                        this.orderbook_old = orderbook;
-                        FactoryService.instance.constant.stopwatch.Stop();
-                        FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};推送深度行情");
-                    }
+                    DepthChange();
+                    this.mutex.ReleaseMutex();
                 };
                 return true;
             }
         });
     }
+
 
     /// <summary>
     /// 取消订单列队
@@ -217,14 +162,18 @@ public class MQ
                     {
                         cancel.AddRange(this.model.match_core.CancelOrder());
                     }
-                    this.mutex.ReleaseMutex();
                     if (cancel.Count > 0)
                     {
-                        FactoryService.instance.constant.MqTask(FactoryService.instance.GetMqOrderDeal(this.model.info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject((new List<Orders>(), new List<Deal>(), cancel))));
-                        FactoryService.instance.constant.stopwatch.Restart();
-                        (List<OrderBook> bid, List<OrderBook> ask) orderbook = this.model.match_core.GetOrderBook();
-                        Dictionary<E_WebsockerChannel, ResDepth> depths = ServiceDepth.instance.ConvertDepth(this.model.info.market, this.model.info.symbol, orderbook);
-                        ServiceDepth.instance.Push(this.model.info.market, depths, true);
+                        orders.Clear();
+                        deal.Clear();
+                        cancel.Clear();
+                        DepthChange();
+
+                        // FactoryService.instance.constant.MqTask(FactoryService.instance.GetMqOrderDeal(this.model.info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject((new List<Orders>(), new List<Deal>(), cancel))));
+                        // FactoryService.instance.constant.stopwatch.Restart();
+                        // (List<OrderBook> bid, List<OrderBook> ask) orderbook = this.model.match_core.GetOrderBook();
+                        // Dictionary<E_WebsockerChannel, ResDepth> depths = ServiceDepth.instance.ConvertDepth(this.model.info.market, this.model.info.symbol, orderbook);
+                        // ServiceDepth.instance.Push(this.model.info.market, depths, true);
                         // (List<BaseOrderBook> bid, List<BaseOrderBook> ask) diff = DepthService.instance.DiffOrderBook(this.orderbook_old, orderbook);
                         // Dictionary<E_WebsockerChannel, Depth> depths_diff = DepthService.instance.ConvertDepth(this.model.info.market, this.model.info.symbol, diff);
                         // DepthService.instance.PushDiff(depths_diff);
@@ -232,10 +181,63 @@ public class MQ
                         // FactoryService.instance.constant.stopwatch.Stop();
                         // FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};推送深度行情");
                     }
+                    this.mutex.ReleaseMutex();
                 }
                 return true;
             }
         });
     }
+
+    /// <summary>
+    /// 深度变更
+    /// </summary>
+    private void DepthChange()
+    {
+        if (orders.Count() > 0 || deal.Count() > 0 || cancel.Count() > 0)
+        {
+            FactoryService.instance.constant.MqTask(FactoryService.instance.GetMqOrderDeal(this.model.info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject((orders, deal, cancel))));
+        }
+        if (deal.Count() > 0 || cancel.Count > 0)
+        {
+            FactoryService.instance.constant.stopwatch.Restart();
+            (List<OrderBook> bid, List<OrderBook> ask) orderbook = this.model.match_core.GetOrderBook();
+            Dictionary<E_WebsockerChannel, ResDepth> depths = ServiceDepth.instance.ConvertDepth(this.model.info.market, this.model.info.symbol, orderbook);
+            ServiceDepth.instance.Push(this.model.info.market, depths, true);
+            (List<(int index, OrderBook orderbook)> bid, List<(int index, OrderBook orderbook)> ask) diff = ServiceDepth.instance.DiffOrderBook(this.orderbook_old, orderbook);
+            Dictionary<E_WebsockerChannel, ResDepth> depths_diff = ServiceDepth.instance.ConvertDepth(this.model.info.market, this.model.info.symbol, diff);
+            foreach (var item in depths_diff)
+            {
+                if (item.Key == E_WebsockerChannel.books10_inc)
+                {
+                    if (depths.ContainsKey(E_WebsockerChannel.books10))
+                    {
+                        item.Value.total_bid = depths[E_WebsockerChannel.books10].total_bid;
+                        item.Value.total_ask = depths[E_WebsockerChannel.books10].total_ask;
+                    }
+                }
+                else if (item.Key == E_WebsockerChannel.books50_inc)
+                {
+                    if (depths.ContainsKey(E_WebsockerChannel.books50))
+                    {
+                        item.Value.total_bid = depths[E_WebsockerChannel.books50].total_bid;
+                        item.Value.total_ask = depths[E_WebsockerChannel.books50].total_ask;
+                    }
+                }
+                else if (item.Key == E_WebsockerChannel.books200_inc)
+                {
+                    if (depths.ContainsKey(E_WebsockerChannel.books200))
+                    {
+                        item.Value.total_bid = depths[E_WebsockerChannel.books200].total_bid;
+                        item.Value.total_ask = depths[E_WebsockerChannel.books200].total_ask;
+                    }
+                }
+            }
+            ServiceDepth.instance.Push(this.model.info.market, depths_diff, false);
+            this.orderbook_old = orderbook;
+            FactoryService.instance.constant.stopwatch.Stop();
+            FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};推送深度行情");
+        }
+    }
+
 
 }

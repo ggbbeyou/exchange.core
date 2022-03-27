@@ -75,7 +75,6 @@ public class MQ
         {
             if (!this.model.run)
             {
-                Thread.Sleep(1000 * 10);
                 return false;
             }
             else
@@ -126,7 +125,6 @@ public class MQ
         {
             if (!this.model.run)
             {
-                Thread.Sleep(1000 * 10);
                 return false;
             }
             else

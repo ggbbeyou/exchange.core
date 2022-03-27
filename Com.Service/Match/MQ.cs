@@ -27,16 +27,6 @@ public class MQ
     /// </summary>
     private MatchModel model;
     /// <summary>
-    /// 接收挂单订单队列标记
-    /// </summary>
-    /// <value></value>
-    public string? consumerTags_order_send;
-    /// <summary>
-    /// 接收撤单订单队列标记
-    /// </summary>
-    /// <value></value>
-    public string? consumerTags_order_cancel;
-    /// <summary>
     /// 互斥锁
     /// </summary>
     /// <returns></returns>
@@ -78,9 +68,10 @@ public class MQ
     /// <summary>
     /// 接收订单列队
     /// </summary>
-    public void OrderReceive()
+    /// <returns>队列标识</returns>
+    public string OrderReceive()
     {
-        this.consumerTags_order_send = FactoryService.instance.constant.MqReceive(FactoryService.instance.GetMqOrderPlace(this.model.info.market), (e) =>
+        return FactoryService.instance.constant.MqReceive(FactoryService.instance.GetMqOrderPlace(this.model.info.market), (e) =>
         {
             if (!this.model.run)
             {
@@ -128,9 +119,10 @@ public class MQ
     /// <summary>
     /// 取消订单列队
     /// </summary>
-    public void OrderCancel()
+    /// <returns>队列标识</returns>
+    public string OrderCancel()
     {
-        this.consumerTags_order_cancel = FactoryService.instance.constant.MqReceive(FactoryService.instance.GetMqOrderCancel(this.model.info.market), e =>
+        return FactoryService.instance.constant.MqReceive(FactoryService.instance.GetMqOrderCancel(this.model.info.market), e =>
         {
             if (!this.model.run)
             {
@@ -224,6 +216,5 @@ public class MQ
             FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};推送深度行情");
         }
     }
-
 
 }

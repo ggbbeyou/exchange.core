@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.IdentityModel.Tokens;
 using SixLabors;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
@@ -142,6 +145,41 @@ public class Common
             this._logger.LogError(ex, $"生成图片出错");
         }
         return ms.ToArray();
+    }
+
+    /// <summary>
+    /// 生成token
+    /// </summary>
+    /// <param name="host">发布者</param>
+    /// <param name="public_key">公钥</param>
+    /// <param name="id">id</param>
+    /// <param name="no">登录唯一码</param>
+    /// <param name="account">账号</param>
+    /// <param name="name">名称</param>
+    /// <param name="timeout">超时</param>
+    /// <param name="app">终端</param>
+    /// <returns></returns>       
+    public string CreateToken(string host, string public_key, int id, string no, string account, string name, DateTime timeout, string app = "html5")
+    {
+        var claims = new[]
+                    {
+                        new Claim(JwtRegisteredClaimNames.Iss,host),
+                        new Claim(JwtRegisteredClaimNames.Aud,id.ToString()),
+                        new Claim(JwtRegisteredClaimNames.Amr,no),
+                        new Claim(JwtRegisteredClaimNames.GivenName,account),
+                        new Claim(JwtRegisteredClaimNames.FamilyName,name),
+                        new Claim(JwtRegisteredClaimNames.AuthTime,$"{new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds()}"),
+                        new Claim("app",app),
+                    };
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(public_key));
+        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        var token = new JwtSecurityToken(
+            issuer: host,
+            audience: host,
+            claims: claims,
+            expires: timeout,
+            signingCredentials: creds);
+        return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
 }

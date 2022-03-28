@@ -140,7 +140,6 @@ public class Core
     /// <param name="deals"></param>
     private bool ReceiveDealOrder(List<Orders> orders, List<Deal> deals, List<Orders> cancels)
     {
-
         if (deals.Count > 0)
         {
             FactoryService.instance.constant.stopwatch.Restart();

@@ -26,14 +26,14 @@ public class Common
     /// <summary>
     /// 日志接口
     /// </summary>
-    private readonly ILogger _logger;
+    private readonly ILogger logger;
 
     /// <summary>
     /// 初始化
     /// </summary>
     public Common()
     {
-        this._logger = NullLogger.Instance;
+        this.logger = NullLogger.Instance;
     }
 
     /// <summary>
@@ -42,7 +42,7 @@ public class Common
     /// <param name="logger">日志接口</param>
     public Common(ILogger logger)
     {
-        this._logger = logger ?? NullLogger.Instance;
+        this.logger = logger ?? NullLogger.Instance;
     }
 
     /// <summary>
@@ -142,7 +142,7 @@ public class Common
         }
         catch (System.Exception ex)
         {
-            this._logger.LogError(ex, $"生成图片出错");
+            this.logger.LogError(ex, $"生成图片出错");
         }
         return ms.ToArray();
     }

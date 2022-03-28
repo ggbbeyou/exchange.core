@@ -53,4 +53,14 @@ public class Users
     /// </summary>
     /// <value></value>
     public long vip { get; set; }
+    /// <summary>
+    /// sha公钥
+    /// </summary>
+    /// <value></value>
+    public string public_key { get; set; } = null!;
+    /// <summary>
+    /// sha私钥
+    /// </summary>
+    /// <value></value>
+    public string private_key { get; set; } = null!;
 }

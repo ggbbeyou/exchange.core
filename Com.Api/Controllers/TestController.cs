@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 using Com.Api.Sdk.Models;
+using Com.Bll.Util;
 
 namespace Com.Api.Controllers;
 
@@ -115,6 +116,7 @@ public class TestController : Controller
 
         for (int i = 0; i < 10; i++)
         {
+            (string public_key, string private_key) key = Encryption.GetRsaKey();
             Users user = new Users()
             {
                 user_id = FactoryService.instance.constant.worker.NextId(),
@@ -126,6 +128,8 @@ public class TestController : Controller
                 phone = null,
                 email = null,
                 vip = vip1.id,
+                public_key = key.public_key,
+                private_key = key.private_key,
             };
             this.db.Users.Add(user);
             Wallet wallet_usdt = new Wallet()
@@ -168,6 +172,7 @@ public class TestController : Controller
             this.db.Wallet.Add(wallet_btc);
             this.db.Wallet.Add(wallet_eth);
         }
+        (string public_key, string private_key) key_btc_user = Encryption.GetRsaKey();
         Users settlement_btc_usdt = new Users()
         {
             user_id = FactoryService.instance.constant.worker.NextId(),
@@ -179,8 +184,11 @@ public class TestController : Controller
             phone = null,
             email = null,
             vip = vip1.id,
+            public_key = key_btc_user.public_key,
+            private_key = key_btc_user.private_key,
         };
         this.db.Users.Add(settlement_btc_usdt);
+        (string public_key, string private_key) key_eth_user = Encryption.GetRsaKey();
         Users settlement_eth_usdt = new Users()
         {
             user_id = FactoryService.instance.constant.worker.NextId(),
@@ -192,9 +200,10 @@ public class TestController : Controller
             phone = null,
             email = null,
             vip = vip1.id,
+            public_key = key_eth_user.public_key,
+            private_key = key_eth_user.private_key,
         };
         this.db.Users.Add(settlement_eth_usdt);
-
         foreach (var item in coins)
         {
             this.db.Wallet.Add(new Wallet()

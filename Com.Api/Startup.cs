@@ -1,4 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
+using System.Reflection;
 using System.Security.Claims;
 using System.Text;
 using Com.Db;
@@ -7,7 +8,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-// using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 
 namespace Com.Api;
@@ -59,35 +60,50 @@ public class Startup
             options.CacheProfiles.Add("cache_2", new CacheProfile() { Duration = 10 });
             options.CacheProfiles.Add("cache_3", new CacheProfile() { Duration = 60 });
         });
-        // services.AddSwaggerGen(c =>
-        // {
-        //     string? basePath = Path.GetDirectoryName(typeof(Program).Assembly.Location);
-        //     if (basePath != null)
-        //     {
-        //         c.IncludeXmlComments(Path.Combine(basePath, "Com.Api.xml"));
-        //     }
-        //     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Com.Api", Version = "v1" });
-        //     c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
-        //     {
-        //         Description = "JWT授权(数据将在请求头中进行传输) 参数结构: \"Authorization: Bearer {token}\"",
-        //         Name = "Authorization",
-        //         In = Microsoft.OpenApi.Models.ParameterLocation.Header,
-        //         Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
-        //         BearerFormat = "JWT",
-        //         Scheme = "bearer",
-        //     });
-        //     c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
-        //     {{
-        //             new Microsoft.OpenApi.Models.OpenApiSecurityScheme
-        //             {
-        //                 Reference = new Microsoft.OpenApi.Models.OpenApiReference
-        //                 {
-        //                     Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
-        //                     Id = "Bearer"
-        //                 }
-        //             }, new List<string>()
-        //         }});
-        // });
+        services.AddEndpointsApiExplorer();
+        services.AddSwaggerGen(options =>
+        {
+            // string? basePath = Path.GetDirectoryName(typeof(Program).Assembly.Location);
+            // if (basePath != null)
+            // {
+            //     c.IncludeXmlComments(Path.Combine(basePath, "Com.Api.xml"));
+            // }
+            // c.SwaggerDoc("v1", new OpenApiInfo { Title = "Com.Api", Version = "v1" });
+            // c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            // {
+            //     Description = "JWT授权(数据将在请求头中进行传输) 参数结构: \"Authorization: Bearer {token}\"",
+            //     Name = "Authorization",
+            //     In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+            //     Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
+            //     BearerFormat = "JWT",
+            //     Scheme = "bearer",
+            // });
+            // c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+            // {{
+            //         new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            //         {
+            //             Reference = new Microsoft.OpenApi.Models.OpenApiReference
+            //             {
+            //                 Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+            //                 Id = "Bearer"
+            //             }
+            //         }, new List<string>()
+            // }});
+
+            options.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Version = "v1",
+                Title = "ToDo API",
+                Description = "An ASP.NET Core Web API for managing ToDo items",
+            });
+
+            // using System.Reflection;
+            var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+            options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+
+
+
+        });
         services.AddControllersWithViews();
         services.AddHostedService<MainService>();
         services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -194,12 +210,12 @@ public class Startup
         if (env.IsDevelopment() || env.IsStaging())
         {
             app.UseDeveloperExceptionPage();
-            // app.UseSwagger();
-            // app.UseSwaggerUI(c =>
-            // {
-            //     c.SwaggerEndpoint("/swagger/v1/swagger.json", "Com.Api v1");
-            //     c.RoutePrefix = string.Empty;
-            // });
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Com.Api v1");
+                c.RoutePrefix = string.Empty;
+            });
         }
         app.UseWebSockets();
         //路由
@@ -214,24 +230,26 @@ public class Startup
         app.UseAuthorization();
         //响应压缩
         app.UseResponseCompression();
-        app.Use(async (context, next) =>
-        {
-            await next.Invoke();
-            if (context.Response.StatusCode == 404)
-            {
-                // ModelResult result = new ModelResult();
-                // result.code = E_ResultCode.not_found_url;
-                // string json = JsonConvert.SerializeObject(result);
-                // context.Response.StatusCode = 200;
-                // context.Response.ContentType = "application/json";
-                // await context.Response.Body.WriteAsync(System.Text.Encoding.Default.GetBytes(json));
-            }
-        });
+        // app.Use(async (context, next) =>
+        // {
+        //     await next.Invoke();
+        //     if (context.Response.StatusCode == 404)
+        //     {
+        //         // ModelResult result = new ModelResult();
+        //         // result.code = E_ResultCode.not_found_url;
+        //         // string json = JsonConvert.SerializeObject(result);
+        //         // context.Response.StatusCode = 200;
+        //         // context.Response.ContentType = "application/json";
+        //         // await context.Response.Body.WriteAsync(System.Text.Encoding.Default.GetBytes(json));
+        //     }
+        // });
+        // app.UseHttpsRedirection();
         app.UseEndpoints(endpoints =>
         {
-            endpoints.MapControllerRoute(
-                name: "default",
-                pattern: "{controller=Account}/{action=Login}/{id?}");
+            endpoints.MapSwagger();
+            // endpoints.MapControllerRoute(
+            //     name: "default",
+            //     pattern: "{controller=Account}/{action=Login}/{id?}");
         });
     }
 }

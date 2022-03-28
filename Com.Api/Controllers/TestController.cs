@@ -113,7 +113,6 @@ public class TestController : Controller
         };
         this.db.Vip.Add(vip1);
         this.db.Vip.Add(vip2);
-
         for (int i = 0; i < 10; i++)
         {
             (string public_key, string private_key) key = Encryption.GetRsaKey();
@@ -121,7 +120,7 @@ public class TestController : Controller
             {
                 user_id = FactoryService.instance.constant.worker.NextId(),
                 user_name = "user" + i,
-                password = "123456",
+                password = Encryption.SHA256Encrypt("123456_" + i),
                 disabled = false,
                 transaction = true,
                 withdrawal = false,
@@ -177,7 +176,7 @@ public class TestController : Controller
         {
             user_id = FactoryService.instance.constant.worker.NextId(),
             user_name = "settlement_btc/usdt",
-            password = "123456",
+            password = Encryption.SHA256Encrypt("123456"),
             disabled = false,
             transaction = true,
             withdrawal = false,
@@ -193,7 +192,7 @@ public class TestController : Controller
         {
             user_id = FactoryService.instance.constant.worker.NextId(),
             user_name = "settlement_eth/usdt",
-            password = "123456",
+            password = Encryption.SHA256Encrypt("123456"),
             disabled = false,
             transaction = true,
             withdrawal = false,

@@ -1,5 +1,5 @@
-using System.Security.Cryptography;
 using System.Text;
+using System.Security.Cryptography;
 
 namespace Com.Bll.Util;
 
@@ -87,6 +87,7 @@ public class Encryption
     /// <returns></returns>
     public static string RSADecrypt(string private_key, string content)
     {
+
         using (RSACryptoServiceProvider rsa = new RSACryptoServiceProvider())
         {
             rsa.FromXmlString(private_key);
@@ -94,6 +95,7 @@ public class Encryption
             return Encoding.UTF8.GetString(decryptedData);
         }
     }
+
 
     #endregion
 

@@ -65,7 +65,6 @@ builder.Host.ConfigureLogging((context, logging) =>
     logging.ClearProviders();
 #if (DEBUG)
     logging.AddConsole();
-    logging.AddDebug();
 #endif
 });
 var app = builder.Build();

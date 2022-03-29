@@ -336,14 +336,19 @@ public class TestController : ControllerBase
     /// <summary>
     /// 模拟下单
     /// </summary>
+    /// <param name="count">次数</param>
     /// <returns></returns>
     [HttpPost]
     [Route("PlaceOrderText")]
-    public ResCall<List<Orders>> PlaceOrderText()
+    public ResCall<List<Orders>> PlaceOrderText(int count)
     {
+        ResCall<List<Orders>> res = new ResCall<List<Orders>>();
+        res.success = true;
+        res.code = E_Res_Code.ok;
+        res.data = new List<Orders>();
         List<Users> users = this.db.Users.ToList();
-        List<Market> markets = this.db.Market.ToList();        
-        for (int i = 0; i < 10; i++)
+        List<Market> markets = this.db.Market.ToList();
+        for (int i = 0; i < count; i++)
         {
             Users user = users[FactoryService.instance.constant.random.Next(0, 10)];
             Market market = markets[FactoryService.instance.constant.random.Next(0, 2)];
@@ -389,9 +394,9 @@ public class TestController : ControllerBase
                 };
                 reqOrders.Add(order);
             }
-            return order_service.PlaceOrder(market.symbol, user.user_id, user.user_name, reqOrders);
+            order_service.PlaceOrder(market.symbol, user.user_id, user.user_name, reqOrders);
         }
-        return new ResCall<List<Orders>>();
+        return res;
     }
 
 }

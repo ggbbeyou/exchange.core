@@ -15,7 +15,7 @@ namespace Com.Api.Controllers;
 [ApiController]
 public class OrderController : ControllerBase
 {
-    private readonly ILogger<WeatherForecastController> logger;
+    private readonly ILogger<OrderController> logger;
     /// <summary>
     /// 登录玩家id
     /// </summary>
@@ -69,7 +69,7 @@ public class OrderController : ControllerBase
     /// 
     /// </summary>
     /// <param name="logger"></param>
-    public OrderController(ILogger<WeatherForecastController> logger)
+    public OrderController(ILogger<OrderController> logger)
     {
         this.logger = logger;
     }

@@ -63,6 +63,7 @@ public class ServiceController : ControllerBase
     /// <param name="status">状态 0:获取状态,1:服务启动,2:服务停止</param>
     /// <returns></returns>
     [HttpPost]
+    [Route("Manage")]
     public async Task<Res<bool?>> Manage(long market, int status)
     {
         Res<bool?> res = new Res<bool?>();

@@ -15,10 +15,11 @@ namespace Com.Api.Controllers;
 /// <summary>
 /// 
 /// </summary>
+[ApiController]
 [Authorize]
 [AllowAnonymous]
 [Route("[controller]")]
-public class TestController : Controller
+public class TestController : ControllerBase
 {
     /// <summary>
     /// 
@@ -70,7 +71,7 @@ public class TestController : Controller
     /// <returns></returns>
     [HttpGet]
     [Route("Init")]
-    public IActionResult Init()
+    public int Init()
     {
         List<Coin> coins = new List<Coin>();
         Coin usdt = new Coin()
@@ -327,7 +328,7 @@ public class TestController : Controller
         };
         this.db.Market.Add(btcusdt);
         this.db.Market.Add(ethusdt);
-        return Json(this.db.SaveChanges());
+        return this.db.SaveChanges();
     }
 
 
@@ -337,7 +338,7 @@ public class TestController : Controller
     /// <returns></returns>
     [HttpPost]
     [Route("PlaceOrderText")]
-    public IActionResult PlaceOrderText()
+    public ResCall<List<Orders>> PlaceOrderText()
     {
         List<Users> users = this.db.Users.ToList();
         List<Market> markets = this.db.Market.ToList();
@@ -385,12 +386,11 @@ public class TestController : Controller
                     trigger_cancel_price = 0,
                     data = null,
                 };
-
                 reqOrders.Add(order);
             }
-            order_service.PlaceOrder(market.symbol, user.user_id, user.user_name, reqOrders);
+            return order_service.PlaceOrder(market.symbol, user.user_id, user.user_name, reqOrders);
         }
-        return Json("");
+        return new ResCall<List<Orders>>();
     }
 
 }

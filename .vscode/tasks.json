@@ -31,7 +31,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/Com.Admin/Com.Admin.csproj",
+                "${workspaceFolder}/Com.Api.Admin/Com.Api.Admin.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],

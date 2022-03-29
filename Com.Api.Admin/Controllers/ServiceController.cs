@@ -12,10 +12,6 @@ using Com.Api.Sdk.Models;
 
 namespace Com.Api.Admin.Controllers;
 
-///
-// [Route("api/[controller]/[action]")]
-// [Authorize]
-
 /// <summary>
 /// 
 /// </summary>

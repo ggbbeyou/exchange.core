@@ -12,8 +12,13 @@ using Com.Api.Sdk.Models;
 
 namespace Com.Api.Admin.Controllers;
 
+///
 // [Route("api/[controller]/[action]")]
 // [Authorize]
+
+/// <summary>
+/// 
+/// </summary>
 [AllowAnonymous]
 [ApiController]
 [Route("[controller]")]
@@ -42,6 +47,10 @@ public class ServiceController : ControllerBase
     /// </summary>
     public DbContextEF db = null!;
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="db"></param>
     public ServiceController(DbContextEF db)
     {
         this.db = db;

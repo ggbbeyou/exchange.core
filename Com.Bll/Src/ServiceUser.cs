@@ -1,6 +1,8 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Com.Api.Sdk.Enum;
+using Com.Api.Sdk.Models;
 using Com.Bll.Util;
 using Com.Db;
 using Microsoft.EntityFrameworkCore;
@@ -28,6 +30,67 @@ public class ServiceUser
     }
 
     #region 辅助方法
+
+    /// <summary>
+    /// 登录
+    /// </summary>
+    /// <param name="account">账号</param>
+    /// <param name="password">密码</param>
+    /// <param name="no">验证码编号</param>
+    /// <param name="code">验证码</param>
+    /// <param name="app">登录终端</param>
+    /// <param name="ip">登录ip</param>
+    /// <returns></returns>
+    public Res<ResUser> Login(string account, string password, long no, string code, string app, string ip)
+    {
+        Res<ResUser> res = new Res<ResUser>();
+        res.success = false;
+        res.code = E_Res_Code.fail;
+        if (!VerificationCode(no, code))
+        {
+            res.message = "验证码错误";
+            return res;
+        }
+        using (var scope = FactoryService.instance.constant.provider.CreateScope())
+        {
+            using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
+            {
+                var user = db.Users.FirstOrDefault(P => P.disabled == false && (P.user_name == account || P.phone == account || P.email == account) && P.password == password);
+                if (user == null)
+                {
+                    res.message = "账户名或密码错误";
+                    return res;
+                }
+                var token = GenerateToken(user, DateTime.UtcNow.AddMonths(12), app);
+                res.data = new ResUser
+                {
+                    user_id = user.user_id,
+                    user_name = user.user_name,
+                    transaction = user.transaction,
+                    withdrawal = user.withdrawal,
+                    phone = user.phone,
+                    email = user.email,
+                    vip = user.vip,
+                    public_key = user.public_key,
+                    token = token
+                };
+                res.success = true;
+                res.code = E_Res_Code.ok;
+                return res;
+            }
+        }
+    }
+
+    public void Register(string user_name, string password, string phone, string email, string app, string ip)
+    {
+
+    }
+
+    public void logout()
+    {
+
+    }
+
     /// <summary>
     /// 生成token
     /// </summary>

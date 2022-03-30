@@ -105,13 +105,13 @@ public class AccountController : ControllerBase
     [HttpGet]
     [AllowAnonymous]
     [Route("GetVerificationCode")]
-    public Res<KeyValuePair<long, string>> GetVerificationCode()
+    public Res<KeyValuePair<string, string>> GetVerificationCode()
     {
-        Res<KeyValuePair<long, string>> res = new Res<KeyValuePair<long, string>>();
+        Res<KeyValuePair<string, string>> res = new Res<KeyValuePair<string, string>>();
         res.success = true;
         res.code = E_Res_Code.ok;
-        (long, string) verifiction = user_service.GetVerificationCode();
-        res.data = new KeyValuePair<long, string>(verifiction.Item1, verifiction.Item2);
+        (long no, string code) verifiction = user_service.GetVerificationCode();
+        res.data = new KeyValuePair<string, string>(verifiction.no.ToString(), verifiction.code);
         return res;
     }
 

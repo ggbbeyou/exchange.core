@@ -248,7 +248,9 @@ public class ServiceOrder
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
-                db.OrdersBuy.AddRange(res.data);
+                (List<OrderBuy> buy, List<OrderSell> sell) aaa = ConvertOrder(res.data);
+                db.OrderBuy.AddRange(aaa.buy);
+                db.OrderSell.AddRange(aaa.sell);
                 db.SaveChanges();
             }
         }
@@ -308,7 +310,9 @@ public class ServiceOrder
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
-                db.OrdersBuy.UpdateRange(data);
+                (List<OrderBuy> buy, List<OrderSell> sell) orders = ConvertOrder(data);
+                db.OrderBuy.UpdateRange(orders.buy);
+                db.OrderSell.UpdateRange(orders.sell);
                 db.SaveChanges();
             }
         }
@@ -344,10 +348,78 @@ public class ServiceOrder
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
-                List<Orders> orders = db.OrdersBuy.Where(P => P.market == market && (P.state == E_OrderState.unsold || P.state == E_OrderState.partial)).OrderBy(P => P.create_time).ToList();
+                List<Orders> orders = new List<Orders>();
+                orders.AddRange(db.OrderBuy.Where(P => P.market == market && (P.state == E_OrderState.unsold || P.state == E_OrderState.partial)).OrderBy(P => P.create_time).ToList());
+                orders.AddRange(db.OrderSell.Where(P => P.market == market && (P.state == E_OrderState.unsold || P.state == E_OrderState.partial)).OrderBy(P => P.create_time).ToList());
                 return orders;
             }
         }
+    }
+
+    /// <summary>
+    /// 类型转换
+    /// </summary>
+    /// <param name="orders"></param>
+    /// <returns></returns>
+    public (List<OrderBuy> buy, List<OrderSell> sell) ConvertOrder(List<Orders> orders)
+    {
+        List<OrderBuy> buys = new List<OrderBuy>();
+        foreach (var item in orders.Where(P => P.side == E_OrderSide.buy))
+        {
+            buys.Add(new OrderBuy()
+            {
+                order_id = item.order_id,
+                client_id = item.client_id,
+                symbol = item.symbol,
+                side = item.side,
+                type = item.type,
+                price = item.price,
+                amount = item.amount,
+                trigger_hanging_price = item.trigger_hanging_price,
+                trigger_cancel_price = item.trigger_cancel_price,
+                data = item.data,
+                state = item.state,
+                amount_unsold = item.amount_unsold,
+                amount_done = item.amount_done,
+                create_time = item.create_time,
+                deal_last_time = item.deal_last_time,
+                market = item.market,
+                uid = item.uid,
+                user_name = item.user_name,
+                total = item.total,
+                fee_rate = item.fee_rate,
+                remarks = item.remarks,
+            });
+        }
+        List<OrderSell> sells = new List<OrderSell>();
+        foreach (var item in orders.Where(P => P.side == E_OrderSide.sell))
+        {
+            sells.Add(new OrderSell()
+            {
+                order_id = item.order_id,
+                client_id = item.client_id,
+                symbol = item.symbol,
+                side = item.side,
+                type = item.type,
+                price = item.price,
+                amount = item.amount,
+                trigger_hanging_price = item.trigger_hanging_price,
+                trigger_cancel_price = item.trigger_cancel_price,
+                data = item.data,
+                state = item.state,
+                amount_unsold = item.amount_unsold,
+                amount_done = item.amount_done,
+                create_time = item.create_time,
+                deal_last_time = item.deal_last_time,
+                market = item.market,
+                uid = item.uid,
+                user_name = item.user_name,
+                total = item.total,
+                fee_rate = item.fee_rate,
+                remarks = item.remarks,
+            });
+        }
+        return (buys, sells);
     }
 
 

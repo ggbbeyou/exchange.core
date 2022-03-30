@@ -33,12 +33,12 @@ public class DbContextEF : DbContext
     /// 订单表
     /// </summary>
     /// <value></value>
-    public DbSet<Orders> OrdersBuy { get; set; } = null!;
+    public DbSet<OrderBuy> OrderBuy { get; set; } = null!;
     /// <summary>
     /// 订单表
     /// </summary>
     /// <value></value>
-    public DbSet<Orders> OrdersSell { get; set; } = null!;
+    public DbSet<OrderSell> OrderSell { get; set; } = null!;
     /// <summary>
     /// 钱包流水
     /// </summary>
@@ -192,7 +192,7 @@ public class DbContextEF : DbContext
             o.Property(P => P.service_url).IsRequired().HasColumnType("nvarchar").HasMaxLength(50).HasComment("服务地址");
             o.ToTable(nameof(Market));
         });
-        modelBuilder.Entity<Orders>(o =>
+        modelBuilder.Entity<OrderBuy>(o =>
         {
             o.HasKey(p => p.order_id);
             o.HasIndex(P => new { P.market, P.state });
@@ -219,9 +219,9 @@ public class DbContextEF : DbContext
             o.Property(P => P.deal_last_time).HasColumnType("datetimeoffset").HasComment("最后成交时间");
             o.Property(P => P.data).HasColumnType("nvarchar").HasMaxLength(200).HasComment("附加数据");
             o.Property(P => P.remarks).HasColumnType("nvarchar").HasMaxLength(200).HasComment("备注");
-            o.ToTable(nameof(OrdersBuy));
+            o.ToTable(nameof(OrderBuy));
         });
-        modelBuilder.Entity<Orders>(o =>
+        modelBuilder.Entity<OrderSell>(o =>
         {
             o.HasKey(p => p.order_id);
             o.HasIndex(P => new { P.market, P.state });
@@ -248,7 +248,7 @@ public class DbContextEF : DbContext
             o.Property(P => P.deal_last_time).HasColumnType("datetimeoffset").HasComment("最后成交时间");
             o.Property(P => P.data).HasColumnType("nvarchar").HasMaxLength(200).HasComment("附加数据");
             o.Property(P => P.remarks).HasColumnType("nvarchar").HasMaxLength(200).HasComment("备注");
-            o.ToTable(nameof(OrdersSell));
+            o.ToTable(nameof(OrderSell));
         });
         modelBuilder.Entity<Running>(o =>
         {

@@ -97,6 +97,16 @@ public class FactoryService
     }
 
     /// <summary>
+    /// 验证码
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    public string GetRedisVerificationCode(long id)
+    {
+        return string.Format("verification_code:{0}", id);
+    }
+
+    /// <summary>
     /// MQ:发送历史成交记录
     /// </summary>
     /// <param name="market"></param>

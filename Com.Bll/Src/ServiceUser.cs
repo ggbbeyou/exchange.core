@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Com.Bll.Util;
 using Com.Db;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,12 +15,19 @@ namespace Com.Bll;
 public class ServiceUser
 {
     /// <summary>
+    /// 公共类
+    /// </summary>
+    /// <returns></returns>
+    private Common common = new Common();
+
+    /// <summary>
     /// 初始化
     /// </summary>
     public ServiceUser()
     {
     }
 
+    #region 辅助方法
     /// <summary>
     /// 生成token
     /// </summary>
@@ -44,6 +52,36 @@ public class ServiceUser
             signingCredentials: creds);
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
+
+    /// <summary>
+    /// 获取验证码
+    /// </summary>
+    /// <returns></returns>
+    public (long, string) GetVerificationCode()
+    {
+        long no = FactoryService.instance.constant.worker.NextId();
+        string verify = common.CreateRandomCode(4);
+        byte[] b = common.CreateImage(verify);
+        FactoryService.instance.constant.redis.StringSet(FactoryService.instance.GetRedisVerificationCode(no), verify, TimeSpan.FromMinutes(5));
+        return (no, Convert.ToBase64String(b));
+    }
+
+    /// <summary>
+    /// 校验验证码
+    /// </summary>
+    /// <param name="no">编号</param>
+    /// <param name="code">验证码</param>
+    /// <returns></returns>
+    public bool VerificationCode(long no, string code)
+    {
+        string verify = FactoryService.instance.constant.redis.StringGet(FactoryService.instance.GetRedisVerificationCode(no));
+        if (verify.ToLower() == code.ToLower())
+        {
+            return true;
+        }
+        return false;
+    }
+    #endregion
 
     /// <summary>
     /// 

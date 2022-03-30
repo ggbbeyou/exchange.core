@@ -33,7 +33,12 @@ public class DbContextEF : DbContext
     /// 订单表
     /// </summary>
     /// <value></value>
-    public DbSet<Orders> Orders { get; set; } = null!;
+    public DbSet<Orders> OrdersBuy { get; set; } = null!;
+    /// <summary>
+    /// 订单表
+    /// </summary>
+    /// <value></value>
+    public DbSet<Orders> OrdersSell { get; set; } = null!;
     /// <summary>
     /// 钱包流水
     /// </summary>
@@ -214,7 +219,36 @@ public class DbContextEF : DbContext
             o.Property(P => P.deal_last_time).HasColumnType("datetimeoffset").HasComment("最后成交时间");
             o.Property(P => P.data).HasColumnType("nvarchar").HasMaxLength(200).HasComment("附加数据");
             o.Property(P => P.remarks).HasColumnType("nvarchar").HasMaxLength(200).HasComment("备注");
-            o.ToTable(nameof(Orders));
+            o.ToTable(nameof(OrdersBuy));
+        });
+        modelBuilder.Entity<Orders>(o =>
+        {
+            o.HasKey(p => p.order_id);
+            o.HasIndex(P => new { P.market, P.state });
+            o.HasIndex(P => new { P.market, P.uid });
+            o.HasIndex(P => new { P.create_time });
+            o.Property(P => P.order_id).IsRequired().ValueGeneratedNever().HasColumnType("bigint").HasComment("订单ID");
+            o.Property(P => P.client_id).HasColumnType("nvarchar").HasMaxLength(50).HasComment("客户自定义订单id");
+            o.Property(P => P.market).IsRequired().HasColumnType("bigint").HasComment("交易对");
+            o.Property(P => P.symbol).HasColumnType("nvarchar").HasMaxLength(20).HasComment("交易对名称");
+            o.Property(P => P.uid).IsRequired().HasColumnType("bigint").HasComment("用户ID");
+            o.Property(P => P.user_name).IsRequired().HasColumnType("nvarchar").HasMaxLength(50).HasComment("用户名");
+            o.Property(P => P.side).IsRequired().HasColumnType("tinyint").HasComment("交易方向");
+            o.Property(P => P.state).IsRequired().HasColumnType("tinyint").HasComment("成交状态");
+            o.Property(P => P.type).IsRequired().HasColumnType("tinyint").HasComment("订单类型");
+            o.Property(P => P.price).HasColumnType("decimal").HasPrecision(28, 16).HasComment("成交价");
+            o.Property(P => P.amount).HasColumnType("decimal").HasPrecision(28, 16).HasComment("成交量");
+            o.Property(P => P.total).HasColumnType("decimal").HasPrecision(28, 16).HasComment("成交总额");
+            o.Property(P => P.amount_unsold).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("未成交量");
+            o.Property(P => P.amount_done).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("已成交挂单量");
+            o.Property(P => P.fee_rate).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("手续费率");
+            o.Property(P => P.trigger_hanging_price).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("触发挂单价格");
+            o.Property(P => P.trigger_cancel_price).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("触发撤单价格");
+            o.Property(P => P.create_time).IsRequired().HasColumnType("datetimeoffset").HasComment("挂单时间");
+            o.Property(P => P.deal_last_time).HasColumnType("datetimeoffset").HasComment("最后成交时间");
+            o.Property(P => P.data).HasColumnType("nvarchar").HasMaxLength(200).HasComment("附加数据");
+            o.Property(P => P.remarks).HasColumnType("nvarchar").HasMaxLength(200).HasComment("备注");
+            o.ToTable(nameof(OrdersSell));
         });
         modelBuilder.Entity<Running>(o =>
         {

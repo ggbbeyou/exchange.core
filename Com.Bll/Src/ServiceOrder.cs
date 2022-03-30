@@ -248,7 +248,7 @@ public class ServiceOrder
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
-                db.Orders.AddRange(res.data);
+                db.OrdersBuy.AddRange(res.data);
                 db.SaveChanges();
             }
         }
@@ -308,7 +308,7 @@ public class ServiceOrder
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
-                db.Orders.UpdateRange(data);
+                db.OrdersBuy.UpdateRange(data);
                 db.SaveChanges();
             }
         }
@@ -344,7 +344,7 @@ public class ServiceOrder
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
-                List<Orders> orders = db.Orders.Where(P => P.market == market && (P.state == E_OrderState.unsold || P.state == E_OrderState.partial)).OrderBy(P => P.create_time).ToList();
+                List<Orders> orders = db.OrdersBuy.Where(P => P.market == market && (P.state == E_OrderState.unsold || P.state == E_OrderState.partial)).OrderBy(P => P.create_time).ToList();
                 return orders;
             }
         }

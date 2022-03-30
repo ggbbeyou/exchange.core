@@ -1,8 +1,12 @@
 using System.Reflection;
+using System.Text;
 using Com.Api;
 using Com.Db;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
@@ -29,6 +33,22 @@ builder.Services.AddControllers(options =>
     options.CacheProfiles.Add("cache_2", new CacheProfile() { Duration = 10 });
     options.CacheProfiles.Add("cache_3", new CacheProfile() { Duration = 60 });
 });
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters()
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("ThisKeyMustBeAtLeast16Characters")),
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        ValidateLifetime = true,
+        ClockSkew = TimeSpan.FromMinutes(5)
+    };
+});
 builder.Services.AddResponseCompression();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -36,22 +56,20 @@ builder.Services.AddSwaggerGen(options =>
 {
     var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
-    options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        Description = "JWT授权(数据将在请求头中进行传输) 参数结构: \"Authorization: Bearer {token}\"",
-        Name = "Authorization",
-        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
-        Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
         BearerFormat = "JWT",
-        Scheme = "bearer",
+        Description = "JWT Authorization header using the Bearer scheme."
     });
-    options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
     {{
-        new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+        new OpenApiSecurityScheme
         {
-            Reference = new Microsoft.OpenApi.Models.OpenApiReference
+            Reference = new OpenApiReference
             {
-                Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                Type = ReferenceType.SecurityScheme,
                 Id = "Bearer"
             }
         }, new List<string>()

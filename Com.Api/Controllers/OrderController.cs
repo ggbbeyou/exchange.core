@@ -13,6 +13,7 @@ namespace Com.Api.Controllers;
 /// </summary>
 [Route("[controller]")]
 [ApiController]
+[Authorize]
 public class OrderController : ControllerBase
 {
     private readonly ILogger<OrderController> logger;
@@ -82,7 +83,6 @@ public class OrderController : ControllerBase
     /// <returns></returns>
     [HttpPost]
     [Route("PlaceOrder")]
-    // [Authorize]
     public ResCall<List<ResOrder>> PlaceOrder(string symbol, List<ReqOrder> orders)
     {
         //判断用户api是否有交易权限

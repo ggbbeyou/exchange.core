@@ -51,6 +51,7 @@ public class ServiceUser
             res.message = "验证码错误";
             return res;
         }
+        FactoryService.instance.constant.redis.KeyDelete(FactoryService.instance.GetRedisVerificationCode(no));
         using (var scope = FactoryService.instance.constant.provider.CreateScope())
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
@@ -138,7 +139,7 @@ public class ServiceUser
     public bool VerificationCode(long no, string code)
     {
         string verify = FactoryService.instance.constant.redis.StringGet(FactoryService.instance.GetRedisVerificationCode(no));
-        if (verify.ToLower() == code.ToLower())
+        if (verify != null && verify.ToLower() == code.ToLower())
         {
             return true;
         }

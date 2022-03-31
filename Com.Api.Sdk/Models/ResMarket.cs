@@ -1,5 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
+using Com.Api.Sdk;
+using Newtonsoft.Json;
 
 namespace Com.Db;
 
@@ -47,25 +49,30 @@ public class ResMarket
     /// 交易量最小整数倍数
     /// </summary>
     /// <value></value>
+    [JsonConverter(typeof(JsonConverterDecimal))]
     public decimal amount_multiple { get; set; }
     /// <summary>
     /// 市价买手续费
     /// </summary>
     /// <value></value>
+    [JsonConverter(typeof(JsonConverterDecimal))]
     public decimal fee_market_buy { get; set; }
     /// <summary>
     /// 市价卖手续费
     /// </summary>
     /// <value></value>
+    [JsonConverter(typeof(JsonConverterDecimal))]
     public decimal fee_market_sell { get; set; }
     /// <summary>
     /// 限价买手续费
     /// </summary>
     /// <value></value>
+    [JsonConverter(typeof(JsonConverterDecimal))]
     public decimal fee_limit_buy { get; set; }
     /// <summary>
     /// 限价卖手续费
     /// </summary>
     /// <value></value>
+    [JsonConverter(typeof(JsonConverterDecimal))]
     public decimal fee_limit_sell { get; set; }
 }

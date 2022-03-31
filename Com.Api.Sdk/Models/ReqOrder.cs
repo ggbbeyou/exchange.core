@@ -1,6 +1,7 @@
 ﻿
 using Com.Api.Sdk.Enum;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Com.Api.Sdk.Models;
 
@@ -33,6 +34,7 @@ public class ReqOrder
     /// 挂单价(限价单必填,市价单无效,db:市价为成交均价)
     /// </summary>
     /// <value></value>
+    [JsonConverter(typeof(JsonConverterDecimal))]
     public decimal? price { get; set; }
     /// <summary>
     /// 限价单:挂单量,市价单:总额,db:量

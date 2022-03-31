@@ -32,6 +32,7 @@ public class ResOrder : ReqOrder
     /// 已成交量 买:总额,卖:交易量
     /// </summary>
     /// <value></value>
+    [JsonConverter(typeof(JsonConverterDecimal))]
     public decimal amount_done { get; set; }
     /// <summary>
     /// 挂单时间

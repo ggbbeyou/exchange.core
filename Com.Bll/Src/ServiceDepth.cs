@@ -118,17 +118,17 @@ public class ServiceDepth
         for (int i = 0; i < orderbook.ask.Count; i++)
         {
             total_ask += orderbook.ask[i].orderbook.amount * orderbook.ask[i].orderbook.price;
-            if (orderbook.bid[i].index <= 10)
+            if (orderbook.ask[i].index <= 10)
             {
                 depths[E_WebsockerChannel.books10].ask.Add(new List<decimal>() { orderbook.ask[i].orderbook.price, orderbook.ask[i].orderbook.amount });
                 depths[E_WebsockerChannel.books10].total_ask = total_ask;
             }
-            if (orderbook.bid[i].index <= 50)
+            if (orderbook.ask[i].index <= 50)
             {
                 depths[E_WebsockerChannel.books50].ask.Add(new List<decimal>() { orderbook.ask[i].orderbook.price, orderbook.ask[i].orderbook.amount });
                 depths[E_WebsockerChannel.books50].total_ask = total_ask;
             }
-            if (orderbook.bid[i].index <= 200)
+            if (orderbook.ask[i].index <= 200)
             {
                 depths[E_WebsockerChannel.books200].ask.Add(new List<decimal>() { orderbook.ask[i].orderbook.price, orderbook.ask[i].orderbook.amount });
                 depths[E_WebsockerChannel.books200].total_ask = total_ask;

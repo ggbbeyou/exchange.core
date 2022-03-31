@@ -84,7 +84,7 @@ public class Core
     /// 临时变量
     /// </summary>
     /// <returns></returns>
-    private ResWebsocker<ResDeal> res_deal = new ResWebsocker<ResDeal>();
+    private ResWebsocker<List<ResDeal>> res_deal = new ResWebsocker<List<ResDeal>>();
     /// <summary>
     /// 临时变量
     /// </summary>
@@ -200,10 +200,10 @@ public class Core
             SortedSetEntry[] entries = new SortedSetEntry[deals.Count()];
             for (int i = 0; i < deals.Count(); i++)
             {
-                entries[i] = new SortedSetEntry(JsonConvert.SerializeObject(deals[i]), deals[i].time.ToUnixTimeMilliseconds());
+                entries[i] = new SortedSetEntry(JsonConvert.SerializeObject((ResDeal)deals[i]), deals[i].time.ToUnixTimeMilliseconds());
             }
             FactoryService.instance.constant.redis.SortedSetAdd(FactoryService.instance.GetRedisDeal(this.model.info.market), entries);
-            res_deal.data = deal_service.ConvertDeal(this.model.info.symbol, deals);
+            res_deal.data = deals.ConvertAll(P => (ResDeal)P);
             FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.trades, this.model.info.market), JsonConvert.SerializeObject(res_deal));
             FactoryService.instance.constant.stopwatch.Stop();
             FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};Mq,Redis=>推送交易记录");

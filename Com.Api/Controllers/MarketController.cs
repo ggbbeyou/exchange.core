@@ -68,6 +68,10 @@ public class MarketController : ControllerBase
     /// Service:订单
     /// </summary>
     public ServiceOrder service_order = new ServiceOrder();
+    /// <summary>
+    /// Service:交易记录
+    /// </summary>
+    public ServiceDeal service_deal = new ServiceDeal();
 
     /// <summary>
     /// 
@@ -83,7 +87,7 @@ public class MarketController : ControllerBase
     /// </summary>
     /// <param name="symbol">交易对</param>
     /// <returns></returns>
-    [HttpPost]
+    [HttpGet]
     [Route("market")]
     public Res<ResMarket?> Market(string symbol)
     {
@@ -103,7 +107,7 @@ public class MarketController : ControllerBase
     /// </summary>
     /// <param name="symbol"></param>
     /// <returns></returns>
-    [HttpPost]
+    [HttpGet]
     [Route("ticker")]
     public Res<ResTicker?> Ticker(string symbol)
     {
@@ -124,7 +128,7 @@ public class MarketController : ControllerBase
     /// <param name="symbol">交易对</param>
     /// <param name="sz">深度档数,只支持10,50,200</param>
     /// <returns></returns>
-    [HttpPost]
+    [HttpGet]
     [Route("depth")]
     public Res<ResDepth?> Depth(string symbol, int sz = 50)
     {
@@ -149,7 +153,7 @@ public class MarketController : ControllerBase
     /// <param name="skip">跳过行数</param>
     /// <param name="take">获取行数</param>
     /// <returns></returns>
-    [HttpPost]
+    [HttpGet]
     [Route("klines")]
     public Res<List<ResKline>?> Klines(string symbol, E_KlineType type, DateTimeOffset start, DateTimeOffset? end, long skip, long take)
     {
@@ -186,6 +190,42 @@ public class MarketController : ControllerBase
         return res;
     }
 
+    /// <summary>
+    /// 获取历史成交记录
+    /// </summary>
+    /// <param name="symbol">交易对</param>
+    /// <param name="start">开始时间</param>
+    /// <param name="end">结束时间</param>
+    /// <param name="skip">跳过行数</param>
+    /// <param name="take">获取行数</param>
+    /// <returns></returns>
+    [HttpGet]
+    [Route("klines")]
+    public Res<ResDeal?> deals(string symbol, DateTimeOffset start, DateTimeOffset? end, long skip, long take)
+    {
+        Res<ResDeal?> res = new Res<ResDeal?>();
+        double stop = double.PositiveInfinity;
+        if (end != null)
+        {
+            stop = end.Value.ToUnixTimeMilliseconds();
+        }
+        Market? market = service_market.GetMarketBySymbol(symbol);
+        if (market != null)
+        {
+            RedisValue[] rv = FactoryService.instance.constant.redis.SortedSetRangeByScore(key: FactoryService.instance.GetRedisDeal(market.market), start: start.ToUnixTimeMilliseconds(), stop: stop, exclude: Exclude.Both, skip: skip, take: take, order: StackExchange.Redis.Order.Ascending);
+            List<Deal> deals = new List<Deal>();
+            foreach (var item in rv)
+            {
+                Deal? resKline = JsonConvert.DeserializeObject<Deal>(item);
+                if (resKline != null)
+                {
+                    deals.Add(resKline);
+                }
+            }
+            res.data = service_deal.ConvertDeal(market.symbol, deals);
+        }
+        return res;
+    }
 
 
 }

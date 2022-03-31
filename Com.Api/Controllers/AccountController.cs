@@ -85,8 +85,8 @@ public class AccountController : ControllerBase
     /// <param name="app">终端</param>
     /// <returns></returns>
     [HttpPost]
-    [AllowAnonymous]
     [Route("login")]
+    [AllowAnonymous]
     public Res<ResUser> Login(string account, string password, long no, string code, string app)
     {
         string ip = "";

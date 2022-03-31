@@ -9,6 +9,7 @@ using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 using Com.Api.Sdk.Models;
 using Com.Bll.Util;
+using Newtonsoft.Json;
 
 namespace Com.Api.Controllers;
 
@@ -394,6 +395,7 @@ public class TestController : ControllerBase
                 };
                 reqOrders.Add(order);
             }
+            string json = JsonConvert.SerializeObject(reqOrders);
             order_service.PlaceOrder(market.symbol, user.user_id, user.user_name, reqOrders);
         }
         return res;

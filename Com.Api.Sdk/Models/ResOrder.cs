@@ -9,7 +9,6 @@ namespace Com.Api.Sdk.Models;
 /// <summary>
 /// 下单响应模型
 /// </summary>
-[JsonConverter(typeof(JsonConverterDecimal))]
 public class ResOrder : ReqOrder
 {
     /// <summary>
@@ -27,6 +26,7 @@ public class ResOrder : ReqOrder
     /// 未成交 买:总额,卖:交易量
     /// </summary>
     /// <value></value>
+    [JsonConverter(typeof(JsonConverterDecimal))]
     public decimal amount_unsold { get; set; }
     /// <summary>
     /// 已成交量 买:总额,卖:交易量

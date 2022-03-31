@@ -7,7 +7,6 @@ namespace Com.Api.Sdk.Models;
 /// <summary>
 /// 下单请求模型
 /// </summary>
-[JsonConverter(typeof(JsonConverterDecimal))]
 public class ReqOrder
 {
     /// <summary>

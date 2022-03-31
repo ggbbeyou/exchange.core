@@ -30,11 +30,24 @@ public class JsonConverterDecimal : JsonConverter
     {
         if (value == null)
         {
-            writer.WriteValue(value);
-        }
-        else
+            writer.WriteNull();
+            return;
+        }        
+        double input = 0;
+        if (value is decimal)
         {
-            writer.WriteValue((decimal)((double)value));
+            var d = (decimal)value;
+            input = Convert.ToDouble(d);
         }
+        else if (value is float)
+        {
+            var d = (float)value;
+            input = Convert.ToDouble(d);
+        }
+        else if (value != null)
+        {
+            input = (double)value;
+        }
+        writer.WriteValue((decimal)input);
     }
 }

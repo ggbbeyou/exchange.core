@@ -22,6 +22,7 @@ public class ResKline
     /// <value></value>
     [JsonConverter(typeof(StringEnumConverter))]
     public E_KlineType type { get; set; }
+    [JsonConverter(typeof(JsonConverterDecimal))]
     /// <summary>
     /// 成交量
     /// </summary>

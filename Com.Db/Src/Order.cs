@@ -1,8 +1,9 @@
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
+using Com.Api.Sdk;
 using Com.Api.Sdk.Enum;
 using Com.Api.Sdk.Models;
+using Newtonsoft.Json;
 
 namespace Com.Db;
 
@@ -10,6 +11,7 @@ namespace Com.Db;
 /// 订单模型
 /// 注:此表数据量超大,请使用数据库表分区功能
 /// </summary>
+
 public class Orders : ResOrder
 {
     /// <summary>
@@ -35,7 +37,7 @@ public class Orders : ResOrder
     /// <summary>
     /// 手续费率
     /// </summary>
-    /// <value></value>
+    /// <value></value>    
     public decimal fee_rate { get; set; }
     /// <summary>
     /// 备注

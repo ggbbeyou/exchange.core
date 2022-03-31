@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace Com.Api.Sdk.Models;
 
 /// <summary>
@@ -14,7 +16,7 @@ public class ResUser
     /// 用户名
     /// </summary>
     /// <value></value>
-    public string user_name { get; set; } = null!;    
+    public string user_name { get; set; } = null!;
     /// <summary>
     /// 是否交易
     /// </summary>
@@ -49,5 +51,6 @@ public class ResUser
     /// 令牌
     /// </summary>
     /// <value></value>
+    [NotMapped]
     public string token { get; set; } = null!;
 }

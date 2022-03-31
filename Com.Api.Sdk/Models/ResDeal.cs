@@ -1,5 +1,6 @@
 using Com.Api.Sdk.Enum;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Com.Api.Sdk.Models;
 
@@ -27,6 +28,7 @@ public class ResDeal
     /// 成交触发方向
     /// </summary>
     /// <value></value>
+    [JsonConverter(typeof(StringEnumConverter))]
     public E_OrderSide trigger_side { get; set; }
     /// <summary>
     /// 成交时间

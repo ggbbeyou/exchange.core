@@ -1,5 +1,7 @@
 using System;
 using Com.Api.Sdk.Enum;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Com.Api.Sdk.Models;
 
@@ -17,6 +19,7 @@ public class Res<T>
     /// 返回编号
     /// </summary>
     /// <value></value>
+    [JsonConverter(typeof(StringEnumConverter))]
     public E_Res_Code code { get; set; }
     /// <summary>
     /// 响应消息

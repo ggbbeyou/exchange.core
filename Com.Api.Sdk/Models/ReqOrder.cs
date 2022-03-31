@@ -24,11 +24,13 @@ public class ReqOrder
     /// 交易方向
     /// </summary>
     /// <value></value>
+    [JsonConverter(typeof(StringEnumConverter))]
     public E_OrderSide side { get; set; }
     /// <summary>
     /// 订单类型
     /// </summary>
     /// <value></value>
+    [JsonConverter(typeof(StringEnumConverter))]
     public E_OrderType type { get; set; }
     /// <summary>
     /// 挂单价(限价单必填,市价单无效,db:市价为成交均价)

@@ -3,6 +3,7 @@
 
 using Com.Api.Sdk.Enum;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Com.Api.Sdk.Models;
 
@@ -20,6 +21,7 @@ public class ResOrder : ReqOrder
     /// 订单状态
     /// </summary>
     /// <value></value>
+    [JsonConverter(typeof(StringEnumConverter))]
     public E_OrderState state { get; set; }
 
     /// <summary>

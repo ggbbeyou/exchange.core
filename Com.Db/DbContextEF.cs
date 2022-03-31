@@ -178,7 +178,6 @@ public class DbContextEF : DbContext
             o.Property(P => P.coin_name_base).IsRequired().HasColumnType("nvarchar").HasMaxLength(20).HasComment("基础币种名");
             o.Property(P => P.coin_id_quote).IsRequired().ValueGeneratedNever().HasColumnType("bigint").HasComment("报价币种id");
             o.Property(P => P.coin_name_quote).IsRequired().HasColumnType("nvarchar").HasMaxLength(20).HasComment("报价币种名");
-            o.Property(P => P.separator).HasColumnType("nvarchar").HasMaxLength(10).HasComment("分隔符");
             o.Property(P => P.status).IsRequired().HasColumnType("int").HasComment("状态 true:正在运行,false:停止");
             o.Property(P => P.price_places).IsRequired().HasColumnType("int").HasComment("价格小数位数");
             o.Property(P => P.amount_multiple).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("交易量整数倍数");

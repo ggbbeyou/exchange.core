@@ -29,12 +29,7 @@ public class ResMarket
     /// 报价币种名
     /// </summary>
     /// <value></value>
-    public string coin_name_quote { get; set; } = null!;
-    /// <summary>
-    /// 分隔符
-    /// </summary>
-    /// <value></value>
-    public string separator { get; set; } = "/";
+    public string coin_name_quote { get; set; } = null!;   
     /// <summary>
     /// 状态 true:正在运行,false:停止
     /// </summary>

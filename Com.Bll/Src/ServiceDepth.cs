@@ -39,43 +39,45 @@ public class ServiceDepth
         depths.Add(E_WebsockerChannel.books10, new ResDepth());
         depths.Add(E_WebsockerChannel.books50, new ResDepth());
         depths.Add(E_WebsockerChannel.books200, new ResDepth());
-        foreach (var item in depths)
+        decimal total_bid = 0;
+        for (int i = 0; i < orderbook.bid.Count; i++)
         {
-            item.Value.symbol = symbol;
-            item.Value.timestamp = DateTimeOffset.UtcNow;
-            switch (item.Key)
+            total_bid += orderbook.bid[i].amount * orderbook.bid[i].price;
+            if (i < 10)
             {
-                case E_WebsockerChannel.books10:
-                    item.Value.bid = new decimal[orderbook.bid.Count < 10 ? orderbook.bid.Count : 10, 2];
-                    item.Value.ask = new decimal[orderbook.ask.Count < 10 ? orderbook.ask.Count : 10, 2];
-                    break;
-                case E_WebsockerChannel.books50:
-                    item.Value.bid = new decimal[orderbook.bid.Count < 50 ? orderbook.bid.Count : 50, 2];
-                    item.Value.ask = new decimal[orderbook.ask.Count < 50 ? orderbook.ask.Count : 50, 2];
-                    break;
-                case E_WebsockerChannel.books200:
-                    item.Value.bid = new decimal[orderbook.bid.Count < 200 ? orderbook.bid.Count : 200, 2];
-                    item.Value.ask = new decimal[orderbook.ask.Count < 200 ? orderbook.ask.Count : 200, 2];
-                    break;
-                default:
-                    break;
+                depths[E_WebsockerChannel.books10].bid.Add(new List<decimal>() { orderbook.bid[i].price, orderbook.bid[i].amount });
+                depths[E_WebsockerChannel.books10].total_bid = total_bid;
             }
-            decimal total_bid = 0;
-            decimal total_ask = 0;
-            for (int i = 0; i < item.Value.bid.GetLength(0); i++)
+            if (i < 50)
             {
-                item.Value.bid[i, 0] = orderbook.bid[i].price;
-                item.Value.bid[i, 1] = orderbook.bid[i].amount;
-                total_bid += orderbook.bid[i].amount * orderbook.bid[i].price;
+                depths[E_WebsockerChannel.books50].bid.Add(new List<decimal>() { orderbook.bid[i].price, orderbook.bid[i].amount });
+                depths[E_WebsockerChannel.books50].total_bid = total_bid;
             }
-            item.Value.total_bid = total_bid;
-            for (int i = 0; i < item.Value.ask.GetLength(0); i++)
+            if (i < 200)
             {
-                item.Value.ask[i, 0] = orderbook.ask[i].price;
-                item.Value.ask[i, 1] = orderbook.ask[i].amount;
-                total_ask += orderbook.ask[i].amount * orderbook.ask[i].price;
+                depths[E_WebsockerChannel.books200].bid.Add(new List<decimal>() { orderbook.bid[i].price, orderbook.bid[i].amount });
+                depths[E_WebsockerChannel.books200].total_bid = total_bid;
             }
-            item.Value.total_ask = total_ask;
+        }
+        decimal total_ask = 0;
+        for (int i = 0; i < orderbook.ask.Count; i++)
+        {
+            total_ask += orderbook.ask[i].amount * orderbook.ask[i].price;
+            if (i < 10)
+            {
+                depths[E_WebsockerChannel.books10].ask.Add(new List<decimal>() { orderbook.ask[i].price, orderbook.ask[i].amount });
+                depths[E_WebsockerChannel.books10].total_ask = total_ask;
+            }
+            if (i < 50)
+            {
+                depths[E_WebsockerChannel.books50].ask.Add(new List<decimal>() { orderbook.ask[i].price, orderbook.ask[i].amount });
+                depths[E_WebsockerChannel.books50].total_ask = total_ask;
+            }
+            if (i < 200)
+            {
+                depths[E_WebsockerChannel.books200].ask.Add(new List<decimal>() { orderbook.ask[i].price, orderbook.ask[i].amount });
+                depths[E_WebsockerChannel.books200].total_ask = total_ask;
+            }
         }
         return depths;
     }
@@ -92,36 +94,44 @@ public class ServiceDepth
         depths.Add(E_WebsockerChannel.books10_inc, new ResDepth());
         depths.Add(E_WebsockerChannel.books50_inc, new ResDepth());
         depths.Add(E_WebsockerChannel.books200_inc, new ResDepth());
-        foreach (var item in depths)
+        decimal total_bid = 0;
+        for (int i = 0; i < orderbook.bid.Count; i++)
         {
-            item.Value.symbol = symbol;
-            item.Value.timestamp = DateTimeOffset.UtcNow;
-            switch (item.Key)
+            total_bid += orderbook.bid[i].orderbook.amount * orderbook.bid[i].orderbook.price;
+            if (i < 10)
             {
-                case E_WebsockerChannel.books10_inc:
-                    item.Value.bid = new decimal[orderbook.bid.Count(P => Math.Abs(P.index) <= 10), 2];
-                    item.Value.ask = new decimal[orderbook.ask.Count(P => Math.Abs(P.index) <= 10), 2];
-                    break;
-                case E_WebsockerChannel.books50_inc:
-                    item.Value.bid = new decimal[orderbook.bid.Count(P => Math.Abs(P.index) <= 50), 2];
-                    item.Value.ask = new decimal[orderbook.ask.Count(P => Math.Abs(P.index) <= 50), 2];
-                    break;
-                case E_WebsockerChannel.books200_inc:
-                    item.Value.bid = new decimal[orderbook.bid.Count(P => Math.Abs(P.index) <= 200), 2];
-                    item.Value.ask = new decimal[orderbook.ask.Count(P => Math.Abs(P.index) <= 200), 2];
-                    break;
-                default:
-                    break;
+                depths[E_WebsockerChannel.books10].bid.Add(new List<decimal>() { orderbook.bid[i].orderbook.price, orderbook.bid[i].orderbook.amount });
+                depths[E_WebsockerChannel.books10].total_bid = total_bid;
             }
-            for (int i = 0; i < item.Value.bid.GetLength(0); i++)
+            if (i < 50)
             {
-                item.Value.bid[i, 0] = orderbook.bid[i].orderbook.price;
-                item.Value.bid[i, 1] = orderbook.bid[i].orderbook.amount;
+                depths[E_WebsockerChannel.books50].bid.Add(new List<decimal>() { orderbook.bid[i].orderbook.price, orderbook.bid[i].orderbook.amount });
+                depths[E_WebsockerChannel.books50].total_bid = total_bid;
             }
-            for (int i = 0; i < item.Value.ask.GetLength(0); i++)
+            if (i < 200)
             {
-                item.Value.ask[i, 0] = orderbook.ask[i].orderbook.price;
-                item.Value.ask[i, 1] = orderbook.ask[i].orderbook.amount;
+                depths[E_WebsockerChannel.books200].bid.Add(new List<decimal>() { orderbook.bid[i].orderbook.price, orderbook.bid[i].orderbook.amount });
+                depths[E_WebsockerChannel.books200].total_bid = total_bid;
+            }
+        }
+        decimal total_ask = 0;
+        for (int i = 0; i < orderbook.ask.Count; i++)
+        {
+            total_ask += orderbook.ask[i].orderbook.amount * orderbook.ask[i].orderbook.price;
+            if (i < 10)
+            {
+                depths[E_WebsockerChannel.books10].ask.Add(new List<decimal>() { orderbook.ask[i].orderbook.price, orderbook.ask[i].orderbook.amount });
+                depths[E_WebsockerChannel.books10].total_ask = total_ask;
+            }
+            if (i < 50)
+            {
+                depths[E_WebsockerChannel.books50].ask.Add(new List<decimal>() { orderbook.ask[i].orderbook.price, orderbook.ask[i].orderbook.amount });
+                depths[E_WebsockerChannel.books50].total_ask = total_ask;
+            }
+            if (i < 200)
+            {
+                depths[E_WebsockerChannel.books200].ask.Add(new List<decimal>() { orderbook.ask[i].orderbook.price, orderbook.ask[i].orderbook.amount });
+                depths[E_WebsockerChannel.books200].total_ask = total_ask;
             }
         }
         return depths;

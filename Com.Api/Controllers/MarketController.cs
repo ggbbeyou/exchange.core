@@ -131,7 +131,7 @@ public class MarketController : ControllerBase
     }
 
     // /// <summary>
-    // /// 获取聚合行情
+    // /// 获取深度行情
     // /// </summary>
     // /// <param name="symbol">交易对</param>
     // /// <param name="sz">深度档数,只支持10,50,200</param>
@@ -152,7 +152,7 @@ public class MarketController : ControllerBase
     // }
 
     /// <summary>
-    /// 获取聚合行情
+    /// 获取深度行情
     /// </summary>
     /// <param name="symbol">交易对</param>
     /// <param name="sz">深度档数,只支持10,50,200</param>

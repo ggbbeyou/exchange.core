@@ -42,16 +42,19 @@ public class ReqOrder
     /// 限价单:挂单量,市价单:总额,db:量
     /// </summary>
     /// <value></value>
+    [JsonConverter(typeof(JsonConverterDecimal))]
     public decimal? amount { get; set; }
     /// <summary>
     /// 触发挂单价格
     /// </summary>
     /// <value></value>   
+    [JsonConverter(typeof(JsonConverterDecimal))]
     public decimal trigger_hanging_price { get; set; }
     /// <summary>
     /// 触发撤单价格
     /// </summary>
     /// <value></value>
+    [JsonConverter(typeof(JsonConverterDecimal))]
     public decimal trigger_cancel_price { get; set; }
     /// <summary>
     /// 附加数据

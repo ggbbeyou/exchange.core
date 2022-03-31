@@ -18,11 +18,13 @@ public class ResDeal
     /// 成交价
     /// </summary>
     /// <value></value>
+    [JsonConverter(typeof(JsonConverterDecimal))]
     public decimal price { get; set; }
     /// <summary>
     /// 成交量
     /// </summary>
     /// <value></value>
+    [JsonConverter(typeof(JsonConverterDecimal))]
     public decimal amount { get; set; }
     /// <summary>
     /// 成交触发方向

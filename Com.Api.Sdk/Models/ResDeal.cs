@@ -1,8 +1,11 @@
+using Newtonsoft.Json;
+
 namespace Com.Api.Sdk.Models;
 
 /// <summary>
 /// 交易记录
 /// </summary>
+[JsonConverter(typeof(JsonConverterDecimal))]
 public class ResDeal
 {
     /// <summary>

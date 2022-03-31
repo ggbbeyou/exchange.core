@@ -2,12 +2,14 @@
 
 
 using Com.Api.Sdk.Enum;
+using Newtonsoft.Json;
 
 namespace Com.Api.Sdk.Models;
 
 /// <summary>
 /// 下单响应模型
 /// </summary>
+[JsonConverter(typeof(JsonConverterDecimal))]
 public class ResOrder : ReqOrder
 {
     /// <summary>
@@ -20,7 +22,7 @@ public class ResOrder : ReqOrder
     /// </summary>
     /// <value></value>
     public E_OrderState state { get; set; }
-   
+
     /// <summary>
     /// 未成交 买:总额,卖:交易量
     /// </summary>

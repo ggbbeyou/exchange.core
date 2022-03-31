@@ -14,6 +14,7 @@ namespace Com.Api.Controllers;
 /// </summary>
 [Route("[controller]")]
 [ApiController]
+[AllowAnonymous]
 public class AccountController : ControllerBase
 {
     private readonly ILogger<AccountController> logger;
@@ -86,7 +87,7 @@ public class AccountController : ControllerBase
     /// <returns></returns>
     [HttpPost]
     [Route("login")]
-    [AllowAnonymous]
+
     public Res<ResUser> Login(string account, string password, long no, string code, string app)
     {
         string ip = "";

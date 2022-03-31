@@ -200,7 +200,7 @@ public class MarketController : ControllerBase
     /// <param name="take">获取行数</param>
     /// <returns></returns>
     [HttpGet]
-    [Route("klines")]
+    [Route("deals")]
     public Res<ResDeal?> deals(string symbol, DateTimeOffset start, DateTimeOffset? end, long skip, long take)
     {
         Res<ResDeal?> res = new Res<ResDeal?>();

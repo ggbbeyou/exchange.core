@@ -296,10 +296,10 @@ public class ServiceDeal
     {
         ResDeal resDeal = new ResDeal();
         resDeal.symbol = symbol;
-        resDeal.deal = new List<decimal[,,,]>();
+        resDeal.deal = new List<decimal[]>();
         for (int i = 0; i < deals.Count(); i++)
         {
-            resDeal.deal.Add(new decimal[,,,] { { { { deals[i].price, deals[i].amount, (int)deals[i].trigger_side, deals[i].time.ToUnixTimeMilliseconds() } } } });
+            resDeal.deal.Add(new decimal[4] { deals[i].price, deals[i].amount, (decimal)deals[i].trigger_side, deals[i].time.ToUnixTimeMilliseconds() });
         }
         return resDeal;
     }

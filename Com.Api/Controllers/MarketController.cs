@@ -231,9 +231,9 @@ public class MarketController : ControllerBase
     /// <returns></returns>
     [HttpGet]
     [Route("deals")]
-    public Res<ResDeal?> deals(string symbol, DateTimeOffset start, DateTimeOffset? end, long skip, long take)
+    public Res<List<ResDeal>> deals(string symbol, DateTimeOffset start, DateTimeOffset? end, long skip, long take)
     {
-        Res<ResDeal?> res = new Res<ResDeal?>();
+        Res<List<ResDeal>> res = new Res<List<ResDeal>>();
         double stop = double.PositiveInfinity;
         if (end != null)
         {
@@ -243,16 +243,14 @@ public class MarketController : ControllerBase
         if (market != null)
         {
             RedisValue[] rv = FactoryService.instance.constant.redis.SortedSetRangeByScore(key: FactoryService.instance.GetRedisDeal(market.market), start: start.ToUnixTimeMilliseconds(), stop: stop, exclude: Exclude.Both, skip: skip, take: take, order: StackExchange.Redis.Order.Ascending);
-            List<Deal> deals = new List<Deal>();
             foreach (var item in rv)
             {
-                Deal? resKline = JsonConvert.DeserializeObject<Deal>(item);
-                if (resKline != null)
+                ResDeal? res_deal = JsonConvert.DeserializeObject<ResDeal>(item);
+                if (res_deal != null)
                 {
-                    deals.Add(resKline);
+                    res.data.Add(res_deal);
                 }
             }
-            res.data = service_deal.ConvertDeal(market.symbol, deals);
         }
         return res;
     }

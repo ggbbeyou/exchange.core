@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 using Com.Api.Sdk.Enum;
+using Com.Api.Sdk.Models;
 
 namespace Com.Db;
 
@@ -9,7 +10,7 @@ namespace Com.Db;
 /// 成交单
 /// 注:此表数据量超大,请使用数据库表分区功能
 /// </summary>
-public class Deal
+public class Deal : ResDeal
 {
     /// <summary>
     /// 成交id
@@ -20,32 +21,12 @@ public class Deal
     /// 交易对
     /// </summary>
     /// <value></value>
-    public long market { get; set; }
-    /// <summary>
-    /// 交易对名称
-    /// </summary>
-    /// <value></value>
-    public string symbol { get; set; } = null!;
-    /// <summary>
-    /// 成交价
-    /// </summary>
-    /// <value></value>
-    public decimal price { get; set; }
-    /// <summary>
-    /// 成交量
-    /// </summary>
-    /// <value></value>
-    public decimal amount { get; set; }
+    public long market { get; set; } 
     /// <summary>
     /// 成交总额
     /// </summary>
     /// <value></value>
-    public decimal total { get; set; }
-    /// <summary>
-    /// 成交触发方向
-    /// </summary>
-    /// <value></value>
-    public E_OrderSide trigger_side { get; set; }
+    public decimal total { get; set; }   
     /// <summary>
     /// 买单id
     /// </summary>
@@ -126,10 +107,6 @@ public class Deal
     /// </summary>
     /// <value></value>
     public long fee_coin_sell { get; set; }
-    /// <summary>
-    /// 成交时间
-    /// </summary>
-    /// <value></value>
-    public DateTimeOffset time { get; set; }
+    
 
 }

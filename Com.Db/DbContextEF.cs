@@ -276,6 +276,8 @@ public class DbContextEF : DbContext
         {
             o.HasKey(p => p.user_id);
             o.HasIndex(P => new { P.user_name }).IsUnique();
+            o.HasIndex(P => new { P.phone }).IsUnique();
+            o.HasIndex(P => new { P.email }).IsUnique();
             o.Property(P => P.user_id).IsRequired().ValueGeneratedNever().HasColumnType("bigint").HasComment("用户id");
             o.Property(P => P.user_name).IsRequired().HasColumnType("nvarchar").HasMaxLength(50).HasComment("用户名");
             o.Property(P => P.password).HasColumnType("nvarchar").HasMaxLength(500).HasComment("用户密码");

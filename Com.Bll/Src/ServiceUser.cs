@@ -29,7 +29,23 @@ public class ServiceUser
     {
     }
 
-    #region 辅助方法
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="user_name"></param>
+    /// <param name="password"></param>
+    /// <param name="phone"></param>
+    /// <param name="email"></param>
+    /// <param name="app"></param>
+    /// <param name="ip"></param>
+    public void Register(string user_name, string password, string phone, string email, string app, string ip)
+    {
+        if (string.IsNullOrEmpty(user_name)||string.IsNullOrEmpty(password))
+        {
+            throw new Exception("用户名或密码不能为空");
+        }
+                
+    }
 
     /// <summary>
     /// 登录
@@ -82,43 +98,9 @@ public class ServiceUser
         }
     }
 
-    public void Register(string user_name, string password, string phone, string email, string app, string ip)
-    {
-
-    }
-
     public void logout()
     {
 
-    }
-
-    /// <summary>
-    /// 生成token
-    /// </summary>
-    /// <param name="no">登录唯一码</param>
-    /// <param name="user">用户信息</param>
-    /// <param name="timeout"></param>
-    /// <param name="app"></param>
-    /// <returns></returns>
-    public string GenerateToken(long no, Users user, string app)
-    {
-        var claims = new[]
-            {
-                new Claim("no",no.ToString()),
-                new Claim("user_id",user.user_id.ToString()),
-                new Claim("user_name",user.user_name),
-                new Claim("app", app),
-                new Claim("public_key", user.public_key),
-            };
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(FactoryService.instance.constant.config["Jwt:SecretKey"]));
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-        var token = new JwtSecurityToken(
-            issuer: FactoryService.instance.constant.config["Jwt:Issuer"],// 签发者
-            audience: FactoryService.instance.constant.config["Jwt:Audience"],// 接收者
-            expires: DateTime.Now.AddMinutes(double.Parse(FactoryService.instance.constant.config["Jwt:Expires"])),// 过期时间
-            claims: claims,// payload
-            signingCredentials: creds);// 令牌
-        return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
     /// <summary>
@@ -149,10 +131,9 @@ public class ServiceUser
         }
         return false;
     }
-    #endregion
 
     /// <summary>
-    /// 
+    /// 获取用户
     /// </summary>
     /// <param name="symbol"></param>
     /// <returns></returns>
@@ -168,7 +149,7 @@ public class ServiceUser
     }
 
     /// <summary>
-    /// 
+    /// 获取vip
     /// </summary>
     /// <param name="symbol"></param>
     /// <returns></returns>
@@ -183,8 +164,32 @@ public class ServiceUser
         }
     }
 
-
-
-
-
+    /// <summary>
+    /// 生成token
+    /// </summary>
+    /// <param name="no">登录唯一码</param>
+    /// <param name="user">用户信息</param>
+    /// <param name="timeout"></param>
+    /// <param name="app"></param>
+    /// <returns></returns>
+    public string GenerateToken(long no, Users user, string app)
+    {
+        var claims = new[]
+            {
+                new Claim("no",no.ToString()),
+                new Claim("user_id",user.user_id.ToString()),
+                new Claim("user_name",user.user_name),
+                new Claim("app", app),
+                new Claim("public_key", user.public_key),
+            };
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(FactoryService.instance.constant.config["Jwt:SecretKey"]));
+        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        var token = new JwtSecurityToken(
+            issuer: FactoryService.instance.constant.config["Jwt:Issuer"],// 签发者
+            audience: FactoryService.instance.constant.config["Jwt:Audience"],// 接收者
+            expires: DateTime.Now.AddMinutes(double.Parse(FactoryService.instance.constant.config["Jwt:Expires"])),// 过期时间
+            claims: claims,// payload
+            signingCredentials: creds);// 令牌
+        return new JwtSecurityTokenHandler().WriteToken(token);
+    }
 }

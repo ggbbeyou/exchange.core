@@ -44,84 +44,11 @@ builder.Services.AddAuthentication(options =>
     {
         ValidateIssuer = true,//是否在令牌期间验证签发者
         ValidateAudience = true,//是否验证接收者
-        ValidateLifetime = true,//是否验证失效时间
+        ValidateLifetime = false,//是否验证失效时间
         ValidateIssuerSigningKey = true,//是否验证签名
         ValidIssuer = builder.Configuration["Jwt:Issuer"],//签发者，签发的Token的人
         ValidAudience = builder.Configuration["Jwt:Audience"],//接收者
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"])),
-    };
-    options.Events = new JwtBearerEvents()
-    {
-        //验证失败
-        OnAuthenticationFailed = context =>
-        {
-            return Task.CompletedTask;
-        },
-        //仿问禁止的地址
-        OnForbidden = context =>
-        {
-            return Task.CompletedTask;
-        },
-        //仿问地址
-        OnMessageReceived = context =>
-        {
-            return Task.CompletedTask;
-        },
-        //进行验证
-        OnTokenValidated = async context =>
-        {
-            if (context != null && context.Principal != null && context.Principal.Claims != null)
-            {
-                ClaimsIdentity identity = context.Principal.Identities.FirstOrDefault();
-                // Claim login_playInfo_id = identity.Claims.FirstOrDefault(P => P.Type == JwtRegisteredClaimNames.Aud);
-                // Claim login_playInfo_no = identity.Claims.FirstOrDefault(P => P.Type == "http://schemas.microsoft.com/claims/authnmethodsreferences");
-                // Claim app = identity.Claims.FirstOrDefault(P => P.Type == "app");
-                // var redisClient = context.HttpContext.RequestServices.GetRequiredService<IRedisCacheClient>();
-                // string timeout_str = await redisClient.GetDbFromConfiguration().HashGetAsync<string>(Const.redis_blacklist, $"{login_playInfo_id.Value}_{login_playInfo_no.Value}");
-                //             // if (!string.IsNullOrWhiteSpace(timeout_str) && app.Value != "proxy")
-                //             if (!string.IsNullOrWhiteSpace(timeout_str))
-                // {
-                //     string[] values = timeout_str.Split('_');
-                //     DateTimeOffset timeout = DateTimeOffset.FromUnixTimeSeconds(Convert.ToInt64(values[0]));
-                //     if (timeout.DateTime < DateTime.UtcNow)
-                //     {
-                //         await redisClient.GetDbFromConfiguration().HashDeleteAsync(Const.redis_blacklist, $"{login_playInfo_id.Value}_{login_playInfo_no.Value}");
-                //     }
-                //     if (values.Length > 1)
-                //     {
-                //         context.Response.StatusCode = Convert.ToInt32(values[1]);
-                //     }
-                //     else
-                //     {
-                //         context.Response.StatusCode = 9006;
-                //     }
-                //     context.NoResult();
-                // }
-            }
-        },
-        //仿问没权限的
-        OnChallenge = context =>
-        {
-            if (context.Response.StatusCode == 200)
-            {
-                // context.HandleResponse();
-                // context.Response.ContentType = "application/json";
-                // ModelResult result = new ModelResult();
-                // result.code = ResultCode.no_permission;
-                // context.Response.StatusCode = 200;
-                // context.Response.WriteAsync(JsonConvert.SerializeObject(result));
-            }
-            // else if (Enum.IsDefined(typeof(ResultCode), context.Response.StatusCode))
-            {
-                // context.HandleResponse();
-                // context.Response.ContentType = "application/json";
-                // ModelResult result = new ModelResult();
-                // result.code = (ResultCode)context.Response.StatusCode;
-                // context.Response.StatusCode = 200;
-                // context.Response.WriteAsync(JsonConvert.SerializeObject(result));
-            }
-            return Task.CompletedTask;
-        },
     };
 });
 builder.Services.AddResponseCompression();

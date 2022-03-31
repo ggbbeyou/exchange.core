@@ -4,7 +4,7 @@ namespace Com.Api.Sdk.Models;
 /// orderbook
 /// </summary>
 public class ResDepth
-{   
+{
     /// <summary>
     /// 交易对
     /// </summary>

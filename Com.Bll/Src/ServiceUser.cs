@@ -116,18 +116,8 @@ public class ServiceUser
                     return res;
                 }
                 var token = GenerateToken(FactoryService.instance.constant.worker.NextId(), user, app);
-                res.data = new ResUser
-                {
-                    user_id = user.user_id,
-                    user_name = user.user_name,
-                    transaction = user.transaction,
-                    withdrawal = user.withdrawal,
-                    phone = user.phone,
-                    email = user.email,
-                    vip = user.vip,
-                    public_key = user.public_key,
-                    token = token
-                };
+                res.data = user;
+                res.data.token = token;
                 res.success = true;
                 res.code = E_Res_Code.ok;
                 return res;

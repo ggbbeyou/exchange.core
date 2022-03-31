@@ -16,12 +16,12 @@ public class ResDepth
     /// 全部实时深度行情买盘，价格从高到低  0:price,1:size
     /// </summary>
     /// <returns></returns>
-    public List<List<decimal>> bid { get; set; } = null!;
+    public List<List<decimal>> bid { get; set; } = new List<List<decimal>>();
     /// <summary>
     /// 全部实时深度行情买盘，价格从高到低  0:price,1:size
     /// </summary>
     /// <returns></returns>
-    public List<List<decimal>> ask { get; set; } = null!;
+    public List<List<decimal>> ask { get; set; } = new List<List<decimal>>();
     /// <summary>
     /// 总额,可作为推送校检深度
     /// </summary>

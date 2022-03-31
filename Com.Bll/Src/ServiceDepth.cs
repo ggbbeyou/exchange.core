@@ -98,17 +98,17 @@ public class ServiceDepth
         for (int i = 0; i < orderbook.bid.Count; i++)
         {
             total_bid += orderbook.bid[i].orderbook.amount * orderbook.bid[i].orderbook.price;
-            if (i < 10)
+            if (orderbook.bid[i].index <= 10)
             {
                 depths[E_WebsockerChannel.books10].bid.Add(new List<decimal>() { orderbook.bid[i].orderbook.price, orderbook.bid[i].orderbook.amount });
                 depths[E_WebsockerChannel.books10].total_bid = total_bid;
             }
-            if (i < 50)
+            if (orderbook.bid[i].index <= 50)
             {
                 depths[E_WebsockerChannel.books50].bid.Add(new List<decimal>() { orderbook.bid[i].orderbook.price, orderbook.bid[i].orderbook.amount });
                 depths[E_WebsockerChannel.books50].total_bid = total_bid;
             }
-            if (i < 200)
+            if (orderbook.bid[i].index <= 200)
             {
                 depths[E_WebsockerChannel.books200].bid.Add(new List<decimal>() { orderbook.bid[i].orderbook.price, orderbook.bid[i].orderbook.amount });
                 depths[E_WebsockerChannel.books200].total_bid = total_bid;
@@ -118,17 +118,17 @@ public class ServiceDepth
         for (int i = 0; i < orderbook.ask.Count; i++)
         {
             total_ask += orderbook.ask[i].orderbook.amount * orderbook.ask[i].orderbook.price;
-            if (i < 10)
+            if (orderbook.bid[i].index <= 10)
             {
                 depths[E_WebsockerChannel.books10].ask.Add(new List<decimal>() { orderbook.ask[i].orderbook.price, orderbook.ask[i].orderbook.amount });
                 depths[E_WebsockerChannel.books10].total_ask = total_ask;
             }
-            if (i < 50)
+            if (orderbook.bid[i].index <= 50)
             {
                 depths[E_WebsockerChannel.books50].ask.Add(new List<decimal>() { orderbook.ask[i].orderbook.price, orderbook.ask[i].orderbook.amount });
                 depths[E_WebsockerChannel.books50].total_ask = total_ask;
             }
-            if (i < 200)
+            if (orderbook.bid[i].index <= 200)
             {
                 depths[E_WebsockerChannel.books200].ask.Add(new List<decimal>() { orderbook.ask[i].orderbook.price, orderbook.ask[i].orderbook.amount });
                 depths[E_WebsockerChannel.books200].total_ask = total_ask;

@@ -62,7 +62,7 @@ public class ServiceUser
                     res.message = "账户名或密码错误";
                     return res;
                 }
-                var token = GenerateToken(user, DateTime.UtcNow.AddMonths(12), app);
+                var token = GenerateToken(FactoryService.instance.constant.worker.NextId(), user, app);
                 res.data = new ResUser
                 {
                     user_id = user.user_id,
@@ -95,25 +95,29 @@ public class ServiceUser
     /// <summary>
     /// 生成token
     /// </summary>
-    /// <param name="user"></param>
+    /// <param name="no">登录唯一码</param>
+    /// <param name="user">用户信息</param>
     /// <param name="timeout"></param>
     /// <param name="app"></param>
     /// <returns></returns>
-    public string GenerateToken(Users user, DateTime timeout, string app)
+    public string GenerateToken(long no, Users user, string app)
     {
         var claims = new[]
-                {
-                    new Claim(ClaimTypes.NameIdentifier,user.user_id.ToString()),
-                    new Claim(ClaimTypes.Name,user.user_name),
-                    new Claim(ClaimTypes.Rsa, user.public_key),
-                    new Claim("app", app),
-                };
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(user.public_key));
+            {
+                new Claim("no",no.ToString()),
+                new Claim("user_id",user.user_id.ToString()),
+                new Claim("user_name",user.user_name),
+                new Claim("app", app),
+                new Claim("public_key", user.public_key),
+            };
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(FactoryService.instance.constant.config["Jwt:SecretKey"]));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
         var token = new JwtSecurityToken(
-            claims: claims,
-            expires: timeout,
-            signingCredentials: creds);
+            issuer: FactoryService.instance.constant.config["Jwt:Issuer"],// 签发者
+            audience: FactoryService.instance.constant.config["Jwt:Audience"],// 接收者
+            expires: DateTime.Now.AddMinutes(double.Parse(FactoryService.instance.constant.config["Jwt:Expires"])),// 过期时间
+            claims: claims,// payload
+            signingCredentials: creds);// 令牌
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 

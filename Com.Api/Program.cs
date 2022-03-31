@@ -42,12 +42,13 @@ builder.Services.AddAuthentication(options =>
 {
     options.TokenValidationParameters = new TokenValidationParameters()
     {
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("<RSAKeyValue><Modulus>9WC0bup4+tpXZhuQOtmqrjuWZsOiV6uL48R0IkkreY5bXjxTScWEdSYIUKeBHuE2adpb6An4FG3JHvTArh/pcC5vkr0DMSZAuwa6jX0JTWI2UICDKktJkTk9BsrpsRpNtulZ4aNg+V80y3Q+nVKsgg9pFuSC8B0+ElvHvJoJ6WU=</Modulus><Exponent>AQAB</Exponent></RSAKeyValue>")),
-        ValidateIssuer = false,
-        ValidateAudience = false,
-        ValidateLifetime = false,
-        ClockSkew = TimeSpan.FromMinutes(5)
+        ValidateIssuer = true,//是否在令牌期间验证签发者
+        ValidateAudience = true,//是否验证接收者
+        ValidateLifetime = true,//是否验证失效时间
+        ValidateIssuerSigningKey = true,//是否验证签名
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],//签发者，签发的Token的人
+        ValidAudience = builder.Configuration["Jwt:Audience"],//接收者
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"])),
     };
     options.Events = new JwtBearerEvents()
     {

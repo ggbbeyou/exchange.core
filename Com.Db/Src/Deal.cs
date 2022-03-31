@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
+using Com.Api.Sdk;
 using Com.Api.Sdk.Enum;
 using Com.Api.Sdk.Models;
 
@@ -21,12 +22,13 @@ public class Deal : ResDeal
     /// 交易对
     /// </summary>
     /// <value></value>
-    public long market { get; set; } 
+    public long market { get; set; }
     /// <summary>
     /// 成交总额
     /// </summary>
     /// <value></value>
-    public decimal total { get; set; }   
+    [JsonConverter(typeof(JsonConverterDecimal))]
+    public decimal total { get; set; }
     /// <summary>
     /// 买单id
     /// </summary>
@@ -61,41 +63,49 @@ public class Deal : ResDeal
     /// 买单未成交量
     /// </summary>
     /// <value></value>
+    [JsonConverter(typeof(JsonConverterDecimal))]
     public decimal bid_amount_unsold { get; set; }
     /// <summary>
     /// 卖单未成交量
     /// </summary>
     /// <value></value>
+    [JsonConverter(typeof(JsonConverterDecimal))]
     public decimal ask_amount_unsold { get; set; }
     /// <summary>
     /// 买单已成交量
     /// </summary>
     /// <value></value>
+    [JsonConverter(typeof(JsonConverterDecimal))]
     public decimal bid_amount_done { get; set; }
     /// <summary>
     /// 卖单已成交量
     /// </summary>
     /// <value></value>
+    [JsonConverter(typeof(JsonConverterDecimal))]
     public decimal ask_amount_done { get; set; }
     /// <summary>
     /// 买手续费率
     /// </summary>
     /// <value></value>
+    [JsonConverter(typeof(JsonConverterDecimal))]
     public decimal fee_rate_buy { get; set; }
     /// <summary>
     /// 卖手续费率
     /// </summary>
     /// <value></value>
+    [JsonConverter(typeof(JsonConverterDecimal))]
     public decimal fee_rate_sell { get; set; }
     /// <summary>
     /// 买手续费
     /// </summary>
     /// <value></value>
+    [JsonConverter(typeof(JsonConverterDecimal))]
     public decimal fee_buy { get; set; }
     /// <summary>
     /// 卖手续费
     /// </summary>
     /// <value></value>
+    [JsonConverter(typeof(JsonConverterDecimal))]
     public decimal fee_sell { get; set; }
     /// <summary>
     /// 买手续费币种
@@ -107,6 +117,6 @@ public class Deal : ResDeal
     /// </summary>
     /// <value></value>
     public long fee_coin_sell { get; set; }
-    
+
 
 }

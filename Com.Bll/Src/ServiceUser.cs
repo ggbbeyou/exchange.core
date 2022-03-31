@@ -30,7 +30,7 @@ public class ServiceUser
     }
 
     /// <summary>
-    /// 
+    /// 注册
     /// </summary>
     /// <param name="user_name"></param>
     /// <param name="password"></param>
@@ -38,13 +38,50 @@ public class ServiceUser
     /// <param name="email"></param>
     /// <param name="app"></param>
     /// <param name="ip"></param>
-    public void Register(string user_name, string password, string phone, string email, string app, string ip)
+    public Res<long> Register(string user_name, string password, string phone, string email, string app, string ip)
     {
-        if (string.IsNullOrEmpty(user_name)||string.IsNullOrEmpty(password))
+        Res<long> res = new Res<long>();
+        res.success = false;
+        res.code = E_Res_Code.fail;
+        if (string.IsNullOrEmpty(user_name) || string.IsNullOrEmpty(password))
         {
-            throw new Exception("用户名或密码不能为空");
+            res.message = "用户名或密码不能为空";
+            return res;
         }
-                
+        (string public_key, string private_key) key_btc_user = Encryption.GetRsaKey();
+        using (var scope = FactoryService.instance.constant.provider.CreateScope())
+        {
+            using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
+            {
+                if (db.Users.Any(P => P.phone == phone))
+                {
+                    res.message = "手机号已重复";
+                    return res;
+                }
+                if (db.Users.Any(P => P.email == email))
+                {
+                    res.message = "邮箱已重复";
+                    return res;
+                }
+                Users settlement_btc_usdt = new Users()
+                {
+                    user_id = FactoryService.instance.constant.worker.NextId(),
+                    user_name = user_name,
+                    password = Encryption.SHA256Encrypt(password),
+                    disabled = false,
+                    transaction = true,
+                    withdrawal = true,
+                    phone = phone,
+                    email = email,
+                    vip = 0,
+                    public_key = key_btc_user.public_key,
+                    private_key = key_btc_user.private_key,
+                };
+                db.Users.Add(settlement_btc_usdt);
+                db.SaveChanges();
+            }
+        }
+        return res;
     }
 
     /// <summary>

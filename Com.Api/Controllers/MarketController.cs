@@ -87,12 +87,12 @@ public class MarketController : ControllerBase
     /// </summary>
     /// <param name="symbol">交易对</param>
     /// <returns></returns>
-    [HttpGet]
+    [HttpPost]
     [Route("market")]
-    public Res<ResMarket?> Market(string symbol)
+    public Res<List<ResMarket>> Market(List<string> symbol)
     {
-        Res<ResMarket?> res = new Res<ResMarket?>();
-        ResMarket? market = service_market.GetMarketBySymbol(symbol);
+        Res<List<ResMarket>> res = new Res<List<ResMarket>>();
+        List<ResMarket> market = service_market.GetMarketBySymbol(symbol).ConvertAll(P => (ResMarket)P);
         if (market != null)
         {
             res.success = true;
@@ -107,20 +107,49 @@ public class MarketController : ControllerBase
     /// </summary>
     /// <param name="symbol"></param>
     /// <returns></returns>
-    [HttpGet]
+    [HttpPost]
     [Route("ticker")]
-    public Res<ResTicker?> Ticker(string symbol)
+    public Res<List<ResTicker>> Ticker(List<string> symbol)
     {
-        Res<ResTicker?> res = new Res<ResTicker?>();
-        Market? market = service_market.GetMarketBySymbol(symbol);
+        Res<List<ResTicker>> res = new Res<List<ResTicker>>();
+        List<Market> market = service_market.GetMarketBySymbol(symbol);
         if (market != null)
         {
             res.success = true;
             res.code = E_Res_Code.ok;
-            res.data = JsonConvert.DeserializeObject<ResTicker>(FactoryService.instance.constant.redis.HashGet(FactoryService.instance.GetRedisTicker(), market.market.ToString()));
+            res.data = new List<ResTicker>();
+            foreach (var item in market)
+            {
+                ResTicker? ticker = JsonConvert.DeserializeObject<ResTicker>(FactoryService.instance.constant.redis.HashGet(FactoryService.instance.GetRedisTicker(), item.market.ToString()));
+                if (ticker != null)
+                {
+                    res.data.Add(ticker);
+                }
+            }
         }
         return res;
     }
+
+    // /// <summary>
+    // /// 获取聚合行情
+    // /// </summary>
+    // /// <param name="symbol">交易对</param>
+    // /// <param name="sz">深度档数,只支持10,50,200</param>
+    // /// <returns></returns>
+    // [HttpGet]
+    // [Route("depth")]
+    // public Res<ResDepth?> Depth(string symbol, int sz = 50)
+    // {
+    //     Res<ResDepth?> res = new Res<ResDepth?>();
+    //     Market? market = service_market.GetMarketBySymbol(symbol);
+    //     if (market != null && (sz == 10 || sz == 50 || sz == 200))
+    //     {
+    //         res.success = true;
+    //         res.code = E_Res_Code.ok;
+    //         res.data = JsonConvert.DeserializeObject<ResDepth>(FactoryService.instance.constant.redis.HashGet(FactoryService.instance.GetRedisDepth(market.market), "books" + sz));
+    //     }
+    //     return res;
+    // }
 
     /// <summary>
     /// 获取聚合行情
@@ -128,9 +157,10 @@ public class MarketController : ControllerBase
     /// <param name="symbol">交易对</param>
     /// <param name="sz">深度档数,只支持10,50,200</param>
     /// <returns></returns>
-    [HttpGet]
+    [HttpPost]
     [Route("depth")]
-    public Res<ResDepth?> Depth(string symbol, int sz = 50)
+    [Consumes("application/json")]
+    public IActionResult Depth(string symbol, int sz = 50)
     {
         Res<ResDepth?> res = new Res<ResDepth?>();
         Market? market = service_market.GetMarketBySymbol(symbol);
@@ -140,7 +170,7 @@ public class MarketController : ControllerBase
             res.code = E_Res_Code.ok;
             res.data = JsonConvert.DeserializeObject<ResDepth>(FactoryService.instance.constant.redis.HashGet(FactoryService.instance.GetRedisDepth(market.market), "books" + sz));
         }
-        return res;
+        return Content(JsonConvert.SerializeObject(res), "application/json");
     }
 
     /// <summary>

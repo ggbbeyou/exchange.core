@@ -349,9 +349,9 @@ public class ServiceOrder
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
                 List<Orders> orders = new List<Orders>();
-                orders.AddRange(db.OrderBuy.Where(P => P.side == E_OrderSide.buy && P.market == market && (P.state == E_OrderState.unsold || P.state == E_OrderState.partial)).OrderBy(P => P.create_time).ToList());
-                orders.AddRange(db.OrderSell.Where(P => P.side == E_OrderSide.sell && P.market == market && (P.state == E_OrderState.unsold || P.state == E_OrderState.partial)).OrderBy(P => P.create_time).ToList());
-                return orders;
+                orders.AddRange(db.OrderBuy.Where(P => P.side == E_OrderSide.buy && P.market == market && (P.state == E_OrderState.unsold || P.state == E_OrderState.partial)).AsNoTracking().ToList());
+                orders.AddRange(db.OrderSell.Where(P => P.side == E_OrderSide.sell && P.market == market && (P.state == E_OrderState.unsold || P.state == E_OrderState.partial)).AsNoTracking().ToList());
+                return orders.OrderBy(P => P.create_time).ToList();
             }
         }
     }
@@ -421,8 +421,5 @@ public class ServiceOrder
         }
         return (buys, sells);
     }
-
-
-
 
 }

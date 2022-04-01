@@ -82,20 +82,20 @@ public class ServiceOrder
         }
         res.market = info.market;
         List<ReqOrder> market_buy = orders.Where(P => P.side == E_OrderSide.buy && P.type == E_OrderType.price_market).ToList();
-        if (market_buy.Any(P => P.amount == null || P.amount < 0))
+        if (market_buy.Any(P => P.amount == null || P.amount <= 0))
         {
             res.code = E_Res_Code.field_error;
             res.message = "市价买单,总额(amount)不能小于0";
             return res;
         }
-        if (market_buy.Exists(P => Math.Round(P.amount ?? 0, info.price_places, MidpointRounding.ToNegativeInfinity) != P.amount))
+        if (market_buy.Exists(P => (double)P.amount / (Math.Pow(0.1, info.price_places) * (double)info.amount_multiple) != (int)((double)P.amount / (Math.Pow(0.1, info.price_places) * (double)info.amount_multiple))))
         {
             res.code = E_Res_Code.field_error;
-            res.message = $"市价买单,总额(amount)精度不对,总额小数位:{info.price_places}";
+            res.message = $"市价买单,总额(amount)精度不对,总额必须是:{(Math.Pow(0.1, info.price_places) * (double)info.amount_multiple)}整数倍数";
             return res;
         }
         List<ReqOrder> market_sell = orders.Where(P => P.side == E_OrderSide.sell && P.type == E_OrderType.price_market).ToList();
-        if (market_sell.Exists(P => P.amount == null || P.amount < 0))
+        if (market_sell.Exists(P => P.amount == null || P.amount <= 0))
         {
             res.code = E_Res_Code.field_error;
             res.message = "市价卖单,量不能小于0";

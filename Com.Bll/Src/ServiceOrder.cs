@@ -242,7 +242,7 @@ public class ServiceOrder
             }
         }
         FactoryService.instance.constant.stopwatch.Stop();
-        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};挂单=>校验/冻结资金{res.data.Count}条挂单记录");
+        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{info.symbol}:挂单=>校验/冻结资金{res.data.Count}条挂单记录");
         FactoryService.instance.constant.stopwatch.Restart();
         using (var scope = FactoryService.instance.constant.provider.CreateScope())
         {
@@ -255,7 +255,7 @@ public class ServiceOrder
             }
         }
         FactoryService.instance.constant.stopwatch.Stop();
-        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};挂单=>插入{res.data.Count}条订单到DB");
+        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{info.symbol}:挂单=>插入{res.data.Count}条订单到DB");
         FactoryService.instance.constant.stopwatch.Restart();
         ReqCall<List<Orders>> call_req = new ReqCall<List<Orders>>();
         call_req.op = E_Op.place;
@@ -263,14 +263,14 @@ public class ServiceOrder
         call_req.data = res.data;
         FactoryService.instance.constant.MqSend(FactoryService.instance.GetMqOrderPlace(info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(call_req)));
         FactoryService.instance.constant.stopwatch.Stop();
-        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};挂单=>插入{call_req.data.Count}条订单到Mq");
+        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{info.symbol}:挂单=>插入{call_req.data.Count}条订单到Mq");
         res.op = E_Op.place;
         res.success = true;
         res.code = E_Res_Code.ok;
         res.market = info.market;
         res.message = "挂单成功";
         this.stopwatch.Stop();
-        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{this.stopwatch.Elapsed.ToString()};挂单=>总耗时.{call_req.data.Count}条订单");
+        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{this.stopwatch.Elapsed.ToString()};{info.symbol}:挂单=>总耗时.{call_req.data.Count}条订单");
         return res;
     }
 

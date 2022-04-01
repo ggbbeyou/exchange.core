@@ -82,7 +82,7 @@ public class ServiceOrder
         }
         res.market = info.market;
         List<ReqOrder> market_buy = orders.Where(P => P.side == E_OrderSide.buy && P.type == E_OrderType.price_market).ToList();
-        if (market_buy.Exists(P => P.amount == null || P.amount < 0))
+        if (market_buy.Any(P => P.amount == null || P.amount < 0))
         {
             res.code = E_Res_Code.field_error;
             res.message = "市价买单,总额(amount)不能小于0";

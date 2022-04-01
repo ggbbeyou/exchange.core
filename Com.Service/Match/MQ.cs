@@ -71,45 +71,38 @@ public class MQ
     {
         return FactoryService.instance.constant.MqReceive(FactoryService.instance.GetMqOrderPlace(this.model.info.market), (e) =>
         {
-            if (!this.model.run)
+            string json = Encoding.UTF8.GetString(e);
+            ReqCall<List<Orders>>? req = JsonConvert.DeserializeObject<ReqCall<List<Orders>>>(json);
+            if (req != null && req.op == E_Op.place && req.data != null && req.data.Count > 0)
             {
-                return false;
-            }
-            else
-            {
-                string json = Encoding.UTF8.GetString(e);
-                ReqCall<List<Orders>>? req = JsonConvert.DeserializeObject<ReqCall<List<Orders>>>(json);
-                if (req != null && req.op == E_Op.place && req.data != null && req.data.Count > 0)
+                this.mutex.WaitOne();
+                orders.Clear();
+                deal.Clear();
+                cancel.Clear();
+                FactoryService.instance.constant.stopwatch.Restart();
+                foreach (Orders item in req.data)
                 {
-                    this.mutex.WaitOne();
-                    orders.Clear();
-                    deal.Clear();
-                    cancel.Clear();
-                    FactoryService.instance.constant.stopwatch.Restart();
-                    foreach (Orders item in req.data)
+                    (List<Orders> orders, List<Deal> deals, List<Orders> cancels) match = this.model.match_core.Match(item);
+                    if (match.orders.Count == 0 && match.deals.Count == 0 && match.cancels.Count == 0)
                     {
-                        (List<Orders> orders, List<Deal> deals, List<Orders> cancels) match = this.model.match_core.Match(item);
-                        if (match.orders.Count == 0 && match.deals.Count == 0 && match.cancels.Count == 0)
-                        {
-                            continue;
-                        }
-                        deal.AddRange(match.deals);
-                        foreach (var item1 in match.orders)
-                        {
-                            if (!orders.Exists(P => P.order_id == item1.order_id))
-                            {
-                                orders.Add(item1);
-                            }
-                        }
-                        cancel.AddRange(match.cancels);
+                        continue;
                     }
-                    FactoryService.instance.constant.stopwatch.Stop();
-                    FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};撮合订单{req.data.Count}条");
-                    DepthChange();
-                    this.mutex.ReleaseMutex();
-                };
-                return true;
-            }
+                    deal.AddRange(match.deals);
+                    foreach (var item1 in match.orders)
+                    {
+                        if (!orders.Exists(P => P.order_id == item1.order_id))
+                        {
+                            orders.Add(item1);
+                        }
+                    }
+                    cancel.AddRange(match.cancels);
+                }
+                FactoryService.instance.constant.stopwatch.Stop();
+                FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};撮合订单{req.data.Count}条");
+                DepthChange();
+                this.mutex.ReleaseMutex();
+            };
+            return true;
         });
     }
 
@@ -121,44 +114,37 @@ public class MQ
     {
         return FactoryService.instance.constant.MqReceive(FactoryService.instance.GetMqOrderCancel(this.model.info.market), e =>
         {
-            if (!this.model.run)
+            string json = Encoding.UTF8.GetString(e);
+            ReqCall<(long uid, List<long> order_id)>? req = JsonConvert.DeserializeObject<ReqCall<(long, List<long>)>>(json);
+            if (req != null && req.op == E_Op.place)
             {
-                return false;
-            }
-            else
-            {
-                string json = Encoding.UTF8.GetString(e);
-                ReqCall<(long uid, List<long> order_id)>? req = JsonConvert.DeserializeObject<ReqCall<(long, List<long>)>>(json);
-                if (req != null && req.op == E_Op.place)
+                this.mutex.WaitOne();
+                orders.Clear();
+                deal.Clear();
+                cancel.Clear();
+                if (req.op == E_Op.cancel_by_id)
                 {
-                    this.mutex.WaitOne();
-                    orders.Clear();
-                    deal.Clear();
-                    cancel.Clear();
-                    if (req.op == E_Op.cancel_by_id)
-                    {
-                        cancel.AddRange(this.model.match_core.CancelOrder(req.data.uid, req.data.order_id));
-                    }
-                    else if (req.op == E_Op.cancel_by_uid)
-                    {
-                        cancel.AddRange(this.model.match_core.CancelOrder(req.data.uid));
-                    }
-                    else if (req.op == E_Op.cancel_by_clientid)
-                    {
-                        cancel.AddRange(this.model.match_core.CancelOrder(req.data.uid, req.data.order_id));
-                    }
-                    else if (req.op == E_Op.cancel_by_all)
-                    {
-                        cancel.AddRange(this.model.match_core.CancelOrder());
-                    }
-                    if (cancel.Count > 0)
-                    {
-                        DepthChange();
-                    }
-                    this.mutex.ReleaseMutex();
+                    cancel.AddRange(this.model.match_core.CancelOrder(req.data.uid, req.data.order_id));
                 }
-                return true;
+                else if (req.op == E_Op.cancel_by_uid)
+                {
+                    cancel.AddRange(this.model.match_core.CancelOrder(req.data.uid));
+                }
+                else if (req.op == E_Op.cancel_by_clientid)
+                {
+                    cancel.AddRange(this.model.match_core.CancelOrder(req.data.uid, req.data.order_id));
+                }
+                else if (req.op == E_Op.cancel_by_all)
+                {
+                    cancel.AddRange(this.model.match_core.CancelOrder());
+                }
+                if (cancel.Count > 0)
+                {
+                    DepthChange();
+                }
+                this.mutex.ReleaseMutex();
             }
+            return true;
         });
     }
 

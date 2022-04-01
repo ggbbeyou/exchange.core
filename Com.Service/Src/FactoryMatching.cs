@@ -103,6 +103,10 @@ public class FactoryMatching
             this.service.Remove(info.market);
             info.status = false;
         }
+        else
+        {
+            info.status = false;
+        }
         return info;
     }
 

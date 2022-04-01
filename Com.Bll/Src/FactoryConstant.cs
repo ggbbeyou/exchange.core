@@ -275,9 +275,30 @@ public class FactoryConstant
     /// <param name="consumerTag">消费者标示</param>
     public void MqDeleteConsumer(string consumerTag)
     {
-        this.i_model.BasicCancel(consumerTag);
+        try
+        {
+            this.i_model.BasicCancel(consumerTag);
+        }
+        catch (System.Exception ex)
+        {
+            FactoryService.instance.constant.logger.LogError(ex, "删除mq消费者失败");
+        }
     }
 
-
+    /// <summary>
+    /// 请除队列
+    /// </summary>
+    /// <param name="consumerTag"></param>
+    public void MqDeletePurge(string consumerTag)
+    {
+        try
+        {
+            this.i_model.QueuePurge(consumerTag);
+        }
+        catch (System.Exception ex)
+        {
+            FactoryService.instance.constant.logger.LogError(ex, "清除mq队列失败");
+        }
+    }
 
 }

@@ -42,16 +42,17 @@ public class MatchModel
     /// <value></value>
     public Core core { get; set; } = null!;
     /// <summary>
-    /// mq 消费者事件标示 下单
+    /// mq 队列名称
     /// </summary>
-    /// <value></value>
-    public string mq_tag_order_place { get; set; } = null!;
+    /// <typeparam name="string"></typeparam>
+    /// <returns></returns>
+    public HashSet<string> mq_queues = new HashSet<string>();
     /// <summary>
-    /// mq 消费者事件标示 撤单
+    /// mq 消费者事件标示
     /// </summary>
-    /// <value></value>
-    public string mq_tag_order_cancel { get; set; } = null!;
-
+    /// <typeparam name="string"></typeparam>
+    /// <returns></returns>
+    public HashSet<string> mq_consumer = new HashSet<string>();
     /// <summary>
     /// 初始化
     /// </summary>

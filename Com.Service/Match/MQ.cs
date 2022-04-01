@@ -67,9 +67,10 @@ public class MQ
     /// 接收订单列队
     /// </summary>
     /// <returns>队列标识</returns>
-    public string OrderReceive()
+    public (string queue_name, string consume_tag) OrderReceive()
     {
-        return FactoryService.instance.constant.MqReceive(FactoryService.instance.GetMqOrderPlace(this.model.info.market), (e) =>
+        string queue_name = FactoryService.instance.GetMqOrderPlace(this.model.info.market);
+        string consume_tag = FactoryService.instance.constant.MqReceive(queue_name, (e) =>
         {
             string json = Encoding.UTF8.GetString(e);
             ReqCall<List<Orders>>? req = JsonConvert.DeserializeObject<ReqCall<List<Orders>>>(json);
@@ -104,15 +105,17 @@ public class MQ
             };
             return true;
         });
+        return (queue_name, consume_tag);
     }
 
     /// <summary>
     /// 取消订单列队
     /// </summary>
     /// <returns>队列标识</returns>
-    public string OrderCancel()
+    public (string queue_name, string consume_tag) OrderCancel()
     {
-        return FactoryService.instance.constant.MqReceive(FactoryService.instance.GetMqOrderCancel(this.model.info.market), e =>
+        string queue_name = FactoryService.instance.GetMqOrderCancel(this.model.info.market);
+        string consume_tag = FactoryService.instance.constant.MqReceive(queue_name, e =>
         {
             string json = Encoding.UTF8.GetString(e);
             ReqCall<(long uid, List<long> order_id)>? req = JsonConvert.DeserializeObject<ReqCall<(long, List<long>)>>(json);
@@ -146,6 +149,7 @@ public class MQ
             }
             return true;
         });
+        return (queue_name, consume_tag);
     }
 
     /// <summary>

@@ -71,9 +71,7 @@ public class FactoryMatching
     /// <param name="info"></param>
     public Market ServiceStart(Market info)
     {
-
-
-        // this.mutex.WaitOne();
+        this.mutex.WaitOne();
         if (!this.service.ContainsKey(info.market))
         {
             MatchModel model = new MatchModel(info);
@@ -82,16 +80,33 @@ public class FactoryMatching
             model.core = new Core(model);
             this.service.Add(info.market, model);
         }
-        if (this.service[info.market].run == false)
+        MatchModel mm = this.service[info.market];
+        if (mm.run == false)
         {
             ServiceClearCache(info);
             ServiceWarmCache(info);
-            this.service[info.market].run = true;
+            mm.run = true;
+            (string queue_name, string consume_tag) order_cancel = this.service[info.market].mq.OrderCancel();
+            if (!mm.mq_queues.Contains(order_cancel.queue_name))
+            {
+                mm.mq_queues.Add(order_cancel.queue_name);
+            }
+            if (!mm.mq_consumer.Contains(order_cancel.consume_tag))
+            {
+                mm.mq_consumer.Add(order_cancel.consume_tag);
+            }
+            (string queue_name, string consume_tag) order_receive = this.service[info.market].mq.OrderReceive();
+            if (!mm.mq_queues.Contains(order_receive.queue_name))
+            {
+                mm.mq_queues.Add(order_receive.queue_name);
+            }
+            if (!mm.mq_consumer.Contains(order_receive.consume_tag))
+            {
+                mm.mq_consumer.Add(order_receive.consume_tag);
+            }
         }
-        info.status = this.service[info.market].run;
-        this.service[info.market].mq_tag_order_cancel = this.service[info.market].mq.OrderCancel();
-        this.service[info.market].mq_tag_order_place = this.service[info.market].mq.OrderReceive();
-        // this.mutex.ReleaseMutex();
+        info.status = mm.run;
+        this.mutex.ReleaseMutex();
         return info;
     }
 
@@ -104,11 +119,9 @@ public class FactoryMatching
         this.mutex.WaitOne();
         if (this.service.ContainsKey(info.market))
         {
-            this.service[info.market].run = false;
-            FactoryService.instance.constant.MqDeleteConsumer(this.service[info.market].mq_tag_order_cancel);
-            FactoryService.instance.constant.MqDeleteConsumer(this.service[info.market].mq_tag_order_place);
+            MatchModel mm = this.service[info.market];
+            mm.run = false;
             ServiceClearCache(info);
-            this.service[info.market].match_core.CancelOrder();
             this.service.Remove(info.market);
             info.status = false;
         }
@@ -127,27 +140,21 @@ public class FactoryMatching
     /// <returns></returns>
     private bool ServiceClearCache(Market info)
     {
-        // try
-        // {
-        //     FactoryService.instance.constant.i_model.QueuePurge(FactoryService.instance.GetMqOrderPlace(info.market));
-        // }
-        // catch
-        // {
-        // }
-        // try
-        // {
-        //     FactoryService.instance.constant.i_model.QueuePurge(FactoryService.instance.GetMqOrderCancel(info.market));
-        // }
-        // catch
-        // {
-        // }
-        // try
-        // {
-        //     FactoryService.instance.constant.i_model.QueuePurge(FactoryService.instance.GetMqOrderDeal(info.market));
-        // }
-        // catch
-        // {
-        // }
+        if (this.service.ContainsKey(info.market))
+        {
+            MatchModel mm = this.service[info.market];
+            foreach (var item in mm.mq_consumer)
+            {
+                FactoryService.instance.constant.MqDeleteConsumer(item);
+            }
+            mm.mq_consumer.Clear();
+            foreach (var item in mm.mq_queues)
+            {
+                FactoryService.instance.constant.MqDeletePurge(item);
+            }
+            mm.mq_queues.Clear();
+            mm.match_core.CancelOrder();
+        }
         //交易记录数据从DB同步到Redis 至少保存最近3个月记录
         long delete = this.deal_service.DeleteDeal(info.market, DateTimeOffset.UtcNow.AddMonths(-2));
         ServiceDepth.instance.DeleteRedisDepth(info.market);

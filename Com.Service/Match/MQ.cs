@@ -100,7 +100,7 @@ public class MQ
                 }
                 FactoryService.instance.constant.stopwatch.Stop();
                 FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:撮合订单{req.data.Count}条");
-                DepthChange();
+                DepthChange(orders, deal, cancel);
                 this.mutex.ReleaseMutex();
             };
             return true;
@@ -143,7 +143,7 @@ public class MQ
                 }
                 if (cancel.Count > 0)
                 {
-                    DepthChange();
+                    DepthChange(orders, deal, cancel);
                 }
                 this.mutex.ReleaseMutex();
             }
@@ -155,7 +155,7 @@ public class MQ
     /// <summary>
     /// 深度变更
     /// </summary>
-    private void DepthChange()
+    public void DepthChange(List<Orders> orders, List<Deal> deal, List<Orders> cancel)
     {
         if (orders.Count() > 0 || deal.Count() > 0 || cancel.Count() > 0)
         {

@@ -165,7 +165,7 @@ public class FactoryMatching
                 FactoryService.instance.constant.MqDeletePurge(item);
             }
             mm.mq_queues.Clear();
-            mm.match_core.CancelOrder();
+            mm.mq.DepthChange(new List<Orders>(), new List<Deal>(), mm.match_core.CancelOrder());
         }
         //交易记录数据从DB同步到Redis 至少保存最近3个月记录
         FactoryService.instance.constant.stopwatch.Restart();

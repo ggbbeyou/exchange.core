@@ -1,5 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
+using Com.Api.Sdk;
+using Newtonsoft.Json;
 
 namespace Com.Db;
 
@@ -32,6 +34,7 @@ public class Market : ResMarket
     /// 最后的成交价
     /// </summary>
     /// <value></value>
+    [JsonConverter(typeof(JsonConverterDecimal))]
     public decimal last_price { get; set; }
     /// <summary>
     /// 服务地址

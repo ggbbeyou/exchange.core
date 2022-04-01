@@ -33,15 +33,18 @@ public class Orders : ResOrder
     /// 订单总额(市价买单必填,其它都无效)
     /// </summary>
     /// <value></value>
+    [JsonConverter(typeof(JsonConverterDecimal))]
     public decimal? total { get; set; }
     /// <summary>
     /// 手续费率
     /// </summary>
     /// <value></value>    
+    [JsonConverter(typeof(JsonConverterDecimal))]
     public decimal fee_rate { get; set; }
     /// <summary>
     /// 备注
     /// </summary>
     /// <value></value>
+    [JsonConverter(typeof(JsonConverterDecimal))]
     public string? remarks { get; set; }
 }

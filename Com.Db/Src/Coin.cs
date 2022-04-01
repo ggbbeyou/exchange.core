@@ -1,5 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
+using Com.Api.Sdk;
+using Newtonsoft.Json;
 
 namespace Com.Db;
 
@@ -22,11 +24,13 @@ public class Coin
     /// 价格小数位数
     /// </summary>
     /// <value></value>
+    [JsonConverter(typeof(JsonConverterDecimal))]
     public decimal price_places { get; set; }
     /// <summary>
     /// 量小数位数
     /// </summary>
     /// <value></value>
+    [JsonConverter(typeof(JsonConverterDecimal))]
     public decimal amount_places { get; set; }
     /// <summary>
     /// 合约地址

@@ -1,5 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
+using Com.Api.Sdk;
+using Newtonsoft.Json;
 
 namespace Com.Db;
 
@@ -22,11 +24,13 @@ public class Vip
     /// 市价手续费
     /// </summary>
     /// <value></value>
+    [JsonConverter(typeof(JsonConverterDecimal))]
     public decimal fee_market { get; set; }
     /// <summary>
     /// 限价手续费
     /// </summary>
     /// <value></value>
+    [JsonConverter(typeof(JsonConverterDecimal))]
     public decimal fee_limit { get; set; }
 
 }

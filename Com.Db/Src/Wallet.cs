@@ -1,6 +1,9 @@
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
+using Com.Api.Sdk;
 using Com.Api.Sdk.Enum;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Com.Db;
 
@@ -18,6 +21,7 @@ public class Wallet
     /// 钱包类型
     /// </summary>
     /// <value></value>
+    [JsonConverter(typeof(StringEnumConverter))]
     public E_WalletType wallet_type { get; set; }
     /// <summary>
     /// 用户id
@@ -43,15 +47,18 @@ public class Wallet
     /// 总额
     /// </summary>
     /// <value></value>
+    [JsonConverter(typeof(JsonConverterDecimal))]
     public decimal total { get; set; }
     /// <summary>
     /// 可用
     /// </summary>
     /// <value></value>
+    [JsonConverter(typeof(JsonConverterDecimal))]
     public decimal available { get; set; }
     /// <summary>
     /// 冻结
     /// </summary>
     /// <value></value>
+    [JsonConverter(typeof(JsonConverterDecimal))]
     public decimal freeze { get; set; }
 }

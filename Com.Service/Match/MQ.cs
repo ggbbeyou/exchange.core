@@ -99,7 +99,7 @@ public class MQ
                     cancel.AddRange(match.cancels);
                 }
                 FactoryService.instance.constant.stopwatch.Stop();
-                FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};撮合订单{req.data.Count}条");
+                FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:撮合订单{req.data.Count}条");
                 DepthChange();
                 this.mutex.ReleaseMutex();
             };
@@ -199,7 +199,7 @@ public class MQ
             ServiceDepth.instance.Push(this.model.info.market, depths_diff, false);
             this.orderbook_old = orderbook;
             FactoryService.instance.constant.stopwatch.Stop();
-            FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};推送深度行情");
+            FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:推送深度行情");
         }
     }
 

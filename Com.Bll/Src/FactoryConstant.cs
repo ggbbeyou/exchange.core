@@ -195,7 +195,6 @@ public class FactoryConstant
             {
                 this.i_model.BasicNack(deliveryTag: ea.DeliveryTag, multiple: true, requeue: true);
             }
-            // Task.Delay(0);
         };
         return this.i_model.BasicConsume(queue: queue_name, autoAck: false, consumer: consumer);
     }
@@ -234,7 +233,6 @@ public class FactoryConstant
             {
                 this.i_model.BasicNack(deliveryTag: ea.DeliveryTag, multiple: false, requeue: true);
             }
-            // Task.Delay(0);
         };
         return this.i_model.BasicConsume(queue: queue_name, autoAck: false, consumer: consumer);
     }

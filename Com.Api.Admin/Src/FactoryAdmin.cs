@@ -24,6 +24,11 @@ public class FactoryAdmin
     /// </summary>
     /// <returns></returns>
     public static readonly FactoryAdmin instance = new FactoryAdmin();
+    /// <summary>
+    /// 互斥锁
+    /// </summary>
+    /// <returns></returns>
+    private Mutex mutex = new Mutex(false);
 
     /// <summary>
     /// private构造方法
@@ -77,6 +82,7 @@ public class FactoryAdmin
     /// <returns>服务状态</returns>
     public async Task<bool?> ServiceStart(Market info)
     {
+        this.mutex.WaitOne();
         bool? status = null;
         try
         {
@@ -104,6 +110,7 @@ public class FactoryAdmin
         {
             FactoryService.instance.constant.logger.LogError(ex, "服务:启动服务");
         }
+        this.mutex.ReleaseMutex();
         return status;
     }
 
@@ -114,6 +121,7 @@ public class FactoryAdmin
     /// <returns>服务状态</returns>
     public async Task<bool?> ServiceStop(Market info)
     {
+        this.mutex.WaitOne();
         bool? status = null;
         try
         {
@@ -141,6 +149,7 @@ public class FactoryAdmin
         {
             FactoryService.instance.constant.logger.LogError(ex, "服务:停止服务");
         }
+        this.mutex.ReleaseMutex();
         return status;
     }
 

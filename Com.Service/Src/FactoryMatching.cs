@@ -35,7 +35,11 @@ public class FactoryMatching
     /// <typeparam name="Core">服务</typeparam>
     /// <returns></returns>
     public Dictionary<long, MatchModel> service = new Dictionary<long, MatchModel>();
-
+    /// <summary>
+    /// 互斥锁
+    /// </summary>
+    /// <returns></returns>
+    private Mutex mutex = new Mutex(false);
     /// <summary>
     /// 私有构造方法
     /// </summary>
@@ -67,6 +71,9 @@ public class FactoryMatching
     /// <param name="info"></param>
     public Market ServiceStart(Market info)
     {
+
+
+        // this.mutex.WaitOne();
         if (!this.service.ContainsKey(info.market))
         {
             MatchModel model = new MatchModel(info);
@@ -84,6 +91,7 @@ public class FactoryMatching
         info.status = this.service[info.market].run;
         this.service[info.market].mq_tag_order_cancel = this.service[info.market].mq.OrderCancel();
         this.service[info.market].mq_tag_order_place = this.service[info.market].mq.OrderReceive();
+        // this.mutex.ReleaseMutex();
         return info;
     }
 
@@ -93,6 +101,7 @@ public class FactoryMatching
     /// <param name="info"></param>
     public Market ServiceStop(Market info)
     {
+        this.mutex.WaitOne();
         if (this.service.ContainsKey(info.market))
         {
             this.service[info.market].run = false;
@@ -107,6 +116,7 @@ public class FactoryMatching
         {
             info.status = false;
         }
+        this.mutex.ReleaseMutex();
         return info;
     }
 
@@ -117,9 +127,27 @@ public class FactoryMatching
     /// <returns></returns>
     private bool ServiceClearCache(Market info)
     {
-        FactoryService.instance.constant.i_model.QueuePurge(FactoryService.instance.GetMqOrderPlace(info.market));
-        FactoryService.instance.constant.i_model.QueuePurge(FactoryService.instance.GetMqOrderCancel(info.market));
-        FactoryService.instance.constant.i_model.QueuePurge(FactoryService.instance.GetMqOrderDeal(info.market));
+        // try
+        // {
+        //     FactoryService.instance.constant.i_model.QueuePurge(FactoryService.instance.GetMqOrderPlace(info.market));
+        // }
+        // catch
+        // {
+        // }
+        // try
+        // {
+        //     FactoryService.instance.constant.i_model.QueuePurge(FactoryService.instance.GetMqOrderCancel(info.market));
+        // }
+        // catch
+        // {
+        // }
+        // try
+        // {
+        //     FactoryService.instance.constant.i_model.QueuePurge(FactoryService.instance.GetMqOrderDeal(info.market));
+        // }
+        // catch
+        // {
+        // }
         //交易记录数据从DB同步到Redis 至少保存最近3个月记录
         long delete = this.deal_service.DeleteDeal(info.market, DateTimeOffset.UtcNow.AddMonths(-2));
         ServiceDepth.instance.DeleteRedisDepth(info.market);

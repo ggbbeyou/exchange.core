@@ -70,7 +70,7 @@ public class WebSocketController : ControllerBase
                         {
                             foreach (var item in channel)
                             {
-                                FactoryService.instance.constant.i_model.BasicCancel(item.Value);
+                                FactoryService.instance.constant.MqDeleteConsumer(item.Value);
                             }
                             channel.Clear();
                             break;
@@ -87,7 +87,7 @@ public class WebSocketController : ControllerBase
                 }
                 foreach (var item in channel)
                 {
-                    FactoryService.instance.constant.i_model.BasicCancel(item.Value);
+                    FactoryService.instance.constant.MqDeleteConsumer(item.Value);
                 }
                 channel.Clear();
                 await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
@@ -265,7 +265,7 @@ public class WebSocketController : ControllerBase
                         }
                         if (channel.ContainsKey(key))
                         {
-                            FactoryService.instance.constant.i_model.BasicCancel(channel[key]);
+                            FactoryService.instance.constant.MqDeleteConsumer(channel[key]);
                             channel.Remove(key);
                             resWebsocker.channel = item.channel;
                             resWebsocker.data = item.data;

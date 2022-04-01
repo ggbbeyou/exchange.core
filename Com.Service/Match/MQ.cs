@@ -61,8 +61,6 @@ public class MQ
     public MQ(MatchModel model)
     {
         this.model = model;
-        OrderCancel();
-        OrderReceive();
     }
 
     /// <summary>

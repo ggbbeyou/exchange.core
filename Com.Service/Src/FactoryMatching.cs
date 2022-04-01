@@ -82,6 +82,8 @@ public class FactoryMatching
             this.service[info.market].run = true;
         }
         info.status = this.service[info.market].run;
+        this.service[info.market].mq_tag_order_cancel = this.service[info.market].mq.OrderCancel();
+        this.service[info.market].mq_tag_order_place = this.service[info.market].mq.OrderReceive();
         return info;
     }
 
@@ -94,6 +96,8 @@ public class FactoryMatching
         if (this.service.ContainsKey(info.market))
         {
             this.service[info.market].run = false;
+            FactoryService.instance.constant.MqDeleteConsumer(this.service[info.market].mq_tag_order_cancel);
+            FactoryService.instance.constant.MqDeleteConsumer(this.service[info.market].mq_tag_order_place);
             ServiceClearCache(info);
             this.service[info.market].match_core.CancelOrder();
             this.service.Remove(info.market);

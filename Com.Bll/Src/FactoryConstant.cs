@@ -122,7 +122,7 @@ public class FactoryConstant
         {
             this.logger.LogError(ex, $"MQ服务器连接不上");
         }
-    }    
+    }
 
     /// <summary>
     /// 上分布式锁
@@ -265,11 +265,18 @@ public class FactoryConstant
         consumer.Received += (model, ea) =>
         {
             action(ea.Body.ToArray());
-            // Task.Delay(0);
         };
         return this.i_model.BasicConsume(queue: queueName, autoAck: true, consumer: consumer);
     }
 
+    /// <summary>
+    /// 删除消费者
+    /// </summary>
+    /// <param name="consumerTag">消费者标示</param>
+    public void MqDeleteConsumer(string consumerTag)
+    {
+        this.i_model.BasicCancel(consumerTag);
+    }
 
 
 

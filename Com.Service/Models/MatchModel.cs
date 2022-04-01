@@ -41,6 +41,16 @@ public class MatchModel
     /// </summary>
     /// <value></value>
     public Core core { get; set; } = null!;
+    /// <summary>
+    /// mq 消费者事件标示 下单
+    /// </summary>
+    /// <value></value>
+    public string mq_tag_order_place { get; set; } = null!;
+    /// <summary>
+    /// mq 消费者事件标示 撤单
+    /// </summary>
+    /// <value></value>
+    public string mq_tag_order_cancel { get; set; } = null!;
 
     /// <summary>
     /// 初始化

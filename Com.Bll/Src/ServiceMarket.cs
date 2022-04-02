@@ -53,7 +53,7 @@ public class ServiceMarket
                 }
                 else
                 {
-                    return db.Market.AsNoTracking().Where(P => symbol.Contains(P.symbol)).ToList();
+                    return db.Market.AsNoTracking().Where(P => symbol.Contains(P.symbol)).OrderBy(P => P.sort).ToList();
                 }
             }
         }

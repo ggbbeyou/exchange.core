@@ -29,7 +29,7 @@ public class ResMarket
     /// 报价币种名
     /// </summary>
     /// <value></value>
-    public string coin_name_quote { get; set; } = null!;   
+    public string coin_name_quote { get; set; } = null!;
     /// <summary>
     /// 状态 true:正在运行,false:停止
     /// </summary>
@@ -70,4 +70,9 @@ public class ResMarket
     /// <value></value>
     [JsonConverter(typeof(JsonConverterDecimal))]
     public decimal fee_limit_sell { get; set; }
+    /// <summary>
+    /// 排序
+    /// </summary>
+    /// <value></value>
+    public float sort { get; set; }
 }

@@ -139,11 +139,6 @@ public class ServiceOrder
             res.message = "用户禁止下单";
             return res;
         }
-        Vip? vip = user_service.GetVip(users.vip);
-        if (vip == null)
-        {
-            vip = new Vip();
-        }
         decimal coin_base = 0;
         decimal coin_quote = 0;
         foreach (var item in orders)

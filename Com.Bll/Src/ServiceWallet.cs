@@ -54,7 +54,7 @@ public class ServiceWallet
                         return false;
                     }
                 }
-                else
+                else if (amount_base == 0)
                 {
                     return false;
                 }
@@ -98,7 +98,7 @@ public class ServiceWallet
                         return false;
                     }
                 }
-                else
+                else if (amount_base == 0)
                 {
                     return false;
                 }
@@ -121,7 +121,7 @@ public class ServiceWallet
                         return false;
                     }
                 }
-                else
+                else if (amount_base == 0)
                 {
                     return false;
                 }
@@ -189,7 +189,7 @@ public class ServiceWallet
             }
         }
     }
-   
+
     /// <summary>
     /// 撮合成交后资产变动(批量)
     /// </summary>

@@ -270,98 +270,15 @@ public class ServiceWallet
                             buy_quote.total = buy_quote.available + buy_quote.freeze;
                             sell_base.total = sell_base.available + sell_base.freeze;
                             sell_quote.total = sell_quote.available + sell_quote.freeze;
-
-                            runnings.Add(AddRunning(item.trade_id, E_WalletType.main, item.amount, sell_base, buy_base));
+                            runnings.Add(AddRunning(item.trade_id, E_WalletType.main, item.amount - fee_taker, sell_base, buy_base, $"交易:{sell_base.user_name}=>{buy_base.user_name},{item.amount - fee_taker}{sell_base.coin_name}"));
+                            runnings.Add(AddRunning(item.trade_id, E_WalletType.main, item.total - fee_maker, buy_quote, sell_quote, $"交易:{buy_quote.user_name}=>{sell_quote.user_name},{item.total - fee_maker}{buy_quote.coin_name}"));
                             if (settlement_base != null)
                             {
-                                
-                                runnings.Add(AddRunning(item.trade_id, E_WalletType.fee, fee_taker, buy_base, settlement_base));
+                                runnings.Add(AddRunning(item.trade_id, E_WalletType.fee, fee_taker, buy_base, settlement_base, $"手续费:{buy_base.user_name}=>{settlement_base.user_name},{fee_taker}{buy_base.coin_name}"));
                             }
-                            runnings.Add(new Running
+                            if (settlement_quote != null)
                             {
-                                id = FactoryService.instance.constant.worker.NextId(),
-                                relation_id = item.trade_id,
-                                coin_id = market.coin_id_base,
-                                coin_name = market.coin_name_base,
-                                wallet_from = sell_base.wallet_id,
-                                wallet_to = buy_base.wallet_id,
-                                wallet_type_from = E_WalletType.main,
-                                wallet_type_to = E_WalletType.main,
-                                uid_from = sell_base.user_id,
-                                uid_to = buy_base.user_id,
-                                user_name_from = sell_base.user_name,
-                                user_name_to = buy_base.user_name,
-                                amount = item.amount,
-                                operation_uid = 0,
-                                time = item.time,
-                                remarks = "卖币成交,基础币种:卖方支付给买方",
-                            });
-                            runnings.Add(new Running
-                            {
-                                id = FactoryService.instance.constant.worker.NextId(),
-                                relation_id = item.trade_id,
-                                coin_id = market.coin_id_quote,
-                                coin_name = market.coin_name_quote,
-                                wallet_from = buy_quote.wallet_id,
-                                wallet_to = sell_quote.wallet_id,
-                                wallet_type_from = E_WalletType.main,
-                                wallet_type_to = E_WalletType.main,
-                                uid_from = buy_quote.user_id,
-                                uid_to = sell_quote.user_id,
-                                user_name_from = buy_quote.user_name,
-                                user_name_to = sell_quote.user_name,
-                                amount = item.total,
-                                operation_uid = 0,
-                                time = item.time,
-                                remarks = "买币成交,报价币种:买方支付给卖方",
-                            });
-                            if (settlement_base != null)
-                            {
-                                settlement_base.available += item.fee_sell;
-                                settlement_base.total = settlement_base.available + settlement_base.freeze;
-                                runnings.Add(new Running
-                                {
-                                    id = FactoryService.instance.constant.worker.NextId(),
-                                    relation_id = item.trade_id,
-                                    coin_id = market.coin_id_base,
-                                    coin_name = market.coin_name_base,
-                                    wallet_from = sell_base.wallet_id,
-                                    wallet_to = settlement_base.wallet_id,
-                                    wallet_type_from = E_WalletType.main,
-                                    wallet_type_to = E_WalletType.fee,
-                                    uid_from = sell_base.user_id,
-                                    uid_to = settlement_base.user_id,
-                                    user_name_from = sell_base.user_name,
-                                    user_name_to = settlement_base.user_name,
-                                    amount = item.fee_sell,
-                                    operation_uid = settlement_base.user_id,
-                                    time = item.time,
-                                    remarks = "卖币手续费",
-                                });
-                            }
-                            if (settlement_quote != null && item.fee_buy > 0)
-                            {
-                                settlement_quote.available += item.fee_buy;
-                                settlement_quote.total = settlement_quote.available + settlement_quote.freeze;
-                                runnings.Add(new Running
-                                {
-                                    id = FactoryService.instance.constant.worker.NextId(),
-                                    relation_id = item.trade_id,
-                                    coin_id = market.coin_id_quote,
-                                    coin_name = market.coin_name_quote,
-                                    wallet_from = buy_quote.wallet_id,
-                                    wallet_to = settlement_quote.wallet_id,
-                                    wallet_type_from = E_WalletType.main,
-                                    wallet_type_to = E_WalletType.fee,
-                                    uid_from = buy_quote.user_id,
-                                    uid_to = settlement_quote.user_id,
-                                    user_name_from = buy_quote.user_name,
-                                    user_name_to = settlement_quote.user_name,
-                                    amount = item.fee_buy,
-                                    operation_uid = settlement_quote.user_id,
-                                    time = item.time,
-                                    remarks = "买币手续费",
-                                });
+                                runnings.Add(AddRunning(item.trade_id, E_WalletType.fee, fee_maker, sell_quote, settlement_quote, $"手续费:{sell_quote.user_name}=>{settlement_quote.user_name},{fee_maker}{sell_quote.coin_name}"));
                             }
                         }
                         db.SaveChanges();
@@ -380,7 +297,7 @@ public class ServiceWallet
         }
     }
 
-    public Running AddRunning(long relation_id, E_WalletType wallet_type_to, decimal amount, Wallet wallet_from, Wallet wallet_to)
+    public Running AddRunning(long relation_id, E_WalletType wallet_type_to, decimal amount, Wallet wallet_from, Wallet wallet_to, string remarks)
     {
         return new Running
         {
@@ -399,7 +316,7 @@ public class ServiceWallet
             amount = amount,
             operation_uid = 0,
             time = DateTimeOffset.UtcNow,
-            remarks = null,
+            remarks = remarks,
         };
     }
 

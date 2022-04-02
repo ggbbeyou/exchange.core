@@ -111,6 +111,24 @@ public class ServiceOrder
             res.message = $"amount:市价买单成交额精度错误(成交额小数位:{info.places_price + info.places_amount})";
             return res;
         }
+        if (orders.Any(P => P.type == E_OrderType.price_market && P.side == E_OrderSide.sell && P.amount < info.trade_min_market_sell))
+        {
+            res.code = E_Res_Code.field_error;
+            res.message = $"amount:市价卖单成交最不能低于:{info.trade_min_market_sell})";
+            return res;
+        }
+        if (orders.Any(P => P.type == E_OrderType.price_market && P.side == E_OrderSide.buy && P.amount < info.trade_min))
+        {
+            res.code = E_Res_Code.field_error;
+            res.message = $"amount:市价买单成交额不能低于:{info.trade_min})";
+            return res;
+        }
+        if (orders.Any(P => P.type == E_OrderType.price_limit && P.price * P.amount < info.trade_min))
+        {
+            res.code = E_Res_Code.field_error;
+            res.message = $"amount:限价单成交额不能低于:{info.trade_min})";
+            return res;
+        }
         Users? users = user_service.GetUser(uid);
         if (users == null)
         {

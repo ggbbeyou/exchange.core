@@ -46,10 +46,15 @@ public class ResMarket
     /// <value></value>   
     public int places_amount { get; set; }
     /// <summary>
-    /// 最小交易额
+    /// 除了市价卖单外每一笔最小交易额
     /// </summary>
     /// <value></value>
     public decimal trade_min { get; set; }
+    /// <summary>
+    /// 市价卖单每一笔最小交易量
+    /// </summary>
+    /// <value></value>
+    public decimal trade_min_market_sell { get; set; }
     /// <summary>
     /// 排序
     /// </summary>

@@ -1,7 +1,4 @@
-﻿
-
-
-using Com.Api.Sdk.Enum;
+﻿using Com.Api.Sdk.Enum;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -22,6 +19,7 @@ public class ResOrder : ReqOrder
     /// </summary>
     /// <value></value>
     [JsonConverter(typeof(StringEnumConverter))]
+    [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
     public E_OrderState state { get; set; }
     /// <summary>
     /// 未成交 买:交易额,卖:交易量

@@ -25,12 +25,14 @@ public class ReqOrder
     /// </summary>
     /// <value></value>
     [JsonConverter(typeof(StringEnumConverter))]
+    [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
     public E_OrderSide side { get; set; }
     /// <summary>
     /// 订单类型
     /// </summary>
     /// <value></value>
     [JsonConverter(typeof(StringEnumConverter))]
+    [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
     public E_OrderType type { get; set; }
     /// <summary>
     /// 挂单价(限价单必填,市价单无效,db:市价为成交均价)

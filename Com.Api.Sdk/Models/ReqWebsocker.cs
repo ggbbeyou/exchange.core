@@ -15,6 +15,7 @@ public class ReqWebsocker
     /// </summary>
     /// <value></value>
     [JsonConverter(typeof(StringEnumConverter))]
+    [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
     public E_WebsockerOp op { get; set; }
     /// <summary>
     /// 请求订阅的频道列表
@@ -33,6 +34,7 @@ public class ReqChannel
     /// </summary>
     /// <value></value>
     [JsonConverter(typeof(StringEnumConverter))]
+    [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
     public E_WebsockerChannel channel { get; set; }
     /// <summary>
     /// 数据 交易对或其它数据

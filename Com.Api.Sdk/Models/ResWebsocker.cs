@@ -21,12 +21,14 @@ public class ResWebsocker<T>
     /// </summary>
     /// <value></value>
     [JsonConverter(typeof(StringEnumConverter))]
+    [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
     public E_WebsockerOp op { get; set; }
     // <summary>
     /// 频道     
     /// </summary>
     /// <value></value>
     [JsonConverter(typeof(StringEnumConverter))]
+    [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
     public E_WebsockerChannel channel { get; set; }
     /// <summary>
     /// 数据

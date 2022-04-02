@@ -32,12 +32,12 @@ public class ServiceUser
     /// <summary>
     /// 注册
     /// </summary>
-    /// <param name="user_name"></param>
-    /// <param name="password"></param>
-    /// <param name="phone"></param>
-    /// <param name="email"></param>
-    /// <param name="app"></param>
-    /// <param name="ip"></param>
+    /// <param name="user_name">用户名</param>
+    /// <param name="password">密码</param>
+    /// <param name="phone">手机号</param>
+    /// <param name="email">Email</param>
+    /// <param name="app">终端</param>
+    /// <param name="ip">ip地址</param>
     public Res<long> Register(string user_name, string password, string phone, string email, string app, string ip)
     {
         Res<long> res = new Res<long>();

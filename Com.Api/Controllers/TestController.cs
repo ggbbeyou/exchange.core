@@ -366,10 +366,16 @@ public class TestController : ControllerBase
                     if (type == E_OrderType.price_market && side == E_OrderSide.sell)
                     {
                         amount = FactoryService.instance.constant.random.NextInt64(0, 3) + (decimal)FactoryService.instance.constant.random.NextDouble() + market.trade_min_market_sell;
+                        amount = Math.Round(amount, market.places_amount);
                     }
                     else if (type == E_OrderType.price_limit)
                     {
                         price = FactoryService.instance.constant.random.NextInt64(45000, 60000) + (decimal)FactoryService.instance.constant.random.NextDouble();
+                        amount = Math.Round(amount, market.places_amount);
+                    }
+                    else
+                    {
+                        amount = Math.Round(amount, market.places_amount + market.places_price);
                     }
                 }
                 else if (market.symbol == "eth/usdt")
@@ -377,17 +383,22 @@ public class TestController : ControllerBase
                     if (type == E_OrderType.price_market && side == E_OrderSide.sell)
                     {
                         amount = FactoryService.instance.constant.random.NextInt64(0, 10) + (decimal)FactoryService.instance.constant.random.NextDouble() + market.trade_min_market_sell;
+                        amount = Math.Round(amount, market.places_amount);
                     }
                     else if (type == E_OrderType.price_limit)
                     {
                         price = FactoryService.instance.constant.random.NextInt64(3000, 5000) + (decimal)FactoryService.instance.constant.random.NextDouble();
+                        amount = Math.Round(amount, market.places_amount);
+                    }
+                    else
+                    {
+                        amount = Math.Round(amount, market.places_amount + market.places_price);
                     }
                 }
                 if (price != null)
                 {
                     price = Math.Round(price ?? 0, market.places_price);
                 }
-                amount = Math.Round(amount, market.places_amount);
                 ReqOrder order = new ReqOrder()
                 {
                     client_id = FactoryService.instance.constant.worker.NextId().ToString(),

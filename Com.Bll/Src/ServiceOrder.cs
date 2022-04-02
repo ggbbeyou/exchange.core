@@ -73,6 +73,12 @@ public class ServiceOrder
             res.message = "client_id长度不能超过50";
             return res;
         }
+        if (orders.Max(P => P.client_id?.Length ?? 0) > 50)
+        {
+            res.code = E_Res_Code.field_error;
+            res.message = "data长度不能超过50";
+            return res;
+        }
         Market? info = this.market_service.GetMarketBySymbol(symbol);
         if (info == null)
         {

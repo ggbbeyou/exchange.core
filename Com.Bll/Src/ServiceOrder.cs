@@ -88,7 +88,7 @@ public class ServiceOrder
             res.message = "市价买单,总额(amount)不能小于0";
             return res;
         }
-        if (market_buy.Any(P => (double)P.amount / (Math.Pow(0.1, info.price_places) * (double)info.amount_multiple) != (int)((double)P.amount / (Math.Pow(0.1, info.price_places) * (double)info.amount_multiple))))
+        if (market_buy.Any(P => (double)(P.amount ?? 0) / (Math.Pow(0.1, info.price_places) * (double)info.amount_multiple) != (int)((double)(P.amount ?? 0) / (Math.Pow(0.1, info.price_places) * (double)info.amount_multiple))))
         {
             res.code = E_Res_Code.field_error;
             res.message = $"市价买单,总额(amount)精度不对,总额必须是:{(Math.Pow(0.1, info.price_places) * (double)info.amount_multiple)}整数倍数";
@@ -144,8 +144,8 @@ public class ServiceOrder
         {
             vip = new Vip();
         }
-        decimal? coin_base = 0;
-        decimal? coin_quote = 0;
+        decimal coin_base = 0;
+        decimal coin_quote = 0;
         foreach (var item in orders)
         {
             Orders order = new Orders();
@@ -166,13 +166,13 @@ public class ServiceOrder
                 {
                     order.amount = null;
                     order.amount_unsold = item.amount ?? 0;
-                    coin_quote += item.amount;
+                    coin_quote += item.amount ?? 0;
                 }
                 else if (order.side == E_OrderSide.sell)
                 {
                     order.amount = item.amount;
                     order.amount_unsold = item.amount ?? 0;
-                    coin_base += item.amount;
+                    coin_base += item.amount ?? 0;
                 }
             }
             else if (order.type == E_OrderType.price_limit)
@@ -183,12 +183,12 @@ public class ServiceOrder
                 if (order.side == E_OrderSide.buy)
                 {
                     order.amount_unsold = order.total ?? 0;
-                    coin_quote += order.total;
+                    coin_quote += order.total ?? 0;
                 }
                 else if (order.side == E_OrderSide.sell)
                 {
                     order.amount_unsold = item.amount ?? 0;
-                    coin_base += item.amount;
+                    coin_base += item.amount ?? 0;
                 }
             }
             order.amount_done = 0;
@@ -200,27 +200,27 @@ public class ServiceOrder
             order.remarks = null;
             res.data.Add(order);
         }
-        if (coin_base != null && coin_quote != null && coin_base > 0 && coin_quote > 0)
+        if (coin_base > 0 && coin_quote > 0)
         {
-            if (!wallet_service.FreezeChange(E_WalletType.main, uid, info.coin_id_base, coin_base + fee_base ?? 0, info.coin_id_quote, coin_quote + fee_quote ?? 0))
+            if (!wallet_service.FreezeChange(E_WalletType.main, uid, info.coin_id_base, coin_base, info.coin_id_quote, coin_quote))
             {
                 res.code = E_Res_Code.low_capital;
                 res.message = "基础币种或报价币种余额不足";
                 return res;
             }
         }
-        else if (coin_base != null && coin_base > 0)
+        else if (coin_base > 0)
         {
-            if (!wallet_service.FreezeChange(E_WalletType.main, uid, info.coin_id_base, coin_base + fee_base ?? 0))
+            if (!wallet_service.FreezeChange(E_WalletType.main, uid, info.coin_id_base, coin_base))
             {
                 res.code = E_Res_Code.low_capital;
                 res.message = "基础币种余额不足";
                 return res;
             }
         }
-        else if (coin_quote != null && coin_quote > 0)
+        else if (coin_quote > 0)
         {
-            if (!wallet_service.FreezeChange(E_WalletType.main, uid, info.coin_id_quote, coin_quote + fee_quote ?? 0))
+            if (!wallet_service.FreezeChange(E_WalletType.main, uid, info.coin_id_quote, coin_quote))
             {
                 res.code = E_Res_Code.low_capital;
                 res.message = "报价币种余额不足";
@@ -372,7 +372,6 @@ public class ServiceOrder
                 uid = item.uid,
                 user_name = item.user_name,
                 total = item.total,
-                fee_rate = item.fee_rate,
                 remarks = item.remarks,
             });
         }
@@ -400,7 +399,6 @@ public class ServiceOrder
                 uid = item.uid,
                 user_name = item.user_name,
                 total = item.total,
-                fee_rate = item.fee_rate,
                 remarks = item.remarks,
             });
         }

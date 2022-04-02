@@ -143,7 +143,7 @@ public class TestController : ControllerBase
                 withdrawal = false,
                 phone = null,
                 email = null,
-                vip = vip1.id,
+                vip = vip0.id,
                 public_key = key.public_key,
                 private_key = key.private_key,
             };

@@ -36,16 +36,20 @@ public class ResMarket
     /// <value></value>
     public bool status { get; set; }
     /// <summary>
-    /// 价格小数位数
+    /// 交易价小数位数
     /// </summary>
     /// <value></value>
-    public int price_places { get; set; }
+    public int places_price { get; set; }
     /// <summary>
-    /// 交易量最小整数倍数
+    /// 交易量小数位数
+    /// </summary>
+    /// <value></value>   
+    public int places_amount { get; set; }
+    /// <summary>
+    /// 最小交易额
     /// </summary>
     /// <value></value>
-    [JsonConverter(typeof(JsonConverterDecimal))]
-    public decimal amount_multiple { get; set; }   
+    public decimal trade_min { get; set; }
     /// <summary>
     /// 排序
     /// </summary>

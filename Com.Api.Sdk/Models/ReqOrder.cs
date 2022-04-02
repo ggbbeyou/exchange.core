@@ -39,7 +39,7 @@ public class ReqOrder
     [JsonConverter(typeof(JsonConverterDecimal))]
     public decimal? price { get; set; }
     /// <summary>
-    /// 限价单:挂单量,市价单:总额,db:量
+    /// 限价单:挂单量,市价单:交易额,db:量
     /// </summary>
     /// <value></value>
     [JsonConverter(typeof(JsonConverterDecimal))]

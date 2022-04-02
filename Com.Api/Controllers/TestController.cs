@@ -303,8 +303,8 @@ public class TestController : ControllerBase
             coin_name_base = btc.coin_name,
             coin_id_quote = usdt.coin_id,
             coin_name_quote = usdt.coin_name,
-            price_places = 2,
-            amount_multiple = 0.00001m,
+            places_price = 2,
+            places_amount = 6,
             market_uid = 0,
             settlement_uid = settlement_btc_usdt.user_id,
             last_price = Math.Round((decimal)FactoryService.instance.constant.random.NextDouble(), 2),
@@ -318,8 +318,8 @@ public class TestController : ControllerBase
             coin_name_base = eth.coin_name,
             coin_id_quote = usdt.coin_id,
             coin_name_quote = usdt.coin_name,
-            price_places = 2,
-            amount_multiple = 0.0002m,
+            places_price = 2,
+            places_amount = 4,
 
             market_uid = 0,
             settlement_uid = settlement_eth_usdt.user_id,
@@ -358,7 +358,7 @@ public class TestController : ControllerBase
                 E_OrderType type = FactoryService.instance.constant.random.Next(0, 2) == 0 ? E_OrderType.price_limit : E_OrderType.price_market;
                 decimal amount = (decimal)FactoryService.instance.constant.random.NextDouble();
                 decimal? price = (decimal)FactoryService.instance.constant.random.NextDouble();
-                price = Math.Round(price ?? 0, market.price_places);
+                price = Math.Round(price ?? 0, market.places_price);
                 if (amount == 0 || price == 0)
                 {
                     continue;
@@ -368,16 +368,16 @@ public class TestController : ControllerBase
                     price = null;
                     if (side == E_OrderSide.buy)
                     {
-                        amount = Math.Round(amount, market.price_places);
+                        amount = Math.Round(amount, market.places_price);
                     }
                 }
                 else if (type == E_OrderType.price_limit)
                 {
-                    amount = Math.Round(amount / market.amount_multiple, 0, MidpointRounding.ToNegativeInfinity) * market.amount_multiple;
+                    amount = Math.Round(amount / market.places_amount, 0, MidpointRounding.ToNegativeInfinity) * market.places_amount;
                 }
                 if (side == E_OrderSide.sell)
                 {
-                    amount = Math.Round(amount / market.amount_multiple, 0, MidpointRounding.ToNegativeInfinity) * market.amount_multiple;
+                    amount = Math.Round(amount / market.places_amount, 0, MidpointRounding.ToNegativeInfinity) * market.places_amount;
                 }
                 ReqOrder order = new ReqOrder()
                 {

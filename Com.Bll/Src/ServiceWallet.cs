@@ -221,27 +221,62 @@ public class ServiceWallet
                         List<long> user_id = deals.Select(T => T.bid_uid).ToList();
                         user_id.AddRange(deals.Select(T => T.ask_uid).ToList());
                         user_id = user_id.Distinct().ToList();
+                        List<Users> users = db.Users.AsNoTracking().Where(P => user_id.Contains(P.user_id)).ToList();
+                        List<Vip> vips = db.Vip.AsNoTracking().Where(P => users.Select(P => P.vip).Distinct().Contains(P.id)).ToList();
                         List<Wallet> wallets = db.Wallet.Where(P => P.wallet_type == wallet_type && user_id.Contains(P.user_id) && (P.coin_id == market.coin_id_base || P.coin_id == market.coin_id_quote)).ToList();
                         Wallet? settlement_base = db.Wallet.Where(P => P.wallet_type == E_WalletType.fee && P.user_id == market.settlement_uid && P.coin_id == market.coin_id_base).FirstOrDefault();
                         Wallet? settlement_quote = db.Wallet.Where(P => P.wallet_type == E_WalletType.fee && P.user_id == market.settlement_uid && P.coin_id == market.coin_id_quote).FirstOrDefault();
                         foreach (var item in deals)
                         {
+                            Users? user_buy = users.FirstOrDefault(P => P.user_id == item.bid_uid);
+                            Users? user_sell = users.FirstOrDefault(P => P.user_id == item.ask_uid);
+                            if (user_buy == null || user_sell == null)
+                            {
+                                return (false, runnings);
+                            }
+                            Vip? vip_buy = vips.FirstOrDefault(P => P.id == user_buy.vip);
+                            Vip? vip_sell = vips.FirstOrDefault(P => P.id == user_sell.vip);
+                            if (vip_buy == null || vip_sell == null)
+                            {
+                                return (false, runnings);
+                            }
                             Wallet? buy_base = wallets.Where(P => P.coin_id == market.coin_id_base && P.user_id == item.bid_uid).FirstOrDefault();
                             Wallet? buy_quote = wallets.Where(P => P.coin_id == market.coin_id_quote && P.user_id == item.bid_uid).FirstOrDefault();
                             Wallet? sell_base = wallets.Where(P => P.coin_id == market.coin_id_base && P.user_id == item.ask_uid).FirstOrDefault();
                             Wallet? sell_quote = wallets.Where(P => P.coin_id == market.coin_id_quote && P.user_id == item.ask_uid).FirstOrDefault();
                             if (buy_base == null || buy_quote == null || sell_base == null || sell_quote == null)
                             {
-                                return (true, runnings);
+                                return (false, runnings);
                             }
-                            buy_base.available += item.amount;
-                            sell_base.freeze -= (item.amount + item.fee_sell);
-                            buy_quote.freeze -= (item.total + item.fee_buy);
-                            sell_quote.available += item.total;
+                            decimal fee_maker = 0;
+                            decimal fee_taker = 0;
+                            if (item.trigger_side == E_OrderSide.buy)
+                            {
+                                // 买单为吃单,卖单为挂单
+                                fee_maker = vip_sell.fee_maker * item.total;
+                                fee_taker = vip_buy.fee_taker * item.amount;
+                            }
+                            else if (item.trigger_side == E_OrderSide.sell)
+                            {
+                                // 卖单为吃单,买单为挂单
+                                fee_maker = vip_buy.fee_maker * item.amount;
+                                fee_taker = vip_sell.fee_taker * item.total;
+                            }
+                            sell_base.freeze -= item.amount;
+                            buy_base.available += (item.amount - fee_taker);
+                            buy_quote.freeze -= item.total;
+                            sell_quote.available += (item.total - fee_maker);
                             buy_base.total = buy_base.available + buy_base.freeze;
                             buy_quote.total = buy_quote.available + buy_quote.freeze;
                             sell_base.total = sell_base.available + sell_base.freeze;
                             sell_quote.total = sell_quote.available + sell_quote.freeze;
+
+                            runnings.Add(AddRunning(item.trade_id, E_WalletType.main, item.amount, sell_base, buy_base));
+                            if (settlement_base != null)
+                            {
+                                
+                                runnings.Add(AddRunning(item.trade_id, E_WalletType.fee, fee_taker, buy_base, settlement_base));
+                            }
                             runnings.Add(new Running
                             {
                                 id = FactoryService.instance.constant.worker.NextId(),
@@ -280,7 +315,7 @@ public class ServiceWallet
                                 time = item.time,
                                 remarks = "买币成交,报价币种:买方支付给卖方",
                             });
-                            if (settlement_base != null && item.fee_sell > 0)
+                            if (settlement_base != null)
                             {
                                 settlement_base.available += item.fee_sell;
                                 settlement_base.total = settlement_base.available + settlement_base.freeze;
@@ -343,6 +378,29 @@ public class ServiceWallet
                 }
             }
         }
+    }
+
+    public Running AddRunning(long relation_id, E_WalletType wallet_type_to, decimal amount, Wallet wallet_from, Wallet wallet_to)
+    {
+        return new Running
+        {
+            id = FactoryService.instance.constant.worker.NextId(),
+            relation_id = relation_id,
+            coin_id = wallet_from.coin_id,
+            coin_name = wallet_from.coin_name,
+            wallet_from = wallet_from.wallet_id,
+            wallet_to = wallet_to.wallet_id,
+            wallet_type_from = E_WalletType.main,
+            wallet_type_to = wallet_type_to,
+            uid_from = wallet_from.user_id,
+            uid_to = wallet_to.user_id,
+            user_name_from = wallet_from.user_name,
+            user_name_to = wallet_to.user_name,
+            amount = amount,
+            operation_uid = 0,
+            time = DateTimeOffset.UtcNow,
+            remarks = null,
+        };
     }
 
     /// <summary>

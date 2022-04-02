@@ -60,7 +60,7 @@ public class Deal : ResDeal
     /// <value></value>
     public string ask_name { get; set; } = null!;
     /// <summary>
-    /// 买单未成交量
+    /// 买单未成交额
     /// </summary>
     /// <value></value>
     [JsonConverter(typeof(JsonConverterDecimal))]
@@ -72,7 +72,7 @@ public class Deal : ResDeal
     [JsonConverter(typeof(JsonConverterDecimal))]
     public decimal ask_amount_unsold { get; set; }
     /// <summary>
-    /// 买单已成交量
+    /// 买单已成交额
     /// </summary>
     /// <value></value>
     [JsonConverter(typeof(JsonConverterDecimal))]
@@ -83,40 +83,4 @@ public class Deal : ResDeal
     /// <value></value>
     [JsonConverter(typeof(JsonConverterDecimal))]
     public decimal ask_amount_done { get; set; }
-    /// <summary>
-    /// 买手续费率
-    /// </summary>
-    /// <value></value>
-    [JsonConverter(typeof(JsonConverterDecimal))]
-    public decimal fee_rate_buy { get; set; }
-    /// <summary>
-    /// 卖手续费率
-    /// </summary>
-    /// <value></value>
-    [JsonConverter(typeof(JsonConverterDecimal))]
-    public decimal fee_rate_sell { get; set; }
-    /// <summary>
-    /// 买手续费
-    /// </summary>
-    /// <value></value>
-    [JsonConverter(typeof(JsonConverterDecimal))]
-    public decimal fee_buy { get; set; }
-    /// <summary>
-    /// 卖手续费
-    /// </summary>
-    /// <value></value>
-    [JsonConverter(typeof(JsonConverterDecimal))]
-    public decimal fee_sell { get; set; }
-    /// <summary>
-    /// 买手续费币种
-    /// </summary>
-    /// <value></value>
-    public long fee_coin_buy { get; set; }
-    /// <summary>
-    /// 卖手续费币种
-    /// </summary>
-    /// <value></value>
-    public long fee_coin_sell { get; set; }
-
-
 }

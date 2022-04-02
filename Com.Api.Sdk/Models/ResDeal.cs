@@ -27,7 +27,7 @@ public class ResDeal
     [JsonConverter(typeof(JsonConverterDecimal))]
     public decimal amount { get; set; }
     /// <summary>
-    /// 成交触发方向
+    /// 成交触发方向(吃单方向)
     /// </summary>
     /// <value></value>
     [JsonConverter(typeof(StringEnumConverter))]

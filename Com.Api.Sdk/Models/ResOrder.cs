@@ -23,15 +23,14 @@ public class ResOrder : ReqOrder
     /// <value></value>
     [JsonConverter(typeof(StringEnumConverter))]
     public E_OrderState state { get; set; }
-
     /// <summary>
-    /// 未成交 买:总额,卖:交易量
+    /// 未成交 买:交易额,卖:交易量
     /// </summary>
     /// <value></value>
     [JsonConverter(typeof(JsonConverterDecimal))]
     public decimal amount_unsold { get; set; }
     /// <summary>
-    /// 已成交量 买:总额,卖:交易量
+    /// 已成交量 买:交易额,卖:交易量
     /// </summary>
     /// <value></value>
     [JsonConverter(typeof(JsonConverterDecimal))]

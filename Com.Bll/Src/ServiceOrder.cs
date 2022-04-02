@@ -81,49 +81,34 @@ public class ServiceOrder
             return res;
         }
         res.market = info.market;
-        List<ReqOrder> market_buy = orders.Where(P => P.side == E_OrderSide.buy && P.type == E_OrderType.price_market).ToList();
-        if (market_buy.Any(P => P.amount == null || P.amount <= 0))
+        if (orders.Any(P => P.amount == null || P.amount <= 0))
         {
             res.code = E_Res_Code.field_error;
-            res.message = "市价买单,总额(amount)不能小于0";
+            res.message = "amount:交易量/交易额不能小于0";
             return res;
         }
-        if (market_buy.Any(P => (double)(P.amount ?? 0) / (Math.Pow(0.1, info.price_places) * (double)info.amount_multiple) != (int)((double)(P.amount ?? 0) / (Math.Pow(0.1, info.price_places) * (double)info.amount_multiple))))
+        if (orders.Any(P => P.type == E_OrderType.price_limit && (P.price == null || P.price <= 0)))
         {
             res.code = E_Res_Code.field_error;
-            res.message = $"市价买单,总额(amount)精度不对,总额必须是:{(Math.Pow(0.1, info.price_places) * (double)info.amount_multiple)}整数倍数";
+            res.message = "price:限价单交易价不能为小于0";
             return res;
         }
-        List<ReqOrder> market_sell = orders.Where(P => P.side == E_OrderSide.sell && P.type == E_OrderType.price_market).ToList();
-        if (market_sell.Any(P => P.amount == null || P.amount <= 0))
+        if (orders.Any(P => P.type == E_OrderType.price_limit && Math.Round(P.price ?? 0, info.places_price, MidpointRounding.ToNegativeInfinity) != P.price))
         {
             res.code = E_Res_Code.field_error;
-            res.message = "市价卖单,量不能小于0";
+            res.message = $"price:限价单交易价精度错误(交易价小数位:{info.places_price})";
             return res;
         }
-        if (orders.Where(P => P.side == E_OrderSide.buy && P.type == E_OrderType.price_limit).Any(P => P.price == null || P.price < 0 || P.amount == null || P.amount <= 0) ||
-         orders.Where(P => P.side == E_OrderSide.sell && P.type == E_OrderType.price_limit).Any(P => P.price == null || P.price < 0 || P.amount == null || P.amount <= 0))
+        if (orders.Any(P => (P.type == E_OrderType.price_limit || (P.type == E_OrderType.price_market && P.side == E_OrderSide.sell)) && Math.Round(P.amount ?? 0, info.places_amount, MidpointRounding.ToNegativeInfinity) != P.amount))
         {
             res.code = E_Res_Code.field_error;
-            res.message = "限价单,价格和量都不能为小于0";
+            res.message = $"amount:限价单/市价卖单交易量精度错误(交易量小数位:{info.places_amount})";
             return res;
         }
-        if (orders.Where(P => P.type == E_OrderType.price_limit).Any(P => Math.Round(P.price ?? 0, info.price_places, MidpointRounding.ToNegativeInfinity) != P.price))
+        if (orders.Any(P => (P.type == E_OrderType.price_market && P.side == E_OrderSide.buy && Math.Round(P.amount ?? 0, info.places_price + info.places_amount, MidpointRounding.ToNegativeInfinity) != P.amount)))
         {
             res.code = E_Res_Code.field_error;
-            res.message = $"限价单价格精度不对,价格小数位:{info.price_places}";
-            return res;
-        }
-        if (orders.Where(P => P.type == E_OrderType.price_limit).Any(P => Math.Round((P.amount ?? 0) / info.amount_multiple, 0, MidpointRounding.ToNegativeInfinity) * info.amount_multiple != P.amount))
-        {
-            res.code = E_Res_Code.field_error;
-            res.message = $"限价单量必须是{info.amount_multiple}的整数倍";
-            return res;
-        }
-        if (orders.Where(P => P.side == E_OrderSide.sell).Any(P => Math.Round((P.amount ?? 0) / info.amount_multiple, 0, MidpointRounding.ToNegativeInfinity) * info.amount_multiple != P.amount))
-        {
-            res.code = E_Res_Code.field_error;
-            res.message = $"卖单量必须是{info.amount_multiple}的整数倍";
+            res.message = $"amount:市价买单成交额精度错误(成交额小数位:{info.places_price + info.places_amount})";
             return res;
         }
         Users? users = user_service.GetUser(uid);
@@ -160,6 +145,7 @@ public class ServiceOrder
                 if (order.side == E_OrderSide.buy)
                 {
                     order.amount = null;
+                    order.total = item.amount;
                     order.amount_unsold = item.amount ?? 0;
                     coin_quote += item.amount ?? 0;
                 }

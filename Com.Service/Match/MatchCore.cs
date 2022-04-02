@@ -455,7 +455,7 @@ public class MatchCore
             return null;
         }
         DateTimeOffset now = DateTimeOffset.UtcNow;
-        decimal bid_amount_unsold = Math.Round(bid.amount_unsold / price / this.model.info.amount_multiple, 0, MidpointRounding.ToNegativeInfinity) * this.model.info.amount_multiple;
+        decimal bid_amount_unsold = Math.Round(bid.amount_unsold / price / this.model.info.places_amount, 0, MidpointRounding.ToNegativeInfinity) * this.model.info.places_amount;
         decimal leftover = bid.amount_unsold - (bid_amount_unsold * price);
         decimal amount = 0;
         if (bid_amount_unsold > ask.amount_unsold)
@@ -510,12 +510,6 @@ public class MatchCore
             ask_amount_unsold = ask.amount_unsold,
             bid_amount_done = bid.amount_done,
             ask_amount_done = ask.amount_done,
-            fee_rate_buy = bid.fee_rate,
-            fee_rate_sell = ask.fee_rate,
-            fee_buy = (amount * price) * bid.fee_rate,
-            fee_sell = (amount * price) * ask.fee_rate,
-            fee_coin_buy = this.model.info.coin_id_quote,
-            fee_coin_sell = this.model.info.coin_id_base,
             time = now,
         };
         deals.Add(deal);
@@ -527,12 +521,12 @@ public class MatchCore
         {
             orders.Add(ask);
         }
-        if ((bid.state == E_OrderState.unsold || bid.state == E_OrderState.partial) && ((bid.trigger_cancel_price > 0 && bid.trigger_cancel_price >= price) || bid.amount_unsold / price < this.model.info.amount_multiple || bid.amount_unsold == leftover))
+        if ((bid.state == E_OrderState.unsold || bid.state == E_OrderState.partial) && ((bid.trigger_cancel_price > 0 && bid.trigger_cancel_price >= price) || bid.amount_unsold / price < this.model.info.places_amount || bid.amount_unsold == leftover))
         {
             bid.state = E_OrderState.cancel;
             cancels.Add(bid);
         }
-        if ((ask.state == E_OrderState.unsold || ask.state == E_OrderState.partial) && ((bid.trigger_cancel_price > 0 && ask.trigger_cancel_price <= price) || ask.amount_unsold < this.model.info.amount_multiple))
+        if ((ask.state == E_OrderState.unsold || ask.state == E_OrderState.partial) && ((bid.trigger_cancel_price > 0 && ask.trigger_cancel_price <= price) || ask.amount_unsold < this.model.info.places_amount))
         {
             ask.state = E_OrderState.cancel;
             cancels.Add(ask);

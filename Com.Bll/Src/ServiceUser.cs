@@ -219,4 +219,45 @@ public class ServiceUser
             signingCredentials: creds);// 令牌
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
+
+    /// <summary>
+    /// 获取登录信息
+    /// </summary>
+    /// <param name="user_id"></param>
+    /// <param name="no"></param>
+    /// <param name="user_name"></param>
+    /// <param name="app"></param>
+    /// <param name="claims_principal"></param>
+    /// <returns></returns>
+    public (long? user_id, string? no, string? user_name, string? app, string? public_key) GetLoginUser(System.Security.Claims.ClaimsPrincipal claims_principal)
+    {
+        string? no = null, user_name = null, app = null, public_key = null;
+        long? user_id = null;
+        Claim? claim = claims_principal.Claims.FirstOrDefault(P => P.Type == "no");
+        if (claim != null)
+        {
+            no = claim.Value;
+        }
+        claim = claims_principal.Claims.FirstOrDefault(P => P.Type == "user_id");
+        if (claim != null)
+        {
+            user_id = long.Parse(claim.Value);
+        }
+        claim = claims_principal.Claims.FirstOrDefault(P => P.Type == "user_name");
+        if (claim != null)
+        {
+            user_name = claim.Value;
+        }
+        claim = claims_principal.Claims.FirstOrDefault(P => P.Type == "app");
+        if (claim != null)
+        {
+            app = claim.Value;
+        }
+        claim = claims_principal.Claims.FirstOrDefault(P => P.Type == "public_key");
+        if (claim != null)
+        {
+            public_key = claim.Value;
+        }
+        return (user_id, no, user_name, app, public_key);
+    }
 }

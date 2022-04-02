@@ -12,68 +12,33 @@ namespace Com.Api.Controllers;
 /// <summary>
 /// 
 /// </summary>
-[Route("[controller]")]
 [ApiController]
 [AllowAnonymous]
+[Route("[controller]")]
 public class AccountController : ControllerBase
 {
-    private readonly ILogger<AccountController> logger;
-    /// <summary>
-    /// 登录玩家id
-    /// </summary>
-    /// <value></value>
-    public int uid
-    {
-        get
-        {
-            Claim? claim = User.Claims.FirstOrDefault(P => P.Type == JwtRegisteredClaimNames.Aud);
-            if (claim != null)
-            {
-                return Convert.ToInt32(claim.Value);
-            }
-            return 5;
-        }
-    }
     /// <summary>
     /// 
     /// </summary>
-    /// <value></value>
-    public string user_name
-    {
-        get
-        {
-            Claim? claim = User.Claims.FirstOrDefault(P => P.Type == JwtRegisteredClaimNames.Aud);
-            if (claim != null)
-            {
-                return (claim.Value);
-            }
-            return "";
-        }
-    }
+    private readonly ILogger<AccountController> logger;
+    /// <summary>
+    /// 
+    /// </summary>
+    public (long? user_id, string? no, string? user_name, string? app, string? public_key) user;
     /// <summary>
     /// 用户服务
     /// </summary>
     /// <returns></returns>
-    private ServiceUser user_service = new ServiceUser();
+    private ServiceUser service_user = new ServiceUser();
 
     /// <summary>
-    /// 交易对基础信息
-    /// </summary>
-    /// <returns></returns>
-    public ServiceMarket service_market = new ServiceMarket();
-
-    /// <summary>
-    /// Service:订单
-    /// </summary>
-    public ServiceOrder service_order = new ServiceOrder();
-
-    /// <summary>
-    /// 
+    /// 初始化
     /// </summary>
     /// <param name="logger"></param>
     public AccountController(ILogger<AccountController> logger)
     {
         this.logger = logger;
+        service_user.GetLoginUser(User);
     }
 
     /// <summary>
@@ -87,7 +52,6 @@ public class AccountController : ControllerBase
     /// <returns></returns>
     [HttpPost]
     [Route("login")]
-
     public Res<ResUser> Login(string account, string password, long no, string code, string app)
     {
         string ip = "";
@@ -95,23 +59,21 @@ public class AccountController : ControllerBase
         {
             ip = ip_addr;
         }
-        return user_service.Login(account, password, no, code, app, ip);
+        return service_user.Login(account, password, no, code, app, ip);
     }
-
 
     /// <summary>
     /// 5:获取图形验证码
     /// </summary>
     /// <returns></returns>  
     [HttpGet]
-    [AllowAnonymous]
     [Route("GetVerificationCode")]
     public Res<KeyValuePair<string, string>> GetVerificationCode()
     {
         Res<KeyValuePair<string, string>> res = new Res<KeyValuePair<string, string>>();
         res.success = true;
         res.code = E_Res_Code.ok;
-        (long no, string code) verifiction = user_service.GetVerificationCode();
+        (long no, string code) verifiction = service_user.GetVerificationCode();
         res.data = new KeyValuePair<string, string>(verifiction.no.ToString(), verifiction.code);
         return res;
     }

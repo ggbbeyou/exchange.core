@@ -35,7 +35,7 @@ public class OrderController : ControllerBase
     private ServiceOrder service_order = new ServiceOrder();
 
     /// <summary>
-    /// 
+    /// 初始化
     /// </summary>
     /// <param name="logger"></param>
     public OrderController(ILogger<OrderController> logger)

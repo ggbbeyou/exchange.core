@@ -30,11 +30,6 @@ public class OrderController : ControllerBase
     /// <returns></returns>
     private ServiceUser service_user = new ServiceUser();
     /// <summary>
-    /// 交易对基础信息
-    /// </summary>
-    /// <returns></returns>
-    private ServiceMarket service_market = new ServiceMarket();
-    /// <summary>
     /// Service:订单
     /// </summary>
     private ServiceOrder service_order = new ServiceOrder();
@@ -56,8 +51,8 @@ public class OrderController : ControllerBase
     /// <param name="orders">订单数据</param>
     /// <returns></returns>
     [HttpPost]
-    [Route("PlaceOrder")]
-    public ResCall<List<ResOrder>> PlaceOrder(string symbol, List<ReqOrder> orders)
+    [Route("OrderPlace")]
+    public ResCall<List<ResOrder>> OrderPlace(string symbol, List<ReqOrder> orders)
     {
         //判断用户api是否有交易权限
         ResCall<List<ResOrder>> result = new ResCall<List<ResOrder>>();

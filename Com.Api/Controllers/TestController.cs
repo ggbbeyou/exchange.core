@@ -305,6 +305,8 @@ public class TestController : ControllerBase
             coin_name_quote = usdt.coin_name,
             places_price = 2,
             places_amount = 6,
+            trade_min = 10,
+            trade_min_market_sell = 0.0002m,
             market_uid = 0,
             settlement_uid = settlement_btc_usdt.user_id,
             last_price = Math.Round((decimal)FactoryService.instance.constant.random.NextDouble(), 2),
@@ -320,7 +322,8 @@ public class TestController : ControllerBase
             coin_name_quote = usdt.coin_name,
             places_price = 2,
             places_amount = 4,
-
+            trade_min = 10,
+            trade_min_market_sell = 0.002m,
             market_uid = 0,
             settlement_uid = settlement_eth_usdt.user_id,
             last_price = Math.Round((decimal)FactoryService.instance.constant.random.NextDouble(), 2),

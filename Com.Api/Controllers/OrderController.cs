@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Com.Api.Controllers;
 
 /// <summary>
-/// 
+/// 订单接口
 /// </summary>
 [ApiController]
 [Authorize]
@@ -21,9 +21,15 @@ public class OrderController : ControllerBase
     /// </summary>
     private readonly ILogger<OrderController> logger;
     /// <summary>
-    /// 
+    /// 登录信息
     /// </summary>
-    private (long user_id, string no, string user_name, string app, string public_key) login;
+    private (long user_id, long no, string user_name, string app, string public_key) login
+    {
+        get
+        {
+            return this.service_user.GetLoginUser(User);
+        }
+    }
     /// <summary>
     /// 用户服务
     /// </summary>
@@ -41,7 +47,6 @@ public class OrderController : ControllerBase
     public OrderController(ILogger<OrderController> logger)
     {
         this.logger = logger;
-        this.login = this.service_user.GetLoginUser(User);
     }
 
     /// <summary>
@@ -93,6 +98,7 @@ public class OrderController : ControllerBase
     [Route("OrderCancel")]
     public ResCall<KeyValuePair<long, List<long>>> OrderCancel(long market, int type, List<long> data)
     {
+        var a = login;
         ResCall<KeyValuePair<long, List<long>>> res = new ResCall<KeyValuePair<long, List<long>>>();
         if (type != 2 || type != 3 || type != 4 || type != 5)
         {

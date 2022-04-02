@@ -104,7 +104,6 @@ public class ServiceUser
             res.message = "验证码错误";
             return res;
         }
-        FactoryService.instance.constant.redis.KeyDelete(FactoryService.instance.GetRedisVerificationCode(no));
         using (var scope = FactoryService.instance.constant.provider.CreateScope())
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
@@ -115,6 +114,7 @@ public class ServiceUser
                     res.message = "账户名或密码错误";
                     return res;
                 }
+                FactoryService.instance.constant.redis.KeyDelete(FactoryService.instance.GetRedisVerificationCode(no));
                 var token = GenerateToken(FactoryService.instance.constant.worker.NextId(), user, app);
                 res.data = user;
                 res.data.token = token;
@@ -229,14 +229,14 @@ public class ServiceUser
     /// <param name="app"></param>
     /// <param name="claims_principal"></param>
     /// <returns></returns>
-    public (long user_id, string no, string user_name, string app, string public_key) GetLoginUser(System.Security.Claims.ClaimsPrincipal claims_principal)
+    public (long user_id, long no, string user_name, string app, string public_key) GetLoginUser(System.Security.Claims.ClaimsPrincipal claims_principal)
     {
-        string no = "", user_name = "", app = "", public_key = "";
-        long user_id = 0;
+        string user_name = "", app = "", public_key = "";
+        long user_id = 0, no = 0;
         Claim? claim = claims_principal.Claims.FirstOrDefault(P => P.Type == "no");
         if (claim != null)
         {
-            no = claim.Value;
+            no = long.Parse(claim.Value);
         }
         claim = claims_principal.Claims.FirstOrDefault(P => P.Type == "user_id");
         if (claim != null)

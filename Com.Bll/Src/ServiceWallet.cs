@@ -297,6 +297,16 @@ public class ServiceWallet
         }
     }
 
+    /// <summary>
+    /// 添加钱包流水
+    /// </summary>
+    /// <param name="relation_id">关联id</param>
+    /// <param name="wallet_type_to">到账钱包类型</param>
+    /// <param name="amount">量</param>
+    /// <param name="wallet_from">来源钱包</param>
+    /// <param name="wallet_to">到账钱包</param>
+    /// <param name="remarks">备注</param>
+    /// <returns></returns>
     public Running AddRunning(long relation_id, E_WalletType wallet_type_to, decimal amount, Wallet wallet_from, Wallet wallet_to, string remarks)
     {
         return new Running

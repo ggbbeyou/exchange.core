@@ -109,7 +109,7 @@ public class TestController : ControllerBase
         Vip vip0 = new Vip()
         {
             id = FactoryService.instance.constant.worker.NextId(),
-            name = "vip1",
+            name = "vip0",
             fee_maker = 0.0002m,
             fee_taker = 0.0004m,
         };

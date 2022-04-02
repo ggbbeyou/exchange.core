@@ -274,11 +274,11 @@ public class ServiceWallet
                             runnings.Add(AddRunning(item.trade_id, E_WalletType.main, item.total - fee_maker, buy_quote, sell_quote, $"交易:{buy_quote.user_name}=>{sell_quote.user_name},{item.total - fee_maker}{buy_quote.coin_name}"));
                             if (settlement_base != null)
                             {
-                                runnings.Add(AddRunning(item.trade_id, E_WalletType.fee, fee_taker, buy_base, settlement_base, $"手续费:{buy_base.user_name}=>{settlement_base.user_name},{fee_taker}{buy_base.coin_name}"));
+                                runnings.Add(AddRunning(item.trade_id, E_WalletType.fee, fee_taker, buy_base, settlement_base, $"手续费(吃单):{buy_base.user_name}=>{settlement_base.user_name},{fee_taker}{buy_base.coin_name}"));
                             }
                             if (settlement_quote != null)
                             {
-                                runnings.Add(AddRunning(item.trade_id, E_WalletType.fee, fee_maker, sell_quote, settlement_quote, $"手续费:{sell_quote.user_name}=>{settlement_quote.user_name},{fee_maker}{sell_quote.coin_name}"));
+                                runnings.Add(AddRunning(item.trade_id, E_WalletType.fee, fee_maker, sell_quote, settlement_quote, $"手续费(挂单):{sell_quote.user_name}=>{settlement_quote.user_name},{fee_maker}{sell_quote.coin_name}"));
                             }
                         }
                         db.SaveChanges();

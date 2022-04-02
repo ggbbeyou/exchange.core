@@ -22,10 +22,6 @@ public class AccountController : ControllerBase
     /// </summary>
     private readonly ILogger<AccountController> logger;
     /// <summary>
-    /// 
-    /// </summary>
-    public (long? user_id, string? no, string? user_name, string? app, string? public_key) user;
-    /// <summary>
     /// 用户服务
     /// </summary>
     /// <returns></returns>
@@ -38,7 +34,6 @@ public class AccountController : ControllerBase
     public AccountController(ILogger<AccountController> logger)
     {
         this.logger = logger;
-        service_user.GetLoginUser(User);
     }
 
     /// <summary>

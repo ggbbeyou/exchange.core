@@ -229,10 +229,10 @@ public class ServiceUser
     /// <param name="app"></param>
     /// <param name="claims_principal"></param>
     /// <returns></returns>
-    public (long? user_id, string? no, string? user_name, string? app, string? public_key) GetLoginUser(System.Security.Claims.ClaimsPrincipal claims_principal)
+    public (long user_id, string no, string user_name, string app, string public_key) GetLoginUser(System.Security.Claims.ClaimsPrincipal claims_principal)
     {
-        string? no = null, user_name = null, app = null, public_key = null;
-        long? user_id = null;
+        string no = "", user_name = "", app = "", public_key = "";
+        long user_id = 0;
         Claim? claim = claims_principal.Claims.FirstOrDefault(P => P.Type == "no");
         if (claim != null)
         {

@@ -11,60 +11,33 @@ namespace Com.Api.Controllers;
 /// <summary>
 /// 
 /// </summary>
-[Route("[controller]")]
 [ApiController]
 [Authorize]
+[Route("[controller]")]
 public class OrderController : ControllerBase
 {
-    private readonly ILogger<OrderController> logger;
     /// <summary>
-    /// 登录玩家id
+    /// 日志
     /// </summary>
-    /// <value></value>
-    public int uid
-    {
-        get
-        {
-            Claim? claim = User.Claims.FirstOrDefault(P => P.Type == JwtRegisteredClaimNames.Aud);
-            if (claim != null)
-            {
-                return Convert.ToInt32(claim.Value);
-            }
-            return 5;
-        }
-    }
+    private readonly ILogger<OrderController> logger;
     /// <summary>
     /// 
     /// </summary>
-    /// <value></value>
-    public string user_name
-    {
-        get
-        {
-            Claim? claim = User.Claims.FirstOrDefault(P => P.Type == JwtRegisteredClaimNames.Aud);
-            if (claim != null)
-            {
-                return (claim.Value);
-            }
-            return "";
-        }
-    }
+    private (long user_id, string no, string user_name, string app, string public_key) login;
     /// <summary>
     /// 用户服务
     /// </summary>
     /// <returns></returns>
-    private ServiceUser user_service = new ServiceUser();
-
+    private ServiceUser service_user = new ServiceUser();
     /// <summary>
     /// 交易对基础信息
     /// </summary>
     /// <returns></returns>
-    public ServiceMarket service_market = new ServiceMarket();
-
+    private ServiceMarket service_market = new ServiceMarket();
     /// <summary>
     /// Service:订单
     /// </summary>
-    public ServiceOrder service_order = new ServiceOrder();
+    private ServiceOrder service_order = new ServiceOrder();
 
     /// <summary>
     /// 
@@ -73,6 +46,7 @@ public class OrderController : ControllerBase
     public OrderController(ILogger<OrderController> logger)
     {
         this.logger = logger;
+        this.login = this.service_user.GetLoginUser(User);
     }
 
     /// <summary>
@@ -100,7 +74,7 @@ public class OrderController : ControllerBase
         //     result.message = "用户禁止下单";
         //     return Json(result);
         // }
-        ResCall<List<Orders>> res = service_order.PlaceOrder(symbol, uid, user_name, orders);
+        ResCall<List<Orders>> res = service_order.PlaceOrder(symbol, login.user_id, login.user_name, orders);
         result = new ResCall<List<ResOrder>>()
         {
             success = res.success,
@@ -129,7 +103,7 @@ public class OrderController : ControllerBase
         {
             return res;
         }
-        res = this.service_order.CancelOrder(market, uid, type, data);
+        res = this.service_order.CancelOrder(market, login.user_id, type, data);
         return res;
     }
 

@@ -342,12 +342,12 @@ public class TestController : ControllerBase
     /// <returns></returns>
     [HttpPost]
     [Route("PlaceOrderText")]
-    public ResCall<List<Orders>> PlaceOrderText(int count)
+    public ResCall<List<ResOrder>> PlaceOrderText(int count)
     {
-        ResCall<List<Orders>> res = new ResCall<List<Orders>>();
+        ResCall<List<ResOrder>> res = new ResCall<List<ResOrder>>();
         res.success = true;
         res.code = E_Res_Code.ok;
-        res.data = new List<Orders>();
+        res.data = new List<ResOrder>();
         List<Users> users = this.db.Users.ToList();
         List<Market> markets = this.db.Market.ToList();
         for (int i = 0; i < count; i++)
@@ -413,8 +413,8 @@ public class TestController : ControllerBase
                 };
                 reqOrders.Add(order);
             }
-            string json = JsonConvert.SerializeObject(reqOrders);
-            order_service.PlaceOrder(market.symbol, user.user_id, user.user_name, reqOrders);
+            ResCall<List<ResOrder>> aaa = order_service.PlaceOrder(market.symbol, user.user_id, user.user_name, reqOrders);
+            res.data.AddRange(aaa.data);
         }
         return res;
     }

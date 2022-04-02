@@ -57,16 +57,16 @@ public class ServiceOrder
     /// <param name="user_name">用户名</param>
     /// <param name="order">订单列表</param>
     /// <returns></returns>
-    public ResCall<List<Orders>> PlaceOrder(string symbol, long uid, string user_name, List<ReqOrder> orders)
+    public ResCall<List<ResOrder>> PlaceOrder(string symbol, long uid, string user_name, List<ReqOrder> orders)
     {
-        ResCall<List<Orders>> res = new ResCall<List<Orders>>();
+        ResCall<List<ResOrder>> res = new ResCall<List<ResOrder>>();
         this.stopwatch.Restart();
         FactoryService.instance.constant.stopwatch.Restart();
         res.success = false;
         res.code = E_Res_Code.fail;
         res.op = E_Op.place;
         res.message = "";
-        res.data = new List<Orders>();
+        res.data = new List<ResOrder>();
         if (orders.Max(P => P.client_id?.Length ?? 0) > 50)
         {
             res.code = E_Res_Code.field_error;
@@ -150,6 +150,7 @@ public class ServiceOrder
         }
         decimal coin_base = 0;
         decimal coin_quote = 0;
+        List<Orders> orders1 = new List<Orders>();
         foreach (var item in orders)
         {
             Orders order = new Orders();
@@ -204,6 +205,7 @@ public class ServiceOrder
             order.data = item.data;
             order.remarks = null;
             res.data.Add(order);
+            orders1.Add(order);
         }
         if (coin_base > 0 && coin_quote > 0)
         {
@@ -239,7 +241,7 @@ public class ServiceOrder
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
-                (List<OrderBuy> buy, List<OrderSell> sell) aaa = ConvertOrder(res.data);
+                (List<OrderBuy> buy, List<OrderSell> sell) aaa = ConvertOrder(orders1);
                 db.OrderBuy.AddRange(aaa.buy);
                 db.OrderSell.AddRange(aaa.sell);
                 db.SaveChanges();
@@ -251,7 +253,7 @@ public class ServiceOrder
         ReqCall<List<Orders>> call_req = new ReqCall<List<Orders>>();
         call_req.op = E_Op.place;
         call_req.market = info.market;
-        call_req.data = res.data;
+        call_req.data = orders1;
         FactoryService.instance.constant.MqSend(FactoryService.instance.GetMqOrderPlace(info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(call_req)));
         FactoryService.instance.constant.stopwatch.Stop();
         FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{info.symbol}:挂单=>插入{call_req.data.Count}条订单到Mq");

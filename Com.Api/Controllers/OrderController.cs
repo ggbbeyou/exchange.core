@@ -74,7 +74,7 @@ public class OrderController : ControllerBase
         //     result.message = "用户禁止下单";
         //     return Json(result);
         // }
-        ResCall<List<Orders>> res = service_order.PlaceOrder(symbol, login.user_id, login.user_name, orders);
+        ResCall<List<ResOrder>> res = service_order.PlaceOrder(symbol, login.user_id, login.user_name, orders);
         result = new ResCall<List<ResOrder>>()
         {
             success = res.success,

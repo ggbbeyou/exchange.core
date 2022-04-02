@@ -45,31 +45,7 @@ public class ResMarket
     /// </summary>
     /// <value></value>
     [JsonConverter(typeof(JsonConverterDecimal))]
-    public decimal amount_multiple { get; set; }
-    /// <summary>
-    /// 市价买手续费
-    /// </summary>
-    /// <value></value>
-    [JsonConverter(typeof(JsonConverterDecimal))]
-    public decimal fee_market_buy { get; set; }
-    /// <summary>
-    /// 市价卖手续费
-    /// </summary>
-    /// <value></value>
-    [JsonConverter(typeof(JsonConverterDecimal))]
-    public decimal fee_market_sell { get; set; }
-    /// <summary>
-    /// 限价买手续费
-    /// </summary>
-    /// <value></value>
-    [JsonConverter(typeof(JsonConverterDecimal))]
-    public decimal fee_limit_buy { get; set; }
-    /// <summary>
-    /// 限价卖手续费
-    /// </summary>
-    /// <value></value>
-    [JsonConverter(typeof(JsonConverterDecimal))]
-    public decimal fee_limit_sell { get; set; }
+    public decimal amount_multiple { get; set; }   
     /// <summary>
     /// 排序
     /// </summary>

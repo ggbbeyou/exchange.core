@@ -21,16 +21,21 @@ public class Vip
     /// <value></value>
     public string name { get; set; } = null!;
     /// <summary>
-    /// 市价手续费
+    /// vip等级要求成交量总额
     /// </summary>
     /// <value></value>
-    [JsonConverter(typeof(JsonConverterDecimal))]
-    public decimal fee_market { get; set; }
+    public decimal volume_used { get; set; }
     /// <summary>
-    /// 限价手续费
+    /// 挂单手续费
     /// </summary>
     /// <value></value>
     [JsonConverter(typeof(JsonConverterDecimal))]
-    public decimal fee_limit { get; set; }
+    public decimal fee_maker { get; set; }
+    /// <summary>
+    /// 吃单手续费
+    /// </summary>
+    /// <value></value>
+    [JsonConverter(typeof(JsonConverterDecimal))]
+    public decimal fee_taker { get; set; }
 
 }

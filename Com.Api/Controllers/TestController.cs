@@ -106,21 +106,28 @@ public class TestController : ControllerBase
         coins.Add(usdt);
         coins.Add(btc);
         coins.Add(eth);
-
+        Vip vip0 = new Vip()
+        {
+            id = FactoryService.instance.constant.worker.NextId(),
+            name = "vip1",
+            fee_maker = 0.0002m,
+            fee_taker = 0.0004m,
+        };
         Vip vip1 = new Vip()
         {
             id = FactoryService.instance.constant.worker.NextId(),
             name = "vip1",
-            fee_market = 0.001m,
-            fee_limit = 0.001m,
+            fee_maker = 0.00016m,
+            fee_taker = 0.0004m,
         };
         Vip vip2 = new Vip()
         {
             id = FactoryService.instance.constant.worker.NextId(),
             name = "vip2",
-            fee_market = 0.002m,
-            fee_limit = 0.002m,
+            fee_maker = 0.00014m,
+            fee_taker = 0.00035m,
         };
+        this.db.Vip.Add(vip0);
         this.db.Vip.Add(vip1);
         this.db.Vip.Add(vip2);
         for (int i = 0; i < 10; i++)
@@ -298,10 +305,6 @@ public class TestController : ControllerBase
             coin_name_quote = usdt.coin_name,
             price_places = 2,
             amount_multiple = 0.00001m,
-            fee_market_buy = 0.00003m,
-            fee_market_sell = 0.00003m,
-            fee_limit_buy = 0.001m,
-            fee_limit_sell = 0.003m,
             market_uid = 0,
             settlement_uid = settlement_btc_usdt.user_id,
             last_price = Math.Round((decimal)FactoryService.instance.constant.random.NextDouble(), 2),
@@ -317,10 +320,7 @@ public class TestController : ControllerBase
             coin_name_quote = usdt.coin_name,
             price_places = 2,
             amount_multiple = 0.0002m,
-            fee_market_buy = 0.00003m,
-            fee_market_sell = 0.00003m,
-            fee_limit_buy = 0.001m,
-            fee_limit_sell = 0.003m,
+
             market_uid = 0,
             settlement_uid = settlement_eth_usdt.user_id,
             last_price = Math.Round((decimal)FactoryService.instance.constant.random.NextDouble(), 2),

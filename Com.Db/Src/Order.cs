@@ -34,13 +34,7 @@ public class Orders : ResOrder
     /// </summary>
     /// <value></value>
     [JsonConverter(typeof(JsonConverterDecimal))]
-    public decimal? total { get; set; }
-    /// <summary>
-    /// 手续费率
-    /// </summary>
-    /// <value></value>    
-    [JsonConverter(typeof(JsonConverterDecimal))]
-    public decimal fee_rate { get; set; }
+    public decimal? total { get; set; }   
     /// <summary>
     /// 备注
     /// </summary>

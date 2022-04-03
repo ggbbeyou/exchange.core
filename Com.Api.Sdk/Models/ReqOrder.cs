@@ -35,26 +35,26 @@ public class ReqOrder
     [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
     public E_OrderType type { get; set; }
     /// <summary>
-    /// 交易模式
+    /// 交易模式,现货(cash)
     /// </summary>
     /// <value></value>
     [JsonConverter(typeof(StringEnumConverter))]
     [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
     public E_TradeModel trade_model { get; set; }
     /// <summary>
-    /// 挂单价:限价单(有效)
+    /// 挂单价:限价单(有效),其它无效
     /// </summary>
     /// <value></value>
     [JsonConverter(typeof(JsonConverterDecimal))]
     public decimal? price { get; set; }
     /// <summary>
-    /// 挂单量:限价单/市场卖价(有效)
+    /// 挂单量:限价单/市场卖价(有效),其它无效
     /// </summary>
     /// <value></value>
     [JsonConverter(typeof(JsonConverterDecimal))]
     public decimal? amount { get; set; }
     /// <summary>
-    /// 挂单额:市价买单(有效)
+    /// 挂单额:市价买单(有效),其它无效
     /// </summary>
     /// <value></value>
     [JsonConverter(typeof(JsonConverterDecimal))]

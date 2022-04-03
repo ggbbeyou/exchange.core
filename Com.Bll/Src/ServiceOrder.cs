@@ -73,10 +73,29 @@ public class ServiceOrder
             res.message = "client_id长度不能超过50";
             return res;
         }
-        if (orders.Max(P => P.client_id?.Length ?? 0) > 50)
+
+        if (orders.Any(P => P.type == E_OrderType.limit && (P.price == null || P.price <= 0)))
         {
             res.code = E_Res_Code.field_error;
-            res.message = "data长度不能超过50";
+            res.message = "price:限价单,交易价不能为低于0";
+            return res;
+        }
+        if (orders.Any(P => P.type == E_OrderType.limit && (P.amount == null || P.amount <= 0)))
+        {
+            res.code = E_Res_Code.field_error;
+            res.message = "amount:限价单,交易量不能低于0";
+            return res;
+        }
+        if (orders.Any(P => P.type == E_OrderType.market && P.side == E_OrderSide.buy && (P.total == null || P.total <= 0)))
+        {
+            res.code = E_Res_Code.field_error;
+            res.message = "total:市价买单,交易额不能为低于0";
+            return res;
+        }
+        if (orders.Any(P => P.type == E_OrderType.market && (P.amount == null || P.amount <= 0)))
+        {
+            res.code = E_Res_Code.field_error;
+            res.message = "amount:市价卖单,交易量不能为低于0";
             return res;
         }
         Market? info = this.market_service.GetMarketBySymbol(symbol);
@@ -87,22 +106,16 @@ public class ServiceOrder
             return res;
         }
         res.market = info.market;
+        if (info.transaction == false)
+        {
+            res.code = E_Res_Code.field_error;
+            res.message = "该交易对禁止下单(系统设置)";
+            return res;
+        }
         if (info.market_type == E_MarketType.spot && orders.Any(P => P.trade_model != E_TradeModel.cash))
         {
             res.code = E_Res_Code.field_error;
             res.message = "trade_model:现货交易对必须是现货交易模式";
-            return res;
-        }
-        if (orders.Any(P => P.amount == null || P.amount <= 0))
-        {
-            res.code = E_Res_Code.field_error;
-            res.message = "amount:交易量/交易额不能小于0";
-            return res;
-        }
-        if (orders.Any(P => P.type == E_OrderType.limit && (P.price == null || P.price <= 0)))
-        {
-            res.code = E_Res_Code.field_error;
-            res.message = "price:限价单交易价不能为小于0";
             return res;
         }
         if (orders.Any(P => P.type == E_OrderType.limit && Math.Round(P.price ?? 0, info.places_price, MidpointRounding.ToNegativeInfinity) != P.price))
@@ -111,34 +124,34 @@ public class ServiceOrder
             res.message = $"price:限价单交易价精度错误(交易价小数位:{info.places_price})";
             return res;
         }
-        if (orders.Any(P => (P.type == E_OrderType.limit || (P.type == E_OrderType.market && P.side == E_OrderSide.sell)) && Math.Round(P.amount ?? 0, info.places_amount, MidpointRounding.ToNegativeInfinity) != P.amount))
+        if (orders.Any(P => (P.type == E_OrderType.limit && Math.Round(P.amount ?? 0, info.places_amount, MidpointRounding.ToNegativeInfinity) != P.amount)))
         {
             res.code = E_Res_Code.field_error;
-            res.message = $"amount:限价单/市价卖单交易量精度错误(交易量小数位:{info.places_amount})";
+            res.message = $"amount:限价单交易量精度错误(交易量小数位:{info.places_amount})";
             return res;
         }
-        if (orders.Any(P => (P.type == E_OrderType.market && P.side == E_OrderSide.buy && Math.Round(P.amount ?? 0, info.places_price + info.places_amount, MidpointRounding.ToNegativeInfinity) != P.amount)))
+        if (orders.Any(P => (P.type == E_OrderType.market && P.side == E_OrderSide.buy && Math.Round(P.total ?? 0, info.places_price + info.places_amount, MidpointRounding.ToNegativeInfinity) != P.total)))
         {
             res.code = E_Res_Code.field_error;
-            res.message = $"amount:市价买单成交额精度错误(成交额小数位:{info.places_price + info.places_amount})";
-            return res;
-        }
-        if (orders.Any(P => P.type == E_OrderType.market && P.side == E_OrderSide.sell && P.amount < info.trade_min_market_sell))
-        {
-            res.code = E_Res_Code.field_error;
-            res.message = $"amount:市价卖单成交最不能低于:{info.trade_min_market_sell})";
-            return res;
-        }
-        if (orders.Any(P => P.type == E_OrderType.market && P.side == E_OrderSide.buy && P.amount < info.trade_min))
-        {
-            res.code = E_Res_Code.field_error;
-            res.message = $"amount:市价买单成交额不能低于:{info.trade_min})";
+            res.message = $"total:市价买单交易额精度错误(交易额小数位:{info.places_price + info.places_amount})";
             return res;
         }
         if (orders.Any(P => P.type == E_OrderType.limit && P.price * P.amount < info.trade_min))
         {
             res.code = E_Res_Code.field_error;
-            res.message = $"amount:限价单成交额不能低于:{info.trade_min})";
+            res.message = $"price * mount:限价单交易额不能低于:{info.trade_min})";
+            return res;
+        }
+        if (orders.Any(P => P.type == E_OrderType.market && P.side == E_OrderSide.buy && P.total < info.trade_min))
+        {
+            res.code = E_Res_Code.field_error;
+            res.message = $"total:市价买单交易额不能低于:{info.trade_min})";
+            return res;
+        }
+        if (orders.Any(P => P.type == E_OrderType.market && P.side == E_OrderSide.sell && P.amount < info.trade_min_market_sell))
+        {
+            res.code = E_Res_Code.field_error;
+            res.message = $"amount:市价卖单交易量不能低于:{info.trade_min_market_sell})";
             return res;
         }
         Users? users = user_service.GetUser(uid);
@@ -170,25 +183,14 @@ public class ServiceOrder
             order.state = order.trigger_hanging_price > 0 ? E_OrderState.not_match : E_OrderState.unsold;
             order.type = item.type;
             order.trade_model = item.trade_model;
-            if (order.type == E_OrderType.market)
-            {
-                order.price = null;
-                order.total = null;
-                if (order.side == E_OrderSide.buy)
-                {
-                    order.amount = null;
-                    order.total = item.amount;
-                    order.unsold = item.amount ?? 0;
-                    coin_quote += item.amount ?? 0;
-                }
-                else if (order.side == E_OrderSide.sell)
-                {
-                    order.amount = item.amount;
-                    order.unsold = item.amount ?? 0;
-                    coin_base += item.amount ?? 0;
-                }
-            }
-            else if (order.type == E_OrderType.limit)
+            order.price = null;
+            order.amount = null;
+            order.total = null;
+            order.deal_price = 0;
+            order.deal_amount = 0;
+            order.deal_total = 0;
+            order.unsold = 0;
+            if (order.type == E_OrderType.limit)
             {
                 order.price = item.price;
                 order.amount = item.amount;
@@ -200,6 +202,21 @@ public class ServiceOrder
                 }
                 else if (order.side == E_OrderSide.sell)
                 {
+                    order.unsold = item.amount ?? 0;
+                    coin_base += item.amount ?? 0;
+                }
+            }
+            else if (order.type == E_OrderType.market)
+            {
+                if (order.side == E_OrderSide.buy)
+                {
+                    order.total = item.total;
+                    order.unsold = item.total ?? 0;
+                    coin_quote += item.total ?? 0;
+                }
+                else if (order.side == E_OrderSide.sell)
+                {
+                    order.amount = item.amount;
                     order.unsold = item.amount ?? 0;
                     coin_base += item.amount ?? 0;
                 }

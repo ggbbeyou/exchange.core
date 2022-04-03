@@ -64,7 +64,7 @@ public class Deal : ResDeal
     /// </summary>
     /// <value></value>
     [JsonConverter(typeof(JsonConverterDecimal))]
-    public decimal bid_amount_unsold { get; set; }
+    public decimal bid_total_unsold { get; set; }
     /// <summary>
     /// 卖单未成交量
     /// </summary>
@@ -76,7 +76,7 @@ public class Deal : ResDeal
     /// </summary>
     /// <value></value>
     [JsonConverter(typeof(JsonConverterDecimal))]
-    public decimal bid_amount_done { get; set; }
+    public decimal bid_total_done { get; set; }
     /// <summary>
     /// 卖单已成交量
     /// </summary>

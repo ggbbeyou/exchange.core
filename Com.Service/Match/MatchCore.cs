@@ -450,13 +450,13 @@ public class MatchCore
     /// <returns>最新成交价</returns>
     public decimal? CreateDeal(Orders bid, Orders ask, decimal price, E_OrderSide trigger_side, List<Orders> orders, List<Deal> deals, List<Orders> cancels)
     {
-        if (price <= 0 || bid.state == E_OrderState.cancel || bid.state == E_OrderState.completed || ask.state == E_OrderState.cancel || ask.state == E_OrderState.completed)
+        if (price <= 0 || bid.state == E_OrderState.completed || bid.state == E_OrderState.cancel || ask.state == E_OrderState.completed || ask.state == E_OrderState.cancel)
         {
             return null;
         }
         DateTimeOffset now = DateTimeOffset.UtcNow;
         decimal bid_amount_unsold = Math.Round(bid.unsold / price, this.model.info.places_amount, MidpointRounding.ToNegativeInfinity);
-        decimal leftover = bid.unsold - (bid_amount_unsold * price);
+        // decimal leftover = bid.unsold - (bid_amount_unsold * price);
         decimal amount = 0;
         if (bid_amount_unsold > ask.unsold)
         {
@@ -480,12 +480,14 @@ public class MatchCore
         {
             return null;
         }
+        bid.deal_amount += amount;
+        bid.deal_total += (amount * price);
+        bid.deal_price = Math.Round(bid.deal_total / bid.deal_amount, this.model.info.places_price);
         bid.unsold -= (amount * price);
         bid.deal_last_time = now;
-        if (bid.type == E_OrderType.market)
-        {
-            bid.amount += amount;
-        }
+        ask.deal_amount += amount;
+        ask.deal_total += (amount * price);
+        ask.deal_price = Math.Round(bid.deal_total / bid.deal_amount, this.model.info.places_price);
         ask.unsold -= amount;
         ask.deal_last_time = now;
         Deal deal = new Deal()
@@ -504,27 +506,27 @@ public class MatchCore
             ask_uid = ask.uid,
             bid_name = bid.user_name,
             ask_name = ask.user_name,
-            bid_amount_unsold = bid.unsold,
+            bid_total_unsold = bid.unsold,
             ask_amount_unsold = ask.unsold,
-            // bid_amount_done = bid.amount_done,
-            // ask_amount_done = ask.amount_done,
+            bid_total_done = bid.deal_total,
+            ask_amount_done = ask.deal_amount,
             time = now,
         };
         deals.Add(deal);
-        if (!orders.Exists(P => P.order_id == bid.order_id))
+        if (!orders.Any(P => P.order_id == bid.order_id))
         {
             orders.Add(bid);
         }
-        if (!orders.Exists(P => P.order_id == ask.order_id))
+        if (!orders.Any(P => P.order_id == ask.order_id))
         {
             orders.Add(ask);
         }
-        if ((bid.state == E_OrderState.unsold || bid.state == E_OrderState.partial) && ((bid.trigger_cancel_price > 0 && bid.trigger_cancel_price >= price) || bid.unsold / price < this.model.info.places_amount || bid.unsold == leftover))
+        if ((bid.state == E_OrderState.unsold || bid.state == E_OrderState.partial) && ((bid.trigger_cancel_price > 0 && bid.trigger_cancel_price >= price)))
         {
             bid.state = E_OrderState.cancel;
             cancels.Add(bid);
         }
-        if ((ask.state == E_OrderState.unsold || ask.state == E_OrderState.partial) && ((bid.trigger_cancel_price > 0 && ask.trigger_cancel_price <= price) || ask.unsold < this.model.info.places_amount))
+        if ((ask.state == E_OrderState.unsold || ask.state == E_OrderState.partial) && ((bid.trigger_cancel_price > 0 && ask.trigger_cancel_price <= price)))
         {
             ask.state = E_OrderState.cancel;
             cancels.Add(ask);

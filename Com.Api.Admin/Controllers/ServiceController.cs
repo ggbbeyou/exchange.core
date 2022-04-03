@@ -15,8 +15,8 @@ namespace Com.Api.Admin.Controllers;
 /// <summary>
 /// 
 /// </summary>
-[AllowAnonymous]
 [ApiController]
+[AllowAnonymous]
 [Route("[controller]")]
 public class ServiceController : ControllerBase
 {

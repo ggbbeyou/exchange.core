@@ -169,6 +169,7 @@ public class ServiceOrder
             order.side = item.side;
             order.state = order.trigger_hanging_price > 0 ? E_OrderState.not_match : E_OrderState.unsold;
             order.type = item.type;
+            order.trade_model = item.trade_model;
             if (order.type == E_OrderType.price_market)
             {
                 order.price = null;

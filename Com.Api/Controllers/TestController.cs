@@ -363,6 +363,7 @@ public class TestController : ControllerBase
                     type = type,
                     price = price,
                     amount = amount,
+                    trade_model = E_TradeModel.cash,
                     trigger_hanging_price = 0,
                     trigger_cancel_price = 0,
                     data = null,

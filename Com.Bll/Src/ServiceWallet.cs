@@ -298,6 +298,7 @@ public class ServiceWallet
                                 {
                                     buy_quote.freeze -= item.unsold;
                                     buy_quote.available += item.unsold;
+                                    item.remarks = $"退还:{item.unsold}";
                                     item.unsold = 0;
                                 }
                             }
@@ -308,6 +309,7 @@ public class ServiceWallet
                                 {
                                     sell_base.freeze -= item.unsold;
                                     sell_base.available += item.unsold;
+                                    item.remarks = $"退还:{item.unsold}";
                                     item.unsold = 0;
                                 }
                             }

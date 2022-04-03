@@ -12,15 +12,7 @@ public enum E_WalletType
     /// </summary>
     main = 0,
     /// <summary>
-    /// (结算账号)收手续费钱包
+    /// (用户)现货
     /// </summary>
-    fee = 1,
-    /// <summary>
-    /// (结算账号)充值钱包
-    /// </summary>
-    recharge = 2,
-    /// <summary>
-    /// (结算账号)取款续费钱包
-    /// </summary>
-    withdraw = 3,
+    spot = 1,
 }

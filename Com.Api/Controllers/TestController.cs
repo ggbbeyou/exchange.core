@@ -225,7 +225,7 @@ public class TestController : ControllerBase
             this.db.Wallet.Add(new Wallet()
             {
                 wallet_id = FactoryService.instance.constant.worker.NextId(),
-                wallet_type = E_WalletType.fee,
+                wallet_type = E_WalletType.main,
                 user_id = settlement_btc_usdt.user_id,
                 user_name = settlement_btc_usdt.user_name,
                 coin_id = item.coin_id,
@@ -237,7 +237,7 @@ public class TestController : ControllerBase
             this.db.Wallet.Add(new Wallet()
             {
                 wallet_id = FactoryService.instance.constant.worker.NextId(),
-                wallet_type = E_WalletType.fee,
+                wallet_type = E_WalletType.main,
                 user_id = settlement_eth_usdt.user_id,
                 user_name = settlement_eth_usdt.user_name,
                 coin_id = item.coin_id,
@@ -249,7 +249,7 @@ public class TestController : ControllerBase
             this.db.Wallet.Add(new Wallet()
             {
                 wallet_id = FactoryService.instance.constant.worker.NextId(),
-                wallet_type = E_WalletType.recharge,
+                wallet_type = E_WalletType.main,
                 user_id = settlement_btc_usdt.user_id,
                 user_name = settlement_btc_usdt.user_name,
                 coin_id = item.coin_id,
@@ -261,7 +261,7 @@ public class TestController : ControllerBase
             this.db.Wallet.Add(new Wallet()
             {
                 wallet_id = FactoryService.instance.constant.worker.NextId(),
-                wallet_type = E_WalletType.recharge,
+                wallet_type = E_WalletType.main,
                 user_id = settlement_eth_usdt.user_id,
                 user_name = settlement_eth_usdt.user_name,
                 coin_id = item.coin_id,
@@ -273,7 +273,7 @@ public class TestController : ControllerBase
             this.db.Wallet.Add(new Wallet()
             {
                 wallet_id = FactoryService.instance.constant.worker.NextId(),
-                wallet_type = E_WalletType.withdraw,
+                wallet_type = E_WalletType.main,
                 user_id = settlement_btc_usdt.user_id,
                 user_name = settlement_btc_usdt.user_name,
                 coin_id = item.coin_id,
@@ -285,7 +285,7 @@ public class TestController : ControllerBase
             this.db.Wallet.Add(new Wallet()
             {
                 wallet_id = FactoryService.instance.constant.worker.NextId(),
-                wallet_type = E_WalletType.withdraw,
+                wallet_type = E_WalletType.main,
                 user_id = settlement_eth_usdt.user_id,
                 user_name = settlement_eth_usdt.user_name,
                 coin_id = item.coin_id,
@@ -308,6 +308,8 @@ public class TestController : ControllerBase
             trade_min = 10,
             trade_min_market_sell = 0.0002m,
             market_uid = 0,
+            status = false,
+            transaction = true,
             settlement_uid = settlement_btc_usdt.user_id,
             last_price = Math.Round((decimal)FactoryService.instance.constant.random.NextDouble(), 2),
             service_url = "http://localhost:8080",
@@ -325,6 +327,8 @@ public class TestController : ControllerBase
             trade_min = 10,
             trade_min_market_sell = 0.002m,
             market_uid = 0,
+            status = false,
+            transaction = true,
             settlement_uid = settlement_eth_usdt.user_id,
             last_price = Math.Round((decimal)FactoryService.instance.constant.random.NextDouble(), 2),
             service_url = "http://localhost:8080",

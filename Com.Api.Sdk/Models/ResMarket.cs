@@ -31,6 +31,11 @@ public class ResMarket
     /// <value></value>
     public string coin_name_quote { get; set; } = null!;
     /// <summary>
+    /// 是否交易(true:可以交易,false:禁止交易)
+    /// </summary>
+    /// <value></value>
+    public bool transaction { get; set; }
+    /// <summary>
     /// 状态 true:正在运行,false:停止
     /// </summary>
     /// <value></value>

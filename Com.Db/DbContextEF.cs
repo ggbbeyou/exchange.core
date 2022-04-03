@@ -122,6 +122,7 @@ public class DbContextEF : DbContext
             o.HasKey(p => p.trade_id);
             o.HasIndex(P => new { P.market, P.time });
             o.Property(P => P.trade_id).IsRequired().ValueGeneratedNever().HasColumnType("bigint").HasComment("成交订单ID");
+            o.Property(P => P.trade_model).IsRequired().HasColumnType("tinyint").HasComment("交易模式");
             o.Property(P => P.market).IsRequired().HasColumnType("bigint").HasComment("交易对");
             o.Property(P => P.symbol).HasColumnType("nvarchar").HasMaxLength(20).HasComment("交易对名称");
             o.Property(P => P.price).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("成交均价");
@@ -172,7 +173,8 @@ public class DbContextEF : DbContext
             o.Property(P => P.coin_name_base).IsRequired().HasColumnType("nvarchar").HasMaxLength(20).HasComment("基础币种名");
             o.Property(P => P.coin_id_quote).IsRequired().ValueGeneratedNever().HasColumnType("bigint").HasComment("报价币种id");
             o.Property(P => P.coin_name_quote).IsRequired().HasColumnType("nvarchar").HasMaxLength(20).HasComment("报价币种名");
-            o.Property(P => P.status).IsRequired().HasColumnType("int").HasComment("状态 true:正在运行,false:停止");
+            o.Property(P => P.status).IsRequired().HasColumnType("bit").HasComment("状态 true:正在运行,false:停止");
+            o.Property(P => P.transaction).IsRequired().HasColumnType("bit").HasComment("是否交易");
             o.Property(P => P.places_price).IsRequired().HasColumnType("int").HasComment("交易价小数位数");
             o.Property(P => P.places_amount).IsRequired().HasColumnType("int").HasComment("交易量小数位数");
             o.Property(P => P.trade_min).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("除了市价卖单外每一笔最小交易额");
@@ -199,6 +201,7 @@ public class DbContextEF : DbContext
             o.Property(P => P.side).IsRequired().HasColumnType("tinyint").HasComment("交易方向");
             o.Property(P => P.state).IsRequired().HasColumnType("tinyint").HasComment("成交状态");
             o.Property(P => P.type).IsRequired().HasColumnType("tinyint").HasComment("订单类型");
+            o.Property(P => P.trade_model).IsRequired().HasColumnType("tinyint").HasComment("交易模式");
             o.Property(P => P.price).HasColumnType("decimal").HasPrecision(28, 16).HasComment("成交价");
             o.Property(P => P.amount).HasColumnType("decimal").HasPrecision(28, 16).HasComment("成交量");
             o.Property(P => P.total).HasColumnType("decimal").HasPrecision(28, 16).HasComment("成交总额");
@@ -227,6 +230,7 @@ public class DbContextEF : DbContext
             o.Property(P => P.side).IsRequired().HasColumnType("tinyint").HasComment("交易方向");
             o.Property(P => P.state).IsRequired().HasColumnType("tinyint").HasComment("成交状态");
             o.Property(P => P.type).IsRequired().HasColumnType("tinyint").HasComment("订单类型");
+            o.Property(P => P.trade_model).IsRequired().HasColumnType("tinyint").HasComment("交易模式");
             o.Property(P => P.price).HasColumnType("decimal").HasPrecision(28, 16).HasComment("成交价");
             o.Property(P => P.amount).HasColumnType("decimal").HasPrecision(28, 16).HasComment("成交量");
             o.Property(P => P.total).HasColumnType("decimal").HasPrecision(28, 16).HasComment("成交总额");

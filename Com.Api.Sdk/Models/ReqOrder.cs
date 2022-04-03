@@ -35,6 +35,13 @@ public class ReqOrder
     [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
     public E_OrderType type { get; set; }
     /// <summary>
+    /// 交易模式
+    /// </summary>
+    /// <value></value>
+    [JsonConverter(typeof(StringEnumConverter))]
+    [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+    public E_TradeModel trade_model { get; set; }
+    /// <summary>
     /// 挂单价(限价单必填,市价单无效,db:市价为成交均价)
     /// </summary>
     /// <value></value>

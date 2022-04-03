@@ -87,6 +87,12 @@ public class ServiceOrder
             return res;
         }
         res.market = info.market;
+        if (info.market_type == E_MarketType.spot && orders.Any(P => P.trade_model != E_TradeModel.cash))
+        {
+            res.code = E_Res_Code.field_error;
+            res.message = "trade_model:现货交易对必须是现货交易模式";
+            return res;
+        }
         if (orders.Any(P => P.amount == null || P.amount <= 0))
         {
             res.code = E_Res_Code.field_error;

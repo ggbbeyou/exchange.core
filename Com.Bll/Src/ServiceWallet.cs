@@ -191,7 +191,7 @@ public class ServiceWallet
     }
 
     /// <summary>
-    /// 撮合成交后资产变动(批量)
+    /// 撮合成交后资产变动(批量),手续费内扣
     /// </summary>
     /// <param name="market">市场</param>
     /// <param name="orders">相关订单</param>
@@ -270,7 +270,6 @@ public class ServiceWallet
                                 settlement_quote.available += fee_quote;
                                 settlement_quote.total = settlement_quote.available + settlement_quote.freeze;
                                 runnings.Add(AddRunning(item.trade_id, wallet_type, E_WalletType.main, fee_quote, sell_quote, settlement_quote, $"手续费(挂单):{sell_quote.user_name}=>结算账户:{settlement_quote.user_name},{fee_quote}{sell_quote.coin_name}"));
-
                             }
                             else if (item.trigger_side == E_OrderSide.sell)
                             {
@@ -303,7 +302,7 @@ public class ServiceWallet
                     {
                         runnings.Clear();
                         transaction.Rollback();
-                        FactoryService.instance.constant.logger.LogError(ex, ex.Message);
+                        FactoryService.instance.constant.logger.LogError(ex, market.symbol + ":" + ex.Message);
                         return (false, runnings);
                     }
                 }

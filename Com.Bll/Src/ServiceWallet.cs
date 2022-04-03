@@ -192,18 +192,13 @@ public class ServiceWallet
 
     /// <summary>
     /// 撮合成交后资产变动(批量)
-    /// </summary>
+    /// </summary>   
     /// <param name="wallet_type">钱包类型</param>
-    /// <param name="coin_id_base">基础币种id</param>
-    /// <param name="coin_id_quote">报价币种id</param>
-    /// <param name="buy_uid">买用户</param>
-    /// <param name="sell_uid">卖用户</param>
-    /// <param name="rate_buy">买手续费</param>
-    /// <param name="rate_sell">卖手续费</param>
-    /// <param name="amount">成交量</param>
-    /// <param name="price">成交价</param>
-    /// <returns>是否成功</returns>
-    public (bool result, List<Running> running) Transaction(E_WalletType wallet_type, Market market, List<Deal> deals)
+    /// <param name="market">市场</param>
+    /// <param name="orders">订单</param>
+    /// <param name="deals">成交记录</param>
+    /// <returns></returns>
+    public (bool result, List<Running> running) Transaction(E_WalletType wallet_type, Market market, List<Orders> orders, List<Deal> deals)
     {
         List<Running> runnings = new List<Running>();
         if (deals == null || deals.Count == 0)

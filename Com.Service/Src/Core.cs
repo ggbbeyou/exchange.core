@@ -143,7 +143,7 @@ public class Core
         if (deals.Count > 0)
         {
             FactoryService.instance.constant.stopwatch.Restart();
-            (bool result, List<Running> running) transaction = wallet_service.Transaction(deals[0].trade_model == E_TradeModel.cash ? E_WalletType.spot : E_WalletType.main, this.model.info, orders, deals);
+            (bool result, List<Running> running) transaction = wallet_service.Transaction(this.model.info, orders, deals);
             wallet_service.AddRunning(transaction.running);
             FactoryService.instance.constant.stopwatch.Stop();
             FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>成交记录{deals.Count}条,实际资产转移(结果{transaction.result})");

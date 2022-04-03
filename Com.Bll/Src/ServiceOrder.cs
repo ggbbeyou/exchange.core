@@ -178,13 +178,13 @@ public class ServiceOrder
                 {
                     order.amount = null;
                     order.total = item.amount;
-                    order.amount_unsold = item.amount ?? 0;
+                    order.unsold = item.amount ?? 0;
                     coin_quote += item.amount ?? 0;
                 }
                 else if (order.side == E_OrderSide.sell)
                 {
                     order.amount = item.amount;
-                    order.amount_unsold = item.amount ?? 0;
+                    order.unsold = item.amount ?? 0;
                     coin_base += item.amount ?? 0;
                 }
             }
@@ -195,21 +195,19 @@ public class ServiceOrder
                 order.total = item.price * item.amount;
                 if (order.side == E_OrderSide.buy)
                 {
-                    order.amount_unsold = order.total ?? 0;
+                    order.unsold = order.total ?? 0;
                     coin_quote += order.total ?? 0;
                 }
                 else if (order.side == E_OrderSide.sell)
                 {
-                    order.amount_unsold = item.amount ?? 0;
+                    order.unsold = item.amount ?? 0;
                     coin_base += item.amount ?? 0;
                 }
             }
-            order.amount_done = 0;
             order.trigger_hanging_price = item.trigger_hanging_price;
             order.trigger_cancel_price = item.trigger_cancel_price;
             order.create_time = DateTimeOffset.UtcNow;
             order.deal_last_time = null;
-            order.data = item.data;
             order.remarks = null;
             temp_order.Add(order);
         }
@@ -381,10 +379,8 @@ public class ServiceOrder
                 amount = item.amount,
                 trigger_hanging_price = item.trigger_hanging_price,
                 trigger_cancel_price = item.trigger_cancel_price,
-                data = item.data,
                 state = item.state,
-                amount_unsold = item.amount_unsold,
-                amount_done = item.amount_done,
+                unsold = item.unsold,
                 create_time = item.create_time,
                 deal_last_time = item.deal_last_time,
                 market = item.market,
@@ -408,10 +404,8 @@ public class ServiceOrder
                 amount = item.amount,
                 trigger_hanging_price = item.trigger_hanging_price,
                 trigger_cancel_price = item.trigger_cancel_price,
-                data = item.data,
                 state = item.state,
-                amount_unsold = item.amount_unsold,
-                amount_done = item.amount_done,
+                unsold = item.unsold,
                 create_time = item.create_time,
                 deal_last_time = item.deal_last_time,
                 market = item.market,

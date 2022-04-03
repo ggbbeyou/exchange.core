@@ -4,6 +4,7 @@ using Com.Api.Sdk;
 using Com.Api.Sdk.Enum;
 using Com.Api.Sdk.Models;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Com.Db;
 
@@ -30,15 +31,46 @@ public class Orders : ResOrder
     /// <value></value>
     public string user_name { get; set; } = null!;
     /// <summary>
-    /// 订单总额(市价买单必填,其它都无效)
+    /// 已成交均价
     /// </summary>
     /// <value></value>
     [JsonConverter(typeof(JsonConverterDecimal))]
-    public decimal? total { get; set; }   
+    public decimal deal_price { get; set; }
+    /// <summary>
+    /// 已成交量
+    /// </summary>
+    /// <value></value>
+    [JsonConverter(typeof(JsonConverterDecimal))]
+    public decimal deal_amount { get; set; }
+    /// <summary>
+    /// 已成交额
+    /// </summary>
+    /// <value></value>
+    [JsonConverter(typeof(JsonConverterDecimal))]
+    public decimal deal_total { get; set; }
+    /// <summary>
+    /// 未成交 买:交易额,卖:交易量
+    /// </summary>
+    /// <value></value>
+    [JsonConverter(typeof(JsonConverterDecimal))]
+    public decimal unsold { get; set; }
+    /// <summary>
+    /// 订单状态
+    /// </summary>
+    /// <value></value>
+    [JsonConverter(typeof(StringEnumConverter))]
+    [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+    public E_OrderState state { get; set; }
+    /// <summary>
+    /// 最后成交时间或撤单时间
+    /// </summary>
+    /// <value></value>
+    public DateTimeOffset? deal_last_time { get; set; }
     /// <summary>
     /// 备注
     /// </summary>
     /// <value></value>
     [JsonConverter(typeof(JsonConverterDecimal))]
     public string? remarks { get; set; }
+    
 }

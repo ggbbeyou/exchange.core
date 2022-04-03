@@ -42,17 +42,23 @@ public class ReqOrder
     [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
     public E_TradeModel trade_model { get; set; }
     /// <summary>
-    /// 挂单价(限价单必填,市价单无效,db:市价为成交均价)
+    /// 挂单价:限价单(有效)
     /// </summary>
     /// <value></value>
     [JsonConverter(typeof(JsonConverterDecimal))]
     public decimal? price { get; set; }
     /// <summary>
-    /// 限价单:挂单量,市价单:交易额,db:量
+    /// 挂单量:限价单/市场卖价(有效)
     /// </summary>
     /// <value></value>
     [JsonConverter(typeof(JsonConverterDecimal))]
     public decimal? amount { get; set; }
+    /// <summary>
+    /// 挂单额:市价买单(有效)
+    /// </summary>
+    /// <value></value>
+    [JsonConverter(typeof(JsonConverterDecimal))]
+    public decimal? total { get; set; }
     /// <summary>
     /// 触发挂单价格
     /// </summary>
@@ -65,10 +71,5 @@ public class ReqOrder
     /// <value></value>
     [JsonConverter(typeof(JsonConverterDecimal))]
     public decimal trigger_cancel_price { get; set; }
-    /// <summary>
-    /// 附加数据
-    /// </summary>
-    /// <value></value>
-    public string? data { get; set; }
 
 }

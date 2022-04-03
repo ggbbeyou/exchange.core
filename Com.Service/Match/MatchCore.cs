@@ -245,10 +245,10 @@ public class MatchCore
     {
         var bids = from b in fixed_bid
                    group b by new { b.market, b.symbol, b.price } into g
-                   select new OrderBook { market = g.Key.market, symbol = g.Key.symbol, price = g.Key.price ?? 0, amount = g.Sum(p => p.amount_unsold), count = g.Count(), direction = E_OrderSide.buy, last_time = g.Max(p => p.deal_last_time ?? DateTimeOffset.UtcNow) };
+                   select new OrderBook { market = g.Key.market, symbol = g.Key.symbol, price = g.Key.price ?? 0, amount = g.Sum(p => p.unsold), count = g.Count(), direction = E_OrderSide.buy, last_time = g.Max(p => p.deal_last_time ?? DateTimeOffset.UtcNow) };
         var asks = from a in fixed_ask
                    group a by new { a.market, a.symbol, a.price } into g
-                   select new OrderBook { market = g.Key.market, symbol = g.Key.symbol, price = g.Key.price ?? 0, amount = g.Sum(p => p.amount_unsold), count = g.Count(), direction = E_OrderSide.sell, last_time = g.Max(p => p.deal_last_time ?? DateTimeOffset.UtcNow) };
+                   select new OrderBook { market = g.Key.market, symbol = g.Key.symbol, price = g.Key.price ?? 0, amount = g.Sum(p => p.unsold), count = g.Count(), direction = E_OrderSide.sell, last_time = g.Max(p => p.deal_last_time ?? DateTimeOffset.UtcNow) };
         return (bids.ToList(), asks.ToList());
     }
 
@@ -263,7 +263,7 @@ public class MatchCore
         List<Deal> deals = new List<Deal>();
         List<Orders> cancels = new List<Orders>();
         decimal? price = null;
-        if (order.market != this.model.info.market || order.amount_unsold <= 0 || order.state == E_OrderState.completed || order.state == E_OrderState.cancel)
+        if (order.market != this.model.info.market || order.unsold <= 0 || order.state == E_OrderState.completed || order.state == E_OrderState.cancel)
         {
             return (orders, deals, cancels);
         }
@@ -455,22 +455,22 @@ public class MatchCore
             return null;
         }
         DateTimeOffset now = DateTimeOffset.UtcNow;
-        decimal bid_amount_unsold = Math.Round(bid.amount_unsold / price, this.model.info.places_amount, MidpointRounding.ToNegativeInfinity);
-        decimal leftover = bid.amount_unsold - (bid_amount_unsold * price);
+        decimal bid_amount_unsold = Math.Round(bid.unsold / price, this.model.info.places_amount, MidpointRounding.ToNegativeInfinity);
+        decimal leftover = bid.unsold - (bid_amount_unsold * price);
         decimal amount = 0;
-        if (bid_amount_unsold > ask.amount_unsold)
+        if (bid_amount_unsold > ask.unsold)
         {
-            amount = ask.amount_unsold;
+            amount = ask.unsold;
             ask.state = E_OrderState.completed;
             bid.state = E_OrderState.partial;
         }
-        else if (bid_amount_unsold < ask.amount_unsold)
+        else if (bid_amount_unsold < ask.unsold)
         {
             amount = bid_amount_unsold;
             bid.state = E_OrderState.completed;
             ask.state = E_OrderState.partial;
         }
-        else if (bid_amount_unsold == ask.amount_unsold)
+        else if (bid_amount_unsold == ask.unsold)
         {
             amount = bid_amount_unsold;
             bid.state = E_OrderState.completed;
@@ -480,16 +480,13 @@ public class MatchCore
         {
             return null;
         }
-        bid.amount_unsold -= (amount * price);
-        bid.amount_done += (amount * price);
+        bid.unsold -= (amount * price);
         bid.deal_last_time = now;
         if (bid.type == E_OrderType.market)
         {
             bid.amount += amount;
-            bid.price = bid.amount_done / bid.amount;
         }
-        ask.amount_unsold -= amount;
-        ask.amount_done += amount;
+        ask.unsold -= amount;
         ask.deal_last_time = now;
         Deal deal = new Deal()
         {
@@ -507,10 +504,10 @@ public class MatchCore
             ask_uid = ask.uid,
             bid_name = bid.user_name,
             ask_name = ask.user_name,
-            bid_amount_unsold = bid.amount_unsold,
-            ask_amount_unsold = ask.amount_unsold,
-            bid_amount_done = bid.amount_done,
-            ask_amount_done = ask.amount_done,
+            bid_amount_unsold = bid.unsold,
+            ask_amount_unsold = ask.unsold,
+            // bid_amount_done = bid.amount_done,
+            // ask_amount_done = ask.amount_done,
             time = now,
         };
         deals.Add(deal);
@@ -522,12 +519,12 @@ public class MatchCore
         {
             orders.Add(ask);
         }
-        if ((bid.state == E_OrderState.unsold || bid.state == E_OrderState.partial) && ((bid.trigger_cancel_price > 0 && bid.trigger_cancel_price >= price) || bid.amount_unsold / price < this.model.info.places_amount || bid.amount_unsold == leftover))
+        if ((bid.state == E_OrderState.unsold || bid.state == E_OrderState.partial) && ((bid.trigger_cancel_price > 0 && bid.trigger_cancel_price >= price) || bid.unsold / price < this.model.info.places_amount || bid.unsold == leftover))
         {
             bid.state = E_OrderState.cancel;
             cancels.Add(bid);
         }
-        if ((ask.state == E_OrderState.unsold || ask.state == E_OrderState.partial) && ((bid.trigger_cancel_price > 0 && ask.trigger_cancel_price <= price) || ask.amount_unsold < this.model.info.places_amount))
+        if ((ask.state == E_OrderState.unsold || ask.state == E_OrderState.partial) && ((bid.trigger_cancel_price > 0 && ask.trigger_cancel_price <= price) || ask.unsold < this.model.info.places_amount))
         {
             ask.state = E_OrderState.cancel;
             cancels.Add(ask);

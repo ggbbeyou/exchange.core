@@ -13,34 +13,11 @@ public class ResOrder : ReqOrder
     /// 订单id
     /// </summary>
     /// <value></value>
-    public long order_id { get; set; }
-    /// <summary>
-    /// 订单状态
-    /// </summary>
-    /// <value></value>
-    [JsonConverter(typeof(StringEnumConverter))]
-    [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-    public E_OrderState state { get; set; }
-    /// <summary>
-    /// 未成交 买:交易额,卖:交易量
-    /// </summary>
-    /// <value></value>
-    [JsonConverter(typeof(JsonConverterDecimal))]
-    public decimal amount_unsold { get; set; }
-    /// <summary>
-    /// 已成交量 买:交易额,卖:交易量
-    /// </summary>
-    /// <value></value>
-    [JsonConverter(typeof(JsonConverterDecimal))]
-    public decimal amount_done { get; set; }
+    public long order_id { get; set; }  
     /// <summary>
     /// 挂单时间
     /// </summary>
     /// <value></value>
     public DateTimeOffset create_time { get; set; }
-    /// <summary>
-    /// 最后成交时间或撤单时间
-    /// </summary>
-    /// <value></value>
-    public DateTimeOffset? deal_last_time { get; set; }
+   
 }

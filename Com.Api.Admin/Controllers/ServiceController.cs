@@ -24,7 +24,10 @@ public class ServiceController : ControllerBase
     /// 数据库
     /// </summary>
     public DbContextEF db = null!;
-
+    /// <summary>
+    /// service:公共服务
+    /// </summary>
+    private ServiceCommon service_common = new ServiceCommon();
     /// <summary>
     /// 登录信息
     /// </summary>
@@ -32,7 +35,7 @@ public class ServiceController : ControllerBase
     {
         get
         {
-            return this.service_user.GetLoginUser(User);
+            return this.service_common.GetLoginUser(User);
         }
     }
 

@@ -26,6 +26,10 @@ public class AccountController : ControllerBase
     /// </summary>
     /// <returns></returns>
     private ServiceUser service_user = new ServiceUser();
+    /// <summary>
+    /// service:公共服务
+    /// </summary>
+    private ServiceCommon service_common = new ServiceCommon();
 
     /// <summary>
     /// 初始化
@@ -68,7 +72,7 @@ public class AccountController : ControllerBase
         Res<KeyValuePair<string, string>> res = new Res<KeyValuePair<string, string>>();
         res.success = true;
         res.code = E_Res_Code.ok;
-        (long no, string code) verifiction = service_user.GetVerificationCode();
+        (long no, string code) verifiction = service_common.GetVerificationCode();
         res.data = new KeyValuePair<string, string>(verifiction.no.ToString(), verifiction.code);
         return res;
     }

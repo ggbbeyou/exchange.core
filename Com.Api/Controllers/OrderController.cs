@@ -27,9 +27,13 @@ public class OrderController : ControllerBase
     {
         get
         {
-            return this.service_user.GetLoginUser(User);
+            return this.service_common.GetLoginUser(User);
         }
     }
+    /// <summary>
+    /// service:公共服务
+    /// </summary>
+    private ServiceCommon service_common = new ServiceCommon();
     /// <summary>
     /// 用户服务
     /// </summary>

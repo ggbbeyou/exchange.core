@@ -20,28 +20,27 @@ namespace Com.Api.Admin.Controllers;
 [Route("[controller]")]
 public class ServiceController : ControllerBase
 {
-
-    /// <summary>
-    /// 登录玩家id
-    /// </summary>
-    /// <value></value>
-    public int user_id
-    {
-        get
-        {
-            Claim? claim = User.Claims.FirstOrDefault(P => P.Type == JwtRegisteredClaimNames.Aud);
-            if (claim != null)
-            {
-                return Convert.ToInt32(claim.Value);
-            }
-            return 0;
-        }
-    }
-
     /// <summary>
     /// 数据库
     /// </summary>
     public DbContextEF db = null!;
+
+    /// <summary>
+    /// 登录信息
+    /// </summary>
+    private (long user_id, long no, string user_name, string app, string public_key) login
+    {
+        get
+        {
+            return this.service_user.GetLoginUser(User);
+        }
+    }
+
+    /// <summary>
+    /// 用户服务
+    /// </summary>
+    /// <returns></returns>
+    private ServiceUser service_user = new ServiceUser();
 
     /// <summary>
     /// 

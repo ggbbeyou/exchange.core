@@ -455,7 +455,7 @@ public class MatchCore
             return null;
         }
         DateTimeOffset now = DateTimeOffset.UtcNow;
-        decimal bid_amount_unsold = Math.Round(bid.amount_unsold / price / this.model.info.places_amount, 0, MidpointRounding.ToNegativeInfinity) * this.model.info.places_amount;
+        decimal bid_amount_unsold = Math.Round(bid.amount_unsold / price, this.model.info.places_amount, MidpointRounding.ToNegativeInfinity);
         decimal leftover = bid.amount_unsold - (bid_amount_unsold * price);
         decimal amount = 0;
         if (bid_amount_unsold > ask.amount_unsold)
@@ -480,8 +480,8 @@ public class MatchCore
         {
             return null;
         }
-        bid.amount_unsold -= amount * price;
-        bid.amount_done += amount * price;
+        bid.amount_unsold -= (amount * price);
+        bid.amount_done += (amount * price);
         bid.deal_last_time = now;
         if (bid.type == E_OrderType.market)
         {

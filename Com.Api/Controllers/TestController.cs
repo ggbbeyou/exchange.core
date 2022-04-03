@@ -315,47 +315,48 @@ public class TestController : ControllerBase
             List<ReqOrder> reqOrders = new List<ReqOrder>();
             for (int j = 0; j < 1; j++)
             {
-                decimal amount = FactoryService.instance.constant.random.NextInt64(0, 5) + (decimal)FactoryService.instance.constant.random.NextDouble() + market.trade_min;
-                decimal? price = null;
                 E_OrderSide side = FactoryService.instance.constant.random.Next(0, 2) == 0 ? E_OrderSide.buy : E_OrderSide.sell;
                 E_OrderType type = FactoryService.instance.constant.random.Next(0, 2) == 0 ? E_OrderType.limit : E_OrderType.market;
+                decimal? price = null;
+                decimal? amount = null;
+                decimal? total = null;
                 if (market.symbol == "btc/usdt")
                 {
-                    if (type == E_OrderType.market && side == E_OrderSide.sell)
+                    if (type == E_OrderType.limit)
                     {
-                        amount = FactoryService.instance.constant.random.NextInt64(0, 3) + (decimal)FactoryService.instance.constant.random.NextDouble() + market.trade_min_market_sell;
-                        amount = Math.Round(amount, market.places_amount);
+                        price = FactoryService.instance.constant.random.NextInt64(45000, 60000) + (decimal)Math.Round(FactoryService.instance.constant.random.NextDouble(), market.places_price);
+                        amount = FactoryService.instance.constant.random.NextInt64(0, 3) + Math.Round((decimal)FactoryService.instance.constant.random.NextDouble() + market.trade_min_market_sell, market.places_amount);
                     }
-                    else if (type == E_OrderType.limit)
+                    else if (type == E_OrderType.market)
                     {
-                        price = FactoryService.instance.constant.random.NextInt64(45000, 60000) + (decimal)FactoryService.instance.constant.random.NextDouble();
-                        amount = Math.Round(amount, market.places_amount);
-                    }
-                    else
-                    {
-                        amount = Math.Round(amount, market.places_amount + market.places_price);
+                        if (side == E_OrderSide.buy)
+                        {
+                            total = FactoryService.instance.constant.random.NextInt64(0, 250) + Math.Round((decimal)FactoryService.instance.constant.random.NextDouble() + market.trade_min, market.places_price + market.places_amount);
+                        }
+                        else if (side == E_OrderSide.sell)
+                        {
+                            amount = FactoryService.instance.constant.random.NextInt64(0, 3) + Math.Round((decimal)FactoryService.instance.constant.random.NextDouble() + market.trade_min_market_sell, market.places_amount);
+                        }
                     }
                 }
                 else if (market.symbol == "eth/usdt")
                 {
-                    if (type == E_OrderType.market && side == E_OrderSide.sell)
+                    if (type == E_OrderType.limit)
                     {
-                        amount = FactoryService.instance.constant.random.NextInt64(0, 10) + (decimal)FactoryService.instance.constant.random.NextDouble() + market.trade_min_market_sell;
-                        amount = Math.Round(amount, market.places_amount);
+                        price = FactoryService.instance.constant.random.NextInt64(3500, 5000) + (decimal)Math.Round(FactoryService.instance.constant.random.NextDouble(), market.places_price);
+                        amount = FactoryService.instance.constant.random.NextInt64(0, 5) + Math.Round((decimal)FactoryService.instance.constant.random.NextDouble() + market.trade_min_market_sell, market.places_amount);
                     }
-                    else if (type == E_OrderType.limit)
+                    else if (type == E_OrderType.market)
                     {
-                        price = FactoryService.instance.constant.random.NextInt64(3000, 5000) + (decimal)FactoryService.instance.constant.random.NextDouble();
-                        amount = Math.Round(amount, market.places_amount);
+                        if (side == E_OrderSide.buy)
+                        {
+                            total = FactoryService.instance.constant.random.NextInt64(0, 250) + Math.Round((decimal)FactoryService.instance.constant.random.NextDouble() + market.trade_min, market.places_price + market.places_amount);
+                        }
+                        else if (side == E_OrderSide.sell)
+                        {
+                            amount = FactoryService.instance.constant.random.NextInt64(0, 5) + Math.Round((decimal)FactoryService.instance.constant.random.NextDouble() + market.trade_min_market_sell, market.places_amount);
+                        }
                     }
-                    else
-                    {
-                        amount = Math.Round(amount, market.places_amount + market.places_price);
-                    }
-                }
-                if (price != null)
-                {
-                    price = Math.Round(price ?? 0, market.places_price);
                 }
                 ReqOrder order = new ReqOrder()
                 {
@@ -363,9 +364,10 @@ public class TestController : ControllerBase
                     symbol = market.symbol,
                     side = side,
                     type = type,
+                    trade_model = E_TradeModel.cash,
                     price = price,
                     amount = amount,
-                    trade_model = E_TradeModel.cash,
+                    total = total,
                     trigger_hanging_price = 0,
                     trigger_cancel_price = 0,
                 };

@@ -285,8 +285,8 @@ public class ServiceWallet
                             settlement_quote.available += fee_quote;
                             settlement_base.total = settlement_base.available + settlement_base.freeze;
                             settlement_quote.total = settlement_quote.available + settlement_quote.freeze;
-                            runnings.Add(AddRunning(item.trade_id, wallet_type, E_WalletType.main, fee_base, buy_base, settlement_base, $"手续费(吃单):{buy_base.user_name}=>结算账户:{settlement_base.user_name},{fee_base}{buy_base.coin_name}"));
-                            runnings.Add(AddRunning(item.trade_id, wallet_type, E_WalletType.main, fee_quote, sell_quote, settlement_quote, $"手续费(挂单):{sell_quote.user_name}=>结算账户:{settlement_quote.user_name},{fee_quote}{sell_quote.coin_name}"));
+                            runnings.Add(AddRunning(item.trade_id, wallet_type, E_WalletType.main, fee_base, buy_base, settlement_base, $"手续费:{buy_base.user_name}=>结算账户:{settlement_base.user_name},{fee_base}{buy_base.coin_name}"));
+                            runnings.Add(AddRunning(item.trade_id, wallet_type, E_WalletType.main, fee_quote, sell_quote, settlement_quote, $"手续费:{sell_quote.user_name}=>结算账户:{settlement_quote.user_name},{fee_quote}{sell_quote.coin_name}"));
                         }
                         List<Orders> order = orders.Where(P => P.state == E_OrderState.completed && P.unsold > 0).Distinct().ToList();
                         foreach (Orders item in order)

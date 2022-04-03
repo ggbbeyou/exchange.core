@@ -277,6 +277,8 @@ public class DbContextEF : DbContext
             o.Property(P => P.phone).HasColumnType("nvarchar").HasMaxLength(500).HasComment("用户手机号码");
             o.Property(P => P.email).HasColumnType("nvarchar").HasMaxLength(500).HasComment("邮箱");
             o.Property(P => P.vip).IsRequired().HasColumnType("bigint").HasComment("用户等级");
+            o.Property(P => P.google_key).HasColumnType("nvarchar").HasMaxLength(50).HasComment("google验证码");
+            o.Property(P => P.google_private_key).HasColumnType("nvarchar").HasMaxLength(500).HasComment("google验证器密钥");
             o.Property(P => P.public_key).IsRequired().HasColumnType("nvarchar").HasMaxLength(1000).HasComment("公钥");
             o.Property(P => P.private_key).IsRequired().HasColumnType("nvarchar").HasMaxLength(3000).HasComment("私钥");
             o.ToTable(nameof(Users));

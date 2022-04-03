@@ -5,6 +5,7 @@ using Com.Api.Sdk.Enum;
 using Com.Api.Sdk.Models;
 using Com.Bll.Util;
 using Com.Db;
+using Google_Authenticator_netcore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -84,6 +85,8 @@ public class ServiceUser
         return res;
     }
 
+
+
     /// <summary>
     /// 登录
     /// </summary>
@@ -157,6 +160,45 @@ public class ServiceUser
             return true;
         }
         return false;
+    }
+
+    /// <summary>
+    /// 给用户创建google验证器
+    /// </summary>
+    /// <param name="issuer">签发者</param>
+    /// <param name="user_id">用户id</param>
+    /// <returns></returns>
+    public string Create2FA(string issuer, long user_id)
+    {
+        TwoFactorAuthenticator tfa = new TwoFactorAuthenticator();
+        string tempKey = common.CreateRandomCode(40);
+        using (var scope = FactoryService.instance.constant.provider.CreateScope())
+        {
+            using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
+            {
+                Users? user = db.Users.FirstOrDefault(P => P.user_id == user_id);
+                if (user != null)
+                {
+                    SetupCode setupInfo = tfa.GenerateSetupCode(issuer, user.user_name, tempKey, 300, 300);
+                    user.google_key = tempKey;
+                    user.google_private_key = setupInfo.ManualEntryKey;
+                    db.SaveChanges();
+                    return setupInfo.ManualEntryKey;
+                }
+            }
+        }
+        return "";
+    }
+
+    /// <summary>
+    /// 验证google验证器
+    /// </summary>
+    /// <param name="google_key">google key</param>
+    /// <param name="_2FA">google验证码</param>
+    /// <returns></returns>
+    public bool Verification2FA(string google_key, string _2FA)
+    {
+        return new TwoFactorAuthenticator().ValidateTwoFactorPIN(google_key, _2FA);
     }
 
     /// <summary>

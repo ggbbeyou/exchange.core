@@ -27,6 +27,7 @@
     <PackageReference Include="SixLabors.Fonts" Version="1.0.0-beta0013" />
     <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-rc0003" />
     <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="1.0.0-beta0010" />
+    <PackageReference Include="Google-Authenticator-netcore" Version="1.1.0" />
     <PackageReference Include="Google.Protobuf" Version="3.19.4" />
     <PackageReference Include="Grpc" Version="2.44.0" />
     <PackageReference Include="Grpc.Net.Client" Version="2.43.0" />

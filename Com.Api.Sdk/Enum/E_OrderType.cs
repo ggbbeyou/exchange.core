@@ -10,9 +10,9 @@ public enum E_OrderType
     /// <summary>
     /// 市价
     /// </summary>
-    price_market = 1,
+    market = 1,
     /// <summary>
     /// 限价
     /// </summary>
-    price_limit = 2,
+    limit = 2,
 }

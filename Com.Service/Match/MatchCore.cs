@@ -275,7 +275,7 @@ public class MatchCore
         if (order.side == E_OrderSide.buy)
         {
             //先市价成交,再限价成交
-            if (order.type == E_OrderType.price_market)
+            if (order.type == E_OrderType.market)
             {
                 //市价买单与市价卖市撮合
                 if ((order.state == E_OrderState.unsold || order.state == E_OrderState.partial) && this.market_ask.Count() > 0)
@@ -310,7 +310,7 @@ public class MatchCore
                     this.market_bid.Add(order);
                 }
             }
-            else if (order.type == E_OrderType.price_limit)
+            else if (order.type == E_OrderType.limit)
             {
                 //限价买单与市价卖单撮合
                 if ((order.state == E_OrderState.unsold || order.state == E_OrderState.partial) && market_ask.Count() > 0)
@@ -356,7 +356,7 @@ public class MatchCore
         else if (order.side == E_OrderSide.sell)
         {
             //先市价成交,再限价成交
-            if (order.type == E_OrderType.price_market)
+            if (order.type == E_OrderType.market)
             {
                 if ((order.state == E_OrderState.unsold || order.state == E_OrderState.partial) && market_bid.Count() > 0)
                 {
@@ -391,7 +391,7 @@ public class MatchCore
                     market_ask.Add(order);
                 }
             }
-            else if (order.type == E_OrderType.price_limit)
+            else if (order.type == E_OrderType.limit)
             {
                 //限价卖单与市价买市撮合
                 if ((order.state == E_OrderState.unsold || order.state == E_OrderState.partial) && market_bid.Count() > 0)
@@ -483,7 +483,7 @@ public class MatchCore
         bid.amount_unsold -= amount * price;
         bid.amount_done += amount * price;
         bid.deal_last_time = now;
-        if (bid.type == E_OrderType.price_market)
+        if (bid.type == E_OrderType.market)
         {
             bid.amount += amount;
             bid.price = bid.amount_done / bid.amount;

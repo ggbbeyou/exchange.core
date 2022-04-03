@@ -99,43 +99,43 @@ public class ServiceOrder
             res.message = "amount:交易量/交易额不能小于0";
             return res;
         }
-        if (orders.Any(P => P.type == E_OrderType.price_limit && (P.price == null || P.price <= 0)))
+        if (orders.Any(P => P.type == E_OrderType.limit && (P.price == null || P.price <= 0)))
         {
             res.code = E_Res_Code.field_error;
             res.message = "price:限价单交易价不能为小于0";
             return res;
         }
-        if (orders.Any(P => P.type == E_OrderType.price_limit && Math.Round(P.price ?? 0, info.places_price, MidpointRounding.ToNegativeInfinity) != P.price))
+        if (orders.Any(P => P.type == E_OrderType.limit && Math.Round(P.price ?? 0, info.places_price, MidpointRounding.ToNegativeInfinity) != P.price))
         {
             res.code = E_Res_Code.field_error;
             res.message = $"price:限价单交易价精度错误(交易价小数位:{info.places_price})";
             return res;
         }
-        if (orders.Any(P => (P.type == E_OrderType.price_limit || (P.type == E_OrderType.price_market && P.side == E_OrderSide.sell)) && Math.Round(P.amount ?? 0, info.places_amount, MidpointRounding.ToNegativeInfinity) != P.amount))
+        if (orders.Any(P => (P.type == E_OrderType.limit || (P.type == E_OrderType.market && P.side == E_OrderSide.sell)) && Math.Round(P.amount ?? 0, info.places_amount, MidpointRounding.ToNegativeInfinity) != P.amount))
         {
             res.code = E_Res_Code.field_error;
             res.message = $"amount:限价单/市价卖单交易量精度错误(交易量小数位:{info.places_amount})";
             return res;
         }
-        if (orders.Any(P => (P.type == E_OrderType.price_market && P.side == E_OrderSide.buy && Math.Round(P.amount ?? 0, info.places_price + info.places_amount, MidpointRounding.ToNegativeInfinity) != P.amount)))
+        if (orders.Any(P => (P.type == E_OrderType.market && P.side == E_OrderSide.buy && Math.Round(P.amount ?? 0, info.places_price + info.places_amount, MidpointRounding.ToNegativeInfinity) != P.amount)))
         {
             res.code = E_Res_Code.field_error;
             res.message = $"amount:市价买单成交额精度错误(成交额小数位:{info.places_price + info.places_amount})";
             return res;
         }
-        if (orders.Any(P => P.type == E_OrderType.price_market && P.side == E_OrderSide.sell && P.amount < info.trade_min_market_sell))
+        if (orders.Any(P => P.type == E_OrderType.market && P.side == E_OrderSide.sell && P.amount < info.trade_min_market_sell))
         {
             res.code = E_Res_Code.field_error;
             res.message = $"amount:市价卖单成交最不能低于:{info.trade_min_market_sell})";
             return res;
         }
-        if (orders.Any(P => P.type == E_OrderType.price_market && P.side == E_OrderSide.buy && P.amount < info.trade_min))
+        if (orders.Any(P => P.type == E_OrderType.market && P.side == E_OrderSide.buy && P.amount < info.trade_min))
         {
             res.code = E_Res_Code.field_error;
             res.message = $"amount:市价买单成交额不能低于:{info.trade_min})";
             return res;
         }
-        if (orders.Any(P => P.type == E_OrderType.price_limit && P.price * P.amount < info.trade_min))
+        if (orders.Any(P => P.type == E_OrderType.limit && P.price * P.amount < info.trade_min))
         {
             res.code = E_Res_Code.field_error;
             res.message = $"amount:限价单成交额不能低于:{info.trade_min})";
@@ -170,7 +170,7 @@ public class ServiceOrder
             order.state = order.trigger_hanging_price > 0 ? E_OrderState.not_match : E_OrderState.unsold;
             order.type = item.type;
             order.trade_model = item.trade_model;
-            if (order.type == E_OrderType.price_market)
+            if (order.type == E_OrderType.market)
             {
                 order.price = null;
                 order.total = null;
@@ -188,7 +188,7 @@ public class ServiceOrder
                     coin_base += item.amount ?? 0;
                 }
             }
-            else if (order.type == E_OrderType.price_limit)
+            else if (order.type == E_OrderType.limit)
             {
                 order.price = item.price;
                 order.amount = item.amount;

@@ -343,7 +343,7 @@ public class TestController : ControllerBase
                 {
                     if (type == E_OrderType.limit)
                     {
-                        price = FactoryService.instance.constant.random.NextInt64(3500, 5000) + (decimal)Math.Round(FactoryService.instance.constant.random.NextDouble(), market.places_price);
+                        price = FactoryService.instance.constant.random.NextInt64(3200, 5000) + (decimal)Math.Round(FactoryService.instance.constant.random.NextDouble(), market.places_price);
                         amount = FactoryService.instance.constant.random.NextInt64(0, 5) + Math.Round((decimal)FactoryService.instance.constant.random.NextDouble() + market.trade_min_market_sell, market.places_amount);
                     }
                     else if (type == E_OrderType.market)

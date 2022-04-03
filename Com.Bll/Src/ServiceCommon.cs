@@ -31,7 +31,7 @@ public class ServiceCommon
     }
 
     /// <summary>
-    /// 获取验证码
+    /// 获取图形验证码
     /// </summary>
     /// <returns></returns>
     public (long, string) GetVerificationCode()
@@ -44,7 +44,7 @@ public class ServiceCommon
     }
 
     /// <summary>
-    /// 校验验证码
+    /// 校验图形验证码
     /// </summary>
     /// <param name="no">编号</param>
     /// <param name="code">验证码</param>
@@ -96,7 +96,7 @@ public class ServiceCommon
     public bool Verification2FA(string google_key, string _2FA)
     {
         return new TwoFactorAuthenticator().ValidateTwoFactorPIN(google_key, _2FA);
-    }    
+    }
 
     /// <summary>
     /// 生成token

@@ -298,6 +298,7 @@ public class ServiceWallet
                                 {
                                     buy_quote.freeze -= item.unsold;
                                     buy_quote.available += item.unsold;
+                                    item.unsold = 0;
                                 }
                             }
                             else if (item.side == E_OrderSide.sell)
@@ -307,6 +308,7 @@ public class ServiceWallet
                                 {
                                     sell_base.freeze -= item.unsold;
                                     sell_base.available += item.unsold;
+                                    item.unsold = 0;
                                 }
                             }
                         }

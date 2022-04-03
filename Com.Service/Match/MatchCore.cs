@@ -494,6 +494,7 @@ public class MatchCore
         Deal deal = new Deal()
         {
             trade_id = FactoryService.instance.constant.worker.NextId(),
+            trade_model = bid.trade_model,
             market = this.model.info.market,
             symbol = this.model.info.symbol,
             price = price,

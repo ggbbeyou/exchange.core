@@ -270,8 +270,8 @@ public class ServiceWallet
                             buy_quote.total = buy_quote.available + buy_quote.freeze;
                             sell_base.total = sell_base.available + sell_base.freeze;
                             sell_quote.total = sell_quote.available + sell_quote.freeze;
-                            runnings.Add(AddRunning(item.trade_id, E_WalletType.main, item.amount - fee_taker, sell_base, buy_base, $"交易:{sell_base.user_name}=>{buy_base.user_name},{item.amount - fee_taker}{sell_base.coin_name}"));
-                            runnings.Add(AddRunning(item.trade_id, E_WalletType.main, item.total - fee_maker, buy_quote, sell_quote, $"交易:{buy_quote.user_name}=>{sell_quote.user_name},{item.total - fee_maker}{buy_quote.coin_name}"));
+                            runnings.Add(AddRunning(item.trade_id, wallet_type, item.amount - fee_taker, sell_base, buy_base, $"交易:{sell_base.user_name}=>{buy_base.user_name},{item.amount - fee_taker}{sell_base.coin_name}"));
+                            runnings.Add(AddRunning(item.trade_id, wallet_type, item.total - fee_maker, buy_quote, sell_quote, $"交易:{buy_quote.user_name}=>{sell_quote.user_name},{item.total - fee_maker}{buy_quote.coin_name}"));
                             if (settlement_base != null)
                             {
                                 runnings.Add(AddRunning(item.trade_id, E_WalletType.main, fee_taker, buy_base, settlement_base, $"手续费(吃单):{buy_base.user_name}=>{settlement_base.user_name},{fee_taker}{buy_base.coin_name}"));

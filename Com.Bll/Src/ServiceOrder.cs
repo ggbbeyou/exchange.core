@@ -207,9 +207,14 @@ public class ServiceOrder
             res.data.Add(order);
             orders1.Add(order);
         }
+        E_WalletType wallet_type = E_WalletType.main;
+        if (info.market_type == E_MarketType.spot)
+        {
+            wallet_type = E_WalletType.spot;
+        }
         if (coin_base > 0 && coin_quote > 0)
         {
-            if (!wallet_service.FreezeChange(E_WalletType.main, uid, info.coin_id_base, coin_base, info.coin_id_quote, coin_quote))
+            if (!wallet_service.FreezeChange(wallet_type, uid, info.coin_id_base, coin_base, info.coin_id_quote, coin_quote))
             {
                 res.code = E_Res_Code.low_capital;
                 res.message = "基础币种或报价币种余额不足";
@@ -218,7 +223,7 @@ public class ServiceOrder
         }
         else if (coin_base > 0)
         {
-            if (!wallet_service.FreezeChange(E_WalletType.main, uid, info.coin_id_base, coin_base))
+            if (!wallet_service.FreezeChange(wallet_type, uid, info.coin_id_base, coin_base))
             {
                 res.code = E_Res_Code.low_capital;
                 res.message = "基础币种余额不足";
@@ -227,7 +232,7 @@ public class ServiceOrder
         }
         else if (coin_quote > 0)
         {
-            if (!wallet_service.FreezeChange(E_WalletType.main, uid, info.coin_id_quote, coin_quote))
+            if (!wallet_service.FreezeChange(wallet_type, uid, info.coin_id_quote, coin_quote))
             {
                 res.code = E_Res_Code.low_capital;
                 res.message = "报价币种余额不足";

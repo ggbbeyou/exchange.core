@@ -151,7 +151,7 @@ public class TestController : ControllerBase
             Wallet wallet_usdt = new Wallet()
             {
                 wallet_id = FactoryService.instance.constant.worker.NextId(),
-                wallet_type = E_WalletType.main,
+                wallet_type = E_WalletType.spot,
                 user_id = user.user_id,
                 user_name = user.user_name,
                 coin_id = usdt.coin_id,
@@ -163,7 +163,7 @@ public class TestController : ControllerBase
             Wallet wallet_btc = new Wallet()
             {
                 wallet_id = FactoryService.instance.constant.worker.NextId(),
-                wallet_type = E_WalletType.main,
+                wallet_type = E_WalletType.spot,
                 user_id = user.user_id,
                 user_name = user.user_name,
                 coin_id = btc.coin_id,
@@ -175,7 +175,7 @@ public class TestController : ControllerBase
             Wallet wallet_eth = new Wallet()
             {
                 wallet_id = FactoryService.instance.constant.worker.NextId(),
-                wallet_type = E_WalletType.main,
+                wallet_type = E_WalletType.spot,
                 user_id = user.user_id,
                 user_name = user.user_name,
                 coin_id = eth.coin_id,

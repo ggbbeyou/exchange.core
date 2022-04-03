@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
 using Com.Api.Sdk;
+using Com.Api.Sdk.Enum;
 using Newtonsoft.Json;
 
 namespace Com.Db;
@@ -30,6 +31,11 @@ public class ResMarket
     /// </summary>
     /// <value></value>
     public string coin_name_quote { get; set; } = null!;
+    /// <summary>
+    /// 市场类型
+    /// </summary>
+    /// <value></value>
+    public E_MarketType market_type { get; set; }
     /// <summary>
     /// 是否交易(true:可以交易,false:禁止交易)
     /// </summary>

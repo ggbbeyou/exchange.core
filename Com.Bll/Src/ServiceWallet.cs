@@ -264,12 +264,6 @@ public class ServiceWallet
                                 fee_quote = vip_sell.fee_maker * item.total;
                                 temp_base = (item.amount - fee_base);
                                 temp_quote = (item.total - fee_quote);
-                                settlement_base.available += fee_base;
-                                settlement_base.total = settlement_base.available + settlement_base.freeze;
-                                runnings.Add(AddRunning(item.trade_id, wallet_type, E_WalletType.main, fee_base, buy_base, settlement_base, $"手续费(吃单):{buy_base.user_name}=>结算账户:{settlement_base.user_name},{fee_base}{buy_base.coin_name}"));
-                                settlement_quote.available += fee_quote;
-                                settlement_quote.total = settlement_quote.available + settlement_quote.freeze;
-                                runnings.Add(AddRunning(item.trade_id, wallet_type, E_WalletType.main, fee_quote, sell_quote, settlement_quote, $"手续费(挂单):{sell_quote.user_name}=>结算账户:{settlement_quote.user_name},{fee_quote}{sell_quote.coin_name}"));
                             }
                             else if (item.trigger_side == E_OrderSide.sell)
                             {
@@ -278,12 +272,6 @@ public class ServiceWallet
                                 fee_base = vip_buy.fee_maker * item.amount;
                                 temp_base = (item.amount - fee_base);
                                 temp_quote = (item.total - fee_quote);
-                                settlement_base.available += fee_base;
-                                settlement_base.total = settlement_base.available + settlement_base.freeze;
-                                runnings.Add(AddRunning(item.trade_id, wallet_type, E_WalletType.main, fee_base, buy_base, settlement_base, $"手续费(挂单):{buy_base.user_name}=>结算账户:{settlement_base.user_name},{fee_base}{buy_base.coin_name}"));
-                                settlement_quote.available += fee_quote;
-                                settlement_quote.total = settlement_quote.available + settlement_quote.freeze;
-                                runnings.Add(AddRunning(item.trade_id, wallet_type, E_WalletType.main, fee_quote, sell_quote, settlement_quote, $"手续费(吃单):{sell_quote.user_name}=>结算账户:{settlement_quote.user_name},{fee_quote}{sell_quote.coin_name}"));
                             }
                             buy_base.available += temp_base;
                             sell_quote.available += temp_quote;
@@ -293,6 +281,34 @@ public class ServiceWallet
                             sell_quote.total = sell_quote.available + sell_quote.freeze;
                             runnings.Add(AddRunning(item.trade_id, wallet_type, wallet_type, temp_base, sell_base, buy_base, $"交易:{sell_base.user_name}=>{buy_base.user_name},{temp_base}{sell_base.coin_name}"));
                             runnings.Add(AddRunning(item.trade_id, wallet_type, wallet_type, temp_quote, buy_quote, sell_quote, $"交易:{buy_quote.user_name}=>{sell_quote.user_name},{temp_quote}{buy_quote.coin_name}"));
+                            settlement_base.available += fee_base;
+                            settlement_quote.available += fee_quote;
+                            settlement_base.total = settlement_base.available + settlement_base.freeze;
+                            settlement_quote.total = settlement_quote.available + settlement_quote.freeze;
+                            runnings.Add(AddRunning(item.trade_id, wallet_type, E_WalletType.main, fee_base, buy_base, settlement_base, $"手续费(吃单):{buy_base.user_name}=>结算账户:{settlement_base.user_name},{fee_base}{buy_base.coin_name}"));
+                            runnings.Add(AddRunning(item.trade_id, wallet_type, E_WalletType.main, fee_quote, sell_quote, settlement_quote, $"手续费(挂单):{sell_quote.user_name}=>结算账户:{settlement_quote.user_name},{fee_quote}{sell_quote.coin_name}"));
+                        }
+                        List<Orders> order = orders.Where(P => P.state == E_OrderState.completed && P.unsold > 0).Distinct().ToList();
+                        foreach (Orders item in order)
+                        {
+                            if (item.side == E_OrderSide.buy)
+                            {
+                                Wallet? buy_quote = wallets.Where(P => P.coin_id == market.coin_id_quote && P.user_id == item.uid).FirstOrDefault();
+                                if (buy_quote != null)
+                                {
+                                    buy_quote.freeze -= item.unsold;
+                                    buy_quote.available += item.unsold;
+                                }
+                            }
+                            else if (item.side == E_OrderSide.sell)
+                            {
+                                Wallet? sell_base = wallets.Where(P => P.coin_id == market.coin_id_base && P.user_id == item.uid).FirstOrDefault();
+                                if (sell_base != null)
+                                {
+                                    sell_base.freeze -= item.unsold;
+                                    sell_base.available += item.unsold;
+                                }
+                            }
                         }
                         db.SaveChanges();
                         transaction.Commit();

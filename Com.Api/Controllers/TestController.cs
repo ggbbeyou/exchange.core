@@ -138,7 +138,7 @@ public class TestController : ControllerBase
                 user_id = FactoryService.instance.constant.worker.NextId(),
                 user_name = "user" + i,
                 password = Encryption.SHA256Encrypt("123456_" + i),
-                user_type=E_UserType.general,
+                user_type = E_UserType.general,
                 disabled = false,
                 transaction = true,
                 withdrawal = false,
@@ -195,7 +195,7 @@ public class TestController : ControllerBase
             user_id = FactoryService.instance.constant.worker.NextId(),
             user_name = "settlement_btc/usdt",
             password = Encryption.SHA256Encrypt("123456"),
-            user_type=E_UserType.settlement,
+            user_type = E_UserType.settlement,
             disabled = false,
             transaction = true,
             withdrawal = false,
@@ -212,7 +212,7 @@ public class TestController : ControllerBase
             user_id = FactoryService.instance.constant.worker.NextId(),
             user_name = "settlement_eth/usdt",
             password = Encryption.SHA256Encrypt("123456"),
-            user_type=E_UserType.settlement,
+            user_type = E_UserType.settlement,
             disabled = false,
             transaction = true,
             withdrawal = false,
@@ -327,18 +327,18 @@ public class TestController : ControllerBase
                 {
                     if (type == E_OrderType.limit)
                     {
-                        price = FactoryService.instance.constant.random.NextInt64(45000, 60000) + (decimal)Math.Round(FactoryService.instance.constant.random.NextDouble(), market.places_price);
-                        amount = FactoryService.instance.constant.random.NextInt64(0, 3) + Math.Round((decimal)FactoryService.instance.constant.random.NextDouble() + market.trade_min_market_sell, market.places_amount);
+                        price = FactoryService.instance.constant.random.NextInt64(50000, 50000) + (decimal)Math.Round(FactoryService.instance.constant.random.NextDouble(), market.places_price);
+                        amount = FactoryService.instance.constant.random.NextInt64(0, 1) + Math.Round((decimal)FactoryService.instance.constant.random.NextDouble() + market.trade_min_market_sell, market.places_amount);
                     }
                     else if (type == E_OrderType.market)
                     {
                         if (side == E_OrderSide.buy)
                         {
-                            total = FactoryService.instance.constant.random.NextInt64(0, 250) + Math.Round((decimal)FactoryService.instance.constant.random.NextDouble() + market.trade_min, market.places_price + market.places_amount);
+                            total = FactoryService.instance.constant.random.NextInt64(0, 20) + Math.Round((decimal)FactoryService.instance.constant.random.NextDouble() + market.trade_min, market.places_price + market.places_amount);
                         }
                         else if (side == E_OrderSide.sell)
                         {
-                            amount = FactoryService.instance.constant.random.NextInt64(0, 3) + Math.Round((decimal)FactoryService.instance.constant.random.NextDouble() + market.trade_min_market_sell, market.places_amount);
+                            amount = FactoryService.instance.constant.random.NextInt64(0, 1) + Math.Round((decimal)FactoryService.instance.constant.random.NextDouble() + market.trade_min_market_sell, market.places_amount);
                         }
                     }
                 }
@@ -346,18 +346,18 @@ public class TestController : ControllerBase
                 {
                     if (type == E_OrderType.limit)
                     {
-                        price = FactoryService.instance.constant.random.NextInt64(3200, 5000) + (decimal)Math.Round(FactoryService.instance.constant.random.NextDouble(), market.places_price);
-                        amount = FactoryService.instance.constant.random.NextInt64(0, 5) + Math.Round((decimal)FactoryService.instance.constant.random.NextDouble() + market.trade_min_market_sell, market.places_amount);
+                        price = FactoryService.instance.constant.random.NextInt64(5000, 5000) + (decimal)Math.Round(FactoryService.instance.constant.random.NextDouble(), market.places_price);
+                        amount = FactoryService.instance.constant.random.NextInt64(0, 2) + Math.Round((decimal)FactoryService.instance.constant.random.NextDouble() + market.trade_min_market_sell, market.places_amount);
                     }
                     else if (type == E_OrderType.market)
                     {
                         if (side == E_OrderSide.buy)
                         {
-                            total = FactoryService.instance.constant.random.NextInt64(0, 250) + Math.Round((decimal)FactoryService.instance.constant.random.NextDouble() + market.trade_min, market.places_price + market.places_amount);
+                            total = FactoryService.instance.constant.random.NextInt64(0, 20) + Math.Round((decimal)FactoryService.instance.constant.random.NextDouble() + market.trade_min, market.places_price + market.places_amount);
                         }
                         else if (side == E_OrderSide.sell)
                         {
-                            amount = FactoryService.instance.constant.random.NextInt64(0, 5) + Math.Round((decimal)FactoryService.instance.constant.random.NextDouble() + market.trade_min_market_sell, market.places_amount);
+                            amount = FactoryService.instance.constant.random.NextInt64(0, 2) + Math.Round((decimal)FactoryService.instance.constant.random.NextDouble() + market.trade_min_market_sell, market.places_amount);
                         }
                     }
                 }

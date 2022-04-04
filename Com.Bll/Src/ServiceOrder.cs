@@ -92,7 +92,7 @@ public class ServiceOrder
             res.message = "total:市价买单,交易额不能为低于0";
             return res;
         }
-        if (orders.Any(P => P.type == E_OrderType.market && (P.amount == null || P.amount <= 0)))
+        if (orders.Any(P => P.type == E_OrderType.market && P.side == E_OrderSide.sell && (P.amount == null || P.amount <= 0)))
         {
             res.code = E_Res_Code.field_error;
             res.message = "amount:市价卖单,交易量不能为低于0";

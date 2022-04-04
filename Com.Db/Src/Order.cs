@@ -69,8 +69,7 @@ public class Orders : ResOrder
     /// <summary>
     /// 备注
     /// </summary>
-    /// <value></value>
-    [JsonConverter(typeof(JsonConverterDecimal))]
+    /// <value></value>    
     public string? remarks { get; set; }
     
 }

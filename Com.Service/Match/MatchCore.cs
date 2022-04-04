@@ -110,7 +110,7 @@ public class MatchCore
     /// <returns>最新价</returns>
     public decimal GetNewPrice(decimal bid, decimal ask, decimal last)
     {
-        if (bid == 0 || ask == 0 || last == 0)
+        if (bid <= 0 || ask <= 0 || last <= 0)
         {
             return 0;
         }

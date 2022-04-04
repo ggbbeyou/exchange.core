@@ -338,7 +338,7 @@ public class TestController : ControllerBase
                         }
                         else if (side == E_OrderSide.sell)
                         {
-                            amount = FactoryService.instance.constant.random.NextInt64(0, 1) + Math.Round((decimal)FactoryService.instance.constant.random.NextDouble() + market.trade_min_market_sell, market.places_amount);
+                            amount = Math.Round((decimal)FactoryService.instance.constant.random.NextDouble() + market.trade_min_market_sell, market.places_amount);
                         }
                     }
                 }
@@ -357,7 +357,7 @@ public class TestController : ControllerBase
                         }
                         else if (side == E_OrderSide.sell)
                         {
-                            amount = FactoryService.instance.constant.random.NextInt64(0, 2) + Math.Round((decimal)FactoryService.instance.constant.random.NextDouble() + market.trade_min_market_sell, market.places_amount);
+                            amount = Math.Round((decimal)FactoryService.instance.constant.random.NextDouble() + market.trade_min_market_sell, market.places_amount);
                         }
                     }
                 }

@@ -5,25 +5,25 @@ http://www.easyswoole.com/wstool.html
 ws://localhost:5210/WebSocket/WebSocket
 
 {"op":"subscribe","args":[
-{"channel":"tickers","data":"btc/usdt"},
-{"channel":"trades","data":"btc/usdt"},
-{"channel":"books10","data":"btc/usdt"},
-{"channel":"books50","data":"btc/usdt"},
-{"channel":"books200","data":"btc/usdt"},
-{"channel":"books10_inc","data":"btc/usdt"},
-{"channel":"books50_inc","data":"btc/usdt"},
-{"channel":"books200_inc","data":"btc/usdt"},
-{"channel":"min1","data":"btc/usdt"},
-{"channel":"min5","data":"btc/usdt"},
-{"channel":"min15","data":"btc/usdt"},
-{"channel":"min30","data":"btc/usdt"},
-{"channel":"hour1","data":"btc/usdt"},
-{"channel":"hour6","data":"btc/usdt"},
-{"channel":"trades","data":"btc/usdt"},
-{"channel":"hour12","data":"btc/usdt"},
-{"channel":"day1","data":"btc/usdt"},
-{"channel":"week1","data":"btc/usdt"},
-{"channel":"month1","data":"btc/usdt"}
+    {"channel":"tickers","data":"btc/usdt"},
+    {"channel":"trades","data":"btc/usdt"},
+    {"channel":"books10","data":"btc/usdt"},
+    {"channel":"books50","data":"btc/usdt"},
+    {"channel":"books200","data":"btc/usdt"},
+    {"channel":"books10_inc","data":"btc/usdt"},
+    {"channel":"books50_inc","data":"btc/usdt"},
+    {"channel":"books200_inc","data":"btc/usdt"},
+    {"channel":"min1","data":"btc/usdt"},
+    {"channel":"min5","data":"btc/usdt"},
+    {"channel":"min15","data":"btc/usdt"},
+    {"channel":"min30","data":"btc/usdt"},
+    {"channel":"hour1","data":"btc/usdt"},
+    {"channel":"hour6","data":"btc/usdt"},
+    {"channel":"trades","data":"btc/usdt"},
+    {"channel":"hour12","data":"btc/usdt"},
+    {"channel":"day1","data":"btc/usdt"},
+    {"channel":"week1","data":"btc/usdt"},
+    {"channel":"month1","data":"btc/usdt"}
 ]}
 
 

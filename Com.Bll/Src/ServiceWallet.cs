@@ -216,7 +216,7 @@ public class ServiceWallet
     }
 
     /// <summary>
-    /// 撮合成交后资产变动(批量),手续费内扣
+    /// 撮合成交后资产变动(批量),手续费内扣(到手资产里面再去扣手续费)
     /// </summary>
     /// <param name="market">市场</param>
     /// <param name="orders">相关订单</param>

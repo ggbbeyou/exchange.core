@@ -120,7 +120,12 @@ public class MarketController : ControllerBase
             res.data = new List<ResTicker>();
             foreach (var item in market)
             {
-                ResTicker? ticker = JsonConvert.DeserializeObject<ResTicker>(FactoryService.instance.constant.redis.HashGet(FactoryService.instance.GetRedisTicker(), item.market.ToString()));
+                RedisValue rv = FactoryService.instance.constant.redis.HashGet(FactoryService.instance.GetRedisTicker(), item.market.ToString());
+                if (!rv.HasValue)
+                {
+                    continue;
+                }
+                ResTicker? ticker = JsonConvert.DeserializeObject<ResTicker>(rv);
                 if (ticker != null)
                 {
                     res.data.Add(ticker);
@@ -130,27 +135,6 @@ public class MarketController : ControllerBase
         return res;
     }
 
-    // /// <summary>
-    // /// 获取深度行情
-    // /// </summary>
-    // /// <param name="symbol">交易对</param>
-    // /// <param name="sz">深度档数,只支持10,50,200</param>
-    // /// <returns></returns>
-    // [HttpGet]
-    // [Route("depth")]
-    // public Res<ResDepth?> Depth(string symbol, int sz = 50)
-    // {
-    //     Res<ResDepth?> res = new Res<ResDepth?>();
-    //     Market? market = service_market.GetMarketBySymbol(symbol);
-    //     if (market != null && (sz == 10 || sz == 50 || sz == 200))
-    //     {
-    //         res.success = true;
-    //         res.code = E_Res_Code.ok;
-    //         res.data = JsonConvert.DeserializeObject<ResDepth>(FactoryService.instance.constant.redis.HashGet(FactoryService.instance.GetRedisDepth(market.market), "books" + sz));
-    //     }
-    //     return res;
-    // }
-
     /// <summary>
     /// 获取深度行情
     /// </summary>
@@ -159,18 +143,27 @@ public class MarketController : ControllerBase
     /// <returns></returns>
     [HttpPost]
     [Route("depth")]
-    [Consumes("application/json")]
-    public IActionResult Depth(string symbol, int sz = 50)
+    // [Consumes("application/json")]
+    public Res<ResDepth?> Depth(string symbol, int sz = 50)
     {
         Res<ResDepth?> res = new Res<ResDepth?>();
-        Market? market = service_market.GetMarketBySymbol(symbol);
-        if (market != null && (sz == 10 || sz == 50 || sz == 200))
+        if (sz != 10 && sz != 50 && sz != 200)
         {
+            return res;
+        }
+        Market? market = service_market.GetMarketBySymbol(symbol);
+        if (market != null)
+        {
+            RedisValue rv = FactoryService.instance.constant.redis.HashGet(FactoryService.instance.GetRedisDepth(market.market), "books" + sz);
+            if (!rv.HasValue)
+            {
+                return res;
+            }
             res.success = true;
             res.code = E_Res_Code.ok;
-            res.data = JsonConvert.DeserializeObject<ResDepth>(FactoryService.instance.constant.redis.HashGet(FactoryService.instance.GetRedisDepth(market.market), "books" + sz));
+            res.data = JsonConvert.DeserializeObject<ResDepth>(rv);
         }
-        return Content(JsonConvert.SerializeObject(res), "application/json");
+        return res;
     }
 
     /// <summary>
@@ -202,6 +195,10 @@ public class MarketController : ControllerBase
             RedisValue[] rv = FactoryService.instance.constant.redis.SortedSetRangeByScore(key: FactoryService.instance.GetRedisKline(market.market, type), start: start.ToUnixTimeMilliseconds(), stop: stop, exclude: Exclude.Both, skip: skip, take: take, order: StackExchange.Redis.Order.Ascending);
             foreach (var item in rv)
             {
+                if (!item.HasValue)
+                {
+                    continue;
+                }
                 ResKline? resKline = JsonConvert.DeserializeObject<ResKline>(item);
                 if (resKline != null)
                 {
@@ -245,6 +242,10 @@ public class MarketController : ControllerBase
             RedisValue[] rv = FactoryService.instance.constant.redis.SortedSetRangeByScore(key: FactoryService.instance.GetRedisDeal(market.market), start: start.ToUnixTimeMilliseconds(), stop: stop, exclude: Exclude.Both, skip: skip, take: take, order: StackExchange.Redis.Order.Ascending);
             foreach (var item in rv)
             {
+                if (!item.HasValue)
+                {
+                    continue;
+                }
                 ResDeal? res_deal = JsonConvert.DeserializeObject<ResDeal>(item);
                 if (res_deal != null)
                 {

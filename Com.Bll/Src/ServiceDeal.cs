@@ -188,8 +188,8 @@ public class ServiceDeal
                               {
                                   market = g.Key.market,
                                   symbol = g.Key.symbol,
-                                  price_change = g.Average(P => P.price),
-                                  price_change_percent = 0,
+                                  price_change = g.Max(P => P.price) - g.Min(P => P.price),
+                                  price_change_percent = (g.Max(P => P.price) - g.Min(P => P.price)) / g.Min(P => P.price),
                                   open = g.OrderBy(P => P.time).First().price,
                                   close = g.OrderBy(P => P.time).Last().price,
                                   low = g.Min(P => P.price),
@@ -287,6 +287,6 @@ public class ServiceDeal
         return FactoryService.instance.constant.redis.SortedSetRemoveRangeByScore(FactoryService.instance.GetRedisDeal(market), 0, end.ToUnixTimeMilliseconds());
     }
 
-    
+
 
 }

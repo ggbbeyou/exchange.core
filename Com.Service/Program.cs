@@ -30,7 +30,7 @@ builder.ConfigureLogging((hostContext, logging) =>
             logging.AddNLog();
         });
 var app = builder.Build();
-app.Run();
+await app.RunAsync();
 
 
 

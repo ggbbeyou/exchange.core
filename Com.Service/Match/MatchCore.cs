@@ -456,7 +456,6 @@ public class MatchCore
         }
         DateTimeOffset now = DateTimeOffset.UtcNow;
         decimal bid_amount_unsold = Math.Round(bid.unsold / price, this.model.info.places_amount, MidpointRounding.ToNegativeInfinity);
-        // decimal leftover = bid.unsold - (bid_amount_unsold * price);
         decimal amount = 0;
         if (bid_amount_unsold > ask.unsold)
         {
@@ -481,14 +480,14 @@ public class MatchCore
             return null;
         }
         bid.deal_amount += amount;
-        bid.deal_total += (amount * price);
-        bid.deal_price = Math.Round(bid.deal_total / bid.deal_amount, this.model.info.places_price);
-        bid.unsold -= (amount * price);
-        bid.deal_last_time = now;
         ask.deal_amount += amount;
+        bid.deal_total += (amount * price);
         ask.deal_total += (amount * price);
+        bid.deal_price = Math.Round(bid.deal_total / bid.deal_amount, this.model.info.places_price);
         ask.deal_price = Math.Round(bid.deal_total / bid.deal_amount, this.model.info.places_price);
+        bid.unsold -= (amount * price);
         ask.unsold -= amount;
+        bid.deal_last_time = now;
         ask.deal_last_time = now;
         Deal deal = new Deal()
         {

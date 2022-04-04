@@ -254,18 +254,21 @@ public class ServiceWallet
                         {
                             if (settlement_base == null || settlement_quote == null)
                             {
+                                FactoryService.instance.constant.logger.LogError($"{market.symbol}:交易对没有找到结算账户");
                                 return (false, runnings);
                             }
                             Users? user_buy = users.FirstOrDefault(P => P.user_id == item.bid_uid);
                             Users? user_sell = users.FirstOrDefault(P => P.user_id == item.ask_uid);
                             if (user_buy == null || user_sell == null)
                             {
+                                FactoryService.instance.constant.logger.LogError($"{market.symbol}:未找到交易账户");
                                 return (false, runnings);
                             }
                             Vip? vip_buy = vips.FirstOrDefault(P => P.id == user_buy.vip);
                             Vip? vip_sell = vips.FirstOrDefault(P => P.id == user_sell.vip);
                             if (vip_buy == null || vip_sell == null)
                             {
+                                FactoryService.instance.constant.logger.LogError($"{market.symbol}:用户:{user_buy.user_name}/{user_sell.user_name},未找到交易账户vip等级");
                                 return (false, runnings);
                             }
                             Wallet? buy_base = wallets.Where(P => P.coin_id == market.coin_id_base && P.user_id == item.bid_uid).FirstOrDefault();
@@ -274,6 +277,7 @@ public class ServiceWallet
                             Wallet? sell_quote = wallets.Where(P => P.coin_id == market.coin_id_quote && P.user_id == item.ask_uid).FirstOrDefault();
                             if (buy_base == null || buy_quote == null || sell_base == null || sell_quote == null)
                             {
+                                FactoryService.instance.constant.logger.LogError($"{market.symbol}:用户:{user_buy.user_name}/{user_sell.user_name},未找到交易账户钱包");
                                 return (false, runnings);
                             }
                             sell_base.freeze -= item.amount;

@@ -225,7 +225,7 @@ public class TestController : ControllerBase
             this.db.Wallet.Add(new Wallet()
             {
                 wallet_id = FactoryService.instance.constant.worker.NextId(),
-                wallet_type = E_WalletType.spot,
+                wallet_type = E_WalletType.main,
                 user_id = settlement_btc_usdt.user_id,
                 user_name = settlement_btc_usdt.user_name,
                 coin_id = item.coin_id,
@@ -237,7 +237,7 @@ public class TestController : ControllerBase
             this.db.Wallet.Add(new Wallet()
             {
                 wallet_id = FactoryService.instance.constant.worker.NextId(),
-                wallet_type = E_WalletType.spot,
+                wallet_type = E_WalletType.main,
                 user_id = settlement_eth_usdt.user_id,
                 user_name = settlement_eth_usdt.user_name,
                 coin_id = item.coin_id,

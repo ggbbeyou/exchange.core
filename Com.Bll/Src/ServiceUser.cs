@@ -154,7 +154,7 @@ public class ServiceUser
     /// <summary>
     /// 获取vip
     /// </summary>
-    /// <param name="symbol"></param>
+    /// <param name="id"></param>
     /// <returns></returns>
     public Vip? GetVip(long id)
     {

@@ -83,4 +83,28 @@ public class Deal : ResDeal
     /// <value></value>
     [JsonConverter(typeof(JsonConverterDecimal))]
     public decimal ask_amount_done { get; set; }
+    /// <summary>
+    /// 买单挂单手续费
+    /// </summary>
+    /// <value></value>
+    [JsonConverter(typeof(JsonConverterDecimal))]
+    public decimal fee_bid_maker { get; set; }
+    /// <summary>
+    /// 买单吃单手续费
+    /// </summary>
+    /// <value></value>
+    [JsonConverter(typeof(JsonConverterDecimal))]
+    public decimal fee_bid_taker { get; set; }
+    /// <summary>
+    /// 卖单挂单手续费
+    /// </summary>
+    /// <value></value>
+    [JsonConverter(typeof(JsonConverterDecimal))]
+    public decimal fee_ask_maker { get; set; }
+    /// <summary>
+    /// 卖单吃单手续费
+    /// </summary>
+    /// <value></value>
+    [JsonConverter(typeof(JsonConverterDecimal))]
+    public decimal fee_ask_taker { get; set; }
 }

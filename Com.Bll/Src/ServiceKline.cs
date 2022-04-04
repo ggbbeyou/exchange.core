@@ -27,7 +27,7 @@ public class ServiceKline
     /// <summary>
     /// DB:交易记录
     /// </summary>
-    private ServiceDeal deal_service = new ServiceDeal();
+    private ServiceDeal service_deal = new ServiceDeal();
 
     /// <summary>
     /// 初始化
@@ -149,7 +149,7 @@ public class ServiceKline
                     switch (type)
                     {
                         case E_KlineType.min1:
-                            return this.deal_service.GetKlinesMin1ByDeal(market, start, end);
+                            return this.service_deal.GetKlinesMin1ByDeal(market, start, end);
                         case E_KlineType.min5:
                             predicate = predicate.And(P => P.type == E_KlineType.min1);
                             var sql5 = from kline in db.Kline.Where(predicate)
@@ -464,10 +464,10 @@ public class ServiceKline
         {
             DateTimeOffset now = DateTimeOffset.UtcNow;
             (DateTimeOffset start, DateTimeOffset end) startend = KlineTime(cycle, now);
-            Kline? kline_new = this.deal_service.GetKlinesByDeal(market, cycle, startend.start, null);
+            Kline? kline_new = this.service_deal.GetKlinesByDeal(market, cycle, startend.start, null);
             if (kline_new == null)
             {
-                Deal? last_deal = deal_service.GetRedisLastDeal(market);
+                Deal? last_deal = service_deal.GetRedisLastDeal(market);
                 if (last_deal == null)
                 {
                     FactoryService.instance.constant.redis.HashDelete(FactoryService.instance.GetRedisKlineing(market), cycle.ToString());

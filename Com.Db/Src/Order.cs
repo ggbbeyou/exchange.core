@@ -61,6 +61,18 @@ public class Orders : ResOrder
     [JsonConverter(typeof(JsonConverterDecimal))]
     public decimal complete_thaw { get; set; }
     /// <summary>
+    /// 挂单手续费
+    /// </summary>
+    /// <value></value>
+    [JsonConverter(typeof(JsonConverterDecimal))]
+    public decimal fee_maker { get; set; }
+    /// <summary>
+    /// 吃单手续费
+    /// </summary>
+    /// <value></value>
+    [JsonConverter(typeof(JsonConverterDecimal))]
+    public decimal fee_taker { get; set; }
+    /// <summary>
     /// 订单状态
     /// </summary>
     /// <value></value>

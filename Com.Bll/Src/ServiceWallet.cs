@@ -273,7 +273,7 @@ public class ServiceWallet
                         }
                         List<long> user_id = deals.Select(T => T.bid_uid).ToList();
                         user_id.AddRange(deals.Select(T => T.ask_uid).ToList());
-                        user_id = user_id.Distinct().ToList();
+                        user_id = user_id.Distinct().ToList();                        
                         List<Users> users = db.Users.AsNoTracking().Where(P => user_id.Contains(P.user_id)).ToList();
                         List<Vip> vips = db.Vip.AsNoTracking().Where(P => users.Select(P => P.vip).Distinct().Contains(P.id)).ToList();
                         List<Wallet> wallets = db.Wallet.Where(P => P.wallet_type == wallet_type && user_id.Contains(P.user_id) && (P.coin_id == market.coin_id_base || P.coin_id == market.coin_id_quote)).ToList();

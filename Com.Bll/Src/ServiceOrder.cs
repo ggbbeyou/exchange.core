@@ -30,17 +30,17 @@ public class ServiceOrder
     /// 钱包服务
     /// </summary>
     /// <returns></returns>
-    private ServiceWallet wallet_service = new ServiceWallet();
+    private ServiceWallet service_wallet = new ServiceWallet();
     /// <summary>
     /// 交易对服务
     /// </summary>
     /// <returns></returns>
-    private ServiceMarket market_service = new ServiceMarket();
+    private ServiceMarket service_market = new ServiceMarket();
     /// <summary>
     /// 用户服务
     /// </summary>
     /// <returns></returns>
-    private ServiceUser user_service = new ServiceUser();
+    private ServiceUser service_user = new ServiceUser();
 
     /// <summary>
     /// 初始化
@@ -98,7 +98,7 @@ public class ServiceOrder
             res.message = "amount:市价卖单,交易量不能为低于0";
             return res;
         }
-        Market? info = this.market_service.GetMarketBySymbol(symbol);
+        Market? info = this.service_market.GetMarketBySymbol(symbol);
         if (info == null)
         {
             res.code = E_Res_Code.no_symbol;
@@ -154,7 +154,7 @@ public class ServiceOrder
             res.message = $"amount:市价卖单交易量不能低于:{info.trade_min_market_sell})";
             return res;
         }
-        Users? users = user_service.GetUser(uid);
+        Users? users = service_user.GetUser(uid);
         if (users == null)
         {
             res.code = E_Res_Code.no_user;
@@ -165,6 +165,13 @@ public class ServiceOrder
         {
             res.code = E_Res_Code.no_permission;
             res.message = "用户禁止下单";
+            return res;
+        }
+        Vip? vip = service_user.GetVip(users.vip);
+        if (vip == null)
+        {
+            res.code = E_Res_Code.field_error;
+            res.message = "未找到该用户的vip等级信息";
             return res;
         }
         decimal coin_base = 0;
@@ -190,6 +197,8 @@ public class ServiceOrder
             order.deal_amount = 0;
             order.deal_total = 0;
             order.unsold = 0;
+            order.fee_maker = vip.fee_maker;
+            order.fee_taker = vip.fee_taker;
             if (order.type == E_OrderType.limit)
             {
                 order.price = item.price;
@@ -235,7 +244,7 @@ public class ServiceOrder
         }
         if (coin_base > 0 && coin_quote > 0)
         {
-            if (!wallet_service.FreezeChange(wallet_type, uid, info.coin_id_base, coin_base, info.coin_id_quote, coin_quote))
+            if (!service_wallet.FreezeChange(wallet_type, uid, info.coin_id_base, coin_base, info.coin_id_quote, coin_quote))
             {
                 res.code = E_Res_Code.low_capital;
                 res.message = "基础币种或报价币种余额不足";
@@ -244,7 +253,7 @@ public class ServiceOrder
         }
         else if (coin_base > 0)
         {
-            if (!wallet_service.FreezeChange(wallet_type, uid, info.coin_id_base, coin_base))
+            if (!service_wallet.FreezeChange(wallet_type, uid, info.coin_id_base, coin_base))
             {
                 res.code = E_Res_Code.low_capital;
                 res.message = "基础币种余额不足";
@@ -253,7 +262,7 @@ public class ServiceOrder
         }
         else if (coin_quote > 0)
         {
-            if (!wallet_service.FreezeChange(wallet_type, uid, info.coin_id_quote, coin_quote))
+            if (!service_wallet.FreezeChange(wallet_type, uid, info.coin_id_quote, coin_quote))
             {
                 res.code = E_Res_Code.low_capital;
                 res.message = "报价币种余额不足";
@@ -404,6 +413,9 @@ public class ServiceOrder
                 deal_amount = item.deal_amount,
                 deal_total = item.deal_total,
                 unsold = item.unsold,
+                complete_thaw = item.complete_thaw,
+                fee_maker = item.fee_maker,
+                fee_taker = item.fee_taker,
                 trigger_hanging_price = item.trigger_hanging_price,
                 trigger_cancel_price = item.trigger_cancel_price,
                 create_time = item.create_time,
@@ -433,6 +445,9 @@ public class ServiceOrder
                 deal_amount = item.deal_amount,
                 deal_total = item.deal_total,
                 unsold = item.unsold,
+                complete_thaw = item.complete_thaw,
+                fee_maker = item.fee_maker,
+                fee_taker = item.fee_taker,
                 trigger_hanging_price = item.trigger_hanging_price,
                 trigger_cancel_price = item.trigger_cancel_price,
                 create_time = item.create_time,

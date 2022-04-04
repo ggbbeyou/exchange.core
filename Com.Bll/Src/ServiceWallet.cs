@@ -64,21 +64,21 @@ public class ServiceWallet
                 {
                     try
                     {
-                        Wallet? wallet_base = db.Wallet.Where(P => P.wallet_type == wallet_type && P.user_id == uid && P.coin_id == coin_id).SingleOrDefault();
-                        if (wallet_base == null)
+                        Wallet? wallet = db.Wallet.Where(P => P.wallet_type == wallet_type && P.user_id == uid && P.coin_id == coin_id).SingleOrDefault();
+                        if (wallet == null)
                         {
                             return false;
                         }
                         if (amount > 0)
                         {
-                            if (wallet_base.available < amount)
+                            if (wallet.available < amount)
                             {
                                 return false;
                             }
                         }
                         else if (amount < 0)
                         {
-                            if (wallet_base.freeze < Math.Abs(amount))
+                            if (wallet.freeze < Math.Abs(amount))
                             {
                                 return false;
                             }
@@ -87,14 +87,16 @@ public class ServiceWallet
                         {
                             return false;
                         }
-                        wallet_base.freeze += amount;
-                        wallet_base.available -= amount;
-                        return db.SaveChanges() > 0;
+                        wallet.freeze += amount;
+                        wallet.available -= amount;
+                        db.SaveChanges();
+                        transaction.Commit();
+                        return true;
                     }
                     catch (Exception ex)
                     {
                         transaction.Rollback();
-                        FactoryService.instance.constant.logger.LogError(ex, "资产冻结变更" + ex.Message);
+                        FactoryService.instance.constant.logger.LogError(ex, "FreezeChange:" + ex.Message);
                         return false;
                     }
                 }
@@ -171,12 +173,14 @@ public class ServiceWallet
                         wallet_base.available -= amount_base;
                         wallet_quote.freeze += amount_quote;
                         wallet_quote.available -= amount_quote;
-                        return db.SaveChanges() > 0;
+                        db.SaveChanges();
+                        transaction.Commit();
+                        return true;
                     }
                     catch (Exception ex)
                     {
                         transaction.Rollback();
-                        FactoryService.instance.constant.logger.LogError(ex, "资产冻结变更" + ex.Message);
+                        FactoryService.instance.constant.logger.LogError(ex, "FreezeChange:" + ex.Message);
                         return false;
                     }
                 }
@@ -232,7 +236,7 @@ public class ServiceWallet
                     catch (Exception ex)
                     {
                         transaction.Rollback();
-                        FactoryService.instance.constant.logger.LogError(ex, ex.Message);
+                        FactoryService.instance.constant.logger.LogError(ex, "TansferAvailable" + ex.Message);
                         return false;
                     }
                 }
@@ -376,7 +380,7 @@ public class ServiceWallet
                     {
                         runnings.Clear();
                         transaction.Rollback();
-                        FactoryService.instance.constant.logger.LogError(ex, market.symbol + ":" + ex.Message);
+                        FactoryService.instance.constant.logger.LogError(ex, market.symbol + ":Transaction," + ex.Message);
                         return (false, runnings);
                     }
                 }

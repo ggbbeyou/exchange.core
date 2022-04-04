@@ -1,9 +1,43 @@
-﻿using System.Diagnostics;
+﻿
+/*
+
+http://www.easyswoole.com/wstool.html
+ws://localhost:5210/WebSocket/WebSocket
+
+{"op":"subscribe","args":[
+{"channel":"tickers","data":"btc/usdt"},
+{"channel":"trades","data":"btc/usdt"},
+{"channel":"books10","data":"btc/usdt"},
+{"channel":"books50","data":"btc/usdt"},
+{"channel":"books200","data":"btc/usdt"},
+{"channel":"books10_inc","data":"btc/usdt"},
+{"channel":"books50_inc","data":"btc/usdt"},
+{"channel":"books200_inc","data":"btc/usdt"},
+{"channel":"min1","data":"btc/usdt"},
+{"channel":"min5","data":"btc/usdt"},
+{"channel":"min15","data":"btc/usdt"},
+{"channel":"min30","data":"btc/usdt"},
+{"channel":"hour1","data":"btc/usdt"},
+{"channel":"hour6","data":"btc/usdt"},
+{"channel":"trades","data":"btc/usdt"},
+{"channel":"hour12","data":"btc/usdt"},
+{"channel":"day1","data":"btc/usdt"},
+{"channel":"week1","data":"btc/usdt"},
+{"channel":"month1","data":"btc/usdt"}
+]}
+
+
+{"op":"login","args":[{"channel":"","data":"密文"}]}
+{"op":"Logout","args":[{"channel":"","data":""}]}
+
+*/
+
+
+using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Com.Bll;
 using Com.Db;
 using Com.Api.Sdk.Enum;
-
 using System.Net.WebSockets;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
@@ -100,17 +134,8 @@ public class WebSocketController : ControllerBase
         return new EmptyResult();
     }
 
-
-
-
     /// <summary>
     /// 订阅消息
-    /// {"op":"login","args":[{"channel":"","data":"密文"}]}
-    /// {"op":"Logout","args":[{"channel":"","data":""}]}
-    /// {"op":"subscribe","args":[{"channel":"tickers","data":"btc/usdt"},{"channel":"tickers","data":"eth/usdt"}]}
-    /// {"op":"unsubscribe","args":[{"channel":"tickers","data":"btc/usdt"},{"channel":"tickers","data":"eth/usdt"}]}
-    /// {"op":"subscribe","args":[{"channel":"books10","data":"btc/usdt"},{"channel":"books10","data":"eth/usdt"}]}
-    /// {"op":"subscribe","args":[{"channel":"books200","data":"btc/usdt"},{"channel":"books200","data":"eth/usdt"}]}
     /// </summary>
     /// <param name="webSocket"></param>
     /// <param name="str"></param>
@@ -278,9 +303,6 @@ public class WebSocketController : ControllerBase
                 }
             }
         }
-
     }
-
-
 
 }

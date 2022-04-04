@@ -51,44 +51,57 @@ public class ServiceWallet
     /// </summary>
     /// <param name="wallet_type">钱包类型</param>
     /// <param name="uid">用户</param>
-    /// <param name="coin_base">币种</param>
-    /// <param name="amount_base">正数:增加冻结,负数:减少冻结</param>
+    /// <param name="coin_id">币种</param>
+    /// <param name="amount">正数:增加冻结,负数:减少冻结</param>
     /// <returns></returns>
-    public bool FreezeChange(E_WalletType wallet_type, long uid, long coin_base, decimal amount_base)
+    public bool FreezeChange(E_WalletType wallet_type, long uid, long coin_id, decimal amount)
     {
         using (var scope = FactoryService.instance.constant.provider.CreateScope())
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
-                Wallet? wallet_base = db.Wallet.Where(P => P.wallet_type == wallet_type && P.user_id == uid && P.coin_id == coin_base).SingleOrDefault();
-                if (wallet_base == null)
+                using (var transaction = db.Database.BeginTransaction())
                 {
-                    return false;
-                }
-                if (amount_base > 0)
-                {
-                    if (wallet_base.available < amount_base)
+                    try
                     {
+                        Wallet? wallet_base = db.Wallet.Where(P => P.wallet_type == wallet_type && P.user_id == uid && P.coin_id == coin_id).SingleOrDefault();
+                        if (wallet_base == null)
+                        {
+                            return false;
+                        }
+                        if (amount > 0)
+                        {
+                            if (wallet_base.available < amount)
+                            {
+                                return false;
+                            }
+                        }
+                        else if (amount < 0)
+                        {
+                            if (wallet_base.freeze < Math.Abs(amount))
+                            {
+                                return false;
+                            }
+                        }
+                        else if (amount == 0)
+                        {
+                            return false;
+                        }
+                        wallet_base.freeze += amount;
+                        wallet_base.available -= amount;
+                        return db.SaveChanges() > 0;
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        FactoryService.instance.constant.logger.LogError(ex, "资产冻结变更" + ex.Message);
                         return false;
                     }
                 }
-                else if (amount_base < 0)
-                {
-                    if (wallet_base.freeze < Math.Abs(amount_base))
-                    {
-                        return false;
-                    }
-                }
-                else if (amount_base == 0)
-                {
-                    return false;
-                }
-                wallet_base.freeze += amount_base;
-                wallet_base.available -= amount_base;
-                return db.SaveChanges() > 0;
             }
         }
     }
+
 
     /// <summary>
     /// 资产冻结变更
@@ -104,57 +117,69 @@ public class ServiceWallet
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
-                Wallet? wallet_base = db.Wallet.Where(P => P.wallet_type == wallet_type && P.user_id == uid && P.coin_id == coin_base).SingleOrDefault();
-                if (wallet_base == null)
+                using (var transaction = db.Database.BeginTransaction())
                 {
-                    return false;
-                }
-                if (amount_base > 0)
-                {
-                    if (wallet_base.available < amount_base)
+                    try
                     {
+                        Wallet? wallet_base = db.Wallet.Where(P => P.wallet_type == wallet_type && P.user_id == uid && P.coin_id == coin_base).SingleOrDefault();
+                        if (wallet_base == null)
+                        {
+                            return false;
+                        }
+                        if (amount_base > 0)
+                        {
+                            if (wallet_base.available < amount_base)
+                            {
+                                return false;
+                            }
+                        }
+                        else if (amount_base < 0)
+                        {
+                            if (wallet_base.freeze < Math.Abs(amount_base))
+                            {
+                                return false;
+                            }
+                        }
+                        else if (amount_base == 0)
+                        {
+                            return false;
+                        }
+                        Wallet? wallet_quote = db.Wallet.Where(P => P.wallet_type == wallet_type && P.user_id == uid && P.coin_id == coin_quote).SingleOrDefault();
+                        if (wallet_quote == null)
+                        {
+                            return false;
+                        }
+                        if (amount_quote > 0)
+                        {
+                            if (wallet_quote.available < amount_quote)
+                            {
+                                return false;
+                            }
+                        }
+                        else if (amount_quote < 0)
+                        {
+                            if (wallet_quote.freeze < Math.Abs(amount_quote))
+                            {
+                                return false;
+                            }
+                        }
+                        else if (amount_base == 0)
+                        {
+                            return false;
+                        }
+                        wallet_base.freeze += amount_base;
+                        wallet_base.available -= amount_base;
+                        wallet_quote.freeze += amount_quote;
+                        wallet_quote.available -= amount_quote;
+                        return db.SaveChanges() > 0;
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        FactoryService.instance.constant.logger.LogError(ex, "资产冻结变更" + ex.Message);
                         return false;
                     }
                 }
-                else if (amount_base < 0)
-                {
-                    if (wallet_base.freeze < Math.Abs(amount_base))
-                    {
-                        return false;
-                    }
-                }
-                else if (amount_base == 0)
-                {
-                    return false;
-                }
-                Wallet? wallet_quote = db.Wallet.Where(P => P.wallet_type == wallet_type && P.user_id == uid && P.coin_id == coin_quote).SingleOrDefault();
-                if (wallet_quote == null)
-                {
-                    return false;
-                }
-                if (amount_quote > 0)
-                {
-                    if (wallet_quote.available < amount_quote)
-                    {
-                        return false;
-                    }
-                }
-                else if (amount_quote < 0)
-                {
-                    if (wallet_quote.freeze < Math.Abs(amount_quote))
-                    {
-                        return false;
-                    }
-                }
-                else if (amount_base == 0)
-                {
-                    return false;
-                }
-                wallet_base.freeze += amount_base;
-                wallet_base.available -= amount_base;
-                wallet_quote.freeze += amount_quote;
-                wallet_quote.available -= amount_quote;
-                return db.SaveChanges() > 0;
             }
         }
     }

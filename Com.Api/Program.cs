@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using NLog.Web;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
@@ -85,6 +86,7 @@ builder.Host.ConfigureLogging((context, logging) =>
     logging.AddConsole();
 #endif
 });
+builder.Host.UseNLog();
 var app = builder.Build();
 if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
 {

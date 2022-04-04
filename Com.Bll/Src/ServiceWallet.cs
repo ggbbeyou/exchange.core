@@ -327,7 +327,7 @@ public class ServiceWallet
                                 {
                                     buy_quote.freeze -= item.unsold;
                                     buy_quote.available += item.unsold;
-                                    item.remarks = $"取消冻结资金:{item.unsold}";
+                                    item.remarks = $"订单完全成交,解冻多余的冻结资金:{item.unsold}";
                                     item.unsold = 0;
                                 }
                             }
@@ -338,7 +338,7 @@ public class ServiceWallet
                                 {
                                     sell_base.freeze -= item.unsold;
                                     sell_base.available += item.unsold;
-                                    item.remarks = $"取消冻结资金:{item.unsold}";
+                                    item.remarks = $"订单完全成交,解冻多余的冻结资金:{item.unsold}";
                                     item.unsold = 0;
                                 }
                             }

@@ -30,6 +30,7 @@ using LinqKit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics;
 
 namespace Com.Bll;
 
@@ -258,6 +259,10 @@ public class ServiceWallet
         {
             return (false, runnings);
         }
+        decimal temp_base = 0;
+        decimal temp_quote = 0;
+        decimal fee_base = 0;
+        decimal fee_quote = 0;
         using (var scope = FactoryService.instance.constant.provider.CreateScope())
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
@@ -278,13 +283,17 @@ public class ServiceWallet
                         List<Wallet> wallets_settlement = db.Wallet.Where(P => P.wallet_type == E_WalletType.main && P.user_id == market.settlement_uid && (P.coin_id == market.coin_id_base || P.coin_id == market.coin_id_quote)).ToList();
                         Wallet? settlement_base = wallets_settlement.Where(P => P.coin_id == market.coin_id_base).FirstOrDefault();
                         Wallet? settlement_quote = wallets_settlement.Where(P => P.coin_id == market.coin_id_quote).FirstOrDefault();
-                        foreach (var item in deals)
+                        if (settlement_base == null || settlement_quote == null)
                         {
-                            if (settlement_base == null || settlement_quote == null)
-                            {
-                                FactoryService.instance.constant.logger.LogError($"{market.symbol}:交易对没有找到结算账户");
-                                return (false, runnings);
-                            }
+                            FactoryService.instance.constant.logger.LogError($"{market.symbol}:交易对没有找到结算账户");
+                            return (false, runnings);
+                        }
+                        foreach (Deal item in deals)
+                        {
+                            temp_base = 0;
+                            temp_quote = 0;
+                            fee_base = 0;
+                            fee_quote = 0;
                             Wallet? buy_base = wallets.Where(P => P.coin_id == market.coin_id_base && P.user_id == item.bid_uid).FirstOrDefault();
                             Wallet? buy_quote = wallets.Where(P => P.coin_id == market.coin_id_quote && P.user_id == item.bid_uid).FirstOrDefault();
                             Wallet? sell_base = wallets.Where(P => P.coin_id == market.coin_id_base && P.user_id == item.ask_uid).FirstOrDefault();
@@ -296,10 +305,6 @@ public class ServiceWallet
                             }
                             sell_base.freeze -= item.amount;
                             buy_quote.freeze -= item.total;
-                            decimal temp_base = 0;
-                            decimal temp_quote = 0;
-                            decimal fee_base = 0;
-                            decimal fee_quote = 0;
                             if (item.trigger_side == E_OrderSide.buy)
                             {
                                 // 买单为吃单,卖单为挂单
@@ -318,18 +323,21 @@ public class ServiceWallet
                             }
                             buy_base.available += temp_base;
                             sell_quote.available += temp_quote;
-                            buy_base.total = buy_base.available + buy_base.freeze;
-                            buy_quote.total = buy_quote.available + buy_quote.freeze;
-                            sell_base.total = sell_base.available + sell_base.freeze;
-                            sell_quote.total = sell_quote.available + sell_quote.freeze;
-                            runnings.Add(AddRunning(item.trade_id, wallet_type, wallet_type, temp_base, sell_base, buy_base, $"交易:{sell_base.user_name}=>{buy_base.user_name},{(double)temp_base}{sell_base.coin_name}"));
-                            runnings.Add(AddRunning(item.trade_id, wallet_type, wallet_type, temp_quote, buy_quote, sell_quote, $"交易:{buy_quote.user_name}=>{sell_quote.user_name},{(double)temp_quote}{buy_quote.coin_name}"));
                             settlement_base.available += fee_base;
                             settlement_quote.available += fee_quote;
-                            settlement_base.total = settlement_base.available + settlement_base.freeze;
-                            settlement_quote.total = settlement_quote.available + settlement_quote.freeze;
+                            runnings.Add(AddRunning(item.trade_id, wallet_type, wallet_type, temp_base, sell_base, buy_base, $"交易:{sell_base.user_name}=>{buy_base.user_name},{(double)temp_base}{sell_base.coin_name}"));
+                            runnings.Add(AddRunning(item.trade_id, wallet_type, wallet_type, temp_quote, buy_quote, sell_quote, $"交易:{buy_quote.user_name}=>{sell_quote.user_name},{(double)temp_quote}{buy_quote.coin_name}"));
                             runnings.Add(AddRunning(item.trade_id, wallet_type, E_WalletType.main, fee_base, buy_base, settlement_base, $"手续费:{buy_base.user_name}=>结算账户:{settlement_base.user_name},{(double)fee_base}{buy_base.coin_name}"));
                             runnings.Add(AddRunning(item.trade_id, wallet_type, E_WalletType.main, fee_quote, sell_quote, settlement_quote, $"手续费:{sell_quote.user_name}=>结算账户:{settlement_quote.user_name},{(double)fee_quote}{sell_quote.coin_name}"));
+                        }
+                        foreach (var item in wallets)
+                        {
+                            //如果放在上面foreach里面,会非常非常耗时,特别奇怪.怪事
+                            item.total = item.available + item.freeze;
+                        }
+                        foreach (var item in wallets_settlement)
+                        {
+                            item.total = item.available + item.freeze;
                         }
                         List<Orders> order = orders.Where(P => P.state == E_OrderState.completed && P.unsold > 0).Distinct().ToList();
                         foreach (Orders item in order)

@@ -47,16 +47,19 @@ public class ServiceDepth
             {
                 depths[E_WebsockerChannel.books10].bid.Add(new List<decimal>() { orderbook.bid[i].price, orderbook.bid[i].amount });
                 depths[E_WebsockerChannel.books10].total_bid = total_bid;
+                depths[E_WebsockerChannel.books10].timestamp = orderbook.bid[i].last_time;
             }
             if (i < 50)
             {
                 depths[E_WebsockerChannel.books50].bid.Add(new List<decimal>() { orderbook.bid[i].price, orderbook.bid[i].amount });
                 depths[E_WebsockerChannel.books50].total_bid = total_bid;
+                depths[E_WebsockerChannel.books50].timestamp = orderbook.bid[i].last_time;
             }
             if (i < 200)
             {
                 depths[E_WebsockerChannel.books200].bid.Add(new List<decimal>() { orderbook.bid[i].price, orderbook.bid[i].amount });
                 depths[E_WebsockerChannel.books200].total_bid = total_bid;
+                depths[E_WebsockerChannel.books200].timestamp = orderbook.bid[i].last_time;
             }
         }
         decimal total_ask = 0;
@@ -67,16 +70,19 @@ public class ServiceDepth
             {
                 depths[E_WebsockerChannel.books10].ask.Add(new List<decimal>() { orderbook.ask[i].price, orderbook.ask[i].amount });
                 depths[E_WebsockerChannel.books10].total_ask = total_ask;
+                depths[E_WebsockerChannel.books10].timestamp = orderbook.ask[i].last_time;
             }
             if (i < 50)
             {
                 depths[E_WebsockerChannel.books50].ask.Add(new List<decimal>() { orderbook.ask[i].price, orderbook.ask[i].amount });
                 depths[E_WebsockerChannel.books50].total_ask = total_ask;
+                depths[E_WebsockerChannel.books50].timestamp = orderbook.ask[i].last_time;
             }
             if (i < 200)
             {
                 depths[E_WebsockerChannel.books200].ask.Add(new List<decimal>() { orderbook.ask[i].price, orderbook.ask[i].amount });
                 depths[E_WebsockerChannel.books200].total_ask = total_ask;
+                depths[E_WebsockerChannel.books200].timestamp = orderbook.ask[i].last_time;
             }
         }
         return depths;
@@ -99,14 +105,17 @@ public class ServiceDepth
             if (item.index <= 10)
             {
                 depths[E_WebsockerChannel.books10_inc].bid.Add(new List<decimal>() { item.orderbook.price, item.orderbook.amount });
+                depths[E_WebsockerChannel.books10_inc].timestamp = item.orderbook.last_time;
             }
             if (item.index <= 50)
             {
                 depths[E_WebsockerChannel.books50_inc].bid.Add(new List<decimal>() { item.orderbook.price, item.orderbook.amount });
+                depths[E_WebsockerChannel.books50_inc].timestamp = item.orderbook.last_time;
             }
             if (item.index <= 200)
             {
                 depths[E_WebsockerChannel.books200_inc].bid.Add(new List<decimal>() { item.orderbook.price, item.orderbook.amount });
+                depths[E_WebsockerChannel.books200_inc].timestamp = item.orderbook.last_time;
             }
         }
         foreach (var item in orderbook.ask)
@@ -114,14 +123,17 @@ public class ServiceDepth
             if (item.index <= 10)
             {
                 depths[E_WebsockerChannel.books10_inc].ask.Add(new List<decimal>() { item.orderbook.price, item.orderbook.amount });
+                depths[E_WebsockerChannel.books10_inc].timestamp = item.orderbook.last_time;
             }
             if (item.index <= 50)
             {
                 depths[E_WebsockerChannel.books50_inc].ask.Add(new List<decimal>() { item.orderbook.price, item.orderbook.amount });
+                depths[E_WebsockerChannel.books50_inc].timestamp = item.orderbook.last_time;
             }
             if (item.index <= 200)
             {
                 depths[E_WebsockerChannel.books200_inc].ask.Add(new List<decimal>() { item.orderbook.price, item.orderbook.amount });
+                depths[E_WebsockerChannel.books200_inc].timestamp = item.orderbook.last_time;
             }
         }
         return depths;

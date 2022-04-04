@@ -208,7 +208,8 @@ public class DbContextEF : DbContext
             o.Property(P => P.deal_price).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("已成交均价");
             o.Property(P => P.deal_amount).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("已成交量");
             o.Property(P => P.deal_total).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("已成交额");
-            o.Property(P => P.unsold).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("未成交量");
+            o.Property(P => P.unsold).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("未成交额");
+            o.Property(P => P.complete_thaw).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("订单完成解冻金额");
             o.Property(P => P.trigger_hanging_price).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("触发挂单价格");
             o.Property(P => P.trigger_cancel_price).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("触发撤单价格");
             o.Property(P => P.create_time).IsRequired().HasColumnType("datetimeoffset").HasComment("挂单时间");
@@ -239,6 +240,7 @@ public class DbContextEF : DbContext
             o.Property(P => P.deal_amount).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("已成交量");
             o.Property(P => P.deal_total).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("已成交额");
             o.Property(P => P.unsold).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("未成交量");
+            o.Property(P => P.complete_thaw).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("订单完成解冻金额");
             o.Property(P => P.trigger_hanging_price).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("触发挂单价格");
             o.Property(P => P.trigger_cancel_price).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("触发撤单价格");
             o.Property(P => P.create_time).IsRequired().HasColumnType("datetimeoffset").HasComment("挂单时间");

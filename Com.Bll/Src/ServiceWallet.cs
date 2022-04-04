@@ -327,8 +327,8 @@ public class ServiceWallet
                                 {
                                     buy_quote.freeze -= item.unsold;
                                     buy_quote.available += item.unsold;
-                                    item.remarks = $"订单完全成交,解冻多余的冻结资金:{item.unsold}";
-                                    item.unsold = 0;
+                                    item.complete_thaw = item.unsold;
+                                    item.unsold -= item.unsold;
                                 }
                             }
                             else if (item.side == E_OrderSide.sell)
@@ -338,8 +338,8 @@ public class ServiceWallet
                                 {
                                     sell_base.freeze -= item.unsold;
                                     sell_base.available += item.unsold;
-                                    item.remarks = $"订单完全成交,解冻多余的冻结资金:{item.unsold}";
-                                    item.unsold = 0;
+                                    item.complete_thaw = item.unsold;
+                                    item.unsold -= item.unsold;
                                 }
                             }
                         }

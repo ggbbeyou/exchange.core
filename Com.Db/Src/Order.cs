@@ -55,6 +55,12 @@ public class Orders : ResOrder
     [JsonConverter(typeof(JsonConverterDecimal))]
     public decimal unsold { get; set; }
     /// <summary>
+    /// 订单完成解冻金额
+    /// </summary>
+    /// <value></value>
+    [JsonConverter(typeof(JsonConverterDecimal))]
+    public decimal complete_thaw { get; set; }
+    /// <summary>
     /// 订单状态
     /// </summary>
     /// <value></value>
@@ -71,5 +77,5 @@ public class Orders : ResOrder
     /// </summary>
     /// <value></value>    
     public string? remarks { get; set; }
-    
+
 }

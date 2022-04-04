@@ -277,6 +277,7 @@ public class DbContextEF : DbContext
             o.Property(P => P.user_id).IsRequired().ValueGeneratedNever().HasColumnType("bigint").HasComment("用户id");
             o.Property(P => P.user_name).IsRequired().HasColumnType("nvarchar").HasMaxLength(50).HasComment("用户名");
             o.Property(P => P.password).HasColumnType("nvarchar").HasMaxLength(500).HasComment("用户密码");
+            o.Property(P => P.user_type).IsRequired().HasColumnType("tinyint").HasComment("用户类型");
             o.Property(P => P.disabled).IsRequired().HasColumnType("bit").HasComment("禁用");
             o.Property(P => P.transaction).IsRequired().HasColumnType("bit").HasComment("是否交易");
             o.Property(P => P.withdrawal).IsRequired().HasColumnType("bit").HasComment("是否提现");

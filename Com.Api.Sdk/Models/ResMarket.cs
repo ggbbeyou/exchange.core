@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using Com.Api.Sdk;
 using Com.Api.Sdk.Enum;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Com.Db;
 
@@ -35,6 +36,8 @@ public class ResMarket
     /// 市场类型
     /// </summary>
     /// <value></value>
+    [JsonConverter(typeof(StringEnumConverter))]
+    [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
     public E_MarketType market_type { get; set; }
     /// <summary>
     /// 是否交易(true:可以交易,false:禁止交易)

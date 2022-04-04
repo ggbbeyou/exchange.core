@@ -509,6 +509,10 @@ public class MatchCore
             ask_amount_unsold = ask.unsold,
             bid_total_done = bid.deal_total,
             ask_amount_done = ask.deal_amount,
+            fee_bid_maker=bid.fee_maker,
+            fee_ask_maker=ask.fee_maker,
+            fee_bid_taker=bid.fee_taker,
+            fee_ask_taker=ask.fee_taker,
             time = now,
         };
         deals.Add(deal);

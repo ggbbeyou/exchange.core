@@ -262,42 +262,27 @@ public class ServiceWallet
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
+                E_WalletType wallet_type = E_WalletType.main;
+                if (market.market_type == E_MarketType.spot)
+                {
+                    wallet_type = E_WalletType.spot;
+                }
+                List<long> user_id = deals.Select(T => T.bid_uid).ToList();
+                user_id.AddRange(deals.Select(T => T.ask_uid).ToList());
+                user_id = user_id.Distinct().ToList();
                 using (var transaction = db.Database.BeginTransaction())
                 {
                     try
                     {
-                        E_WalletType wallet_type = E_WalletType.main;
-                        if (market.market_type == E_MarketType.spot)
-                        {
-                            wallet_type = E_WalletType.spot;
-                        }
-                        List<long> user_id = deals.Select(T => T.bid_uid).ToList();
-                        user_id.AddRange(deals.Select(T => T.ask_uid).ToList());
-                        user_id = user_id.Distinct().ToList();                        
-                        List<Users> users = db.Users.AsNoTracking().Where(P => user_id.Contains(P.user_id)).ToList();
-                        List<Vip> vips = db.Vip.AsNoTracking().Where(P => users.Select(P => P.vip).Distinct().Contains(P.id)).ToList();
                         List<Wallet> wallets = db.Wallet.Where(P => P.wallet_type == wallet_type && user_id.Contains(P.user_id) && (P.coin_id == market.coin_id_base || P.coin_id == market.coin_id_quote)).ToList();
-                        Wallet? settlement_base = db.Wallet.Where(P => P.wallet_type == E_WalletType.main && P.user_id == market.settlement_uid && P.coin_id == market.coin_id_base).FirstOrDefault();
-                        Wallet? settlement_quote = db.Wallet.Where(P => P.wallet_type == E_WalletType.main && P.user_id == market.settlement_uid && P.coin_id == market.coin_id_quote).FirstOrDefault();
+                        List<Wallet> wallets_settlement = wallets.Where(P => P.wallet_type == E_WalletType.main && P.user_id == market.settlement_uid && (P.coin_id == market.coin_id_base || P.coin_id == market.coin_id_quote)).ToList();
+                        Wallet? settlement_base = wallets_settlement.Where(P => P.coin_id == market.coin_id_base).FirstOrDefault();
+                        Wallet? settlement_quote = wallets_settlement.Where(P => P.coin_id == market.coin_id_quote).FirstOrDefault();
                         foreach (var item in deals)
                         {
                             if (settlement_base == null || settlement_quote == null)
                             {
                                 FactoryService.instance.constant.logger.LogError($"{market.symbol}:交易对没有找到结算账户");
-                                return (false, runnings);
-                            }
-                            Users? user_buy = users.FirstOrDefault(P => P.user_id == item.bid_uid);
-                            Users? user_sell = users.FirstOrDefault(P => P.user_id == item.ask_uid);
-                            if (user_buy == null || user_sell == null)
-                            {
-                                FactoryService.instance.constant.logger.LogError($"{market.symbol}:未找到交易账户");
-                                return (false, runnings);
-                            }
-                            Vip? vip_buy = vips.FirstOrDefault(P => P.id == user_buy.vip);
-                            Vip? vip_sell = vips.FirstOrDefault(P => P.id == user_sell.vip);
-                            if (vip_buy == null || vip_sell == null)
-                            {
-                                FactoryService.instance.constant.logger.LogError($"{market.symbol}:用户:{user_buy.user_name}/{user_sell.user_name},未找到交易账户vip等级");
                                 return (false, runnings);
                             }
                             Wallet? buy_base = wallets.Where(P => P.coin_id == market.coin_id_base && P.user_id == item.bid_uid).FirstOrDefault();
@@ -306,7 +291,7 @@ public class ServiceWallet
                             Wallet? sell_quote = wallets.Where(P => P.coin_id == market.coin_id_quote && P.user_id == item.ask_uid).FirstOrDefault();
                             if (buy_base == null || buy_quote == null || sell_base == null || sell_quote == null)
                             {
-                                FactoryService.instance.constant.logger.LogError($"{market.symbol}:用户:{user_buy.user_name}/{user_sell.user_name},未找到交易账户钱包");
+                                FactoryService.instance.constant.logger.LogError($"{market.symbol}:用户:{item.bid_uid}/{item.ask_uid},未找到交易账户钱包");
                                 return (false, runnings);
                             }
                             sell_base.freeze -= item.amount;
@@ -318,16 +303,16 @@ public class ServiceWallet
                             if (item.trigger_side == E_OrderSide.buy)
                             {
                                 // 买单为吃单,卖单为挂单
-                                fee_base = vip_buy.fee_taker * item.amount;
-                                fee_quote = vip_sell.fee_maker * item.total;
+                                fee_base = item.fee_bid_taker * item.amount;
+                                fee_quote = item.fee_ask_maker * item.total;
                                 temp_base = (item.amount - fee_base);
                                 temp_quote = (item.total - fee_quote);
                             }
                             else if (item.trigger_side == E_OrderSide.sell)
                             {
                                 // 卖单为吃单,买单为挂单
-                                fee_quote = vip_sell.fee_taker * item.total;
-                                fee_base = vip_buy.fee_maker * item.amount;
+                                fee_quote = item.fee_ask_taker * item.total;
+                                fee_base = item.fee_bid_maker * item.amount;
                                 temp_base = (item.amount - fee_base);
                                 temp_quote = (item.total - fee_quote);
                             }

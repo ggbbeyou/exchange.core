@@ -308,14 +308,14 @@ public class ServiceWallet
                             buy_quote.total = buy_quote.available + buy_quote.freeze;
                             sell_base.total = sell_base.available + sell_base.freeze;
                             sell_quote.total = sell_quote.available + sell_quote.freeze;
-                            runnings.Add(AddRunning(item.trade_id, wallet_type, wallet_type, temp_base, sell_base, buy_base, $"交易:{sell_base.user_name}=>{buy_base.user_name},{temp_base}{sell_base.coin_name}"));
-                            runnings.Add(AddRunning(item.trade_id, wallet_type, wallet_type, temp_quote, buy_quote, sell_quote, $"交易:{buy_quote.user_name}=>{sell_quote.user_name},{temp_quote}{buy_quote.coin_name}"));
+                            runnings.Add(AddRunning(item.trade_id, wallet_type, wallet_type, temp_base, sell_base, buy_base, $"交易:{sell_base.user_name}=>{buy_base.user_name},{(double)temp_base}{sell_base.coin_name}"));
+                            runnings.Add(AddRunning(item.trade_id, wallet_type, wallet_type, temp_quote, buy_quote, sell_quote, $"交易:{buy_quote.user_name}=>{sell_quote.user_name},{(double)temp_quote}{buy_quote.coin_name}"));
                             settlement_base.available += fee_base;
                             settlement_quote.available += fee_quote;
                             settlement_base.total = settlement_base.available + settlement_base.freeze;
                             settlement_quote.total = settlement_quote.available + settlement_quote.freeze;
-                            runnings.Add(AddRunning(item.trade_id, wallet_type, E_WalletType.main, fee_base, buy_base, settlement_base, $"手续费:{buy_base.user_name}=>结算账户:{settlement_base.user_name},{fee_base}{buy_base.coin_name}"));
-                            runnings.Add(AddRunning(item.trade_id, wallet_type, E_WalletType.main, fee_quote, sell_quote, settlement_quote, $"手续费:{sell_quote.user_name}=>结算账户:{settlement_quote.user_name},{fee_quote}{sell_quote.coin_name}"));
+                            runnings.Add(AddRunning(item.trade_id, wallet_type, E_WalletType.main, fee_base, buy_base, settlement_base, $"手续费:{buy_base.user_name}=>结算账户:{settlement_base.user_name},{(double)fee_base}{buy_base.coin_name}"));
+                            runnings.Add(AddRunning(item.trade_id, wallet_type, E_WalletType.main, fee_quote, sell_quote, settlement_quote, $"手续费:{sell_quote.user_name}=>结算账户:{settlement_quote.user_name},{(double)fee_quote}{sell_quote.coin_name}"));
                         }
                         List<Orders> order = orders.Where(P => P.state == E_OrderState.completed && P.unsold > 0).Distinct().ToList();
                         foreach (Orders item in order)
@@ -386,7 +386,7 @@ public class ServiceWallet
             user_name_from = wallet_from.user_name,
             user_name_to = wallet_to.user_name,
             amount = amount,
-            operation_uid = 0,
+            operation_uid = wallet_from.user_id,
             time = DateTimeOffset.UtcNow,
             remarks = remarks,
         };

@@ -275,7 +275,7 @@ public class ServiceWallet
                     try
                     {
                         List<Wallet> wallets = db.Wallet.Where(P => P.wallet_type == wallet_type && user_id.Contains(P.user_id) && (P.coin_id == market.coin_id_base || P.coin_id == market.coin_id_quote)).ToList();
-                        List<Wallet> wallets_settlement = wallets.Where(P => P.wallet_type == E_WalletType.main && P.user_id == market.settlement_uid && (P.coin_id == market.coin_id_base || P.coin_id == market.coin_id_quote)).ToList();
+                        List<Wallet> wallets_settlement = db.Wallet.Where(P => P.wallet_type == E_WalletType.main && P.user_id == market.settlement_uid && (P.coin_id == market.coin_id_base || P.coin_id == market.coin_id_quote)).ToList();
                         Wallet? settlement_base = wallets_settlement.Where(P => P.coin_id == market.coin_id_base).FirstOrDefault();
                         Wallet? settlement_quote = wallets_settlement.Where(P => P.coin_id == market.coin_id_quote).FirstOrDefault();
                         foreach (var item in deals)

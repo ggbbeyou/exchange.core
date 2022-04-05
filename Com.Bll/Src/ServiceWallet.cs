@@ -189,61 +189,6 @@ public class ServiceWallet
         }
     }
 
-    /// <summary>
-    /// 可用余额转账
-    /// </summary>
-    /// <param name="wallet_type">钱包类型</param>
-    /// <param name="coin_id">币ID</param>
-    /// <param name="from">来源:用户id</param>
-    /// <param name="to">目的:用户id</param>
-    /// <param name="amount">数量</param>
-    /// <returns></returns>
-    public bool TransferAvailable(E_WalletType wallet_type, long coin_id, long from, long to, decimal amount)
-    {
-        if (amount == 0)
-        {
-            return false;
-        }
-        using (var scope = FactoryService.instance.constant.provider.CreateScope())
-        {
-            using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
-            {
-                using (var transaction = db.Database.BeginTransaction())
-                {
-                    try
-                    {
-                        Wallet? wallet_from = db.Wallet.Where(P => P.wallet_type == wallet_type && P.coin_id == coin_id && P.user_id == from).SingleOrDefault();
-                        Wallet? wallet_to = db.Wallet.Where(P => P.wallet_type == wallet_type && P.coin_id == coin_id && P.user_id == to).SingleOrDefault();
-                        if (wallet_from == null || wallet_to == null)
-                        {
-                            return false;
-                        }
-                        if (amount > 0 && wallet_from.available < amount)
-                        {
-                            return false;
-                        }
-                        else if (amount < 0 && wallet_to.available < Math.Abs(amount))
-                        {
-                            return false;
-                        }
-                        wallet_from.available -= amount;
-                        wallet_from.total = wallet_from.available + wallet_from.freeze;
-                        wallet_to.available += amount;
-                        wallet_to.total = wallet_to.available + wallet_to.freeze;
-                        db.SaveChanges();
-                        transaction.Commit();
-                        return true;
-                    }
-                    catch (Exception ex)
-                    {
-                        transaction.Rollback();
-                        FactoryService.instance.constant.logger.LogError(ex, "TansferAvailable" + ex.Message);
-                        return false;
-                    }
-                }
-            }
-        }
-    }
 
     /// <summary>
     /// 撮合成交后资产变动(批量),手续费内扣(到手资产里面再去扣手续费)
@@ -291,10 +236,6 @@ public class ServiceWallet
                         }
                         foreach (Deal item in deals)
                         {
-                            temp_base = 0;
-                            temp_quote = 0;
-                            fee_base = 0;
-                            fee_quote = 0;
                             Wallet? buy_base = wallets.Where(P => P.coin_id == market.coin_id_base && P.user_id == item.bid_uid).FirstOrDefault();
                             Wallet? buy_quote = wallets.Where(P => P.coin_id == market.coin_id_quote && P.user_id == item.bid_uid).FirstOrDefault();
                             Wallet? sell_base = wallets.Where(P => P.coin_id == market.coin_id_base && P.user_id == item.ask_uid).FirstOrDefault();
@@ -304,6 +245,10 @@ public class ServiceWallet
                                 FactoryService.instance.constant.logger.LogError($"{market.symbol}:用户:{item.bid_uid}/{item.ask_uid},未找到交易账户钱包");
                                 return (false, runnings);
                             }
+                            temp_base = 0;
+                            temp_quote = 0;
+                            fee_base = 0;
+                            fee_quote = 0;
                             sell_base.freeze -= item.amount;
                             buy_quote.freeze -= item.total;
                             if (item.trigger_side == E_OrderSide.buy)
@@ -381,6 +326,63 @@ public class ServiceWallet
             }
         }
     }
+
+    /// <summary>
+    /// 可用余额转账
+    /// </summary>
+    /// <param name="wallet_type">钱包类型</param>
+    /// <param name="coin_id">币ID</param>
+    /// <param name="from">来源:用户id</param>
+    /// <param name="to">目的:用户id</param>
+    /// <param name="amount">数量</param>
+    /// <returns></returns>
+    public bool TransferAvailable(E_WalletType wallet_type, long coin_id, long from, long to, decimal amount)
+    {
+        if (amount == 0)
+        {
+            return false;
+        }
+        using (var scope = FactoryService.instance.constant.provider.CreateScope())
+        {
+            using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
+            {
+                using (var transaction = db.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        Wallet? wallet_from = db.Wallet.Where(P => P.wallet_type == wallet_type && P.coin_id == coin_id && P.user_id == from).SingleOrDefault();
+                        Wallet? wallet_to = db.Wallet.Where(P => P.wallet_type == wallet_type && P.coin_id == coin_id && P.user_id == to).SingleOrDefault();
+                        if (wallet_from == null || wallet_to == null)
+                        {
+                            return false;
+                        }
+                        if (amount > 0 && wallet_from.available < amount)
+                        {
+                            return false;
+                        }
+                        else if (amount < 0 && wallet_to.available < Math.Abs(amount))
+                        {
+                            return false;
+                        }
+                        wallet_from.available -= amount;
+                        wallet_from.total = wallet_from.available + wallet_from.freeze;
+                        wallet_to.available += amount;
+                        wallet_to.total = wallet_to.available + wallet_to.freeze;
+                        db.SaveChanges();
+                        transaction.Commit();
+                        return true;
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        FactoryService.instance.constant.logger.LogError(ex, "TansferAvailable" + ex.Message);
+                        return false;
+                    }
+                }
+            }
+        }
+    }
+
 
     /// <summary>
     /// 添加钱包流水

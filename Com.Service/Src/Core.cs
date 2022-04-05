@@ -127,10 +127,26 @@ public class Core
             string json = Encoding.UTF8.GetString(b);
             (long no, List<Orders> orders, List<Deal> deals, List<Orders> cancels) deals = JsonConvert.DeserializeObject<(long no, List<Orders> orders, List<Deal> deals, List<Orders> cancels)>(json);
             this.stopwatch.Restart();
-            bool result = ReceiveDealOrder(deals.no, deals.orders, deals.deals, deals.cancels);
+            RedisValue rv = FactoryService.instance.constant.redis.HashGet(FactoryService.instance.GetRedisProcess(), deals.no);
+            Processing? process = JsonConvert.DeserializeObject<Processing>(rv);
+            if (process == null || process.match == false)
+            {
+                FactoryService.instance.constant.redis.HashDelete(FactoryService.instance.GetRedisProcess(), deals.no);
+                return true;
+            }
+            process = ReceiveDealOrder(process, deals.orders, deals.deals, deals.cancels);
             this.stopwatch.Stop();
-            FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{this.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:撮合后续处理总时间(结果{result}),成交记录:{deals.deals.Count}");
-            return result;
+            FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{this.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:撮合后续处理总时间(成交记录数:{deals.deals.Count},成交订单数:{deals.orders.Count},撤单数:{deals.cancels.Count}),处理结果:{JsonConvert.SerializeObject(process)}");
+            if (process.match && process.asset && process.deal && process.order && process.order_cancel && process.push_order && process.push_order_cancel && process.sync_kline && process.push_kline && process.push_deal && process.push_ticker)
+            {
+                FactoryService.instance.constant.redis.HashDelete(FactoryService.instance.GetRedisProcess(), process.no);
+                return true;
+            }
+            else
+            {
+                FactoryService.instance.constant.redis.HashSet(FactoryService.instance.GetRedisProcess(), process.no, JsonConvert.SerializeObject(process));
+                return false;
+            }
         });
         return (queue_name, consume_tag);
     }
@@ -139,15 +155,8 @@ public class Core
     /// 接收到成交订单
     /// </summary>
     /// <param name="deals"></param>
-    private bool ReceiveDealOrder(long no, List<Orders> orders, List<Deal> deals, List<Orders> cancels)
+    private Processing ReceiveDealOrder(Processing process, List<Orders> orders, List<Deal> deals, List<Orders> cancels)
     {
-        RedisValue rv = FactoryService.instance.constant.redis.HashGet(FactoryService.instance.GetRedisProcess(), no);
-        Processing? process = JsonConvert.DeserializeObject<Processing>(rv);
-        if (process == null || process.match == false)
-        {
-            FactoryService.instance.constant.redis.HashDelete(FactoryService.instance.GetRedisProcess(), no);
-            return true;
-        }
         if (deals.Count > 0)
         {
             if (process.asset == false)
@@ -289,16 +298,8 @@ public class Core
             process.order_cancel = true;
             process.push_order_cancel = true;
         }
-        if (process.match && process.asset && process.deal && process.order && process.order_cancel && process.push_order && process.push_order_cancel && process.sync_kline && process.push_kline && process.push_deal && process.push_ticker)
-        {
-            FactoryService.instance.constant.redis.HashDelete(FactoryService.instance.GetRedisProcess(), process.no);
-            return true;
-        }
-        else
-        {
-            FactoryService.instance.constant.redis.HashSet(FactoryService.instance.GetRedisProcess(), process.no, JsonConvert.SerializeObject(process));
-            return false;
-        }
+        return process;
+
     }
 
 }

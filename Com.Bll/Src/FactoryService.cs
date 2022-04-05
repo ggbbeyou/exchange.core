@@ -97,6 +97,15 @@ public class FactoryService
     }
 
     /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    public string GetRedisProcess()
+    {
+        return string.Format("process");
+    }
+
+    /// <summary>
     /// 验证码
     /// </summary>
     /// <param name="id"></param>

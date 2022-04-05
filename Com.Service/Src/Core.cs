@@ -125,9 +125,9 @@ public class Core
         FactoryService.instance.constant.MqWorker(FactoryService.instance.GetMqOrderDeal(this.model.info.market), (b) =>
         {
             string json = Encoding.UTF8.GetString(b);
-            (List<Orders> orders, List<Deal> deals, List<Orders> cancels) deals = JsonConvert.DeserializeObject<(List<Orders> orders, List<Deal> deals, List<Orders> cancels)>(json);
+            (long no, List<Orders> orders, List<Deal> deals, List<Orders> cancels) deals = JsonConvert.DeserializeObject<(long no, List<Orders> orders, List<Deal> deals, List<Orders> cancels)>(json);
             this.stopwatch.Restart();
-            bool result = ReceiveDealOrder(deals.orders, deals.deals, deals.cancels);
+            bool result = ReceiveDealOrder(deals.no, deals.orders, deals.deals, deals.cancels);
             this.stopwatch.Stop();
             FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{this.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:撮合后续处理总时间(结果{result}),成交记录:{deals.deals.Count}");
             return result;
@@ -138,96 +138,135 @@ public class Core
     /// 接收到成交订单
     /// </summary>
     /// <param name="deals"></param>
-    private bool ReceiveDealOrder(List<Orders> orders, List<Deal> deals, List<Orders> cancels)
+    private bool ReceiveDealOrder(long no, List<Orders> orders, List<Deal> deals, List<Orders> cancels)
     {
         if (deals.Count > 0)
         {
-            FactoryService.instance.constant.stopwatch.Restart();
-            (bool result, List<Running> running) transaction = service_wallet.Transaction(this.model.info, orders, deals);
-            service_wallet.AddRunning(transaction.running);
-            FactoryService.instance.constant.stopwatch.Stop();
-            FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>成交记录{deals.Count}条,实际资产转移(结果{transaction.result})");
-            if (!transaction.result)
+            RedisValue rv = FactoryService.instance.constant.redis.HashGet(FactoryService.instance.GetRedisProcess(), no);
+            Processing? process = JsonConvert.DeserializeObject<Processing>(rv);
+            if (process == null || process.match == false)
             {
-                FactoryService.instance.constant.logger.LogError(this.model.eventId, $"DB=>成交记录{deals.Count}条,实际资产转移失败");
-                return false;
+                FactoryService.instance.constant.redis.HashDelete(FactoryService.instance.GetRedisProcess(), no);
+                return true;
             }
-            FactoryService.instance.constant.stopwatch.Restart();
-            int deal_add = service_deal.AddDeal(deals);
-            FactoryService.instance.constant.stopwatch.Stop();
-            FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>记录:{deals.Count},实际插入{deal_add}条成交记录");
-            if (orders.Count > 0 && transaction.result && deal_add > 0)
+            if (process.asset == false)
             {
                 FactoryService.instance.constant.stopwatch.Restart();
-                service_order.UpdateOrder(orders);
+                process.asset = service_wallet.Transaction(this.model.info, orders, deals);
                 FactoryService.instance.constant.stopwatch.Stop();
-                FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>更新{orders.Count}条订单记录");
+                FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>成交记录{deals.Count}条,实际资产转移(结果)");
+            }
+            if (process.deal == false)
+            {
                 FactoryService.instance.constant.stopwatch.Restart();
-                var uid_order = orders.GroupBy(P => P.uid).ToList();
-                foreach (var item in uid_order)
-                {
-                    res_order.data = item.ToList();
-                    FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.orders, this.model.info.market, item.Key), JsonConvert.SerializeObject(item.ToList()));
-                }
+                process.deal = service_deal.AddDeal(deals);
                 FactoryService.instance.constant.stopwatch.Stop();
-                FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:Mq=>推送订单更新");
+                FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>记录:{deals.Count}");
+            }
+            if (orders.Count > 0)
+            {
+                if (process.order == false)
+                {
+                    FactoryService.instance.constant.stopwatch.Restart();
+                    process.order = service_order.UpdateOrder(orders);
+                    FactoryService.instance.constant.stopwatch.Stop();
+                    FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>更新{orders.Count}条订单记录");
+                }
+                if (process.push_order == false)
+                {
+                    FactoryService.instance.constant.stopwatch.Restart();
+                    var uid_order = orders.GroupBy(P => P.uid).ToList();
+                    foreach (var item in uid_order)
+                    {
+                        res_order.data = item.ToList();
+                        FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.orders, this.model.info.market, item.Key), JsonConvert.SerializeObject(item.ToList()));
+                        process.push_order = true;
+                    }
+                    FactoryService.instance.constant.stopwatch.Stop();
+                    FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:Mq=>推送订单更新");
+                }
+            }
+            else
+            {
+                process.order = true;
+                process.push_order = true;
+            }
+            Dictionary<E_KlineType, DateTimeOffset> last_kline = new Dictionary<E_KlineType, DateTimeOffset>();
+            if (process.sync_kline == false)
+            {
+                FactoryService.instance.constant.stopwatch.Restart();
+                DateTimeOffset now = DateTimeOffset.UtcNow;
+                now = now.AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond);
+                DateTimeOffset end = now.AddMilliseconds(-1);
+                foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
+                {
+                    Kline? Last_kline = service_kline.GetRedisLastKline(this.model.info.market, cycle);
+                    if (Last_kline == null)
+                    {
+                        last_kline.Add(cycle, FactoryService.instance.system_init);
+                    }
+                    else
+                    {
+                        last_kline.Add(cycle, Last_kline.time_start);
+                    }
+                }
+                this.service_kline.DBtoRedised(this.model.info.market, this.model.info.symbol, end);
+                this.service_kline.DBtoRedising(this.model.info.market, this.model.info.symbol, deals);
+                process.sync_kline = true;
+                FactoryService.instance.constant.stopwatch.Stop();
+                FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>同步K线记录");
+            }
+            if (process.push_deal == false)
+            {
+                FactoryService.instance.constant.stopwatch.Restart();
+                SortedSetEntry[] entries = new SortedSetEntry[deals.Count()];
+                res_deal.data = new List<ResDeal>();
+                for (int i = 0; i < deals.Count(); i++)
+                {
+                    ResDeal resdeal = service_deal.Convert(deals[i]);
+                    entries[i] = new SortedSetEntry(JsonConvert.SerializeObject(resdeal), resdeal.time.ToUnixTimeMilliseconds());
+                    res_deal.data.Add(resdeal);
+                }
+                FactoryService.instance.constant.redis.SortedSetAdd(FactoryService.instance.GetRedisDeal(this.model.info.market), entries);
+                FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.trades, this.model.info.market), JsonConvert.SerializeObject(res_deal));
+                process.push_deal = true;
+                FactoryService.instance.constant.stopwatch.Stop();
+                FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:Mq,Redis=>推送交易记录");
+            }
+            if (process.push_kline == false)
+            {
+                FactoryService.instance.constant.stopwatch.Restart();
+                HashEntry[]
+                hashes = FactoryService.instance.constant.redis.HashGetAll(FactoryService.instance.GetRedisKlineing(this.model.info.market));
+                foreach (var item in hashes)
+                {
+                    res_kline.data.Clear();
+                    E_KlineType klineType = (E_KlineType)Enum.Parse(typeof(E_KlineType), item.Name.ToString());
+                    if (last_kline.ContainsKey(klineType))
+                    {
+                        res_kline.data.AddRange(service_kline.GetRedisKline(this.model.info.market, klineType, last_kline[klineType], null));
+                    }
+                    res_kline.channel = (E_WebsockerChannel)Enum.Parse(typeof(E_WebsockerChannel), item.Name.ToString());
+                    res_kline.data.Add(JsonConvert.DeserializeObject<Kline>(item.Value)!);
+                    FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(res_kline.channel, this.model.info.market), JsonConvert.SerializeObject(res_kline));
+                }
+                process.push_kline = true;
+                FactoryService.instance.constant.stopwatch.Stop();
+                FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:Mq,Redis=>推送K线记录");
+            }
+            if (process.push_ticker == false)
+            {
+                FactoryService.instance.constant.stopwatch.Restart();
+                ResTicker? ticker = service_deal.Get24HoursTicker(this.model.info.market);
+                service_deal.PushTicker(ticker);
+                process.push_ticker = true;
+                FactoryService.instance.constant.stopwatch.Stop();
+                FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:Mq,Redis=>推送聚合行情");
             }
         }
-        if (deals.Count > 0)
+        else
         {
-            FactoryService.instance.constant.stopwatch.Restart();
-            DateTimeOffset now = DateTimeOffset.UtcNow;
-            now = now.AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond);
-            DateTimeOffset end = now.AddMilliseconds(-1);
-            Dictionary<E_KlineType, DateTimeOffset> last_kline = new Dictionary<E_KlineType, DateTimeOffset>();
-            foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
-            {
-                Kline? Last_kline = service_kline.GetRedisLastKline(this.model.info.market, cycle);
-                if (Last_kline == null)
-                {
-                    last_kline.Add(cycle, FactoryService.instance.system_init);
-                }
-                else
-                {
-                    last_kline.Add(cycle, Last_kline.time_start);
-                }
-            }
-            this.service_kline.DBtoRedised(this.model.info.market, this.model.info.symbol, end);
-            this.service_kline.DBtoRedising(this.model.info.market, this.model.info.symbol, deals);
-            FactoryService.instance.constant.stopwatch.Stop();
-            FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>同步K线记录");
-            FactoryService.instance.constant.stopwatch.Restart();
-            SortedSetEntry[] entries = new SortedSetEntry[deals.Count()];
-            res_deal.data = new List<ResDeal>();
-            for (int i = 0; i < deals.Count(); i++)
-            {
-                ResDeal resdeal = service_deal.Convert(deals[i]);
-                entries[i] = new SortedSetEntry(JsonConvert.SerializeObject(resdeal), resdeal.time.ToUnixTimeMilliseconds());
-                res_deal.data.Add(resdeal);
-            }
-            FactoryService.instance.constant.redis.SortedSetAdd(FactoryService.instance.GetRedisDeal(this.model.info.market), entries);
-            FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.trades, this.model.info.market), JsonConvert.SerializeObject(res_deal));
-            FactoryService.instance.constant.stopwatch.Stop();
-            FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:Mq,Redis=>推送交易记录");
-            FactoryService.instance.constant.stopwatch.Restart();
-            HashEntry[]
-            hashes = FactoryService.instance.constant.redis.HashGetAll(FactoryService.instance.GetRedisKlineing(this.model.info.market));
-            foreach (var item in hashes)
-            {
-                res_kline.data.Clear();
-                E_KlineType klineType = (E_KlineType)Enum.Parse(typeof(E_KlineType), item.Name.ToString());
-                if (last_kline.ContainsKey(klineType))
-                {
-                    res_kline.data.AddRange(service_kline.GetRedisKline(this.model.info.market, klineType, last_kline[klineType], null));
-                }
-                res_kline.channel = (E_WebsockerChannel)Enum.Parse(typeof(E_WebsockerChannel), item.Name.ToString());
-                res_kline.data.Add(JsonConvert.DeserializeObject<Kline>(item.Value)!);
-                FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(res_kline.channel, this.model.info.market), JsonConvert.SerializeObject(res_kline));
-            }
-            ResTicker? ticker = service_deal.Get24HoursTicker(this.model.info.market);
-            service_deal.PushTicker(ticker);
-            FactoryService.instance.constant.stopwatch.Stop();
-            FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:Mq,Redis=>推送K线记录和聚合行情");
+
         }
         if (cancels.Count > 0)
         {

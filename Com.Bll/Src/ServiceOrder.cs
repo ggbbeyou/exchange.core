@@ -332,16 +332,25 @@ public class ServiceOrder
     /// 更新订单
     /// </summary>
     /// <param name="data"></param>
-    public void UpdateOrder(List<Orders> data)
+    public bool UpdateOrder(List<Orders> data)
     {
         using (var scope = FactoryService.instance.constant.provider.CreateScope())
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
-                (List<OrderBuy> buy, List<OrderSell> sell) orders = ConvertOrder(data);
-                db.OrderBuy.UpdateRange(orders.buy);
-                db.OrderSell.UpdateRange(orders.sell);
-                db.SaveChanges();
+                try
+                {
+                    (List<OrderBuy> buy, List<OrderSell> sell) orders = ConvertOrder(data);
+                    db.OrderBuy.UpdateRange(orders.buy);
+                    db.OrderSell.UpdateRange(orders.sell);
+                    db.SaveChanges();
+                }
+                catch (System.Exception ex)
+                {
+                    FactoryService.instance.constant.logger.LogError($"更新订单失败:{ex.Message}");
+                    return false;
+                }
+                return true;
             }
         }
     }

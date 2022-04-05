@@ -51,17 +51,26 @@ public class ServiceDeal
     }
 
     /// <summary>
-    /// 添加或保存交易记录
+    /// 添加交易记录
     /// </summary>
     /// <param name="deals"></param>
-    public int AddDeal(List<Deal> deals)
+    public bool AddDeal(List<Deal> deals)
     {
         using (var scope = FactoryService.instance.constant.provider.CreateScope())
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
-                db.Deal.AddRange(deals);
-                return db.SaveChanges();
+                try
+                {
+                    db.Deal.AddRange(deals);
+                    db.SaveChanges();
+                }
+                catch (System.Exception ex)
+                {
+                    FactoryService.instance.constant.logger.LogError(ex, "添加交易记录出错");
+                    return false;
+                }
+                return true;
             }
         }
     }

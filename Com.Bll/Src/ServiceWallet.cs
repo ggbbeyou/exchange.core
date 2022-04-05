@@ -252,12 +252,11 @@ public class ServiceWallet
     /// <param name="orders">相关订单</param>
     /// <param name="deals">成交记录</param>
     /// <returns></returns>
-    public (bool result, List<Running> running) Transaction(Market market, List<Orders> orders, List<Deal> deals)
+    public bool Transaction(Market market, List<Orders> orders, List<Deal> deals)
     {
-        List<Running> runnings = new List<Running>();
         if (deals == null || deals.Count == 0 || orders == null || orders.Count == 0)
         {
-            return (false, runnings);
+            return false;
         }
         decimal temp_base = 0;
         decimal temp_quote = 0;
@@ -286,7 +285,7 @@ public class ServiceWallet
                         if (settlement_base == null || settlement_quote == null)
                         {
                             FactoryService.instance.constant.logger.LogError($"{market.symbol}:交易对没有找到结算账户");
-                            return (false, runnings);
+                            return false;
                         }
                         foreach (Deal item in deals)
                         {
@@ -301,7 +300,7 @@ public class ServiceWallet
                             if (buy_base == null || buy_quote == null || sell_base == null || sell_quote == null)
                             {
                                 FactoryService.instance.constant.logger.LogError($"{market.symbol}:用户:{item.bid_uid}/{item.ask_uid},未找到交易账户钱包");
-                                return (false, runnings);
+                                return false;
                             }
                             sell_base.freeze -= item.amount;
                             buy_quote.freeze -= item.total;
@@ -325,10 +324,10 @@ public class ServiceWallet
                             sell_quote.available += temp_quote;
                             settlement_base.available += fee_base;
                             settlement_quote.available += fee_quote;
-                            runnings.Add(AddRunning(item.trade_id, wallet_type, wallet_type, temp_base, sell_base, buy_base, $"交易:{sell_base.user_name}=>{buy_base.user_name},{(double)temp_base}{sell_base.coin_name}"));
-                            runnings.Add(AddRunning(item.trade_id, wallet_type, wallet_type, temp_quote, buy_quote, sell_quote, $"交易:{buy_quote.user_name}=>{sell_quote.user_name},{(double)temp_quote}{buy_quote.coin_name}"));
-                            runnings.Add(AddRunning(item.trade_id, wallet_type, E_WalletType.main, fee_base, buy_base, settlement_base, $"手续费:{buy_base.user_name}=>结算账户:{settlement_base.user_name},{(double)fee_base}{buy_base.coin_name}"));
-                            runnings.Add(AddRunning(item.trade_id, wallet_type, E_WalletType.main, fee_quote, sell_quote, settlement_quote, $"手续费:{sell_quote.user_name}=>结算账户:{settlement_quote.user_name},{(double)fee_quote}{sell_quote.coin_name}"));
+                            db.Running.Add(AddRunning(item.trade_id, wallet_type, wallet_type, temp_base, sell_base, buy_base, $"交易:{sell_base.user_name}=>{buy_base.user_name},{(double)temp_base}{sell_base.coin_name}"));
+                            db.Running.Add(AddRunning(item.trade_id, wallet_type, wallet_type, temp_quote, buy_quote, sell_quote, $"交易:{buy_quote.user_name}=>{sell_quote.user_name},{(double)temp_quote}{buy_quote.coin_name}"));
+                            db.Running.Add(AddRunning(item.trade_id, wallet_type, E_WalletType.main, fee_base, buy_base, settlement_base, $"手续费:{buy_base.user_name}=>结算账户:{settlement_base.user_name},{(double)fee_base}{buy_base.coin_name}"));
+                            db.Running.Add(AddRunning(item.trade_id, wallet_type, E_WalletType.main, fee_quote, sell_quote, settlement_quote, $"手续费:{sell_quote.user_name}=>结算账户:{settlement_quote.user_name},{(double)fee_quote}{sell_quote.coin_name}"));
                         }
                         foreach (var item in wallets)
                         {
@@ -367,14 +366,13 @@ public class ServiceWallet
                         }
                         db.SaveChanges();
                         transaction.Commit();
-                        return (true, runnings);
+                        return true;
                     }
                     catch (Exception ex)
                     {
-                        runnings.Clear();
                         transaction.Rollback();
                         FactoryService.instance.constant.logger.LogError(ex, market.symbol + ":Transaction," + ex.Message);
-                        return (false, runnings);
+                        return false;
                     }
                 }
             }
@@ -418,14 +416,14 @@ public class ServiceWallet
     /// 添加资金流水
     /// </summary>
     /// <param name="runnings"></param>
-    public void AddRunning(List<Running> runnings)
+    public bool AddRunning(List<Running> runnings)
     {
         using (var scope = FactoryService.instance.constant.provider.CreateScope())
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
                 db.Running.AddRange(runnings);
-                db.SaveChanges();
+                return db.SaveChanges() > 0;
             }
         }
     }

@@ -140,15 +140,15 @@ public class Core
     /// <param name="deals"></param>
     private bool ReceiveDealOrder(long no, List<Orders> orders, List<Deal> deals, List<Orders> cancels)
     {
+        RedisValue rv = FactoryService.instance.constant.redis.HashGet(FactoryService.instance.GetRedisProcess(), no);
+        Processing? process = JsonConvert.DeserializeObject<Processing>(rv);
+        if (process == null || process.match == false)
+        {
+            FactoryService.instance.constant.redis.HashDelete(FactoryService.instance.GetRedisProcess(), no);
+            return true;
+        }
         if (deals.Count > 0)
         {
-            RedisValue rv = FactoryService.instance.constant.redis.HashGet(FactoryService.instance.GetRedisProcess(), no);
-            Processing? process = JsonConvert.DeserializeObject<Processing>(rv);
-            if (process == null || process.match == false)
-            {
-                FactoryService.instance.constant.redis.HashDelete(FactoryService.instance.GetRedisProcess(), no);
-                return true;
-            }
             if (process.asset == false)
             {
                 FactoryService.instance.constant.stopwatch.Restart();
@@ -264,26 +264,43 @@ public class Core
                 FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:Mq,Redis=>推送聚合行情");
             }
         }
-        else
-        {
-
-        }
         if (cancels.Count > 0)
         {
-            FactoryService.instance.constant.stopwatch.Restart();
-            service_order.UpdateOrder(cancels);
-            FactoryService.instance.constant.stopwatch.Stop();
-            FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>撤单{cancels.Count}条订单记录");
-            var uid_order = cancels.GroupBy(P => P.uid).ToList();
-            foreach (var item in uid_order)
+            if (process.order_cancel == false)
             {
-                res_order.data = item.ToList();
-                FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.orders, this.model.info.market, item.Key), JsonConvert.SerializeObject(item.ToList()));
+                FactoryService.instance.constant.stopwatch.Restart();
+                process.order_cancel = service_order.UpdateOrder(cancels);
+                FactoryService.instance.constant.stopwatch.Stop();
+                FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>撤单{cancels.Count}条订单记录");
             }
-            FactoryService.instance.constant.stopwatch.Stop();
-            FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:Mq=>推送撤单订单");
+            if (process.push_order_cancel == false)
+            {
+                var uid_order = cancels.GroupBy(P => P.uid).ToList();
+                foreach (var item in uid_order)
+                {
+                    res_order.data = item.ToList();
+                    FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.orders, this.model.info.market, item.Key), JsonConvert.SerializeObject(item.ToList()));
+                }
+                process.push_order_cancel = true;
+                FactoryService.instance.constant.stopwatch.Stop();
+                FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:Mq=>推送撤单订单");
+            }
         }
-        return true;
+        else
+        {
+            process.order_cancel = true;
+            process.push_order_cancel = true;
+        }
+        if (process.match && process.asset && process.deal && process.order && process.order_cancel && process.push_order && process.push_order_cancel && process.sync_kline && process.push_kline && process.push_deal && process.push_ticker)
+        {
+            FactoryService.instance.constant.redis.HashDelete(FactoryService.instance.GetRedisProcess(), process.no);
+            return true;
+        }
+        else
+        {
+            FactoryService.instance.constant.redis.HashSet(FactoryService.instance.GetRedisProcess(), process.no, JsonConvert.SerializeObject(process));
+            return false;
+        }
     }
 
 }

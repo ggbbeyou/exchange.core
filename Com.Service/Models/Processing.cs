@@ -34,10 +34,20 @@ public class Processing
     /// <value></value>
     public bool order { get; set; }
     /// <summary>
+    /// 订单取消
+    /// </summary>
+    /// <value></value>
+    public bool order_cancel { get; set; }
+    /// <summary>
     /// 推送订单更新
     /// </summary>
     /// <value></value>
     public bool push_order { get; set; }
+    /// <summary>
+    /// 推送订单取消
+    /// </summary>
+    /// <value></value>
+    public bool push_order_cancel { get; set; }
     /// <summary>
     /// 推送K线
     /// </summary>

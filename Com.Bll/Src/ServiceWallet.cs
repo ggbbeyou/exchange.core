@@ -292,7 +292,6 @@ public class ServiceWallet
                         db.Wallet.UpdateRange(wallets_settlement);
                         int savecount = db.SaveChanges();
                         transaction.Commit();
-                        Test(db);
                         return (savecount > 0, runnings);
                     }
                     catch (Exception ex)
@@ -410,20 +409,6 @@ public class ServiceWallet
                 db.Running.AddRange(runnings);
                 return db.SaveChanges() > 0;
             }
-        }
-    }
-
-    public void Test(DbContextEF db)
-    {
-
-        if (db.Wallet.Where(P => P.coin_name == "btc").Sum(P => P.freeze) != db.OrderSell.Sum(P => P.unsold))
-        {
-            FactoryService.instance.constant.logger.LogError($":资金不对");
-        }
-        if (db.Wallet.Where(P => P.coin_name == "usdt").Sum(P => P.freeze) != db.OrderBuy.Sum(P => P.unsold))
-        {
-            FactoryService.instance.constant.logger.LogError($":资金不对");
-
         }
     }
 

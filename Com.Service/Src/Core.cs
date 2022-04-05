@@ -176,11 +176,24 @@ public class Core
                 FactoryService.instance.constant.stopwatch.Restart();
                 (bool result, List<Running> running) result = service_wallet.Transaction(this.model.info, deals);
                 process.asset = result.result;
+                if (orders.Count > 0)
+                {
+                    if (process.order == false)
+                    {
+                        FactoryService.instance.constant.stopwatch.Restart();
+                        process.order = service_order.UpdateOrder(orders);
+                        FactoryService.instance.constant.stopwatch.Stop();
+                        FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>更新{orders.Count}条订单记录");
+                    }
+                }
+                else
+                {
+                    process.order = true;
+                }
                 if (result.result && result.running.Count > 0)
                 {
                     service_wallet.AddRunning(result.running);
                 }
-                Test();
                 FactoryService.instance.constant.stopwatch.Stop();
                 FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>成交记录{deals.Count}条,实际资产转移(结果)");
             }
@@ -193,13 +206,6 @@ public class Core
             }
             if (orders.Count > 0)
             {
-                if (process.order == false)
-                {
-                    FactoryService.instance.constant.stopwatch.Restart();
-                    process.order = service_order.UpdateOrder(orders);
-                    FactoryService.instance.constant.stopwatch.Stop();
-                    FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>更新{orders.Count}条订单记录");
-                }
                 if (process.order_complete_thaw == false)
                 {
                     FactoryService.instance.constant.stopwatch.Restart();
@@ -272,7 +278,6 @@ public class Core
             }
             else
             {
-                process.order = true;
                 process.order_complete_thaw = true;
                 process.push_order = true;
             }

@@ -167,12 +167,21 @@ public class FactoryConstant
     /// </summary>
     /// <param name="queue_name"></param>
     /// <param name="body"></param>
-    public void MqSend(string queue_name, byte[] body)
+    public bool MqSend(string queue_name, byte[] body)
     {
-        IBasicProperties props = this.i_model.CreateBasicProperties();
-        props.DeliveryMode = 2;
-        this.i_model.QueueDeclare(queue: queue_name, durable: true, exclusive: false, autoDelete: false, arguments: null);
-        this.i_model.BasicPublish(exchange: "", routingKey: queue_name, basicProperties: props, body: body);
+        try
+        {
+            IBasicProperties props = this.i_model.CreateBasicProperties();
+            props.DeliveryMode = 2;
+            this.i_model.QueueDeclare(queue: queue_name, durable: true, exclusive: false, autoDelete: false, arguments: null);
+            this.i_model.BasicPublish(exchange: "", routingKey: queue_name, basicProperties: props, body: body);
+        }
+        catch (System.Exception ex)
+        {
+            FactoryService.instance.constant.logger.LogError(ex, "MQ 简单的队列 发送消息");
+            return false;
+        }
+        return true;
     }
 
     /// <summary>
@@ -204,12 +213,21 @@ public class FactoryConstant
     /// </summary>
     /// <param name="queue_name"></param>
     /// <param name="body"></param>
-    public void MqTask(string queue_name, byte[] body)
+    public bool MqTask(string queue_name, byte[] body)
     {
-        this.i_model.QueueDeclare(queue: queue_name, durable: true, exclusive: false, autoDelete: false, arguments: null);
-        var properties = this.i_model.CreateBasicProperties();
-        properties.Persistent = true;
-        this.i_model.BasicPublish(exchange: "", routingKey: queue_name, basicProperties: properties, body: body);
+        try
+        {
+            this.i_model.QueueDeclare(queue: queue_name, durable: true, exclusive: false, autoDelete: false, arguments: null);
+            var properties = this.i_model.CreateBasicProperties();
+            properties.Persistent = true;
+            this.i_model.BasicPublish(exchange: "", routingKey: queue_name, basicProperties: properties, body: body);
+        }
+        catch (System.Exception ex)
+        {
+            FactoryService.instance.constant.logger.LogError(ex, "MQ 发布工作任务");
+            return false;
+        }
+        return true;
     }
 
     /// <summary>
@@ -242,11 +260,20 @@ public class FactoryConstant
     /// </summary>
     /// <param name="exchange"></param>
     /// <param name="message"></param>
-    public void MqPublish(string exchange, string message)
+    public bool MqPublish(string exchange, string message)
     {
-        this.i_model.ExchangeDeclare(exchange: exchange, type: ExchangeType.Fanout);
-        var body = Encoding.UTF8.GetBytes(message);
-        this.i_model.BasicPublish(exchange: exchange, routingKey: "", basicProperties: null, body);
+        try
+        {
+            this.i_model.ExchangeDeclare(exchange: exchange, type: ExchangeType.Fanout);
+            var body = Encoding.UTF8.GetBytes(message);
+            this.i_model.BasicPublish(exchange: exchange, routingKey: "", basicProperties: null, body);
+        }
+        catch (System.Exception ex)
+        {
+            FactoryService.instance.constant.logger.LogError(ex, "MQ发布消息错误");
+            return false;
+        }
+        return true;
     }
 
     /// <summary>

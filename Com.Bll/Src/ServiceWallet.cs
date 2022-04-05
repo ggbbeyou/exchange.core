@@ -31,6 +31,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
+using System.Data;
 
 namespace Com.Bll;
 
@@ -61,7 +62,7 @@ public class ServiceWallet
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
-                using (var transaction = db.Database.BeginTransaction())
+                using (var transaction = db.Database.BeginTransaction(IsolationLevel.ReadCommitted))
                 {
                     try
                     {
@@ -120,7 +121,7 @@ public class ServiceWallet
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
-                using (var transaction = db.Database.BeginTransaction())
+                using (var transaction = db.Database.BeginTransaction(IsolationLevel.ReadCommitted))
                 {
                     try
                     {
@@ -220,7 +221,7 @@ public class ServiceWallet
                 List<long> user_id = deals.Select(T => T.bid_uid).ToList();
                 user_id.AddRange(deals.Select(T => T.ask_uid).ToList());
                 user_id = user_id.Distinct().ToList();
-                using (var transaction = db.Database.BeginTransaction())
+                using (var transaction = db.Database.BeginTransaction(IsolationLevel.ReadCommitted))
                 {
                     try
                     {
@@ -319,7 +320,7 @@ public class ServiceWallet
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
-                using (var transaction = db.Database.BeginTransaction())
+                using (var transaction = db.Database.BeginTransaction(IsolationLevel.ReadCommitted))
                 {
                     try
                     {

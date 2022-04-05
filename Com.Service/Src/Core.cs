@@ -177,6 +177,7 @@ public class Core
                 {
                     FactoryService.instance.constant.stopwatch.Restart();
                     var uid_order = orders.GroupBy(P => P.uid).ToList();
+                    process.push_order = true;
                     foreach (var item in uid_order)
                     {
                         res_order.data = item.ToList();
@@ -235,8 +236,8 @@ public class Core
             if (process.push_kline == false)
             {
                 FactoryService.instance.constant.stopwatch.Restart();
-                HashEntry[]
-                hashes = FactoryService.instance.constant.redis.HashGetAll(FactoryService.instance.GetRedisKlineing(this.model.info.market));
+                HashEntry[] hashes = FactoryService.instance.constant.redis.HashGetAll(FactoryService.instance.GetRedisKlineing(this.model.info.market));
+                process.push_kline = true;
                 foreach (var item in hashes)
                 {
                     res_kline.data.Clear();
@@ -273,6 +274,7 @@ public class Core
             if (process.push_order_cancel == false)
             {
                 var uid_order = cancels.GroupBy(P => P.uid).ToList();
+                process.push_order_cancel = true;
                 foreach (var item in uid_order)
                 {
                     res_order.data = item.ToList();

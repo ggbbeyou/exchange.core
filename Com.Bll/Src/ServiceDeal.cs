@@ -245,7 +245,7 @@ public class ServiceDeal
             FactoryService.instance.constant.logger.LogError(ex, "深度行情保存到redis并且推送到MQ失败");
             return false;
         }
-        return false;
+        return true;
     }
 
 

@@ -104,7 +104,12 @@ public class Core
     /// <typeparam name="decimal"></typeparam>
     /// <returns></returns>
     private Dictionary<long, decimal> temp_map = new Dictionary<long, decimal>();
-
+    /// <summary>
+    /// 临时变量
+    /// </summary>
+    /// <typeparam name="Orders"></typeparam>
+    /// <returns></returns>
+    private List<Orders> temp_order = new List<Orders>();
     /// <summary>
     /// 初始化
     /// </summary>
@@ -190,13 +195,20 @@ public class Core
                 if (process.order == false)
                 {
                     FactoryService.instance.constant.stopwatch.Restart();
-                    process.order = true;
+                    process.order = service_order.UpdateOrder(orders);
+                    FactoryService.instance.constant.stopwatch.Stop();
+                    FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>更新{orders.Count}条订单记录");
+                }
+                if (process.order_complete_thaw == false)
+                {
+                    FactoryService.instance.constant.stopwatch.Restart();
                     E_WalletType wallet_type = E_WalletType.main;
                     if (this.model.info.market_type == E_MarketType.spot)
                     {
                         wallet_type = E_WalletType.spot;
                     }
                     temp_map.Clear();
+                    temp_order.Clear();
                     foreach (var item in orders.Distinct().Where(P => P.state == E_OrderState.completed && P.unsold > 0 && P.side == E_OrderSide.buy))
                     {
                         item.complete_thaw = item.unsold;
@@ -212,7 +224,10 @@ public class Core
                     }
                     foreach (var item in temp_map)
                     {
-                        process.order = process.order && service_wallet.FreezeChange(wallet_type, item.Key, this.model.info.coin_id_quote, -item.Value);
+                        if (service_wallet.FreezeChange(wallet_type, item.Key, this.model.info.coin_id_quote, -item.Value))
+                        {
+                            temp_order.AddRange(orders.Where(P => P.side == E_OrderSide.buy && P.uid == item.Key));
+                        }
                     }
                     temp_map.Clear();
                     foreach (var item in orders.Distinct().Where(P => P.state == E_OrderState.completed && P.unsold > 0 && P.side == E_OrderSide.sell))
@@ -230,11 +245,14 @@ public class Core
                     }
                     foreach (var item in temp_map)
                     {
-                        process.order = process.order && service_wallet.FreezeChange(wallet_type, item.Key, this.model.info.coin_id_base, -item.Value);
+                        if (service_wallet.FreezeChange(wallet_type, item.Key, this.model.info.coin_id_base, -item.Value))
+                        {
+                            temp_order.AddRange(orders.Where(P => P.side == E_OrderSide.sell && P.uid == item.Key));
+                        }
                     }
-                    process.order = process.order && service_order.UpdateOrder(orders);
+                    process.order_complete_thaw = service_order.UpdateOrder(temp_order);
                     FactoryService.instance.constant.stopwatch.Stop();
-                    FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>更新{orders.Count}条订单记录");
+                    FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>更新{temp_order.Count}条订单记录(完成解冻多余资金)");
                 }
                 if (process.push_order == false)
                 {
@@ -253,6 +271,7 @@ public class Core
             else
             {
                 process.order = true;
+                process.order_complete_thaw = true;
                 process.push_order = true;
             }
             Dictionary<E_KlineType, DateTimeOffset> last_kline = new Dictionary<E_KlineType, DateTimeOffset>();

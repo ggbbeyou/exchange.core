@@ -39,6 +39,11 @@ public class Processing
     /// <value></value>
     public bool order_cancel { get; set; }
     /// <summary>
+    /// 订单完成解冻多余资金
+    /// </summary>
+    /// <value></value>
+    public bool order_complete_thaw { get; set; }
+    /// <summary>
     /// 推送订单更新
     /// </summary>
     /// <value></value>

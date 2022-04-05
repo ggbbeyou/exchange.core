@@ -54,7 +54,7 @@ public class ServiceDeal
     /// 添加或保存交易记录
     /// </summary>
     /// <param name="deals"></param>
-    public int AddOrUpdateDeal(List<Deal> deals)
+    public int AddDeal(List<Deal> deals)
     {
         using (var scope = FactoryService.instance.constant.provider.CreateScope())
         {

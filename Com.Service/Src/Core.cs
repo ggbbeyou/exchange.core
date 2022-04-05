@@ -59,22 +59,22 @@ public class Core
     /// 交易记录Db操作
     /// </summary>
     /// <returns></returns>
-    public ServiceDeal deal_service = new ServiceDeal();
+    public ServiceDeal service_deal = new ServiceDeal();
     /// <summary>
     /// 订单服务
     /// </summary>
     /// <returns></returns>
-    public ServiceOrder order_service = new ServiceOrder();
+    public ServiceOrder service_order = new ServiceOrder();
     /// <summary>
     /// K线服务
     /// </summary>
     /// <returns></returns>
-    public ServiceKline kline_service = new ServiceKline();
+    public ServiceKline service_kline = new ServiceKline();
     /// <summary>
     /// 钱包服务
     /// </summary>
     /// <returns></returns>
-    private ServiceWallet wallet_service = new ServiceWallet();
+    private ServiceWallet service_wallet = new ServiceWallet();
     /// <summary>
     /// 秒表
     /// </summary>
@@ -97,10 +97,7 @@ public class Core
     /// <typeparam name="Kline?"></typeparam>
     /// <returns></returns>
     private ResWebsocker<List<Orders>> res_order = new ResWebsocker<List<Orders>>();
-    private JsonSerializerSettings settings = new JsonSerializerSettings()
-    {
-        TypeNameHandling = TypeNameHandling.All
-    };
+
     /// <summary>
     /// 初始化
     /// </summary>
@@ -146,8 +143,8 @@ public class Core
         if (deals.Count > 0)
         {
             FactoryService.instance.constant.stopwatch.Restart();
-            (bool result, List<Running> running) transaction = wallet_service.Transaction(this.model.info, orders, deals);
-            wallet_service.AddRunning(transaction.running);
+            (bool result, List<Running> running) transaction = service_wallet.Transaction(this.model.info, orders, deals);
+            service_wallet.AddRunning(transaction.running);
             FactoryService.instance.constant.stopwatch.Stop();
             FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>成交记录{deals.Count}条,实际资产转移(结果{transaction.result})");
             if (!transaction.result)
@@ -156,13 +153,13 @@ public class Core
                 return false;
             }
             FactoryService.instance.constant.stopwatch.Restart();
-            int deal_add = deal_service.AddOrUpdateDeal(deals);
+            int deal_add = service_deal.AddDeal(deals);
             FactoryService.instance.constant.stopwatch.Stop();
             FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>记录:{deals.Count},实际插入{deal_add}条成交记录");
             if (orders.Count > 0 && transaction.result && deal_add > 0)
             {
                 FactoryService.instance.constant.stopwatch.Restart();
-                order_service.UpdateOrder(orders);
+                service_order.UpdateOrder(orders);
                 FactoryService.instance.constant.stopwatch.Stop();
                 FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>更新{orders.Count}条订单记录");
                 FactoryService.instance.constant.stopwatch.Restart();
@@ -185,7 +182,7 @@ public class Core
             Dictionary<E_KlineType, DateTimeOffset> last_kline = new Dictionary<E_KlineType, DateTimeOffset>();
             foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
             {
-                Kline? Last_kline = kline_service.GetRedisLastKline(this.model.info.market, cycle);
+                Kline? Last_kline = service_kline.GetRedisLastKline(this.model.info.market, cycle);
                 if (Last_kline == null)
                 {
                     last_kline.Add(cycle, FactoryService.instance.system_init);
@@ -195,8 +192,8 @@ public class Core
                     last_kline.Add(cycle, Last_kline.time_start);
                 }
             }
-            this.kline_service.DBtoRedised(this.model.info.market, this.model.info.symbol, end);
-            this.kline_service.DBtoRedising(this.model.info.market, this.model.info.symbol, deals);
+            this.service_kline.DBtoRedised(this.model.info.market, this.model.info.symbol, end);
+            this.service_kline.DBtoRedising(this.model.info.market, this.model.info.symbol, deals);
             FactoryService.instance.constant.stopwatch.Stop();
             FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>同步K线记录");
             FactoryService.instance.constant.stopwatch.Restart();
@@ -204,7 +201,7 @@ public class Core
             res_deal.data = new List<ResDeal>();
             for (int i = 0; i < deals.Count(); i++)
             {
-                ResDeal resdeal = deal_service.Convert(deals[i]);
+                ResDeal resdeal = service_deal.Convert(deals[i]);
                 entries[i] = new SortedSetEntry(JsonConvert.SerializeObject(resdeal), resdeal.time.ToUnixTimeMilliseconds());
                 res_deal.data.Add(resdeal);
             }
@@ -221,21 +218,21 @@ public class Core
                 E_KlineType klineType = (E_KlineType)Enum.Parse(typeof(E_KlineType), item.Name.ToString());
                 if (last_kline.ContainsKey(klineType))
                 {
-                    res_kline.data.AddRange(kline_service.GetRedisKline(this.model.info.market, klineType, last_kline[klineType], null));
+                    res_kline.data.AddRange(service_kline.GetRedisKline(this.model.info.market, klineType, last_kline[klineType], null));
                 }
                 res_kline.channel = (E_WebsockerChannel)Enum.Parse(typeof(E_WebsockerChannel), item.Name.ToString());
                 res_kline.data.Add(JsonConvert.DeserializeObject<Kline>(item.Value)!);
                 FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(res_kline.channel, this.model.info.market), JsonConvert.SerializeObject(res_kline));
             }
-            ResTicker? ticker = deal_service.Get24HoursTicker(this.model.info.market);
-            deal_service.PushTicker(ticker);
+            ResTicker? ticker = service_deal.Get24HoursTicker(this.model.info.market);
+            service_deal.PushTicker(ticker);
             FactoryService.instance.constant.stopwatch.Stop();
             FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:Mq,Redis=>推送K线记录和聚合行情");
         }
         if (cancels.Count > 0)
         {
             FactoryService.instance.constant.stopwatch.Restart();
-            order_service.UpdateOrder(cancels);
+            service_order.UpdateOrder(cancels);
             FactoryService.instance.constant.stopwatch.Stop();
             FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>撤单{cancels.Count}条订单记录");
             var uid_order = cancels.GroupBy(P => P.uid).ToList();

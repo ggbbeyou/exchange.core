@@ -266,6 +266,7 @@ public class ServiceWallet
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
+                List<Running> runnings = new List<Running>();
                 E_WalletType wallet_type = E_WalletType.main;
                 if (market.market_type == E_MarketType.spot)
                 {
@@ -324,10 +325,10 @@ public class ServiceWallet
                             sell_quote.available += temp_quote;
                             settlement_base.available += fee_base;
                             settlement_quote.available += fee_quote;
-                            db.Running.Add(AddRunning(item.trade_id, wallet_type, wallet_type, temp_base, sell_base, buy_base, $"交易:{sell_base.user_name}=>{buy_base.user_name},{(double)temp_base}{sell_base.coin_name}"));
-                            db.Running.Add(AddRunning(item.trade_id, wallet_type, wallet_type, temp_quote, buy_quote, sell_quote, $"交易:{buy_quote.user_name}=>{sell_quote.user_name},{(double)temp_quote}{buy_quote.coin_name}"));
-                            db.Running.Add(AddRunning(item.trade_id, wallet_type, E_WalletType.main, fee_base, buy_base, settlement_base, $"手续费:{buy_base.user_name}=>结算账户:{settlement_base.user_name},{(double)fee_base}{buy_base.coin_name}"));
-                            db.Running.Add(AddRunning(item.trade_id, wallet_type, E_WalletType.main, fee_quote, sell_quote, settlement_quote, $"手续费:{sell_quote.user_name}=>结算账户:{settlement_quote.user_name},{(double)fee_quote}{sell_quote.coin_name}"));
+                            runnings.Add(AddRunning(item.trade_id, wallet_type, wallet_type, temp_base, sell_base, buy_base, $"交易:{sell_base.user_name}=>{buy_base.user_name},{(double)temp_base}{sell_base.coin_name}"));
+                            runnings.Add(AddRunning(item.trade_id, wallet_type, wallet_type, temp_quote, buy_quote, sell_quote, $"交易:{buy_quote.user_name}=>{sell_quote.user_name},{(double)temp_quote}{buy_quote.coin_name}"));
+                            runnings.Add(AddRunning(item.trade_id, wallet_type, E_WalletType.main, fee_base, buy_base, settlement_base, $"手续费:{buy_base.user_name}=>结算账户:{settlement_base.user_name},{(double)fee_base}{buy_base.coin_name}"));
+                            runnings.Add(AddRunning(item.trade_id, wallet_type, E_WalletType.main, fee_quote, sell_quote, settlement_quote, $"手续费:{sell_quote.user_name}=>结算账户:{settlement_quote.user_name},{(double)fee_quote}{sell_quote.coin_name}"));
                         }
                         foreach (var item in wallets)
                         {
@@ -364,6 +365,8 @@ public class ServiceWallet
                                 }
                             }
                         }
+                        db.SaveChanges();
+                        db.Running.AddRange(runnings);
                         db.SaveChanges();
                         transaction.Commit();
                         return true;

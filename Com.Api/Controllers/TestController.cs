@@ -267,7 +267,7 @@ public class TestController : ControllerBase
             status = false,
             transaction = true,
             settlement_uid = settlement_btc_usdt.user_id,
-            last_price = Math.Round((decimal)FactoryService.instance.constant.random.NextDouble(), 2),
+            last_price = 50000,
             service_url = "http://localhost:8080",
         };
         Market ethusdt = new Market()
@@ -287,7 +287,7 @@ public class TestController : ControllerBase
             status = false,
             transaction = true,
             settlement_uid = settlement_eth_usdt.user_id,
-            last_price = Math.Round((decimal)FactoryService.instance.constant.random.NextDouble(), 2),
+            last_price = 5000,
             service_url = "http://localhost:8080",
         };
         this.db.Market.Add(btcusdt);

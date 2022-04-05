@@ -287,6 +287,22 @@ public class ServiceDeal
         return FactoryService.instance.constant.redis.SortedSetRemoveRangeByScore(FactoryService.instance.GetRedisDeal(market), 0, end.ToUnixTimeMilliseconds());
     }
 
+    /// <summary>
+    /// 转换
+    /// </summary>
+    /// <param name="deal"></param>
+    /// <returns></returns>
+    public ResDeal Convert(Deal deal)
+    {
+        return new ResDeal
+        {
+            symbol = deal.symbol,
+            price = deal.price,
+            amount = deal.amount,
+            trigger_side = deal.trigger_side,
+            time = deal.time,
+        };
+    }
 
 
 }

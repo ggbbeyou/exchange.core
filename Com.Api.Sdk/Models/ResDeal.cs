@@ -14,13 +14,7 @@ public class ResDeal
     /// </summary>
     /// <value></value>
     public string symbol { get; set; } = null!;
-    /// <summary>
-    /// 交易模式
-    /// </summary>
-    /// <value></value>
-    [JsonConverter(typeof(StringEnumConverter))]
-    [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-    public E_TradeModel trade_model { get; set; }
+   
     /// <summary>
     /// 成交价
     /// </summary>

@@ -97,7 +97,10 @@ public class Core
     /// <typeparam name="Kline?"></typeparam>
     /// <returns></returns>
     private ResWebsocker<List<Orders>> res_order = new ResWebsocker<List<Orders>>();
-
+    private JsonSerializerSettings settings = new JsonSerializerSettings()
+    {
+        TypeNameHandling = TypeNameHandling.All
+    };
     /// <summary>
     /// 初始化
     /// </summary>
@@ -198,12 +201,14 @@ public class Core
             FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>同步K线记录");
             FactoryService.instance.constant.stopwatch.Restart();
             SortedSetEntry[] entries = new SortedSetEntry[deals.Count()];
+            res_deal.data = new List<ResDeal>();
             for (int i = 0; i < deals.Count(); i++)
             {
-                entries[i] = new SortedSetEntry(JsonConvert.SerializeObject((ResDeal)deals[i]), deals[i].time.ToUnixTimeMilliseconds());
+                ResDeal resdeal = deal_service.Convert(deals[i]);
+                entries[i] = new SortedSetEntry(JsonConvert.SerializeObject(resdeal), resdeal.time.ToUnixTimeMilliseconds());
+                res_deal.data.Add(resdeal);
             }
             FactoryService.instance.constant.redis.SortedSetAdd(FactoryService.instance.GetRedisDeal(this.model.info.market), entries);
-            res_deal.data = deals.ConvertAll(P => (ResDeal)P);
             FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.trades, this.model.info.market), JsonConvert.SerializeObject(res_deal));
             FactoryService.instance.constant.stopwatch.Stop();
             FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:Mq,Redis=>推送交易记录");

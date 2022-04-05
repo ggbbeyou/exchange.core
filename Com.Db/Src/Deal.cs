@@ -1,9 +1,10 @@
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
 using Com.Api.Sdk;
 using Com.Api.Sdk.Enum;
 using Com.Api.Sdk.Models;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Com.Db;
 
@@ -23,6 +24,13 @@ public class Deal : ResDeal
     /// </summary>
     /// <value></value>
     public long market { get; set; }
+    /// <summary>
+    /// 交易模式
+    /// </summary>
+    /// <value></value>
+    [JsonConverter(typeof(StringEnumConverter))]
+    [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+    public E_TradeModel trade_model { get; set; }
     /// <summary>
     /// 成交总额
     /// </summary>

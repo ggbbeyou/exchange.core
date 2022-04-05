@@ -134,7 +134,7 @@ public class Core
                 FactoryService.instance.constant.redis.HashDelete(FactoryService.instance.GetRedisProcess(), deals.no);
                 return true;
             }
-            process = ReceiveDealOrder(process, deals.orders, deals.deals, deals.cancels);
+            ReceiveDealOrder(process, deals.orders, deals.deals, deals.cancels);
             this.stopwatch.Stop();
             FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{this.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:撮合后续处理总时间(成交记录数:{deals.deals.Count},成交订单数:{deals.orders.Count},撤单数:{deals.cancels.Count}),处理结果:{JsonConvert.SerializeObject(process)}");
             if (process.match && process.asset && process.deal && process.order && process.order_cancel && process.push_order && process.push_order_cancel && process.sync_kline && process.push_kline && process.push_deal && process.push_ticker)
@@ -155,7 +155,7 @@ public class Core
     /// 接收到成交订单
     /// </summary>
     /// <param name="deals"></param>
-    private Processing ReceiveDealOrder(Processing process, List<Orders> orders, List<Deal> deals, List<Orders> cancels)
+    private void ReceiveDealOrder(Processing process, List<Orders> orders, List<Deal> deals, List<Orders> cancels)
     {
         if (deals.Count > 0)
         {
@@ -298,8 +298,6 @@ public class Core
             process.order_cancel = true;
             process.push_order_cancel = true;
         }
-        return process;
-
     }
 
 }

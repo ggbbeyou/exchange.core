@@ -17,7 +17,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddDbContextPool<DbContextEF>(options =>
 {
     // options.UseLoggerFactory(LoggerFactory.Create(builder => { builder.AddConsole(); }));
-    // options.EnableSensitiveDataLogging();
+    options.EnableSensitiveDataLogging();
     DbContextOptions options1 = options.UseSqlServer(builder.Configuration.GetConnectionString("Mssql")).Options;
 });
 builder.Services.AddStackExchangeRedisCache(options =>

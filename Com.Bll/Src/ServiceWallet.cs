@@ -41,7 +41,7 @@ namespace Com.Bll;
 public class ServiceWallet
 {
 
-    private IsolationLevel isolationLevel = IsolationLevel.ReadCommitted;
+    private IsolationLevel isolationLevel = IsolationLevel.RepeatableRead;
 
     /// <summary>
     /// 初始化
@@ -287,6 +287,10 @@ public class ServiceWallet
                         foreach (var item in wallets_settlement)
                         {
                             item.total = item.available + item.freeze;
+                        }
+                        if (wallets.Any(P => P.freeze <0))
+                        {
+
                         }
                         db.Wallet.UpdateRange(wallets);
                         db.Wallet.UpdateRange(wallets_settlement);

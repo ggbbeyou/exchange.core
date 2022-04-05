@@ -252,28 +252,28 @@ public class ServiceWallet
                             temp_quote = 0;
                             fee_base = 0;
                             fee_quote = 0;
-                            sell_base.freeze -= item.amount;
-                            buy_quote.freeze -= item.total;
+                            sell_base.freeze = sell_base.freeze - item.amount;
+                            buy_quote.freeze = buy_quote.freeze - item.total;
                             if (item.trigger_side == E_OrderSide.buy)
                             {
                                 // 买单为吃单,卖单为挂单
                                 fee_base = item.fee_bid_taker * item.amount;
                                 fee_quote = item.fee_ask_maker * item.total;
-                                temp_base = (item.amount - fee_base);
-                                temp_quote = (item.total - fee_quote);
+                                temp_base = item.amount - fee_base;
+                                temp_quote = item.total - fee_quote;
                             }
                             else if (item.trigger_side == E_OrderSide.sell)
                             {
                                 // 卖单为吃单,买单为挂单
                                 fee_quote = item.fee_ask_taker * item.total;
                                 fee_base = item.fee_bid_maker * item.amount;
-                                temp_base = (item.amount - fee_base);
-                                temp_quote = (item.total - fee_quote);
+                                temp_base = item.amount - fee_base;
+                                temp_quote = item.total - fee_quote;
                             }
-                            buy_base.available += temp_base;
-                            sell_quote.available += temp_quote;
-                            settlement_base.available += fee_base;
-                            settlement_quote.available += fee_quote;
+                            buy_base.available = buy_base.available + temp_base;
+                            sell_quote.available = sell_quote.available + temp_quote;
+                            settlement_base.available = settlement_base.available + fee_base;
+                            settlement_quote.available = settlement_quote.available + fee_quote;
                             runnings.Add(AddRunning(item.trade_id, wallet_type, wallet_type, temp_base, sell_base, buy_base, $"交易:{sell_base.user_name}=>{buy_base.user_name},{(double)temp_base}{sell_base.coin_name}"));
                             runnings.Add(AddRunning(item.trade_id, wallet_type, wallet_type, temp_quote, buy_quote, sell_quote, $"交易:{buy_quote.user_name}=>{sell_quote.user_name},{(double)temp_quote}{buy_quote.coin_name}"));
                             runnings.Add(AddRunning(item.trade_id, wallet_type, E_WalletType.main, fee_base, buy_base, settlement_base, $"手续费:{buy_base.user_name}=>结算账户:{settlement_base.user_name},{(double)fee_base}{buy_base.coin_name}"));
@@ -288,7 +288,7 @@ public class ServiceWallet
                         {
                             item.total = item.available + item.freeze;
                         }
-                        if (wallets.Any(P => P.freeze <0))
+                        if (wallets.Any(P => P.freeze < 0))
                         {
 
                         }

@@ -194,13 +194,12 @@ public class ServiceWallet
     /// 撮合成交后资产变动(批量),手续费内扣(到手资产里面再去扣手续费)
     /// </summary>
     /// <param name="market">市场</param>
-    /// <param name="orders">相关订单</param>
     /// <param name="deals">成交记录</param>
     /// <returns></returns>
-    public (bool result, List<Running> running) Transaction(Market market, List<Orders> orders, List<Deal> deals)
+    public (bool result, List<Running> running) Transaction(Market market, List<Deal> deals)
     {
         List<Running> runnings = new List<Running>();
-        if (deals == null || deals.Count == 0 || orders == null || orders.Count == 0)
+        if (deals == null || deals.Count == 0)
         {
             return (false, runnings);
         }
@@ -284,32 +283,6 @@ public class ServiceWallet
                         foreach (var item in wallets_settlement)
                         {
                             item.total = item.available + item.freeze;
-                        }
-                        List<Orders> order = orders.Where(P => P.state == E_OrderState.completed && P.unsold > 0).Distinct().ToList();
-                        foreach (Orders item in order)
-                        {
-                            if (item.side == E_OrderSide.buy)
-                            {
-                                Wallet? buy_quote = wallets.Where(P => P.coin_id == market.coin_id_quote && P.user_id == item.uid).FirstOrDefault();
-                                if (buy_quote != null)
-                                {
-                                    buy_quote.freeze -= item.unsold;
-                                    buy_quote.available += item.unsold;
-                                    item.complete_thaw = item.unsold;
-                                    item.unsold -= item.unsold;
-                                }
-                            }
-                            else if (item.side == E_OrderSide.sell)
-                            {
-                                Wallet? sell_base = wallets.Where(P => P.coin_id == market.coin_id_base && P.user_id == item.uid).FirstOrDefault();
-                                if (sell_base != null)
-                                {
-                                    sell_base.freeze -= item.unsold;
-                                    sell_base.available += item.unsold;
-                                    item.complete_thaw = item.unsold;
-                                    item.unsold -= item.unsold;
-                                }
-                            }
                         }
                         db.SaveChanges();
                         transaction.Commit();

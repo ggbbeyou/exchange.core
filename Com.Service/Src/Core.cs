@@ -97,6 +97,13 @@ public class Core
     /// <typeparam name="Kline?"></typeparam>
     /// <returns></returns>
     private ResWebsocker<List<Orders>> res_order = new ResWebsocker<List<Orders>>();
+    /// <summary>
+    /// 临时变量
+    /// </summary>
+    /// <typeparam name="long"></typeparam>
+    /// <typeparam name="decimal"></typeparam>
+    /// <returns></returns>
+    private Dictionary<long, decimal> temp_map = new Dictionary<long, decimal>();
 
     /// <summary>
     /// 初始化
@@ -162,7 +169,7 @@ public class Core
             if (process.asset == false)
             {
                 FactoryService.instance.constant.stopwatch.Restart();
-                (bool result, List<Running> running) result = service_wallet.Transaction(this.model.info, orders, deals);
+                (bool result, List<Running> running) result = service_wallet.Transaction(this.model.info, deals);
                 process.asset = result.result;
                 if (result.result && result.running.Count > 0)
                 {
@@ -183,7 +190,49 @@ public class Core
                 if (process.order == false)
                 {
                     FactoryService.instance.constant.stopwatch.Restart();
-                    process.order = service_order.UpdateOrder(orders);
+                    process.order = true;
+                    E_WalletType wallet_type = E_WalletType.main;
+                    if (this.model.info.market_type == E_MarketType.spot)
+                    {
+                        wallet_type = E_WalletType.spot;
+                    }
+                    temp_map.Clear();
+                    foreach (var item in orders.Distinct().Where(P => P.state == E_OrderState.completed && P.unsold > 0 && P.side == E_OrderSide.buy))
+                    {
+                        item.complete_thaw = item.unsold;
+                        item.unsold -= item.unsold;
+                        if (temp_map.ContainsKey(item.uid))
+                        {
+                            temp_map[item.uid] += item.unsold;
+                        }
+                        else
+                        {
+                            temp_map.Add(item.uid, item.unsold);
+                        }
+                    }
+                    foreach (var item in temp_map)
+                    {
+                        process.order = process.order && service_wallet.FreezeChange(wallet_type, item.Key, this.model.info.coin_id_quote, -item.Value);
+                    }
+                    temp_map.Clear();
+                    foreach (var item in orders.Distinct().Where(P => P.state == E_OrderState.completed && P.unsold > 0 && P.side == E_OrderSide.sell))
+                    {
+                        item.complete_thaw = item.unsold;
+                        item.unsold -= item.unsold;
+                        if (temp_map.ContainsKey(item.uid))
+                        {
+                            temp_map[item.uid] += item.unsold;
+                        }
+                        else
+                        {
+                            temp_map.Add(item.uid, item.unsold);
+                        }
+                    }
+                    foreach (var item in temp_map)
+                    {
+                        process.order = process.order && service_wallet.FreezeChange(wallet_type, item.Key, this.model.info.coin_id_base, -item.Value);
+                    }
+                    process.order = process.order && service_order.UpdateOrder(orders);
                     FactoryService.instance.constant.stopwatch.Stop();
                     FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>更新{orders.Count}条订单记录");
                 }

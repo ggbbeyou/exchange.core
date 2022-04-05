@@ -205,7 +205,7 @@ public class ServiceWallet
         List<Running> runnings = new List<Running>();
         if (deals == null || deals.Count == 0)
         {
-            return (false, runnings);
+            return (true, runnings);
         }
         decimal temp_base = 0;
         decimal temp_quote = 0;

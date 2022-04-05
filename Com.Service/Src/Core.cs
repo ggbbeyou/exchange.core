@@ -178,30 +178,32 @@ public class Core
                 process.asset = result.result;
                 FactoryService.instance.constant.stopwatch.Stop();
                 FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>成交记录{deals.Count}条,实际资产转移(结果)");
-                if (orders.Count > 0)
+                if (result.result)
                 {
-                    if (process.order == false)
+                    if (process.order == false && orders.Count > 0)
                     {
                         FactoryService.instance.constant.stopwatch.Restart();
                         process.order = service_order.UpdateOrder(orders);
                         FactoryService.instance.constant.stopwatch.Stop();
                         FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>更新{orders.Count}条订单记录");
                     }
-                }
-                else
-                {
-                    process.order = true;
-                }
-                if (process.running == false)
-                {
-                    FactoryService.instance.constant.stopwatch.Restart();
-                    if (result.result)
+                    else
                     {
-                        process.running = service_wallet.AddRunning(result.running);
+                        process.order = true;
                     }
-                    FactoryService.instance.constant.stopwatch.Stop();
-                    FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>添加资金流水{result.running.Count}条");
+                    if (process.running == false && result.running.Count > 0)
+                    {
+                        FactoryService.instance.constant.stopwatch.Restart();
+                        process.running = service_wallet.AddRunning(result.running);
+                        FactoryService.instance.constant.stopwatch.Stop();
+                        FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>添加资金流水{result.running.Count}条");
+                    }
+                    else
+                    {
+                        process.running = true;
+                    }
                 }
+                Test();
             }
             if (process.deal == false)
             {

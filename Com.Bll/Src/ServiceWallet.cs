@@ -41,7 +41,7 @@ namespace Com.Bll;
 public class ServiceWallet
 {
 
-    private IsolationLevel isolationLevel = IsolationLevel.RepeatableRead;
+    private IsolationLevel isolationLevel = IsolationLevel.Serializable;
 
     /// <summary>
     /// 初始化

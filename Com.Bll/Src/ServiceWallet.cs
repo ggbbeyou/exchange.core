@@ -252,11 +252,12 @@ public class ServiceWallet
     /// <param name="orders">相关订单</param>
     /// <param name="deals">成交记录</param>
     /// <returns></returns>
-    public bool Transaction(Market market, List<Orders> orders, List<Deal> deals)
+    public (bool result, List<Running> running) Transaction(Market market, List<Orders> orders, List<Deal> deals)
     {
+        List<Running> runnings = new List<Running>();
         if (deals == null || deals.Count == 0 || orders == null || orders.Count == 0)
         {
-            return false;
+            return (false, runnings);
         }
         decimal temp_base = 0;
         decimal temp_quote = 0;
@@ -266,7 +267,7 @@ public class ServiceWallet
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
-                List<Running> runnings = new List<Running>();
+
                 E_WalletType wallet_type = E_WalletType.main;
                 if (market.market_type == E_MarketType.spot)
                 {
@@ -286,7 +287,7 @@ public class ServiceWallet
                         if (settlement_base == null || settlement_quote == null)
                         {
                             FactoryService.instance.constant.logger.LogError($"{market.symbol}:交易对没有找到结算账户");
-                            return false;
+                            return (false, runnings);
                         }
                         foreach (Deal item in deals)
                         {
@@ -301,7 +302,7 @@ public class ServiceWallet
                             if (buy_base == null || buy_quote == null || sell_base == null || sell_quote == null)
                             {
                                 FactoryService.instance.constant.logger.LogError($"{market.symbol}:用户:{item.bid_uid}/{item.ask_uid},未找到交易账户钱包");
-                                return false;
+                                return (false, runnings);
                             }
                             sell_base.freeze -= item.amount;
                             buy_quote.freeze -= item.total;
@@ -366,16 +367,15 @@ public class ServiceWallet
                             }
                         }
                         db.SaveChanges();
-                        db.Running.AddRange(runnings);
-                        db.SaveChanges();
                         transaction.Commit();
-                        return true;
+                        return (false, runnings);
                     }
                     catch (Exception ex)
                     {
                         transaction.Rollback();
                         FactoryService.instance.constant.logger.LogError(ex, market.symbol + ":Transaction," + ex.Message);
-                        return false;
+                        runnings.Clear();
+                        return (false, runnings);
                     }
                 }
             }

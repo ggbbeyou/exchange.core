@@ -162,7 +162,12 @@ public class Core
             if (process.asset == false)
             {
                 FactoryService.instance.constant.stopwatch.Restart();
-                process.asset = service_wallet.Transaction(this.model.info, orders, deals);
+                (bool result, List<Running> running) result = service_wallet.Transaction(this.model.info, orders, deals);
+                process.asset = result.result;
+                if (result.result && result.running.Count > 0)
+                {
+                    service_wallet.AddRunning(result.running);
+                }
                 FactoryService.instance.constant.stopwatch.Stop();
                 FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>成交记录{deals.Count}条,实际资产转移(结果)");
             }

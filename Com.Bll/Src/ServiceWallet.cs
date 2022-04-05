@@ -230,8 +230,8 @@ public class ServiceWallet
                     {
                         List<Wallet> wallets = db.Wallet.Where(P => P.wallet_type == wallet_type && user_id.Contains(P.user_id) && (P.coin_id == market.coin_id_base || P.coin_id == market.coin_id_quote)).ToList();
                         List<Wallet> wallets_settlement = db.Wallet.Where(P => P.wallet_type == E_WalletType.main && P.user_id == market.settlement_uid && (P.coin_id == market.coin_id_base || P.coin_id == market.coin_id_quote)).ToList();
-                        Wallet? settlement_base = wallets_settlement.Where(P => P.coin_id == market.coin_id_base).FirstOrDefault();
-                        Wallet? settlement_quote = wallets_settlement.Where(P => P.coin_id == market.coin_id_quote).FirstOrDefault();
+                        Wallet? settlement_base = wallets_settlement.Where(P => P.coin_id == market.coin_id_base).SingleOrDefault();
+                        Wallet? settlement_quote = wallets_settlement.Where(P => P.coin_id == market.coin_id_quote).SingleOrDefault();
                         if (settlement_base == null || settlement_quote == null)
                         {
                             FactoryService.instance.constant.logger.LogError($"{market.symbol}:交易对没有找到结算账户");
@@ -239,10 +239,10 @@ public class ServiceWallet
                         }
                         foreach (Deal item in deals)
                         {
-                            Wallet? buy_base = wallets.Where(P => P.coin_id == market.coin_id_base && P.user_id == item.bid_uid).FirstOrDefault();
-                            Wallet? buy_quote = wallets.Where(P => P.coin_id == market.coin_id_quote && P.user_id == item.bid_uid).FirstOrDefault();
-                            Wallet? sell_base = wallets.Where(P => P.coin_id == market.coin_id_base && P.user_id == item.ask_uid).FirstOrDefault();
-                            Wallet? sell_quote = wallets.Where(P => P.coin_id == market.coin_id_quote && P.user_id == item.ask_uid).FirstOrDefault();
+                            Wallet? buy_base = wallets.Where(P => P.coin_id == market.coin_id_base && P.user_id == item.bid_uid).SingleOrDefault();
+                            Wallet? buy_quote = wallets.Where(P => P.coin_id == market.coin_id_quote && P.user_id == item.bid_uid).SingleOrDefault();
+                            Wallet? sell_base = wallets.Where(P => P.coin_id == market.coin_id_base && P.user_id == item.ask_uid).SingleOrDefault();
+                            Wallet? sell_quote = wallets.Where(P => P.coin_id == market.coin_id_quote && P.user_id == item.ask_uid).SingleOrDefault();
                             if (buy_base == null || buy_quote == null || sell_base == null || sell_quote == null)
                             {
                                 FactoryService.instance.constant.logger.LogError($"{market.symbol}:用户:{item.bid_uid}/{item.ask_uid},未找到交易账户钱包");

@@ -15,7 +15,7 @@ builder.ConfigureServices((hostContext, services) =>
             services.AddDbContextPool<DbContextEF>(options =>
             {
                 // options.UseLoggerFactory(LoggerFactory.Create(builder => { builder.AddConsole(); }));
-                options.EnableSensitiveDataLogging();
+                // options.EnableSensitiveDataLogging();
                 DbContextOptions options1 = options.UseSqlServer(hostContext.Configuration.GetConnectionString("Mssql")).Options;
             });
             services.AddHostedService<MainService>();
@@ -30,7 +30,7 @@ builder.ConfigureLogging((hostContext, logging) =>
             logging.AddNLog();
         });
 var app = builder.Build();
-await app.RunAsync();
+app.Run();
 
 
 

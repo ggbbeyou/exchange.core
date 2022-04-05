@@ -40,6 +40,9 @@ namespace Com.Bll;
 /// </summary>
 public class ServiceWallet
 {
+
+    private IsolationLevel isolationLevel = IsolationLevel.ReadCommitted;
+
     /// <summary>
     /// 初始化
     /// </summary>
@@ -62,7 +65,7 @@ public class ServiceWallet
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
-                using (var transaction = db.Database.BeginTransaction(IsolationLevel.ReadCommitted))
+                using (var transaction = db.Database.BeginTransaction(isolationLevel))
                 {
                     try
                     {
@@ -121,7 +124,7 @@ public class ServiceWallet
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
-                using (var transaction = db.Database.BeginTransaction(IsolationLevel.ReadCommitted))
+                using (var transaction = db.Database.BeginTransaction(isolationLevel))
                 {
                     try
                     {
@@ -221,7 +224,7 @@ public class ServiceWallet
                 List<long> user_id = deals.Select(T => T.bid_uid).ToList();
                 user_id.AddRange(deals.Select(T => T.ask_uid).ToList());
                 user_id = user_id.Distinct().ToList();
-                using (var transaction = db.Database.BeginTransaction(IsolationLevel.ReadCommitted))
+                using (var transaction = db.Database.BeginTransaction(isolationLevel))
                 {
                     try
                     {
@@ -285,9 +288,12 @@ public class ServiceWallet
                         {
                             item.total = item.available + item.freeze;
                         }
-                        db.SaveChanges();
+                        db.Wallet.UpdateRange(wallets);
+                        db.Wallet.UpdateRange(wallets_settlement);
+                        int savecount = db.SaveChanges();
                         transaction.Commit();
-                        return (true, runnings);
+                        Test(db);
+                        return (savecount > 0, runnings);
                     }
                     catch (Exception ex)
                     {
@@ -320,7 +326,7 @@ public class ServiceWallet
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
-                using (var transaction = db.Database.BeginTransaction(IsolationLevel.ReadCommitted))
+                using (var transaction = db.Database.BeginTransaction(isolationLevel))
                 {
                     try
                     {
@@ -407,7 +413,19 @@ public class ServiceWallet
         }
     }
 
+    public void Test(DbContextEF db)
+    {
 
+        if (db.Wallet.Where(P => P.coin_name == "btc").Sum(P => P.freeze) != db.OrderSell.Sum(P => P.unsold))
+        {
+            FactoryService.instance.constant.logger.LogError($":资金不对");
+        }
+        if (db.Wallet.Where(P => P.coin_name == "usdt").Sum(P => P.freeze) != db.OrderBuy.Sum(P => P.unsold))
+        {
+            FactoryService.instance.constant.logger.LogError($":资金不对");
+
+        }
+    }
 
 
 }

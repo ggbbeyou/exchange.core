@@ -180,6 +180,7 @@ public class Core
                 {
                     service_wallet.AddRunning(result.running);
                 }
+                Test();
                 FactoryService.instance.constant.stopwatch.Stop();
                 FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>成交记录{deals.Count}条,实际资产转移(结果)");
             }
@@ -251,6 +252,7 @@ public class Core
                         }
                     }
                     process.order_complete_thaw = service_order.UpdateOrder(temp_order);
+                    Test();
                     FactoryService.instance.constant.stopwatch.Stop();
                     FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>更新{temp_order.Count}条订单记录(完成解冻多余资金)");
                 }
@@ -370,6 +372,24 @@ public class Core
         {
             process.order_cancel = true;
             process.push_order_cancel = true;
+        }
+    }
+
+    public void Test()
+    {
+        using (var scope = FactoryService.instance.constant.provider.CreateScope())
+        {
+            using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
+            {
+                if (db.Wallet.Where(P => P.coin_name == "btc").Sum(P => P.freeze) != db.OrderSell.Sum(P => P.unsold))
+                {
+                    FactoryService.instance.constant.logger.LogError(this.model.eventId, $"{this.model.eventId.Name}:资金不对");
+                }
+                if (db.Wallet.Where(P => P.coin_name == "usdt").Sum(P => P.freeze) != db.OrderBuy.Sum(P => P.unsold))
+                {
+                    FactoryService.instance.constant.logger.LogError(this.model.eventId, $"{this.model.eventId.Name}:资金不对");
+                }
+            }
         }
     }
 

@@ -24,6 +24,11 @@ public class Processing
     /// <value></value>
     public bool asset { get; set; }
     /// <summary>
+    /// 资产流水
+    /// </summary>
+    /// <value></value>
+    public bool running { get; set; }
+    /// <summary>
     /// 成交记录添加
     /// </summary>
     /// <value></value>

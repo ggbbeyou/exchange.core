@@ -176,6 +176,8 @@ public class Core
                 FactoryService.instance.constant.stopwatch.Restart();
                 (bool result, List<Running> running) result = service_wallet.Transaction(this.model.info, deals);
                 process.asset = result.result;
+                FactoryService.instance.constant.stopwatch.Stop();
+                FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>成交记录{deals.Count}条,实际资产转移(结果)");
                 if (orders.Count > 0)
                 {
                     if (process.order == false)
@@ -190,12 +192,16 @@ public class Core
                 {
                     process.order = true;
                 }
-                if (result.result && result.running.Count > 0)
+                if (process.running == false)
                 {
-                    service_wallet.AddRunning(result.running);
+                    FactoryService.instance.constant.stopwatch.Restart();
+                    if (result.result)
+                    {
+                        process.running = service_wallet.AddRunning(result.running);
+                    }
+                    FactoryService.instance.constant.stopwatch.Stop();
+                    FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>添加资金流水{result.running.Count}条");
                 }
-                FactoryService.instance.constant.stopwatch.Stop();
-                FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>成交记录{deals.Count}条,实际资产转移(结果)");
             }
             if (process.deal == false)
             {

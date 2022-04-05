@@ -95,7 +95,16 @@ public class FactoryMatching
             ServiceClearCache(info);
             ServiceWarmCache(info);
             model.run = true;
-            (string queue_name, string consume_tag) order_cancel = this.service[info.market].mq.OrderCancel();
+            (string queue_name, string consume_tag) receive_match_order = model.core.ReceiveMatchOrder();
+            if (!model.mq_queues.Contains(receive_match_order.queue_name))
+            {
+                model.mq_queues.Add(receive_match_order.queue_name);
+            }
+            if (!model.mq_consumer.Contains(receive_match_order.consume_tag))
+            {
+                model.mq_consumer.Add(receive_match_order.consume_tag);
+            }
+            (string queue_name, string consume_tag) order_cancel = model.mq.OrderCancel();
             if (!model.mq_queues.Contains(order_cancel.queue_name))
             {
                 model.mq_queues.Add(order_cancel.queue_name);
@@ -104,7 +113,7 @@ public class FactoryMatching
             {
                 model.mq_consumer.Add(order_cancel.consume_tag);
             }
-            (string queue_name, string consume_tag) order_receive = this.service[info.market].mq.OrderReceive();
+            (string queue_name, string consume_tag) order_receive = model.mq.OrderReceive();
             if (!model.mq_queues.Contains(order_receive.queue_name))
             {
                 model.mq_queues.Add(order_receive.queue_name);

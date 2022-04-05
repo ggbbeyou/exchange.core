@@ -225,18 +225,27 @@ public class ServiceDeal
     /// 深度行情保存到redis并且推送到MQ
     /// </summary>
     /// <param name="depth"></param>
-    public void PushTicker(ResTicker? ticker)
+    public bool PushTicker(ResTicker? ticker)
     {
-        if (ticker != null)
+        try
         {
-            ResWebsocker<ResTicker> resWebsocker = new ResWebsocker<ResTicker>();
-            resWebsocker.success = true;
-            resWebsocker.op = E_WebsockerOp.subscribe_date;
-            resWebsocker.channel = E_WebsockerChannel.tickers;
-            resWebsocker.data = ticker;
-            FactoryService.instance.constant.redis.HashSet(FactoryService.instance.GetRedisTicker(), ticker.market, JsonConvert.SerializeObject(ticker));
-            FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.tickers, ticker.market), JsonConvert.SerializeObject(resWebsocker));
+            if (ticker != null)
+            {
+                ResWebsocker<ResTicker> resWebsocker = new ResWebsocker<ResTicker>();
+                resWebsocker.success = true;
+                resWebsocker.op = E_WebsockerOp.subscribe_date;
+                resWebsocker.channel = E_WebsockerChannel.tickers;
+                resWebsocker.data = ticker;
+                FactoryService.instance.constant.redis.HashSet(FactoryService.instance.GetRedisTicker(), ticker.market, JsonConvert.SerializeObject(ticker));
+                FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.tickers, ticker.market), JsonConvert.SerializeObject(resWebsocker));
+            }
         }
+        catch (System.Exception ex)
+        {
+            FactoryService.instance.constant.logger.LogError(ex, "深度行情保存到redis并且推送到MQ失败");
+            return false;
+        }
+        return false;
     }
 
 

@@ -98,6 +98,12 @@ public class ServiceWallet
                         transaction.Commit();
                         return true;
                     }
+                    catch (DbUpdateConcurrencyException ex)
+                    {
+                        transaction.Rollback();
+                        FactoryService.instance.constant.logger.LogError(ex, "FreezeChange(并发):" + ex.Message);
+                        return false;
+                    }
                     catch (Exception ex)
                     {
                         transaction.Rollback();
@@ -181,6 +187,12 @@ public class ServiceWallet
                         db.SaveChanges();
                         transaction.Commit();
                         return true;
+                    }
+                    catch (DbUpdateConcurrencyException ex)
+                    {
+                        transaction.Rollback();
+                        FactoryService.instance.constant.logger.LogError(ex, "FreezeChange(并发):" + ex.Message);
+                        return false;
                     }
                     catch (Exception ex)
                     {
@@ -298,6 +310,13 @@ public class ServiceWallet
                         transaction.Commit();
                         return (savecount > 0, runnings);
                     }
+                    catch (DbUpdateConcurrencyException ex)
+                    {
+                        transaction.Rollback();
+                        FactoryService.instance.constant.logger.LogError(ex, "Transaction(并发):" + ex.Message);
+                        runnings.Clear();
+                        return (false, runnings);
+                    }
                     catch (Exception ex)
                     {
                         transaction.Rollback();
@@ -354,6 +373,12 @@ public class ServiceWallet
                         db.SaveChanges();
                         transaction.Commit();
                         return true;
+                    }
+                    catch (DbUpdateConcurrencyException ex)
+                    {
+                        transaction.Rollback();
+                        FactoryService.instance.constant.logger.LogError(ex, "TansferAvailable(并发):" + ex.Message);
+                        return false;
                     }
                     catch (Exception ex)
                     {

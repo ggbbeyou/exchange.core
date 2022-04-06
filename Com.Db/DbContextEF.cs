@@ -335,9 +335,10 @@ public class DbContextEF : DbContext
             o.Property(P => P.user_name).HasColumnType("nvarchar").HasMaxLength(50).HasComment("用户名");
             o.Property(P => P.coin_id).IsRequired().ValueGeneratedNever().HasColumnType("bigint").HasComment(" 币id");
             o.Property(P => P.coin_name).HasColumnType("nvarchar").HasMaxLength(20).HasComment("币名称");
-            o.Property(P => P.total).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("总额");
-            o.Property(P => P.available).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("可用");
-            o.Property(P => P.freeze).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("冻结");
+            o.Property(P => P.total).IsRequired().IsConcurrencyToken().HasColumnType("decimal").HasPrecision(28, 16).HasComment("总额");
+            o.Property(P => P.available).IsRequired().IsConcurrencyToken().HasColumnType("decimal").HasPrecision(28, 16).HasComment("可用");
+            o.Property(P => P.freeze).IsRequired().IsConcurrencyToken().HasColumnType("decimal").HasPrecision(28, 16).HasComment("冻结");
+            o.Property(P => P.timestamp).IsRequired().IsRowVersion().HasColumnType("timestamp").HasComment("行版本");
             o.ToTable(nameof(Wallet));
         });
 

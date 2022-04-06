@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Com.Api.Sdk;
 using Com.Api.Sdk.Enum;
@@ -49,17 +50,26 @@ public class Wallet
     /// </summary>
     /// <value></value>
     [JsonConverter(typeof(JsonConverterDecimal))]
+    // .IsConcurrencyToken()
+    // [ConcurrencyCheck]
     public decimal total { get; set; }
     /// <summary>
     /// 可用
     /// </summary>
     /// <value></value>
     [JsonConverter(typeof(JsonConverterDecimal))]
+    // [ConcurrencyCheck]
     public decimal available { get; set; }
     /// <summary>
     /// 冻结
     /// </summary>
     /// <value></value>
     [JsonConverter(typeof(JsonConverterDecimal))]
+    // [ConcurrencyCheck]
     public decimal freeze { get; set; }
+    /// <summary>
+    /// 行版本
+    /// </summary>
+    /// <value></value>
+    public byte[] timestamp { get; set; } = null!;
 }

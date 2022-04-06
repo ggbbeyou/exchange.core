@@ -73,7 +73,6 @@ public class ServiceOrder
             res.message = "client_id长度不能超过50";
             return res;
         }
-
         if (orders.Any(P => P.type == E_OrderType.limit && (P.price == null || P.price <= 0)))
         {
             res.code = E_Res_Code.field_error;
@@ -106,7 +105,7 @@ public class ServiceOrder
             return res;
         }
         res.market = info.market;
-        if (info.transaction == false)
+        if (info.transaction == false && info.status == false)
         {
             res.code = E_Res_Code.field_error;
             res.message = "该交易对禁止下单(系统设置)";

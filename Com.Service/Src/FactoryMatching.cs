@@ -95,7 +95,7 @@ public class FactoryMatching
             ServiceClearCache(info);
             ServiceWarmCache(info);
             model.run = true;
-            (string queue_name, string consume_tag) receive_match_order = model.core.ReceiveMatchOrder();            
+            (string queue_name, string consume_tag) receive_match_order = model.core.ReceiveMatchOrder();
             if (!model.mq_consumer.Contains(receive_match_order.consume_tag))
             {
                 model.mq_consumer.Add(receive_match_order.consume_tag);
@@ -165,6 +165,12 @@ public class FactoryMatching
                 FactoryService.instance.constant.MqDeleteConsumer(item);
             }
             mm.mq_consumer.Clear();
+            string queue_name = FactoryService.instance.GetMqOrderPlace(info.market);
+            if (!mm.mq_queues.Contains(queue_name))
+            {
+                FactoryService.instance.constant.i_model.QueueDeclare(queue: queue_name, durable: true, exclusive: false, autoDelete: false, arguments: null);
+                mm.mq_queues.Add(queue_name);
+            }
             foreach (var item in mm.mq_queues)
             {
                 FactoryService.instance.constant.MqDeletePurge(item);

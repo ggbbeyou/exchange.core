@@ -18,6 +18,28 @@
             }
         },
         {
+            "name": "Gateway",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build-Gateway",
+            "program": "${workspaceFolder}/Com.Gateway/bin/Debug/net6.0/Com.Gateway.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/Com.Gateway",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+                // "ASPNETCORE_ENVIRONMENT": "Staging"
+                // "ASPNETCORE_ENVIRONMENT": "Production"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceFolder}/Views"
+            }
+        },
+        {
             "name": "Api",
             "type": "coreclr",
             "request": "launch",
@@ -31,8 +53,8 @@
                 "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
             },
             "env": {
-                // "ASPNETCORE_ENVIRONMENT": "Development"
-                "ASPNETCORE_ENVIRONMENT": "Staging"
+                "ASPNETCORE_ENVIRONMENT": "Development"
+                // "ASPNETCORE_ENVIRONMENT": "Staging"
                 // "ASPNETCORE_ENVIRONMENT": "Production"
             },
             "sourceFileMap": {

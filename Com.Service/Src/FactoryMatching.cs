@@ -95,11 +95,7 @@ public class FactoryMatching
             ServiceClearCache(info);
             ServiceWarmCache(info);
             model.run = true;
-            (string queue_name, string consume_tag) receive_match_order = model.core.ReceiveMatchOrder();
-            if (!model.mq_queues.Contains(receive_match_order.queue_name))
-            {
-                model.mq_queues.Add(receive_match_order.queue_name);
-            }
+            (string queue_name, string consume_tag) receive_match_order = model.core.ReceiveMatchOrder();            
             if (!model.mq_consumer.Contains(receive_match_order.consume_tag))
             {
                 model.mq_consumer.Add(receive_match_order.consume_tag);

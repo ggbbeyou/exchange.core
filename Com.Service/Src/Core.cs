@@ -149,7 +149,7 @@ public class Core
             ReceiveDealOrder(process, deals.orders, deals.deals, deals.cancels);
             this.stopwatch.Stop();
             FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{this.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:撮合后续处理总时间(成交记录数:{deals.deals.Count},成交订单数:{deals.orders.Count},撤单数:{deals.cancels.Count}),处理结果:{JsonConvert.SerializeObject(process)}");
-            if (process.match && process.asset && process.deal && process.order && process.order_cancel && process.push_order && process.push_order_cancel && process.sync_kline && process.push_kline && process.push_deal && process.push_ticker)
+            if (process.match && process.asset && process.running && process.deal && process.order && process.order_cancel && process.order_complete_thaw && process.push_order && process.push_order_cancel && process.sync_kline && process.push_kline && process.push_deal && process.push_ticker)
             {
                 FactoryService.instance.constant.redis.HashDelete(FactoryService.instance.GetRedisProcess(), process.no);
                 return true;
@@ -358,6 +358,19 @@ public class Core
                 FactoryService.instance.constant.stopwatch.Stop();
                 FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:Mq,Redis=>推送聚合行情");
             }
+        }
+        else
+        {
+            process.asset = true;
+            process.running = true;
+            process.deal = true;
+            process.order = true;
+            process.order_complete_thaw = true;
+            process.push_order = true;
+            process.sync_kline = true;
+            process.push_kline = true;
+            process.push_deal = true;
+            process.push_ticker = true;
         }
         if (cancels.Count > 0)
         {

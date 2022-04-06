@@ -105,7 +105,7 @@ public class ServiceOrder
             return res;
         }
         res.market = info.market;
-        if (info.transaction == false && info.status == false)
+        if (info.transaction == false || info.status == false)
         {
             res.code = E_Res_Code.field_error;
             res.message = "该交易对禁止下单(系统设置)";

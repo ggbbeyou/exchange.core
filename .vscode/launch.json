@@ -31,8 +31,8 @@
                 "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
             },
             "env": {
-                "ASPNETCORE_ENVIRONMENT": "Development"
-                // "ASPNETCORE_ENVIRONMENT": "Staging"
+                // "ASPNETCORE_ENVIRONMENT": "Development"
+                "ASPNETCORE_ENVIRONMENT": "Staging"
                 // "ASPNETCORE_ENVIRONMENT": "Production"
             },
             "sourceFileMap": {
@@ -53,8 +53,8 @@
                 "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
             },
             "env": {
-                "ASPNETCORE_ENVIRONMENT": "Development"
-                // "ASPNETCORE_ENVIRONMENT": "Staging"
+                // "ASPNETCORE_ENVIRONMENT": "Development"
+                "ASPNETCORE_ENVIRONMENT": "Staging"
                 // "ASPNETCORE_ENVIRONMENT": "Production"
             },
             "sourceFileMap": {

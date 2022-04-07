@@ -16,7 +16,7 @@ namespace Com.Api.Controllers;
 /// </summary>
 [Route("[controller]")]
 [ApiController]
-[AllowAnonymous]
+// [AllowAnonymous]
 public class MarketController : ControllerBase
 {
     /// <summary>

@@ -55,7 +55,7 @@ public class WalletController : ControllerBase
     }
 
     /// <summary>
-    /// 划转
+    /// 划转(同一账户同一币种不同钱包类型划转资金)
     /// </summary>
     /// <param name="coin_id">币id</param>
     /// <param name="from">支付钱包类型</param>

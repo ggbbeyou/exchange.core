@@ -57,10 +57,10 @@ public class WalletController : ControllerBase
     /// <summary>
     /// 划转
     /// </summary>
-    /// <param name="coin_id"></param>
-    /// <param name="from"></param>
-    /// <param name="to"></param>
-    /// <param name="amount"></param>
+    /// <param name="coin_id">币id</param>
+    /// <param name="from">支付钱包类型</param>
+    /// <param name="to">接收钱包类型</param>
+    /// <param name="amount">金额</param>
     /// <returns></returns>
     [HttpPost]
     [Route("Transfer")]

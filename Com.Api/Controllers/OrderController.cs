@@ -1,5 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using Com.Api.Sdk.Enum;
 using Com.Api.Sdk.Models;
 using Com.Bll;
 using Com.Db;
@@ -65,19 +66,19 @@ public class OrderController : ControllerBase
     {
         //判断用户api是否有交易权限
         ResCall<List<ResOrder>> result = new ResCall<List<ResOrder>>();
-        // Users? users = user_service.GetUser(uid);
-        // if (users == null)
-        // {
-        //     result.code = E_Res_Code.no_user;
-        //     result.message = "未找到该用户";
-        //     return Json(result);
-        // }
-        // if (users.disabled || !users.transaction)
-        // {
-        //     result.code = E_Res_Code.no_permission;
-        //     result.message = "用户禁止下单";
-        //     return Json(result);
-        // }
+        Users? users = service_user.GetUser(login.user_id);
+        if (users == null)
+        {
+            result.code = E_Res_Code.no_user;
+            result.message = "未找到该用户";
+            return result;
+        }
+        if (users.disabled || !users.transaction)
+        {
+            result.code = E_Res_Code.no_permission;
+            result.message = "用户禁止下单";
+            return result;
+        }
         ResCall<List<ResOrder>> res = service_order.PlaceOrder(symbol, login.user_id, login.user_name, orders);
         result = new ResCall<List<ResOrder>>()
         {
@@ -102,7 +103,6 @@ public class OrderController : ControllerBase
     [Route("OrderCancel")]
     public ResCall<KeyValuePair<long, List<long>>> OrderCancel(long market, int type, List<long> data)
     {
-        var a = login;
         ResCall<KeyValuePair<long, List<long>>> res = new ResCall<KeyValuePair<long, List<long>>>();
         if (type != 2 || type != 3 || type != 4 || type != 5)
         {

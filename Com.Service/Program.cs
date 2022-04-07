@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Grpc.Net.Client;
 using Com.Service;
 using NLog.Extensions.Logging;
+using Exceptionless;
 
 IHostBuilder builder = Host.CreateDefaultBuilder(args);
 builder.ConfigureServices((hostContext, services) =>
@@ -29,6 +30,7 @@ builder.ConfigureLogging((hostContext, logging) =>
 #endif
             logging.AddNLog();
         });
+ExceptionlessClient.Default.Startup("kaOhMYizKiSSQaFtlOiWEpbb49GrBTi7rhGHuPXd");
 var app = builder.Build();
 app.Run();
 

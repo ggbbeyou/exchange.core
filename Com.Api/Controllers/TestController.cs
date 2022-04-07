@@ -268,7 +268,7 @@ public class TestController : ControllerBase
             transaction = true,
             settlement_uid = settlement_btc_usdt.user_id,
             last_price = 50000,
-            service_url = "http://localhost:8080",
+            service_url = "http://localhost:8800",
         };
         Market ethusdt = new Market()
         {
@@ -288,7 +288,7 @@ public class TestController : ControllerBase
             transaction = true,
             settlement_uid = settlement_eth_usdt.user_id,
             last_price = 5000,
-            service_url = "http://localhost:8080",
+            service_url = "http://localhost:8800",
         };
         this.db.Market.Add(btcusdt);
         this.db.Market.Add(ethusdt);

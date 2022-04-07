@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Com.Api.Controllers;
 
 /// <summary>
-/// 
+/// 账户
 /// </summary>
 [ApiController]
 [AllowAnonymous]
@@ -18,7 +18,7 @@ namespace Com.Api.Controllers;
 public class AccountController : ControllerBase
 {
     /// <summary>
-    /// 
+    /// 日志接口
     /// </summary>
     private readonly ILogger<AccountController> logger;
     /// <summary>

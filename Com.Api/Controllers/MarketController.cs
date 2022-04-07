@@ -19,39 +19,11 @@ namespace Com.Api.Controllers;
 [AllowAnonymous]
 public class MarketController : ControllerBase
 {
+    /// <summary>
+    /// 日志接口
+    /// </summary>
     private readonly ILogger<MarketController> logger;
-    /// <summary>
-    /// 登录玩家id
-    /// </summary>
-    /// <value></value>
-    public int uid
-    {
-        get
-        {
-            Claim? claim = User.Claims.FirstOrDefault(P => P.Type == JwtRegisteredClaimNames.Aud);
-            if (claim != null)
-            {
-                return Convert.ToInt32(claim.Value);
-            }
-            return 5;
-        }
-    }
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <value></value>
-    public string user_name
-    {
-        get
-        {
-            Claim? claim = User.Claims.FirstOrDefault(P => P.Type == JwtRegisteredClaimNames.Aud);
-            if (claim != null)
-            {
-                return (claim.Value);
-            }
-            return "";
-        }
-    }
+
     /// <summary>
     /// 用户服务
     /// </summary>
@@ -63,7 +35,6 @@ public class MarketController : ControllerBase
     /// </summary>
     /// <returns></returns>
     public ServiceMarket service_market = new ServiceMarket();
-
     /// <summary>
     /// Service:订单
     /// </summary>

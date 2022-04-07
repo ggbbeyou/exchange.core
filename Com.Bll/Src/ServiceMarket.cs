@@ -226,27 +226,7 @@ public class ServiceMarket
                 }
             }
         }
-    }
+    }   
 
-    /// <summary>
-    /// 交易量转换
-    /// </summary>
-    /// <param name="amount">交易量</param>
-    /// <param name="amount_multiple">最小交易量倍数</param>
-    /// <returns></returns>
-    public decimal ConvertAmount(decimal amount, decimal amount_multiple)
-    {
-        return ((int)(amount / amount_multiple)) * amount_multiple;
-    }
 
-    /// <summary>
-    /// 交易价转换
-    /// </summary>
-    /// <param name="price">交易价</param>
-    /// <param name="price_places">价格最小位数(截断)</param>
-    /// <returns></returns>
-    public decimal ConvertPrice(decimal price, int price_places)
-    {
-        return Math.Round(price, price_places, MidpointRounding.ToNegativeInfinity);
-    }
 }

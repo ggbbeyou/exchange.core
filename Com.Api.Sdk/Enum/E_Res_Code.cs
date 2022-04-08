@@ -25,9 +25,13 @@ public enum E_Res_Code
     /// </summary>
     fail = 1001,
     /// <summary>
-    /// 数据操作出错
+    /// 数据库操作出错
     /// </summary>
     db_error,
+    /// <summary>
+    /// 服务操作出错
+    /// </summary>
+    service_error,
     /// <summary>
     /// 无权限
     /// </summary>
@@ -115,7 +119,7 @@ public enum E_Res_Code
     available_not_enough,
 
 
- 
+
 
 
 

@@ -69,7 +69,7 @@ public class ServiceController : ControllerBase
         if (marketInfo == null)
         {
             res.success = false;
-            res.code = E_Res_Code.fail;
+            res.code = E_Res_Code.symbol_not_found;
             res.message = "交易对不存在";
             res.data = null;
         }
@@ -83,7 +83,7 @@ public class ServiceController : ControllerBase
             if (marketInfo.last_price <= 0)
             {
                 res.success = false;
-                res.code = E_Res_Code.fail;
+                res.code = E_Res_Code.trans_price_cannot_lower_0;
                 res.message = "最后成交价不能小于0";
                 res.data = null;
             }

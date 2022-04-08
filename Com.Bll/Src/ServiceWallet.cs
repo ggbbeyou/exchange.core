@@ -67,7 +67,7 @@ public class ServiceWallet
         if (amount <= 0)
         {
             res.success = false;
-            res.code = E_Res_Code.fail;
+            res.code = E_Res_Code.amount_cannot_lass_0;
             res.message = "划转金额不能低于0";
             return res;
         }
@@ -84,14 +84,14 @@ public class ServiceWallet
                         if (wallet_from == null || wallet_to == null)
                         {
                             res.success = false;
-                            res.code = E_Res_Code.fail;
+                            res.code = E_Res_Code.wallet_not_found;
                             res.message = "钱包不存在";
                             return res;
                         }
                         if (wallet_from.available < amount)
                         {
                             res.success = false;
-                            res.code = E_Res_Code.fail;
+                            res.code = E_Res_Code.available_not_enough;
                             res.message = "可用资产不足";
                             return res;
                         }

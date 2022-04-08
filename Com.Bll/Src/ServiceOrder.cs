@@ -99,7 +99,7 @@ public class ServiceOrder
         Market? info = this.service_market.GetMarketBySymbol(symbol);
         if (info == null)
         {
-            res.code = E_Res_Code.no_symbol;
+            res.code = E_Res_Code.symbol_not_found;
             res.message = "未找到该交易对";
             return res;
         }
@@ -154,7 +154,7 @@ public class ServiceOrder
         Users? users = service_user.GetUser(uid);
         if (users == null)
         {
-            res.code = E_Res_Code.no_user;
+            res.code = E_Res_Code.user_not_found;
             res.message = "未找到该用户";
             return res;
         }
@@ -243,7 +243,7 @@ public class ServiceOrder
         {
             if (!service_wallet.FreezeChange(wallet_type, uid, info.coin_id_base, coin_base, info.coin_id_quote, coin_quote))
             {
-                res.code = E_Res_Code.low_capital;
+                res.code = E_Res_Code.available_not_enough;
                 res.message = "基础币种或报价币种余额不足";
                 return res;
             }
@@ -252,7 +252,7 @@ public class ServiceOrder
         {
             if (!service_wallet.FreezeChange(wallet_type, uid, info.coin_id_base, coin_base))
             {
-                res.code = E_Res_Code.low_capital;
+                res.code = E_Res_Code.available_not_enough;
                 res.message = "基础币种余额不足";
                 return res;
             }
@@ -261,7 +261,7 @@ public class ServiceOrder
         {
             if (!service_wallet.FreezeChange(wallet_type, uid, info.coin_id_quote, coin_quote))
             {
-                res.code = E_Res_Code.low_capital;
+                res.code = E_Res_Code.available_not_enough;
                 res.message = "报价币种余额不足";
                 return res;
             }
@@ -341,7 +341,7 @@ public class ServiceOrder
         Market? info = this.service_market.GetMarketBySymbol(symbol);
         if (info == null)
         {
-            res.code = E_Res_Code.no_symbol;
+            res.code = E_Res_Code.symbol_not_found;
             res.message = "未找到该交易对";
             return res;
         }
@@ -354,7 +354,7 @@ public class ServiceOrder
         Users? users = service_user.GetUser(uid);
         if (users == null)
         {
-            res.code = E_Res_Code.no_user;
+            res.code = E_Res_Code.user_not_found;
             res.message = "未找到该用户";
             return res;
         }

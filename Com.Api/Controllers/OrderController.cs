@@ -69,7 +69,7 @@ public class OrderController : ControllerBase
         Users? users = service_user.GetUser(login.user_id);
         if (users == null)
         {
-            result.code = E_Res_Code.no_user;
+            result.code = E_Res_Code.user_not_found;
             result.message = "未找到该用户";
             return result;
         }

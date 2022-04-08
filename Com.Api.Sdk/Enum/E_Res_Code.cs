@@ -25,6 +25,10 @@ public enum E_Res_Code
     /// </summary>
     fail = 1001,
     /// <summary>
+    /// 数据操作出错
+    /// </summary>
+    db_error,
+    /// <summary>
     /// 无权限
     /// </summary>
     no_permission = 1002,
@@ -33,7 +37,10 @@ public enum E_Res_Code
     /// 未找到交易对
     /// </summary>
     symbol_not_found = 1004,
-
+    /// <summary>
+    /// 字段长度过长
+    /// </summary>
+    length_too_long,
 
 
     //////用户相关错误码/////////////////////////////////////////////////////////////////////
@@ -44,6 +51,10 @@ public enum E_Res_Code
     /// 未找到该用户
     /// </summary>
     user_not_found,
+    /// <summary>
+    /// 未找到该用户vip
+    /// </summary>
+    vip_not_found,
 
 
     //////订单相关错误码/////////////////////////////////////////////////////////////////////
@@ -53,6 +64,10 @@ public enum E_Res_Code
     /// </summary>
     system_prohibit_place_order,
     /// <summary>
+    /// 用户禁止挂单
+    /// </summary>
+    user_prohibit_place_order,
+    /// <summary>
     /// 成交价格不能低于0
     /// </summary>
     trans_price_cannot_lower_0,
@@ -60,6 +75,28 @@ public enum E_Res_Code
     /// 成交价格不能低于0
     /// </summary>
     amount_cannot_lower_0,
+    /// <summary>
+    /// 限价单交易价错误
+    /// </summary>
+    limit_price_error,
+    /// <summary>
+    /// 限价单交易量错误
+    /// </summary>
+    limit_amount_error,
+
+    /// <summary>
+    /// 市价单交易额错误
+    /// </summary>
+    market_total_error,
+    /// <summary>
+    /// 市价单交易量错误
+    /// </summary>
+    market_amount_error,
+    /// <summary>
+    /// 交易模式
+    /// </summary>
+    trade_model_error,
+
 
     //////资金相关错误码/////////////////////////////////////////////////////////////////////
 
@@ -78,10 +115,7 @@ public enum E_Res_Code
     available_not_enough,
 
 
-    /// <summary>
-    /// 字段内容格式出错
-    /// </summary>
-    field_error = 6,
+ 
 
 
 

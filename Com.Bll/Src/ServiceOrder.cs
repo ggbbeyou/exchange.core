@@ -68,31 +68,31 @@ public class ServiceOrder
         res.data = new List<ResOrder>();
         if (orders.Max(P => P.client_id?.Length ?? 0) > 50)
         {
-            res.code = E_Res_Code.field_error;
+            res.code = E_Res_Code.length_too_long;
             res.message = "client_id长度不能超过50";
             return res;
         }
         if (orders.Any(P => P.type == E_OrderType.limit && (P.price == null || P.price <= 0)))
         {
-            res.code = E_Res_Code.field_error;
+            res.code = E_Res_Code.limit_price_error;
             res.message = "price:限价单,交易价不能为低于0";
             return res;
         }
         if (orders.Any(P => P.type == E_OrderType.limit && (P.amount == null || P.amount <= 0)))
         {
-            res.code = E_Res_Code.field_error;
+            res.code = E_Res_Code.limit_amount_error;
             res.message = "amount:限价单,交易量不能低于0";
             return res;
         }
         if (orders.Any(P => P.type == E_OrderType.market && P.side == E_OrderSide.buy && (P.total == null || P.total <= 0)))
         {
-            res.code = E_Res_Code.field_error;
+            res.code = E_Res_Code.market_total_error;
             res.message = "total:市价买单,交易额不能为低于0";
             return res;
         }
         if (orders.Any(P => P.type == E_OrderType.market && P.side == E_OrderSide.sell && (P.amount == null || P.amount <= 0)))
         {
-            res.code = E_Res_Code.field_error;
+            res.code = E_Res_Code.market_amount_error;
             res.message = "amount:市价卖单,交易量不能为低于0";
             return res;
         }
@@ -105,49 +105,49 @@ public class ServiceOrder
         }
         if (info.transaction == false || info.status == false)
         {
-            res.code = E_Res_Code.field_error;
+            res.code = E_Res_Code.system_prohibit_place_order;
             res.message = "该交易对禁止下单(系统设置)";
             return res;
         }
         if (info.market_type == E_MarketType.spot && orders.Any(P => P.trade_model != E_TradeModel.cash))
         {
-            res.code = E_Res_Code.field_error;
+            res.code = E_Res_Code.trade_model_error;
             res.message = "trade_model:现货交易对必须是现货交易模式";
             return res;
         }
         if (orders.Any(P => P.type == E_OrderType.limit && Math.Round(P.price ?? 0, info.places_price, MidpointRounding.ToNegativeInfinity) != P.price))
         {
-            res.code = E_Res_Code.field_error;
+            res.code = E_Res_Code.limit_price_error;
             res.message = $"price:限价单交易价精度错误(交易价小数位:{info.places_price})";
             return res;
         }
         if (orders.Any(P => (P.type == E_OrderType.limit && Math.Round(P.amount ?? 0, info.places_amount, MidpointRounding.ToNegativeInfinity) != P.amount)))
         {
-            res.code = E_Res_Code.field_error;
+            res.code = E_Res_Code.limit_amount_error;
             res.message = $"amount:限价单交易量精度错误(交易量小数位:{info.places_amount})";
             return res;
         }
         if (orders.Any(P => (P.type == E_OrderType.market && P.side == E_OrderSide.buy && Math.Round(P.total ?? 0, info.places_price + info.places_amount, MidpointRounding.ToNegativeInfinity) != P.total)))
         {
-            res.code = E_Res_Code.field_error;
+            res.code = E_Res_Code.market_total_error;
             res.message = $"total:市价买单交易额精度错误(交易额小数位:{info.places_price + info.places_amount})";
             return res;
         }
         if (orders.Any(P => P.type == E_OrderType.limit && P.price * P.amount < info.trade_min))
         {
-            res.code = E_Res_Code.field_error;
+            res.code = E_Res_Code.market_amount_error;
             res.message = $"price * mount:限价单交易额不能低于:{info.trade_min})";
             return res;
         }
         if (orders.Any(P => P.type == E_OrderType.market && P.side == E_OrderSide.buy && P.total < info.trade_min))
         {
-            res.code = E_Res_Code.field_error;
+            res.code = E_Res_Code.market_total_error;
             res.message = $"total:市价买单交易额不能低于:{info.trade_min})";
             return res;
         }
         if (orders.Any(P => P.type == E_OrderType.market && P.side == E_OrderSide.sell && P.amount < info.trade_min_market_sell))
         {
-            res.code = E_Res_Code.field_error;
+            res.code = E_Res_Code.market_amount_error;
             res.message = $"amount:市价卖单交易量不能低于:{info.trade_min_market_sell})";
             return res;
         }
@@ -160,14 +160,14 @@ public class ServiceOrder
         }
         if (users.disabled || !users.transaction)
         {
-            res.code = E_Res_Code.no_permission;
+            res.code = E_Res_Code.user_prohibit_place_order;
             res.message = "用户禁止下单";
             return res;
         }
         Vip? vip = service_user.GetVip(users.vip);
         if (vip == null)
         {
-            res.code = E_Res_Code.field_error;
+            res.code = E_Res_Code.vip_not_found;
             res.message = "未找到该用户的vip等级信息";
             return res;
         }
@@ -282,7 +282,7 @@ public class ServiceOrder
         }
         if (dbcount <= 0)
         {
-            res.code = E_Res_Code.field_error;
+            res.code = E_Res_Code.db_error;
             res.message = "挂单失败";
             return res;
         }
@@ -347,7 +347,7 @@ public class ServiceOrder
         }
         if (info.transaction == false || info.status == false)
         {
-            res.code = E_Res_Code.field_error;
+            res.code = E_Res_Code.system_prohibit_place_order;
             res.message = "该交易对禁止下单(系统设置)";
             return res;
         }

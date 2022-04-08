@@ -269,6 +269,7 @@ public class ServiceOrder
         FactoryService.instance.constant.stopwatch.Stop();
         FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{info.symbol}:挂单=>校验/冻结资金{temp_order.Count}条挂单记录");
         FactoryService.instance.constant.stopwatch.Restart();
+        int dbcount = 0;
         using (var scope = FactoryService.instance.constant.provider.CreateScope())
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
@@ -276,11 +277,17 @@ public class ServiceOrder
                 (List<OrderBuy> buy, List<OrderSell> sell) aaa = ConvertOrder(temp_order);
                 db.OrderBuy.AddRange(aaa.buy);
                 db.OrderSell.AddRange(aaa.sell);
-                db.SaveChanges();
+                dbcount = db.SaveChanges();
             }
         }
+        if (dbcount <= 0)
+        {
+            res.code = E_Res_Code.field_error;
+            res.message = "挂单失败";
+            return res;
+        }
         FactoryService.instance.constant.stopwatch.Stop();
-        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{info.symbol}:挂单=>插入{temp_order.Count}条订单到DB");
+        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{info.symbol}:挂单=>插入{dbcount}条订单到DB");
         FactoryService.instance.constant.stopwatch.Restart();
         ReqCall<List<Orders>> call_req = new ReqCall<List<Orders>>();
         call_req.op = E_Op.place;

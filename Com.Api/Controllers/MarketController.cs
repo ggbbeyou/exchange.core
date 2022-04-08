@@ -91,7 +91,7 @@ public class MarketController : ControllerBase
     /// <returns></returns>
     [HttpGet]
     [Route("deals")]
-    public Res<List<ResDeal>> deals(string symbol, DateTimeOffset start, DateTimeOffset? end, long skip, long take)
+    public Res<List<ResDeal>> Deals(string symbol, DateTimeOffset start, DateTimeOffset? end, long skip, long take)
     {
         return service_market.Deals(symbol, start, end, skip, take);
     }

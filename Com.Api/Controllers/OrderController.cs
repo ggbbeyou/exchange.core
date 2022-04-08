@@ -95,13 +95,13 @@ public class OrderController : ControllerBase
     /// <summary>
     /// 撤单
     /// </summary>
-    /// <param name="market"></param>
+    /// <param name="symbol">交易对</param>
     /// <param name="type">2:按交易对和用户全部撤单,3:按用户和订单id撤单,4:按用户和用户订单id撤单</param>
     /// <param name="data"></param>
     /// <returns></returns>
     [HttpPost]
     [Route("OrderCancel")]
-    public ResCall<KeyValuePair<long, List<long>>> OrderCancel(long market, int type, List<long> data)
+    public ResCall<KeyValuePair<long, List<long>>> OrderCancel(string symbol, int type, List<long> data)
     {
         ResCall<KeyValuePair<long, List<long>>> res = new ResCall<KeyValuePair<long, List<long>>>();
         if (type != 2 || type != 3 || type != 4 || type != 5)

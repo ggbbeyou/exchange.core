@@ -57,14 +57,13 @@ public class ServiceOrder
     /// <param name="user_name">用户名</param>
     /// <param name="order">订单列表</param>
     /// <returns></returns>
-    public ResCall<List<ResOrder>> PlaceOrder(string symbol, long uid, string user_name, List<ReqOrder> orders)
+    public Res<List<ResOrder>> PlaceOrder(string symbol, long uid, string user_name, List<ReqOrder> orders)
     {
-        ResCall<List<ResOrder>> res = new ResCall<List<ResOrder>>();
+        Res<List<ResOrder>> res = new Res<List<ResOrder>>();
         this.stopwatch.Restart();
         FactoryService.instance.constant.stopwatch.Restart();
         res.success = false;
         res.code = E_Res_Code.fail;
-        res.op = E_Op.place;
         res.message = "";
         res.data = new List<ResOrder>();
         if (orders.Max(P => P.client_id?.Length ?? 0) > 50)
@@ -104,7 +103,6 @@ public class ServiceOrder
             res.message = "未找到该交易对";
             return res;
         }
-        res.market = info.market;
         if (info.transaction == false || info.status == false)
         {
             res.code = E_Res_Code.field_error;
@@ -291,10 +289,8 @@ public class ServiceOrder
         FactoryService.instance.constant.MqSend(FactoryService.instance.GetMqOrderPlace(info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(call_req)));
         FactoryService.instance.constant.stopwatch.Stop();
         FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{info.symbol}:挂单=>插入{call_req.data.Count}条订单到Mq");
-        res.op = E_Op.place;
         res.success = true;
         res.code = E_Res_Code.ok;
-        res.market = info.market;
         res.message = "挂单成功";
         res.data.AddRange(temp_order);
         this.stopwatch.Stop();

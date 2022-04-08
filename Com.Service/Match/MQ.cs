@@ -81,7 +81,6 @@ public class MQ
                     ReqCall<List<Orders>>? req = JsonConvert.DeserializeObject<ReqCall<List<Orders>>>(json);
                     if (req != null && req.op == E_Op.place && req.data != null && req.data.Count > 0)
                     {
-                        this.mutex.WaitOne();
                         orders.Clear();
                         deal.Clear();
                         cancel.Clear();
@@ -106,11 +105,13 @@ public class MQ
                         FactoryService.instance.constant.stopwatch.Stop();
                         FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:撮合订单{req.data.Count}条");
                         DepthChange(orders, deal, cancel);
-                        this.mutex.ReleaseMutex();
                     };
                 }
                 else
                 {
+                    orders.Clear();
+                    deal.Clear();
+                    cancel.Clear();
                     ReqCall<(long uid, List<long> order_id)>? req = JsonConvert.DeserializeObject<ReqCall<(long, List<long>)>>(json);
                     if (req != null)
                     {

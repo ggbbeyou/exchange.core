@@ -313,20 +313,66 @@ public class ServiceOrder
     /// <param name="type">1:按交易对全部撤单,2:按交易对和用户全部撤单,3:按用户和订单id撤单,4:按用户和用户订单id撤单</param>
     /// <param name="order">订单列表</param>
     /// <returns></returns>
-    public ResCall<KeyValuePair<long, List<long>>> CancelOrder(long market, long uid, int type, List<long> order)
+    public Res<bool> CancelOrder(string symbol, long uid, int type, List<long> order)
     {
-        ReqCall<KeyValuePair<long, List<long>>> req = new ReqCall<KeyValuePair<long, List<long>>>();
-        req.op = E_Op.place;
-        req.market = market;
-        req.data = new KeyValuePair<long, List<long>>(uid, order);
-        FactoryService.instance.constant.MqSend(FactoryService.instance.GetMqOrderPlace(market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(req)));
-        ResCall<KeyValuePair<long, List<long>>> res = new ResCall<KeyValuePair<long, List<long>>>();
-        res.op = E_Op.place;
+        Res<bool> res = new Res<bool>();
         res.success = true;
-        res.code = E_Res_Code.ok;
-        res.market = market;
+        res.code = E_Res_Code.fail;
+        res.data = false;
         res.message = null;
-        res.data = new KeyValuePair<long, List<long>>(uid, order);
+        E_Op op;
+        switch (type)
+        {
+            case 1:
+                op = E_Op.cancel_by_all;
+                break;
+            case 2:
+                op = E_Op.cancel_by_uid;
+                break;
+            case 3:
+                op = E_Op.cancel_by_id;
+                break;
+            case 4:
+                op = E_Op.cancel_by_clientid;
+                break;
+            default:
+                return res;
+        }
+        Market? info = this.service_market.GetMarketBySymbol(symbol);
+        if (info == null)
+        {
+            res.code = E_Res_Code.no_symbol;
+            res.message = "未找到该交易对";
+            return res;
+        }
+        if (info.transaction == false || info.status == false)
+        {
+            res.code = E_Res_Code.field_error;
+            res.message = "该交易对禁止下单(系统设置)";
+            return res;
+        }
+        Users? users = service_user.GetUser(uid);
+        if (users == null)
+        {
+            res.code = E_Res_Code.no_user;
+            res.message = "未找到该用户";
+            return res;
+        }
+        if (users.disabled || !users.transaction)
+        {
+            res.code = E_Res_Code.no_permission;
+            res.message = "用户禁止撤单";
+            return res;
+        }
+        ReqCall<(long, List<long>)> req = new ReqCall<(long, List<long>)>();
+        req.op = op;
+        req.market = info.market;
+        req.data = (uid, order);
+        res.data = FactoryService.instance.constant.MqSend(FactoryService.instance.GetMqOrderPlace(info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(req)));
+        if (res.data)
+        {
+            res.code = E_Res_Code.ok;
+        }
         return res;
     }
 

@@ -333,7 +333,7 @@ public class TestController : ControllerBase
                     {
                         if (side == E_OrderSide.buy)
                         {
-                            total = FactoryService.instance.constant.random.NextInt64(0, 20) + Math.Round((decimal)FactoryService.instance.constant.random.NextDouble() + market.trade_min, market.places_price + market.places_amount);
+                            total = FactoryService.instance.constant.random.NextInt64(10, 20) + Math.Round((decimal)FactoryService.instance.constant.random.NextDouble() + market.trade_min, market.places_price + market.places_amount);
                         }
                         else if (side == E_OrderSide.sell)
                         {
@@ -357,7 +357,7 @@ public class TestController : ControllerBase
                     {
                         if (side == E_OrderSide.buy)
                         {
-                            total = FactoryService.instance.constant.random.NextInt64(0, 20) + Math.Round((decimal)FactoryService.instance.constant.random.NextDouble() + market.trade_min, market.places_price + market.places_amount);
+                            total = FactoryService.instance.constant.random.NextInt64(20, 60) + Math.Round((decimal)FactoryService.instance.constant.random.NextDouble() + market.trade_min, market.places_price + market.places_amount);
                         }
                         else if (side == E_OrderSide.sell)
                         {

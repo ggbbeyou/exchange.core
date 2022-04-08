@@ -302,9 +302,9 @@ public class TestController : ControllerBase
     /// <returns></returns>
     [HttpPost]
     [Route("PlaceOrderText")]
-    public ResCall<List<ResOrder>> PlaceOrderText(int count)
+    public Res<List<ResOrder>> PlaceOrderText(int count)
     {
-        ResCall<List<ResOrder>> res = new ResCall<List<ResOrder>>();
+        Res<List<ResOrder>> res = new Res<List<ResOrder>>();
         res.success = true;
         res.code = E_Res_Code.ok;
         res.data = new List<ResOrder>();

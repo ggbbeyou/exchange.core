@@ -62,10 +62,10 @@ public class OrderController : ControllerBase
     /// <returns></returns>
     [HttpPost]
     [Route("OrderPlace")]
-    public ResCall<List<ResOrder>> OrderPlace(string symbol, List<ReqOrder> orders)
+    public Res<List<ResOrder>> OrderPlace(string symbol, List<ReqOrder> orders)
     {
         //判断用户api是否有交易权限
-        ResCall<List<ResOrder>> result = new ResCall<List<ResOrder>>();
+        Res<List<ResOrder>> result = new Res<List<ResOrder>>();
         Users? users = service_user.GetUser(login.user_id);
         if (users == null)
         {
@@ -79,17 +79,7 @@ public class OrderController : ControllerBase
             result.message = "用户禁止下单";
             return result;
         }
-        ResCall<List<ResOrder>> res = service_order.PlaceOrder(symbol, login.user_id, login.user_name, orders);
-        result = new ResCall<List<ResOrder>>()
-        {
-            success = res.success,
-            code = res.code,
-            message = res.message,
-            op = res.op,
-            market = res.market,
-            data = res.data.ConvertAll(P => (ResOrder)P)
-        };
-        return result;
+        return service_order.PlaceOrder(symbol, login.user_id, login.user_name, orders);
     }
 
     /// <summary>
@@ -101,15 +91,9 @@ public class OrderController : ControllerBase
     /// <returns></returns>
     [HttpPost]
     [Route("OrderCancel")]
-    public ResCall<KeyValuePair<long, List<long>>> OrderCancel(string symbol, int type, List<long> data)
+    public Res<bool> OrderCancel(string symbol, int type, List<long> data)
     {
-        ResCall<KeyValuePair<long, List<long>>> res = new ResCall<KeyValuePair<long, List<long>>>();
-        if (type != 2 || type != 3 || type != 4 || type != 5)
-        {
-            return res;
-        }
-        res = this.service_order.CancelOrder(market, login.user_id, type, data);
-        return res;
+        return this.service_order.CancelOrder(symbol, login.user_id, type, data);
     }
 
 }

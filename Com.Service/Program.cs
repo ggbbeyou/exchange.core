@@ -30,7 +30,8 @@ builder.ConfigureLogging((hostContext, logging) =>
 #endif
             logging.AddNLog();
         });
-ExceptionlessClient.Default.Startup("kaOhMYizKiSSQaFtlOiWEpbb49GrBTi7rhGHuPXd");
+// ExceptionlessClient.Default.Startup("vRWgU1ub8e197kpI77ut5LTJAPIxPTH2mcwyeTuI");
+
 var app = builder.Build();
 app.Run();
 

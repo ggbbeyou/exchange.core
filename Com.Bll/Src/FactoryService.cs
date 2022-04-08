@@ -133,17 +133,7 @@ public class FactoryService
     public string GetMqOrderPlace(long market)
     {
         return string.Format("order_place_{0}", market);
-    }
-
-    /// <summary>
-    /// MQ:撤单队列
-    /// </summary>
-    /// <param name="market"></param>
-    /// <returns></returns>
-    public string GetMqOrderCancel(long market)
-    {
-        return string.Format("order_cancel_{0}", market);
-    }
+    }   
 
     /// <summary>
     /// MQ:订阅

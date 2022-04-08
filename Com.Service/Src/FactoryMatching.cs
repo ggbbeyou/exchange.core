@@ -99,16 +99,7 @@ public class FactoryMatching
             if (!model.mq_consumer.Contains(receive_match_order.consume_tag))
             {
                 model.mq_consumer.Add(receive_match_order.consume_tag);
-            }
-            (string queue_name, string consume_tag) order_cancel = model.mq.OrderCancel();
-            if (!model.mq_queues.Contains(order_cancel.queue_name))
-            {
-                model.mq_queues.Add(order_cancel.queue_name);
-            }
-            if (!model.mq_consumer.Contains(order_cancel.consume_tag))
-            {
-                model.mq_consumer.Add(order_cancel.consume_tag);
-            }
+            }           
             (string queue_name, string consume_tag) order_receive = model.mq.OrderReceive();
             if (!model.mq_queues.Contains(order_receive.queue_name))
             {

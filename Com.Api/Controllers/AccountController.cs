@@ -12,9 +12,9 @@ namespace Com.Api.Controllers;
 /// <summary>
 /// 账户
 /// </summary>
-[ApiController]
-[AllowAnonymous]
 [Route("[controller]")]
+[AllowAnonymous]
+[ApiController]
 public class AccountController : ControllerBase
 {
     /// <summary>

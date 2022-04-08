@@ -12,9 +12,9 @@ namespace Com.Api.Controllers;
 /// <summary>
 /// 钱包接口
 /// </summary>
-[ApiController]
-[Authorize]
 [Route("[controller]")]
+[Authorize]
+[ApiController]
 public class WalletController : ControllerBase
 {
     /// <summary>

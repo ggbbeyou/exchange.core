@@ -51,9 +51,9 @@ namespace Com.Api.Controllers;
 /// <summary>
 /// 
 /// </summary>
-[ApiController]
-[AllowAnonymous]
 [Route("[controller]")]
+[AllowAnonymous]
+[ApiController]
 public class WebSocketController : ControllerBase
 {
     /// <summary>

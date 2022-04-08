@@ -12,9 +12,9 @@ namespace Com.Api.Controllers;
 /// <summary>
 /// 订单接口
 /// </summary>
-[ApiController]
-[Authorize]
 [Route("[controller]")]
+[Authorize]
+[ApiController]
 public class OrderController : ControllerBase
 {
     /// <summary>

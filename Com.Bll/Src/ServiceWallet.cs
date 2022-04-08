@@ -32,6 +32,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 using System.Data;
+using Com.Api.Sdk.Models;
 
 namespace Com.Bll;
 
@@ -48,6 +49,83 @@ public class ServiceWallet
     /// </summary>
     public ServiceWallet()
     {
+
+    }
+
+    /// <summary>
+    /// 钱包类型之间划转
+    /// </summary>
+    /// <param name="uid">用户id</param>
+    /// <param name="coin_id">币id</param>
+    /// <param name="from">来源 钱包类型</param>
+    /// <param name="to">目的 钱包类型</param>
+    /// <param name="amount">金额</param>
+    /// <returns></returns>
+    public Res<bool> Transfer(long uid, long coin_id, E_WalletType from, E_WalletType to, decimal amount)
+    {
+        Res<bool> res = new Res<bool>();
+        if (amount <= 0)
+        {
+            res.success = false;
+            res.code = E_Res_Code.fail;
+            res.message = "划转金额不能低于0";
+            return res;
+        }
+        using (var scope = FactoryService.instance.constant.provider.CreateScope())
+        {
+            using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
+            {
+                using (var transaction = db.Database.BeginTransaction(isolationLevel))
+                {
+                    try
+                    {
+                        Wallet? wallet_from = db.Wallet.Where(P => P.user_id == uid && P.wallet_type == from && P.coin_id == coin_id).SingleOrDefault();
+                        Wallet? wallet_to = db.Wallet.Where(P => P.user_id == uid && P.wallet_type == to && P.coin_id == coin_id).SingleOrDefault();
+                        if (wallet_from == null || wallet_to == null)
+                        {
+                            res.success = false;
+                            res.code = E_Res_Code.fail;
+                            res.message = "钱包不存在";
+                            return res;
+                        }
+                        if (wallet_from.available < amount)
+                        {
+                            res.success = false;
+                            res.code = E_Res_Code.fail;
+                            res.message = "可用资产不足";
+                            return res;
+                        }
+                        wallet_from.available -= amount;
+                        wallet_from.total = wallet_from.available + wallet_from.freeze;
+                        wallet_to.available -= amount;
+                        wallet_to.total = wallet_from.available + wallet_from.freeze;
+                        db.SaveChanges();
+                        transaction.Commit();
+                        res.success = true;
+                        res.code = E_Res_Code.ok;
+                        return res;
+                    }
+                    catch (DbUpdateConcurrencyException ex)
+                    {
+                        transaction.Rollback();
+                        FactoryService.instance.constant.logger.LogError(ex, "Transfer(并发):" + ex.Message);
+                        res.success = false;
+                        res.code = E_Res_Code.fail;
+                        res.message = "钱包类型之间划转出错(并发)";
+                        return res;
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        FactoryService.instance.constant.logger.LogError(ex, "FreezeChange:" + ex.Message);
+                        res.success = false;
+                        res.code = E_Res_Code.fail;
+                        res.message = "钱包类型之间划转出错";
+                        return res;
+                    }
+                }
+            }
+        }
 
     }
 

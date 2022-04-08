@@ -16,7 +16,7 @@ namespace Com.Api.Controllers;
 /// </summary>
 [Route("[controller]")]
 [ApiController]
-[AllowAnonymous]
+// [AllowAnonymous]
 public class MarketController : ControllerBase
 {
     /// <summary>
@@ -57,7 +57,6 @@ public class MarketController : ControllerBase
     /// <returns></returns>
     [HttpPost]
     [Route("depth")]
-    // [Consumes("application/json")]
     public Res<ResDepth?> Depth(string symbol, int sz = 50)
     {
         return service_market.Depth(symbol, sz);

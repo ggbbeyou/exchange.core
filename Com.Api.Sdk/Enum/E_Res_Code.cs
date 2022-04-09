@@ -61,7 +61,14 @@ public enum E_Res_Code
     /// 未找到api_timestamp参数
     /// </summary>
     not_found_api_timestamp,
-
+    /// <summary>
+    /// 签名错误
+    /// </summary>
+    signature_error,
+    /// <summary>
+    /// 不是白名单用户
+    /// </summary>
+    not_white_ip,
     //////用户相关错误码/////////////////////////////////////////////////////////////////////
 
 

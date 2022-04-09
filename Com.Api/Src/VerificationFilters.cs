@@ -23,8 +23,10 @@
 
 
 
+using System.Text;
 using Com.Api.Sdk.Enum;
 using Com.Api.Sdk.Models;
+using Com.Bll.Util;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
@@ -42,75 +44,78 @@ public class VerificationFilters : Attribute, IAuthorizationFilter
     public void OnAuthorization(AuthorizationFilterContext context)
     {
         Res<bool> res = new Res<bool>();
+        res.success = false;
+        res.code = E_Res_Code.signature_error;
+        res.message = "签名错误!";
+        res.data = false;
         //参数判断
         if (!context.HttpContext.Request.Headers.ContainsKey("api_key"))
         {
-            res.success = false;
-            res.code = E_Res_Code.no_permission;
+            res.code = E_Res_Code.not_found_api_key;
             res.message = "缺少api_key参数!";
-            JsonResult json = new JsonResult(res);
-            context.Result = json;
+            context.Result = new JsonResult(res);
         }
-        else if (!context.HttpContext.Request.Headers.ContainsKey("sign"))
+        else if (!context.HttpContext.Request.Headers.ContainsKey("api_sign"))
         {
-            res.code = E_Res_Code.no_permission;
-            res.message = "缺少sign参数!";
-            JsonResult json = new JsonResult(res);
-            context.Result = json;
+            res.code = E_Res_Code.not_found_api_sign;
+            res.message = "缺少api_sign参数!";
+            context.Result = new JsonResult(res);
         }
-        else if (!context.HttpContext.Request.Headers.ContainsKey("timestamp"))
+        else if (!context.HttpContext.Request.Headers.ContainsKey("api_timestamp"))
         {
-            res.code = E_Res_Code.no_permission;
-            res.message = "缺少timestamp参数!";
-            JsonResult json = new JsonResult(res);
-            context.Result = json;
+            res.code = E_Res_Code.not_found_api_timestamp;
+            res.message = "缺少api_timestamp参数!";
+            context.Result = new JsonResult(res);
         }
         else
         {
             string api_key = context.HttpContext.Request.Headers["api_key"];
-            string sign = context.HttpContext.Request.Headers["sign"];
-            string timestamp = context.HttpContext.Request.Headers["timestamp"];
+            string sign = context.HttpContext.Request.Headers["api_sign"];
+            string timestamp = context.HttpContext.Request.Headers["api_timestamp"];
             DateTimeOffset requestTime = DateTimeOffset.FromUnixTimeMilliseconds(long.Parse(timestamp));
             // 接口过期
             int apiExpiry = 20;
-            if (requestTime.AddSeconds(apiExpiry) < DateTime.Now)
+            if (requestTime.AddSeconds(apiExpiry) < DateTimeOffset.UtcNow)
             {
                 res.code = E_Res_Code.request_overtime;
                 res.message = "接口过期!";
-                JsonResult json = new JsonResult(res);
-                context.Result = json;
+                context.Result = new JsonResult(res);
+                return;
             }
             else
             {
                 //从数据库或缓存查找对应的appkey,
                 string appkey = "fdsafdsafdsafasdfasdf";
-
+                
                 if (!string.IsNullOrEmpty(appkey))
                 {
-                    res.code = -4;
+                    res.code = E_Res_Code.not_found_api_key;
                     res.message = "api_key不存在!";
-                    JsonResult json = new JsonResult(res);
-                    context.Result = json;
+                    context.Result = new JsonResult(res);
                     return;
                 }
                 //是否合法判断
                 SortedDictionary<string, string> sortedDictionary = new SortedDictionary<string, string>();
                 sortedDictionary.Add("api_key", api_key);
-                sortedDictionary.Add("timestamp", timestamp);
+                sortedDictionary.Add("api_timestamp", timestamp);
                 //获取post数据,并排序
-                Stream stream = context.HttpContext.Request.Body;
-                byte[] buffer = new byte[context.HttpContext.Request.ContentLength.Value];
-                stream.Read(buffer, 0, buffer.Length);
-                string content = Encoding.UTF8.GetString(buffer);
-                context.HttpContext.Request.Body = new MemoryStream(buffer);
-                if (!String.IsNullOrEmpty(content))
+                long? content_length = context.HttpContext.Request.ContentLength;
+                if (content_length != null && content_length > 0)
                 {
-                    string postdata = System.Web.HttpUtility.UrlDecode(content);
-                    string[] posts = postdata.Split(new char[] { '&' });
-                    foreach (var item in posts)
+                    Stream stream = context.HttpContext.Request.Body;
+                    byte[] buffer = new byte[content_length.Value];
+                    stream.Read(buffer, 0, buffer.Length);
+                    string content = Encoding.UTF8.GetString(buffer);
+                    context.HttpContext.Request.Body = new MemoryStream(buffer);
+                    if (!String.IsNullOrEmpty(content))
                     {
-                        string[] post = item.Split(new char[] { '=' });
-                        sortedDictionary.Add(post[0], post[1]);
+                        string postdata = System.Web.HttpUtility.UrlDecode(content);
+                        string[] posts = postdata.Split(new char[] { '&' });
+                        foreach (var item in posts)
+                        {
+                            string[] post = item.Split(new char[] { '=' });
+                            sortedDictionary.Add(post[0], post[1]);
+                        }
                     }
                 }
                 //拼接参数，并在开头和结尾加上key
@@ -120,12 +125,15 @@ public class VerificationFilters : Attribute, IAuthorizationFilter
                     sb.Append(item.Key).Append(item.Value);
                 }
                 sb.Append(appkey);
-                if (sign != CryptographyHelper.Md5_Encryption(sb.ToString()))
+                if (sign == Encryption.MD5Encrypt(sb.ToString()))
                 {
-                    res.code = -2;
-                    res.message = "签名不合法!";
-                    JsonResult json = new JsonResult(res);
-                    context.Result = json;
+                    return;
+                }
+                else
+                {
+                    res.code = E_Res_Code.signature_error;
+                    res.message = "签名错误!";
+                    context.Result = new JsonResult(res);
                 }
             }
         }

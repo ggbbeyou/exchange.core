@@ -117,6 +117,14 @@ public class VerificationFilters : Attribute, IAuthorizationFilter
                     context.Result = new JsonResult(res);
                     return;
                 }
+                //判断白名单ip
+                if (!string.IsNullOrWhiteSpace(userapi.white_list_ip))
+                {
+                    res.code = E_Res_Code.not_white_ip;
+                    res.message = "不是白名单仿问";
+                    context.Result = new JsonResult(res);
+                    return;
+                }
                 //是否合法判断
                 SortedDictionary<string, string> sortedDictionary = new SortedDictionary<string, string>();
                 sortedDictionary.Add("api_key", api_key);

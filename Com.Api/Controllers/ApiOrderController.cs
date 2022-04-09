@@ -64,10 +64,10 @@ public class ApiOrderController : ControllerBase
     /// <returns></returns>
     [HttpPost]
     [Route("OrderPlace")]
-    public Res<List<ResOrder>> OrderPlace([FromHeader] string api_key, string symbol, List<ReqOrder> orders)
+    public Res<List<ResOrder>> OrderPlace([FromBody] string symbol, [FromBody] List<ReqOrder> orders)
     {
         //判断用户api是否有交易权限
-        if (!service_user.ApiUserTransaction(api_key))
+        if (!service_user.ApiUserTransaction(Request.Headers["api_key"]))
         {
             Res<List<ResOrder>> result = new Res<List<ResOrder>>();
             result.code = E_Res_Code.user_prohibit_place_order;

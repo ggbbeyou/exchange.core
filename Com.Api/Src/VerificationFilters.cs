@@ -170,9 +170,9 @@ public class VerificationFilters : Attribute, IAuthorizationFilter
         }
         else
         {
-            res.code = E_Res_Code.signature_error;
-            res.message = "签名错误!";
-            context.Result = new JsonResult(res);
+            // res.code = E_Res_Code.signature_error;
+            // res.message = "签名错误!";
+            // context.Result = new JsonResult(res);
         }
     }
 }

@@ -87,7 +87,7 @@ public class ApiOrderController : ControllerBase
     /// <returns></returns>
     [HttpPost]
     [Route("OrderCancel")]
-    public Res<bool> OrderCancel([FromHeader] string api_key, string symbol, int type, List<long> data)
+    public Res<bool> OrderCancel([FromHeader] string api_key, [FromBody] string symbol, [FromBody] int type, [FromBody] List<long> data)
     {
         if (!service_user.ApiUserTransaction(api_key))
         {

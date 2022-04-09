@@ -45,7 +45,22 @@ public enum E_Res_Code
     /// 字段长度过长
     /// </summary>
     length_too_long,
-
+    /// <summary>
+    /// 请求超时
+    /// </summary>
+    request_overtime,
+    /// <summary>
+    /// 未找到api_key参数
+    /// </summary>
+    not_found_api_key,
+    /// <summary>
+    /// 未找到api_sign参数
+    /// </summary>
+    not_found_api_sign,
+    /// <summary>
+    /// 未找到api_timestamp参数
+    /// </summary>
+    not_found_api_timestamp,
 
     //////用户相关错误码/////////////////////////////////////////////////////////////////////
 

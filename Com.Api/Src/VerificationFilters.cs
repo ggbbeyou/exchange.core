@@ -26,9 +26,13 @@
 using System.Text;
 using Com.Api.Sdk.Enum;
 using Com.Api.Sdk.Models;
+using Com.Bll;
 using Com.Bll.Util;
+using Com.Db;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Newtonsoft.Json;
+using StackExchange.Redis;
 
 namespace Com.Api.Src;
 
@@ -85,9 +89,28 @@ public class VerificationFilters : Attribute, IAuthorizationFilter
             else
             {
                 //从数据库或缓存查找对应的appkey,
-                string appkey = "fdsafdsafdsafasdfasdf";
-                
-                if (!string.IsNullOrEmpty(appkey))
+                // string appkey = "fdsafdsafdsafasdfasdf";
+                UsersApi? userapi = null;
+                RedisValue rv = FactoryService.instance.constant.redis.HashGet(FactoryService.instance.GetRedisApiKey(), api_key);
+                if (rv.IsNullOrEmpty)
+                {
+                    using (var scope = FactoryService.instance.constant.provider.CreateScope())
+                    {
+                        using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
+                        {
+                            userapi = db.UsersApi.SingleOrDefault(P => P.api_key == api_key);
+                            if (userapi != null)
+                            {
+                                FactoryService.instance.constant.redis.HashSet(FactoryService.instance.GetRedisApiKey(), api_key, JsonConvert.SerializeObject(userapi));
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    userapi = JsonConvert.DeserializeObject<UsersApi>(rv);
+                }
+                if (userapi == null)
                 {
                     res.code = E_Res_Code.not_found_api_key;
                     res.message = "api_key不存在!";
@@ -119,12 +142,12 @@ public class VerificationFilters : Attribute, IAuthorizationFilter
                     }
                 }
                 //拼接参数，并在开头和结尾加上key
-                StringBuilder sb = new StringBuilder(appkey);
+                StringBuilder sb = new StringBuilder(userapi.api_key);
                 foreach (var item in sortedDictionary)
                 {
                     sb.Append(item.Key).Append(item.Value);
                 }
-                sb.Append(appkey);
+                sb.Append(userapi.api_key);
                 if (sign == Encryption.MD5Encrypt(sb.ToString()))
                 {
                     return;

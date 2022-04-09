@@ -97,7 +97,7 @@ public class FactoryService
     }
 
     /// <summary>
-    /// 
+    /// 处理进程
     /// </summary>
     /// <returns></returns>
     public string GetRedisProcess()
@@ -113,6 +113,16 @@ public class FactoryService
     public string GetRedisVerificationCode(long id)
     {
         return string.Format("verification_code:{0}", id);
+    }
+
+    /// <summary>
+    /// 用户api账户信息(注意,当修改时记得删除redis数据)
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    public string GetRedisApiKey()
+    {
+        return string.Format("api_key");
     }
 
     /// <summary>
@@ -133,7 +143,7 @@ public class FactoryService
     public string GetMqOrderPlace(long market)
     {
         return string.Format("order_place_{0}", market);
-    }   
+    }
 
     /// <summary>
     /// MQ:订阅

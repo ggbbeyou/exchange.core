@@ -13,9 +13,9 @@ namespace Com.Api.Controllers;
 /// <summary>
 /// 订单接口
 /// </summary>
-[Route("api/order")]
-[ApiController]
 [TypeFilter(typeof(VerificationFilters))]
+[ApiController]
+[Route("api/order")]
 public class ApiOrderController : ControllerBase
 {
     /// <summary>

@@ -91,7 +91,7 @@ public class VerificationFilters : Attribute, IAuthorizationFilter
             {
                 DateTimeOffset requestTime = DateTimeOffset.FromUnixTimeMilliseconds(tempstamp_temp);
                 int apiExpiry = 20;
-                if (requestTime.AddSeconds(apiExpiry) <= DateTimeOffset.UtcNow)
+                if (requestTime.AddMinutes(apiExpiry) <= DateTimeOffset.UtcNow)
                 {
                     res.code = E_Res_Code.request_overtime;
                     res.message = "请求超时!";

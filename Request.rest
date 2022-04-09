@@ -28,4 +28,28 @@ POST {{baseUrl1}}/Test/PlaceOrderText HTTP/1.1
 
 
 
+
+###
+POST http://localhost:5227/api/order/OrderPlace HTTP/1.1
+api_key:aaaa
+api_sign:bbbb
+api_timestamp:1649514960000
+Content-Type: application/x-www-form-urlencoded
+
+symbol=btc_usdt&orders=[
+  {
+    "client_id": "string",
+    "symbol": "string",
+    "side": 1,
+    "type": 1,
+    "trade_model": 1,
+    "price": 0,
+    "amount": 0,
+    "total": 0,
+    "trigger_hanging_price": 0,
+    "trigger_cancel_price": 0
+  }
+]
+
+
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJubyI6IjE1MDkzNTQ3NTU4NDYxODA4NjQiLCJ1c2VyX2lkIjoiMTUwODc1NTM2NzMzMTUwMDAzMiIsInVzZXJfbmFtZSI6InVzZXIwIiwiYXBwIjoiMSIsInB1YmxpY19rZXkiOiI8UlNBS2V5VmFsdWU-PE1vZHVsdXM-OVdDMGJ1cDQrdHBYWmh1UU90bXFyanVXWnNPaVY2dUw0OFIwSWtrcmVZNWJYanhUU2NXRWRTWUlVS2VCSHVFMmFkcGI2QW40RkczSkh2VEFyaC9wY0M1dmtyMERNU1pBdXdhNmpYMEpUV0kyVUlDREtrdEprVGs5QnNycHNScE50dWxaNGFOZytWODB5M1ErblZLc2dnOXBGdVNDOEIwK0Vsdkh2Sm9KNldVPTwvTW9kdWx1cz48RXhwb25lbnQ-QVFBQjwvRXhwb25lbnQ-PC9SU0FLZXlWYWx1ZT4iLCJleHAiOjE2NDg2OTM4MDIsImlzcyI6ImNvbS5hcGkiLCJhdWQiOiIyMjMzMyJ9.KJXohq69vBszEg2gK6TSHbE5MHnkSIhc8-j9hSsL13A

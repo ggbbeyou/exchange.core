@@ -64,7 +64,7 @@ public class ApiOrderController : ControllerBase
     /// <returns></returns>
     [HttpPost]
     [Route("OrderPlace")]
-    public Res<List<ResOrder>> OrderPlace([FromHeader] string api_key, [FromBody] string symbol, [FromBody] List<ReqOrder> orders)
+    public Res<List<ResOrder>> OrderPlace([FromHeader] string api_key, string symbol, List<ReqOrder> orders)
     {
         //判断用户api是否有交易权限
         if (!service_user.ApiUserTransaction(api_key))
@@ -87,7 +87,7 @@ public class ApiOrderController : ControllerBase
     /// <returns></returns>
     [HttpPost]
     [Route("OrderCancel")]
-    public Res<bool> OrderCancel([FromHeader] string api_key, [FromBody] string symbol, [FromBody] int type, [FromBody] List<long> data)
+    public Res<bool> OrderCancel([FromHeader] string api_key, string symbol, int type, List<long> data)
     {
         if (!service_user.ApiUserTransaction(api_key))
         {

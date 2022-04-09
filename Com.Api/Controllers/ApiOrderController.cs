@@ -64,7 +64,7 @@ public class ApiOrderController : ControllerBase
     /// <returns></returns>
     [HttpPost]
     [Route("OrderPlace")]
-    public Res<List<ResOrder>> OrderPlace([FromBody] string symbol, [FromBody] List<ReqOrder> orders)
+    public Res<List<ResOrder>> OrderPlace(string symbol, List<ReqOrder> orders)
     {
         //判断用户api是否有交易权限
         if (!service_user.ApiUserTransaction(Request.Headers["api_key"]))

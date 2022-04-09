@@ -37,5 +37,3 @@ api_timestamp:1649514960000
 Content-Type: application/x-www-form-urlencoded
 
 symbol=btc_usdt&orders=[{"client_id":"string","symbol":"string","side": 1,"type": 1,"trade_model": 1,"price": 0,"amount": 0,"total": 0,"trigger_hanging_price": 0,"trigger_cancel_price":0}]
-
-

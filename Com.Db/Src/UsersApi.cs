@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
+using Newtonsoft.Json;
 
 namespace Com.Db;
 
@@ -26,7 +27,7 @@ public class UsersApi
     /// <summary>
     /// 账户密钥
     /// </summary>
-    /// <value></value>
+    /// <value></value>    
     public string api_secret { get; set; } = null!;
     /// <summary>
     /// 是否交易,true:交易,false:非交易

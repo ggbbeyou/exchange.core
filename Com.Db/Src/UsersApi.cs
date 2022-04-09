@@ -44,6 +44,11 @@ public class UsersApi
     /// <value></value>
     public string? white_list_ip { get; set; }
     /// <summary>
+    /// 创建时间
+    /// </summary>
+    /// <value></value>
+    public DateTimeOffset create_time { get; set; }
+    /// <summary>
     /// 最后登录IP地址
     /// </summary>
     /// <value></value>

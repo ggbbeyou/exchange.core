@@ -312,6 +312,7 @@ public class DbContextEF : DbContext
             o.Property(P => P.transaction).IsRequired().HasColumnType("bit").HasComment("是否交易");
             o.Property(P => P.withdrawal).IsRequired().HasColumnType("bit").HasComment("是否提现");
             o.Property(P => P.white_list_ip).HasColumnType("nvarchar").HasMaxLength(200).HasComment("IP白名单");
+            o.Property(P => P.create_time).IsRequired().HasColumnType("datetimeoffset").HasComment("创建时间");
             o.Property(P => P.last_login_ip).HasColumnType("nvarchar").HasMaxLength(50).HasComment("最后登录IP地址");
             o.ToTable(nameof(UsersApi));
         });

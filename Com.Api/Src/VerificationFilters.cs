@@ -91,7 +91,7 @@ public class VerificationFilters : Attribute, IAuthorizationFilter
             {
                 DateTimeOffset requestTime = DateTimeOffset.FromUnixTimeMilliseconds(tempstamp_temp);
                 int apiExpiry = 20;
-                if (requestTime.AddSeconds(apiExpiry) < DateTimeOffset.UtcNow)
+                if (requestTime.AddSeconds(apiExpiry) <= DateTimeOffset.UtcNow)
                 {
                     res.code = E_Res_Code.request_overtime;
                     res.message = "请求超时!";
@@ -137,6 +137,13 @@ public class VerificationFilters : Attribute, IAuthorizationFilter
         }
         //判断白名单ip
         if (!string.IsNullOrWhiteSpace(userapi.white_list_ip))
+        {
+            res.code = E_Res_Code.not_white_ip;
+            res.message = "不是白名单仿问";
+            context.Result = new JsonResult(res);
+            return;
+        }
+        else if (userapi.create_time.AddDays(10) < DateTimeOffset.UtcNow)
         {
             res.code = E_Res_Code.not_white_ip;
             res.message = "不是白名单仿问";

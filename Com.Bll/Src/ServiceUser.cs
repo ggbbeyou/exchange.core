@@ -167,4 +167,41 @@ public class ServiceUser
         }
     }
 
+
+    /// <summary>
+    /// 获取user api用户
+    /// </summary>
+    /// <param name="api_key"></param>
+    /// <returns></returns>
+    public UsersApi? GetApi(string api_key)
+    {
+        using (var scope = FactoryService.instance.constant.provider.CreateScope())
+        {
+            using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
+            {
+                return db.UsersApi.AsNoTracking().SingleOrDefault(P => P.api_key == api_key);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 判断Api账户是否可以交易
+    /// </summary>
+    /// <param name="api_key"></param>
+    /// <returns></returns>
+    public bool ApiUserTransaction(string api_key)
+    {
+        UsersApi? api = GetApi(api_key);
+        if (api == null || !api.transaction)
+        {
+            return false;
+        }
+        Users? users = GetUser(api.user_id);
+        if (users == null || users.disabled || !users.transaction)
+        {
+            return false;
+        }
+        return true;
+    }
+
 }

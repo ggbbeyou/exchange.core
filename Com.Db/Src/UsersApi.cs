@@ -29,12 +29,12 @@ public class UsersApi
     /// <value></value>
     public string api_secret { get; set; } = null!;
     /// <summary>
-    /// 是否交易
+    /// 是否交易,true:交易,false:非交易
     /// </summary>
     /// <value></value>
     public bool transaction { get; set; }
     /// <summary>
-    /// 是否提现
+    /// 是否提现,true:提现,false:非提现
     /// </summary>
     /// <value></value>
     public bool withdrawal { get; set; }

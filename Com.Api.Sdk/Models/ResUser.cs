@@ -18,12 +18,12 @@ public class ResUser
     /// <value></value>
     public string user_name { get; set; } = null!;
     /// <summary>
-    /// 是否交易
+    /// 是否交易 true:交易,false:非交易
     /// </summary>
     /// <value></value>
     public bool transaction { get; set; }
     /// <summary>
-    /// 是否提现
+    /// 是否提现 true:提现,false:非提现
     /// </summary>
     /// <value></value>
     public bool withdrawal { get; set; }

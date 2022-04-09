@@ -18,7 +18,7 @@ public class Users : ResUser
     /// <value></value>
     public string password { get; set; } = null!;
     /// <summary>
-    /// 禁用
+    /// 禁用,true:禁用,false:启用
     /// </summary>
     /// <value></value>
     public bool disabled { get; set; }

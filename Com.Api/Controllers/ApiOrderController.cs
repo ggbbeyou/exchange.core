@@ -58,25 +58,19 @@ public class ApiOrderController : ControllerBase
     /// <summary>
     /// 挂单
     /// </summary>
+    /// <param name="api_key">交易对</param>
     /// <param name="symbol">交易对</param>
     /// <param name="orders">订单数据</param>
     /// <returns></returns>
     [HttpPost]
     [Route("OrderPlace")]
-    public Res<List<ResOrder>> OrderPlace(string symbol, List<ReqOrder> orders)
+    public Res<List<ResOrder>> OrderPlace([FromHeader] string api_key, [FromBody] string symbol, [FromBody] List<ReqOrder> orders)
     {
         //判断用户api是否有交易权限
-        Res<List<ResOrder>> result = new Res<List<ResOrder>>();
-        Users? users = service_user.GetUser(login.user_id);
-        if (users == null)
+        if (!service_user.ApiUserTransaction(api_key))
         {
-            result.code = E_Res_Code.user_not_found;
-            result.message = "未找到该用户";
-            return result;
-        }
-        if (users.disabled || !users.transaction)
-        {
-            result.code = E_Res_Code.no_permission;
+            Res<List<ResOrder>> result = new Res<List<ResOrder>>();
+            result.code = E_Res_Code.user_prohibit_place_order;
             result.message = "用户禁止下单";
             return result;
         }
@@ -86,14 +80,22 @@ public class ApiOrderController : ControllerBase
     /// <summary>
     /// 撤单
     /// </summary>
+    /// <param name="api_key">交易对</param>
     /// <param name="symbol">交易对</param>
     /// <param name="type">2:按交易对和用户全部撤单,3:按用户和订单id撤单,4:按用户和用户订单id撤单</param>
     /// <param name="data"></param>
     /// <returns></returns>
     [HttpPost]
     [Route("OrderCancel")]
-    public Res<bool> OrderCancel(string symbol, int type, List<long> data)
+    public Res<bool> OrderCancel([FromHeader] string api_key, string symbol, int type, List<long> data)
     {
+        if (!service_user.ApiUserTransaction(api_key))
+        {
+            Res<bool> result = new Res<bool>();
+            result.code = E_Res_Code.user_prohibit_place_order;
+            result.message = "用户禁止撤单";
+            return result;
+        }
         return this.service_order.CancelOrder(symbol, login.user_id, type, data);
     }
 

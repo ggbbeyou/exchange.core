@@ -91,7 +91,7 @@ public class VerificationFilters : Attribute, IAuthorizationFilter
             {
                 DateTimeOffset requestTime = DateTimeOffset.FromUnixTimeMilliseconds(tempstamp_temp);
                 int apiExpiry = 20;
-                if (requestTime.AddMinutes(apiExpiry) <= DateTimeOffset.UtcNow)
+                if (requestTime.AddHours(apiExpiry) <= DateTimeOffset.UtcNow)
                 {
                     res.code = E_Res_Code.request_overtime;
                     res.message = "请求超时!";
@@ -152,25 +152,9 @@ public class VerificationFilters : Attribute, IAuthorizationFilter
         }
         //是否合法判断
         SortedDictionary<string, string> sortedDictionary = new SortedDictionary<string, string>();
-        //获取post数据,并排序
-        long? content_length = context.HttpContext.Request.ContentLength;
-        if (content_length != null && content_length > 0)
+        foreach (var item in context.HttpContext.Request.Form)
         {
-            Stream stream = context.HttpContext.Request.Body;
-            byte[] buffer = new byte[content_length.Value];
-            stream.Read(buffer, 0, buffer.Length);
-            string content = Encoding.UTF8.GetString(buffer);
-            context.HttpContext.Request.Body = new MemoryStream(buffer);
-            if (!String.IsNullOrEmpty(content))
-            {
-                string postdata = System.Web.HttpUtility.UrlDecode(content);
-                string[] posts = postdata.Split(new char[] { '&' });
-                foreach (var item in posts)
-                {
-                    string[] post = item.Split(new char[] { '=' });
-                    sortedDictionary.Add(post[0], post[1]);
-                }
-            }
+            sortedDictionary.Add(item.Key, item.Value);
         }
         //拼接参数，并在开头和结尾加上key
         StringBuilder sb = new StringBuilder(userapi.api_key);

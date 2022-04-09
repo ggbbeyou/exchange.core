@@ -149,6 +149,19 @@ public class TestController : ControllerBase
                 private_key = key.private_key,
             };
             this.db.Users.Add(user);
+            UsersApi api = new UsersApi()
+            {
+                id = FactoryService.instance.constant.worker.NextId(),
+                user_id = user.user_id,
+                api_key = Guid.NewGuid().ToString().Replace("-", ""),
+                api_secret = Encryption.SHA256Encrypt(Guid.NewGuid().ToString().Replace("-", "") + "_" + user.user_id + Guid.NewGuid().ToString()),
+                transaction = true,
+                withdrawal = false,
+                white_list_ip = "",
+                create_time = DateTimeOffset.UtcNow,
+                last_login_ip = ""
+            };
+            this.db.UsersApi.Add(api);
             Wallet wallet_usdt = new Wallet()
             {
                 wallet_id = FactoryService.instance.constant.worker.NextId(),

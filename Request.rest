@@ -31,9 +31,9 @@ POST {{baseUrl1}}/Test/PlaceOrderText HTTP/1.1
 
 ###
 POST http://localhost:5227/api/order/OrderPlace HTTP/1.1
-api_key:d136894da8f6431e8c3a1879aeb88fd4
-api_sign:bbbb
-api_timestamp:1649514960000
+api_key:aaa
+api_sign:aaaaa
+api_timestamp:150814098000
 Content-Type: application/x-www-form-urlencoded
 
-symbol=btc_usdt&orders=[{"client_id":"string","symbol":"string","side": 1,"type": 1,"trade_model": 1,"price": 0,"amount": 0,"total": 0,"trigger_hanging_price": 0,"trigger_cancel_price":0}]
+symbol=btc/usdt&a=[{"client_id":"string","symbol":"string","side":1,"type":1,"trade_model":1,"price":0,"amount":0.1,"total":0.1,"trigger_hanging_price":0.1,"trigger_cancel_price":0.1}]

@@ -53,7 +53,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 builder.Services.AddResponseCompression();
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddNewtonsoftJson();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {

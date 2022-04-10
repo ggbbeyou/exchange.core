@@ -20,6 +20,10 @@ public class JsonConverterDecimal : JsonConverter
         {
             return null;
         }
+        else if (reader.Value.ToString() == "0")
+        {
+            return 0m;
+        }
         else
         {
             return (decimal)((double)reader.Value);
@@ -32,7 +36,7 @@ public class JsonConverterDecimal : JsonConverter
         {
             writer.WriteNull();
             return;
-        }        
+        }
         double input = 0;
         if (value is decimal)
         {

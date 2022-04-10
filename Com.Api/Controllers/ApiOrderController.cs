@@ -7,15 +7,17 @@ using Com.Bll;
 using Com.Db;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace Com.Api.Controllers;
 
 /// <summary>
 /// 订单接口
 /// </summary>
-[TypeFilter(typeof(VerificationFilters))]
+// [TypeFilter(typeof(VerificationFilters))]
 [ApiController]
 [Route("api/order")]
+// [Produces("application/json")]
 public class ApiOrderController : ControllerBase
 {
     /// <summary>
@@ -64,8 +66,11 @@ public class ApiOrderController : ControllerBase
     /// <returns></returns>
     [HttpPost]
     [Route("OrderPlace")]
-    public Res<List<ResOrder>> OrderPlace(string symbol, List<ReqOrder> orders)
+    // [Consumes("application/x-www-form-urlencoded")]
+    // [Consumes("application/json")]
+    public Res<List<ResOrder>> OrderPlace([FromForm] string symbol, [FromForm] string a)
     {
+        List<ReqOrder> orders = JsonConvert.DeserializeObject<List<ReqOrder>>(a);
         //判断用户api是否有交易权限
         if (!service_user.ApiUserTransaction(Request.Headers["api_key"]))
         {

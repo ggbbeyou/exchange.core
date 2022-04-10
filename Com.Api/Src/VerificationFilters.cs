@@ -152,10 +152,10 @@ public class VerificationFilters : Attribute, IAuthorizationFilter
         }
         //是否合法判断
         SortedDictionary<string, string> sortedDictionary = new SortedDictionary<string, string>();
-        foreach (var item in context.HttpContext.Request.Form)
-        {
-            sortedDictionary.Add(item.Key, item.Value);
-        }
+        // foreach (var item in context.HttpContext.Request.Form)
+        // {
+        //     sortedDictionary.Add(item.Key, item.Value);
+        // }
         //拼接参数，并在开头和结尾加上key
         StringBuilder sb = new StringBuilder(userapi.api_key);
         foreach (var item in sortedDictionary)

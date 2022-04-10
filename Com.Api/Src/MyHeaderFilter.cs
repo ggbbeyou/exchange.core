@@ -12,20 +12,6 @@ namespace Com.Api;
 /// </summary>
 public class MyHeaderFilter : IOperationFilter
 {
-    // public void Apply(Operation operation, OperationFilterContext context)
-    // {
-    //     if (operation.Parameters == null)
-    //         operation.Parameters = new List<IParameter>();
-
-    //     operation.Parameters.Add(new NonBodyParameter
-    //     {
-    //         Name = "MY-HEADER",
-    //         In = "header",
-    //         Type = "string",
-    //         Required = true // set to false if this is optional
-    //     });
-    // }
-
     /// <summary>
     /// 
     /// </summary>

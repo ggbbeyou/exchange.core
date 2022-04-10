@@ -93,9 +93,9 @@ public class VerificationFilters : Attribute, IAuthorizationFilter
                 int apiExpiry = 20;
                 if (requestTime.AddHours(apiExpiry) <= DateTimeOffset.UtcNow)
                 {
-                    res.code = E_Res_Code.request_overtime;
-                    res.message = "请求超时!";
-                    context.Result = new JsonResult(res);
+                    // res.code = E_Res_Code.request_overtime;
+                    // res.message = "请求超时!";
+                    // context.Result = new JsonResult(res);
                     return;
                 }
             }

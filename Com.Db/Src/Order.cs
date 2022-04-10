@@ -77,7 +77,7 @@ public class Orders : ResOrder
     /// </summary>
     /// <value></value>
     [JsonConverter(typeof(StringEnumConverter))]
-    [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+    //[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
     public E_OrderState state { get; set; }
     /// <summary>
     /// 最后成交时间或撤单时间

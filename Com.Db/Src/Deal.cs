@@ -29,7 +29,7 @@ public class Deal : ResDeal
     /// </summary>
     /// <value></value>
     [JsonConverter(typeof(StringEnumConverter))]
-    [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+    //[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
     public E_TradeModel trade_model { get; set; }
     /// <summary>
     /// 成交总额

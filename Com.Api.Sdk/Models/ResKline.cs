@@ -21,7 +21,7 @@ public class ResKline
     /// </summary>
     /// <value></value>
     [JsonConverter(typeof(StringEnumConverter))]
-    [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+    //[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
     public E_KlineType type { get; set; }
     /// <summary>
     /// 成交量

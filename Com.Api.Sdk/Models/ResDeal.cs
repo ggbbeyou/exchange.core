@@ -14,7 +14,7 @@ public class ResDeal
     /// </summary>
     /// <value></value>
     public string symbol { get; set; } = null!;
-   
+
     /// <summary>
     /// 成交价
     /// </summary>
@@ -32,7 +32,7 @@ public class ResDeal
     /// </summary>
     /// <value></value>
     [JsonConverter(typeof(StringEnumConverter))]
-    [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+    //[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
     public E_OrderSide trigger_side { get; set; }
     /// <summary>
     /// 成交时间

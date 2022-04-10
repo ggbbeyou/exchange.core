@@ -14,7 +14,7 @@ namespace Com.Api.Controllers;
 /// <summary>
 /// 订单接口
 /// </summary>
-// [TypeFilter(typeof(VerificationFilters))]
+[TypeFilter(typeof(VerificationFilters))]
 [ApiController]
 [Route("api/order")]
 // [Produces("application/json")]
@@ -68,9 +68,9 @@ public class ApiOrderController : ControllerBase
     [Route("OrderPlace")]
     // [Consumes("application/x-www-form-urlencoded")]
     // [Consumes("application/json")]
-    public Res<List<ResOrder>> OrderPlace([FromForm] string symbol, [FromForm] string a)
+    public Res<List<ResOrder>> OrderPlace(CallOrder data)
     {
-        List<ReqOrder> orders = JsonConvert.DeserializeObject<List<ReqOrder>>(a);
+        // List<ReqOrder> orders = JsonConvert.DeserializeObject<List<ReqOrder>>(a);
         //判断用户api是否有交易权限
         if (!service_user.ApiUserTransaction(Request.Headers["api_key"]))
         {
@@ -79,7 +79,7 @@ public class ApiOrderController : ControllerBase
             result.message = "用户禁止下单";
             return result;
         }
-        return service_order.PlaceOrder(symbol, login.user_id, login.user_name, orders);
+        return service_order.PlaceOrder(data.symbol, login.user_id, login.user_name, data.orders);
     }
 
     /// <summary>

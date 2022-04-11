@@ -3,7 +3,6 @@
 
 项目说明:
 Com.Api                 api         api接口
-Com.Api.Model           dll         api模型
 Com.Api.Sdk             dll         api接口SDK
 Com.Bll                 dll         业务逻辑
 Com.Service             console     撮合引擎    RabbitMQ

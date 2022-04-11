@@ -16,6 +16,10 @@ public class CallOrderCancel
     /// </summary>
     /// <value></value>
     public string symbol { get; set; } = null!;
+    /// <summary>
+    /// 撤单数据
+    /// </summary>
+    /// <value></value>
     public List<long> data { get; set; } = null!;
 
 }

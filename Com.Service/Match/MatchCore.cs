@@ -329,21 +329,25 @@ public class MatchCore
                 //限价买单与限价卖单撮合
                 if ((order.state == E_OrderState.unsold || order.state == E_OrderState.partial) && fixed_ask.Count() > 0)
                 {
-                    for (int i = 0; i < fixed_ask.Count; i++)
+                    int index = fixed_ask.FindIndex(P => P.price <= order.price);
+                    if (index != -1)
                     {
-                        decimal new_price = GetNewPrice(order.price ?? 0, fixed_ask[i].price ?? 0, this.last_price);
-                        if (new_price <= 0)
+                        for (int i = index; i < fixed_ask.Count; i++)
                         {
-                            break;
+                            decimal new_price = GetNewPrice(order.price ?? 0, fixed_ask[i].price ?? 0, this.last_price);
+                            if (new_price <= 0)
+                            {
+                                break;
+                            }
+                            price = CreateDeal(order, fixed_ask[i], new_price, E_OrderSide.buy, orders, deals, cancels);
+                            this.last_price = price ?? this.last_price;
+                            if (order.state == E_OrderState.completed || order.state == E_OrderState.cancel)
+                            {
+                                break;
+                            }
                         }
-                        price = CreateDeal(order, fixed_ask[i], new_price, E_OrderSide.buy, orders, deals, cancels);
-                        this.last_price = price ?? this.last_price;
-                        if (order.state == E_OrderState.completed || order.state == E_OrderState.cancel)
-                        {
-                            break;
-                        }
+                        fixed_ask.RemoveAll(P => P.state == E_OrderState.completed || P.state == E_OrderState.cancel);
                     }
-                    fixed_ask.RemoveAll(P => P.state == E_OrderState.completed || P.state == E_OrderState.cancel);
                 }
                 //限价买单没成交部分添加到限价买单相应的位置,(价格优先,时间优先原则)
                 if (order.state == E_OrderState.unsold || order.state == E_OrderState.partial)
@@ -410,21 +414,25 @@ public class MatchCore
                 //限价卖单与限价买单撮合
                 if ((order.state == E_OrderState.unsold || order.state == E_OrderState.partial) && fixed_bid.Count() > 0)
                 {
-                    for (int i = 0; i < fixed_bid.Count; i++)
+                    int index = fixed_bid.FindIndex(P => P.price >= order.price);
+                    if (index != -1)
                     {
-                        decimal new_price = GetNewPrice(fixed_bid[i].price ?? 0, order.price ?? 0, this.last_price);
-                        if (new_price <= 0)
+                        for (int i = index; i < fixed_bid.Count; i++)
                         {
-                            break;
+                            decimal new_price = GetNewPrice(fixed_bid[i].price ?? 0, order.price ?? 0, this.last_price);
+                            if (new_price <= 0)
+                            {
+                                break;
+                            }
+                            price = CreateDeal(fixed_bid[i], order, new_price, E_OrderSide.sell, orders, deals, cancels);
+                            this.last_price = price ?? this.last_price;
+                            if (order.state == E_OrderState.completed || order.state == E_OrderState.cancel)
+                            {
+                                break;
+                            }
                         }
-                        price = CreateDeal(fixed_bid[i], order, new_price, E_OrderSide.sell, orders, deals, cancels);
-                        this.last_price = price ?? this.last_price;
-                        if (order.state == E_OrderState.completed || order.state == E_OrderState.cancel)
-                        {
-                            break;
-                        }
+                        fixed_bid.RemoveAll(P => P.state == E_OrderState.completed || P.state == E_OrderState.cancel);
                     }
-                    fixed_bid.RemoveAll(P => P.state == E_OrderState.completed || P.state == E_OrderState.cancel);
                 }
                 //限价卖单没成交部分添加到限价卖单相应的位置,(价格优先,时间优先原则)
                 if (order.state == E_OrderState.unsold || order.state == E_OrderState.partial)
@@ -509,10 +517,10 @@ public class MatchCore
             ask_amount_unsold = ask.unsold,
             bid_total_done = bid.deal_total,
             ask_amount_done = ask.deal_amount,
-            fee_bid_maker=bid.fee_maker,
-            fee_ask_maker=ask.fee_maker,
-            fee_bid_taker=bid.fee_taker,
-            fee_ask_taker=ask.fee_taker,
+            fee_bid_maker = bid.fee_maker,
+            fee_ask_maker = ask.fee_maker,
+            fee_bid_taker = bid.fee_taker,
+            fee_ask_taker = ask.fee_taker,
             time = now,
         };
         deals.Add(deal);

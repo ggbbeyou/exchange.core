@@ -139,6 +139,10 @@ public class ServiceWallet
     /// <returns></returns>
     public bool FreezeChange(E_WalletType wallet_type, long uid, long coin_id, decimal amount)
     {
+        if (amount == 0)
+        {
+            return false;
+        }
         using (var scope = FactoryService.instance.constant.provider.CreateScope())
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
@@ -165,10 +169,6 @@ public class ServiceWallet
                             {
                                 return false;
                             }
-                        }
-                        else if (amount == 0)
-                        {
-                            return false;
                         }
                         wallet.freeze += amount;
                         wallet.available -= amount;
@@ -198,12 +198,18 @@ public class ServiceWallet
     /// 资产冻结变更
     /// </summary>
     /// <param name="wallet_type">钱包类型</param>
-    /// <param name="uid"></param>
-    /// <param name="coin_base"></param>
+    /// <param name="uid">用户id</param>
+    /// <param name="coin_base">基本币种id</param>
     /// <param name="amount_base">正数:增加冻结,负数:减少冻结</param>
+    /// <param name="coin_quote">报价币种id</param>
+    /// <param name="amount_quote">正数:增加冻结,负数:减少冻结</param>
     /// <returns></returns>
     public bool FreezeChange(E_WalletType wallet_type, long uid, long coin_base, decimal amount_base, long coin_quote, decimal amount_quote)
     {
+        if (amount_base == 0 || amount_quote == 0)
+        {
+            return false;
+        }
         using (var scope = FactoryService.instance.constant.provider.CreateScope())
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
@@ -231,10 +237,6 @@ public class ServiceWallet
                                 return false;
                             }
                         }
-                        else if (amount_base == 0)
-                        {
-                            return false;
-                        }
                         Wallet? wallet_quote = db.Wallet.Where(P => P.wallet_type == wallet_type && P.user_id == uid && P.coin_id == coin_quote).SingleOrDefault();
                         if (wallet_quote == null)
                         {
@@ -253,10 +255,6 @@ public class ServiceWallet
                             {
                                 return false;
                             }
-                        }
-                        else if (amount_base == 0)
-                        {
-                            return false;
                         }
                         wallet_base.freeze += amount_base;
                         wallet_base.available -= amount_base;
@@ -283,7 +281,6 @@ public class ServiceWallet
         }
     }
 
-
     /// <summary>
     /// 撮合成交后资产变动(批量),手续费内扣(到手资产里面再去扣手续费)
     /// </summary>
@@ -297,6 +294,14 @@ public class ServiceWallet
         {
             return (true, runnings);
         }
+        E_WalletType wallet_type = E_WalletType.main;
+        if (market.market_type == E_MarketType.spot)
+        {
+            wallet_type = E_WalletType.spot;
+        }
+        List<long> user_id = deals.Select(T => T.bid_uid).ToList();
+        user_id.AddRange(deals.Select(T => T.ask_uid).ToList());
+        user_id = user_id.Distinct().ToList();
         decimal temp_base = 0;
         decimal temp_quote = 0;
         decimal fee_base = 0;
@@ -305,15 +310,6 @@ public class ServiceWallet
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
-
-                E_WalletType wallet_type = E_WalletType.main;
-                if (market.market_type == E_MarketType.spot)
-                {
-                    wallet_type = E_WalletType.spot;
-                }
-                List<long> user_id = deals.Select(T => T.bid_uid).ToList();
-                user_id.AddRange(deals.Select(T => T.ask_uid).ToList());
-                user_id = user_id.Distinct().ToList();
                 using (var transaction = db.Database.BeginTransaction(isolationLevel))
                 {
                     try
@@ -371,16 +367,11 @@ public class ServiceWallet
                         }
                         foreach (var item in wallets)
                         {
-                            //如果放在上面foreach里面,会非常非常耗时,特别奇怪.怪事
                             item.total = item.available + item.freeze;
                         }
                         foreach (var item in wallets_settlement)
                         {
                             item.total = item.available + item.freeze;
-                        }
-                        if (wallets.Any(P => P.freeze < 0))
-                        {
-
                         }
                         db.Wallet.UpdateRange(wallets);
                         db.Wallet.UpdateRange(wallets_settlement);

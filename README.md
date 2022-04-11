@@ -3,15 +3,15 @@
 
 项目说明:
 Com.Api                 api         api接口
+Com.Api.Admin           api         后台管理接口
 Com.Api.Sdk             dll         api接口SDK
 Com.Bll                 dll         业务逻辑
-Com.Service             console     撮合引擎    RabbitMQ
-Com.Model               dll         基本模型
-Com.Admin               web         后台管理网站
 Com.Db                  dll         数据库模型
 Com.Market              web         作市程序
+Com.Service             console     撮合引擎    RabbitMQ
 doc                     doc         帮助文档
 Protos                  Protos      gprc文件
+SDK                     folder      其它交易所SDK
 
 
 

@@ -286,7 +286,7 @@ public class ServiceOrder
             {
                 if (!service_wallet.FreezeChange(wallet_type, uid, info.coin_id_base, -coin_base, info.coin_id_quote, -coin_quote))
                 {
-                    res.code = E_Res_Code.available_not_enough;
+                    res.code = E_Res_Code.db_error;
                     res.message = "挂单失败,并且解除冻结出错,基础币种或报价币种余额不足";
                     return res;
                 }
@@ -295,7 +295,7 @@ public class ServiceOrder
             {
                 if (!service_wallet.FreezeChange(wallet_type, uid, info.coin_id_base, -coin_base))
                 {
-                    res.code = E_Res_Code.available_not_enough;
+                    res.code = E_Res_Code.db_error;
                     res.message = "挂单失败,并且解除冻结出错,基础币种余额不足";
                     return res;
                 }
@@ -304,7 +304,7 @@ public class ServiceOrder
             {
                 if (!service_wallet.FreezeChange(wallet_type, uid, info.coin_id_quote, -coin_quote))
                 {
-                    res.code = E_Res_Code.available_not_enough;
+                    res.code = E_Res_Code.db_error;
                     res.message = "挂单失败,并且解除冻结出错,报价币种余额不足";
                     return res;
                 }

@@ -408,7 +408,6 @@ public class TestController : ControllerBase
     /// 
     /// </summary>
     /// <param name="a"></param>
-    /// <param name="b"></param>
     [HttpPost]
     [Route("Test")]
     public void aaa(CallOrder a)

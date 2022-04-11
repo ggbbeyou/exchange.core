@@ -45,6 +45,7 @@ using RabbitMQ.Client.Events;
 using Microsoft.AspNetCore.Authorization;
 using StackExchange.Redis;
 using Com.Api.Sdk.Models;
+using System.Text;
 
 namespace Com.Api.Controllers;
 
@@ -227,7 +228,7 @@ public class WebSocketController : ControllerBase
                         resWebsocker.data = item.data;
                         resWebsocker.message = "订阅成功";
                         string Json = JsonConvert.SerializeObject(resWebsocker);
-                        byte[] bb = System.Text.Encoding.UTF8.GetBytes(Json);
+                        byte[] bb = Encoding.UTF8.GetBytes(Json);
                         webSocket.SendAsync(new ArraySegment<byte>(bb, 0, bb.Length), WebSocketMessageType.Text, true, CancellationToken.None);
                         if (item.channel == E_WebsockerChannel.books10_inc || item.channel == E_WebsockerChannel.books50_inc || item.channel == E_WebsockerChannel.books200_inc)
                         {
@@ -253,7 +254,7 @@ public class WebSocketController : ControllerBase
                                 depth_res.op = E_WebsockerOp.subscribe_date;
                                 depth_res.channel = item.channel;
                                 depth_res.data = depth;
-                                byte[] bb1 = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(depth_res));
+                                byte[] bb1 = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(depth_res));
                                 webSocket.SendAsync(new ArraySegment<byte>(bb1, 0, bb1.Length), WebSocketMessageType.Text, true, CancellationToken.None);
                             }
                         }

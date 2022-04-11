@@ -3,7 +3,7 @@
 
 项目说明:
 Com.Api                 api         api接口
-Com.Api.Admin           api         后台管理接口
+Com.Api.Admin           api         api后台管理接口
 Com.Api.Sdk             dll         api接口SDK
 Com.Bll                 dll         业务逻辑
 Com.Db                  dll         数据库模型

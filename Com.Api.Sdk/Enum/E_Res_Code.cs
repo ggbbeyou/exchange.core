@@ -88,11 +88,11 @@ public enum E_Res_Code
     /// <summary>
     /// 系统禁止挂单
     /// </summary>
-    system_prohibit_place_order,
+    system_disable_place_order,
     /// <summary>
     /// 用户禁止挂单
     /// </summary>
-    user_prohibit_place_order,
+    user_disable_place_order,
     /// <summary>
     /// 成交价格不能低于0
     /// </summary>

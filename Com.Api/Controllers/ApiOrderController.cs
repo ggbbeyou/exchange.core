@@ -61,7 +61,7 @@ public class ApiOrderController : ControllerBase
         if (user_api.transaction == false || user_api.users == null)
         {
             Res<List<ResOrder>> result = new Res<List<ResOrder>>();
-            result.code = E_Res_Code.user_prohibit_place_order;
+            result.code = E_Res_Code.user_disable_place_order;
             result.message = "用户禁止下单";
             return result;
         }
@@ -84,7 +84,7 @@ public class ApiOrderController : ControllerBase
         if (user_api.transaction == false || user_api.users == null)
         {
             Res<bool> result = new Res<bool>();
-            result.code = E_Res_Code.user_prohibit_place_order;
+            result.code = E_Res_Code.user_disable_place_order;
             result.message = "用户禁止撤单";
             return result;
         }
@@ -107,7 +107,7 @@ public class ApiOrderController : ControllerBase
         if (user_api.transaction == false || user_api.users == null)
         {
             Res<bool> result = new Res<bool>();
-            result.code = E_Res_Code.user_prohibit_place_order;
+            result.code = E_Res_Code.user_disable_place_order;
             result.message = "用户禁止撤单";
             return result;
         }
@@ -130,7 +130,7 @@ public class ApiOrderController : ControllerBase
         if (user_api.transaction == false || user_api.users == null)
         {
             Res<bool> result = new Res<bool>();
-            result.code = E_Res_Code.user_prohibit_place_order;
+            result.code = E_Res_Code.user_disable_place_order;
             result.message = "用户禁止撤单";
             return result;
         }

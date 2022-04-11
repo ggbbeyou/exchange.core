@@ -105,7 +105,7 @@ public class ServiceOrder
         }
         if (info.transaction == false || info.status == false)
         {
-            res.code = E_Res_Code.system_prohibit_place_order;
+            res.code = E_Res_Code.system_disable_place_order;
             res.message = "该交易对禁止下单(系统设置)";
             return res;
         }
@@ -160,7 +160,7 @@ public class ServiceOrder
         }
         if (users.disabled || !users.transaction)
         {
-            res.code = E_Res_Code.user_prohibit_place_order;
+            res.code = E_Res_Code.user_disable_place_order;
             res.message = "用户禁止下单";
             return res;
         }
@@ -347,7 +347,7 @@ public class ServiceOrder
         }
         if (info.transaction == false || info.status == false)
         {
-            res.code = E_Res_Code.system_prohibit_place_order;
+            res.code = E_Res_Code.system_disable_place_order;
             res.message = "该交易对禁止下单(系统设置)";
             return res;
         }

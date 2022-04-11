@@ -17,23 +17,12 @@ namespace Com.Api.Controllers;
 [TypeFilter(typeof(VerificationFilters))]
 [ApiController]
 [Route("api/order")]
-// [Produces("application/json")]
 public class ApiOrderController : ControllerBase
 {
     /// <summary>
     /// 日志
     /// </summary>
     private readonly ILogger<ApiOrderController> logger;
-    /// <summary>
-    /// 登录信息
-    /// </summary>
-    private (long user_id, long no, string user_name, string app, string public_key) login
-    {
-        get
-        {
-            return this.service_common.GetLoginUser(User);
-        }
-    }
     /// <summary>
     /// service:公共服务
     /// </summary>
@@ -58,50 +47,97 @@ public class ApiOrderController : ControllerBase
     }
 
     /// <summary>
-    /// 挂单
+    /// 批量挂单
     /// </summary>
-    /// <param name="api_key">交易对</param>
-    /// <param name="symbol">交易对</param>
-    /// <param name="orders">订单数据</param>
+    /// <param name="data"></param>
     /// <returns></returns>
     [HttpPost]
     [Route("OrderPlace")]
-    // [Consumes("application/x-www-form-urlencoded")]
-    // [Consumes("application/json")]
     public Res<List<ResOrder>> OrderPlace(CallOrder data)
     {
         // List<ReqOrder> orders = JsonConvert.DeserializeObject<List<ReqOrder>>(a);
         //判断用户api是否有交易权限
-        if (!service_user.ApiUserTransaction(Request.Headers["api_key"]))
+        (bool transaction, Users? users, UsersApi? api) user_api = service_user.ApiUserTransaction(Request.Headers["api_key"]);
+        if (user_api.transaction == false || user_api.users == null)
         {
             Res<List<ResOrder>> result = new Res<List<ResOrder>>();
             result.code = E_Res_Code.user_prohibit_place_order;
             result.message = "用户禁止下单";
             return result;
         }
-        return service_order.PlaceOrder(data.symbol, login.user_id, login.user_name, data.orders);
+        else
+        {
+            return service_order.PlaceOrder(data.symbol, user_api.users.user_id, user_api.users.user_name, data.orders);
+        }
     }
 
     /// <summary>
-    /// 撤单
+    /// 按交易对,用户撤单
     /// </summary>
-    /// <param name="api_key">交易对</param>
     /// <param name="symbol">交易对</param>
-    /// <param name="type">2:按交易对和用户全部撤单,3:按用户和订单id撤单,4:按用户和用户订单id撤单</param>
-    /// <param name="data"></param>
     /// <returns></returns>
     [HttpPost]
-    [Route("OrderCancel")]
-    public Res<bool> OrderCancel([FromHeader] string api_key, string symbol, int type, List<long> data)
+    [Route("OrderCancelByUserId")]
+    public Res<bool> OrderCancelByUserId(string symbol)
     {
-        if (!service_user.ApiUserTransaction(api_key))
+        (bool transaction, Users? users, UsersApi? api) user_api = service_user.ApiUserTransaction(Request.Headers["api_key"]);
+        if (user_api.transaction == false || user_api.users == null)
         {
             Res<bool> result = new Res<bool>();
             result.code = E_Res_Code.user_prohibit_place_order;
             result.message = "用户禁止撤单";
             return result;
         }
-        return this.service_order.CancelOrder(symbol, login.user_id, type, data);
+        else
+        {
+            return this.service_order.CancelOrder(symbol, user_api.users.user_id, 2, new List<long>());
+        }
+    }
+
+    /// <summary>
+    ///  按交易对,订单id撤单
+    /// </summary>
+    /// <param name="model">订单id</param>
+    /// <returns></returns>
+    [HttpPost]
+    [Route("OrderCancelByOrderid")]
+    public Res<bool> OrderCancelByOrderid(CallOrderCancel model)
+    {
+        (bool transaction, Users? users, UsersApi? api) user_api = service_user.ApiUserTransaction(Request.Headers["api_key"]);
+        if (user_api.transaction == false || user_api.users == null)
+        {
+            Res<bool> result = new Res<bool>();
+            result.code = E_Res_Code.user_prohibit_place_order;
+            result.message = "用户禁止撤单";
+            return result;
+        }
+        else
+        {
+            return this.service_order.CancelOrder(model.symbol, user_api.users.user_id, 3, model.data);
+        }
+    }
+
+    /// <summary>
+    ///  按用户,交易对,用户自定义id撤单
+    /// </summary>
+    /// <param name="model">订单id</param>
+    /// <returns></returns>
+    [HttpPost]
+    [Route("OrderCancelByClientId")]
+    public Res<bool> OrderCancelByClientId(CallOrderCancel model)
+    {
+        (bool transaction, Users? users, UsersApi? api) user_api = service_user.ApiUserTransaction(Request.Headers["api_key"]);
+        if (user_api.transaction == false || user_api.users == null)
+        {
+            Res<bool> result = new Res<bool>();
+            result.code = E_Res_Code.user_prohibit_place_order;
+            result.message = "用户禁止撤单";
+            return result;
+        }
+        else
+        {
+            return this.service_order.CancelOrder(model.symbol, user_api.users.user_id, 4, model.data);
+        }
     }
 
 }

@@ -189,19 +189,19 @@ public class ServiceUser
     /// </summary>
     /// <param name="api_key"></param>
     /// <returns></returns>
-    public bool ApiUserTransaction(string api_key)
+    public (bool, Users?, UsersApi?) ApiUserTransaction(string api_key)
     {
         UsersApi? api = GetApi(api_key);
         if (api == null || !api.transaction)
         {
-            return false;
+            return (false, null, null);
         }
         Users? users = GetUser(api.user_id);
         if (users == null || users.disabled || !users.transaction)
         {
-            return false;
+            return (false, null, null);
         }
-        return true;
+        return (true, users, api);
     }
 
 }

@@ -10,6 +10,7 @@ Com.Service             console     撮合引擎    RabbitMQ
 Com.Model               dll         基本模型
 Com.Admin               web         后台管理网站
 Com.Db                  dll         数据库模型
+Com.Market              web         作市程序
 doc                     doc         帮助文档
 Protos                  Protos      gprc文件
 

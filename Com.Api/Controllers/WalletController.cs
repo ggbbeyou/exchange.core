@@ -1,3 +1,4 @@
+using System.Data.Entity;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Com.Api.Sdk.Enum;
@@ -67,6 +68,23 @@ public class WalletController : ControllerBase
     public Res<bool> Transfer(long coin_id, E_WalletType from, E_WalletType to, decimal amount)
     {
         return service_wallet.Transfer(login.user_id, coin_id, from, to, amount);
+    }
+
+    /// <summary>
+    /// 获取用户所有钱包
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet]
+    [Route("Transfer")]
+    public List<Wallet> GetWallet()
+    {
+        using (var scope = FactoryService.instance.constant.provider.CreateScope())
+        {
+            using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
+            {
+                return db.Wallet.Where(P => P.user_id == login.user_id).AsNoTracking().ToList();
+            }
+        }
     }
 
 }

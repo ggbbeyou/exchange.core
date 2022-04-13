@@ -253,7 +253,7 @@ public class MatchCore
     }
 
     /// <summary>
-    ///  撮合算法
+    ///  撮合算法(无限制规则)
     /// </summary>
     /// <param name="order">挂单订单</param>
     /// <returns>成交订单</returns>
@@ -411,6 +411,146 @@ public class MatchCore
                     this.last_price = price ?? this.last_price;
                     market_bid.RemoveAll(P => P.state == E_OrderState.completed || P.state == E_OrderState.cancel);
                 }
+                //限价卖单与限价买单撮合
+                if ((order.state == E_OrderState.unsold || order.state == E_OrderState.partial) && fixed_bid.Count() > 0)
+                {
+                    int index = fixed_bid.FindIndex(P => P.price >= order.price);
+                    if (index != -1)
+                    {
+                        for (int i = index; i < fixed_bid.Count; i++)
+                        {
+                            decimal new_price = GetNewPrice(fixed_bid[i].price ?? 0, order.price ?? 0, this.last_price);
+                            if (new_price <= 0)
+                            {
+                                break;
+                            }
+                            price = CreateDeal(fixed_bid[i], order, new_price, E_OrderSide.sell, orders, deals, cancels);
+                            this.last_price = price ?? this.last_price;
+                            if (order.state == E_OrderState.completed || order.state == E_OrderState.cancel)
+                            {
+                                break;
+                            }
+                        }
+                        fixed_bid.RemoveAll(P => P.state == E_OrderState.completed || P.state == E_OrderState.cancel);
+                    }
+                }
+                //限价卖单没成交部分添加到限价卖单相应的位置,(价格优先,时间优先原则)
+                if (order.state == E_OrderState.unsold || order.state == E_OrderState.partial)
+                {
+                    fixed_ask.Add(order);
+                    fixed_ask = fixed_ask.OrderBy(P => P.price).ThenBy(P => P.create_time).ToList();
+                }
+            }
+        }
+        return (orders, deals, cancels);
+    }
+
+    /// <summary>
+    ///  撮合算法(市价单如果不立即成交就会被撤单,并指定吃到第几档)
+    /// </summary>
+    /// <param name="order">挂单订单</param>
+    /// <param name="archives">市价吃到第几档</param>
+    /// <returns>成交订单</returns>
+    public (List<Orders> orders, List<Deal> deals, List<Orders> cancels) MatchByArchives(Orders order, int archives)
+    {
+        List<Orders> orders = new List<Orders>();
+        List<Deal> deals = new List<Deal>();
+        List<Orders> cancels = new List<Orders>();
+        decimal? price = null;
+        if (order.market != this.model.info.market || order.unsold <= 0 || order.state == E_OrderState.completed || order.state == E_OrderState.cancel || archives <= 0)
+        {
+            return (orders, deals, cancels);
+        }
+        if (order.state == E_OrderState.not_match && order.trigger_hanging_price > 0)
+        {
+            this.trigger.Add(order);
+            return (orders, deals, cancels);
+        }
+        if (order.side == E_OrderSide.buy)
+        {
+            if (order.type == E_OrderType.market)
+            {
+                //市价买单与限价卖单撮合
+                if ((order.state == E_OrderState.unsold || order.state == E_OrderState.partial) && this.fixed_ask.Count() > 0)
+                {
+                    archives = this.fixed_ask.Count > archives - 1 ? archives - 1 : this.fixed_ask.Count;
+                    for (int i = 0; i < archives; i++)
+                    {
+                        price = CreateDeal(order, this.fixed_ask[i], this.fixed_ask[i].price ?? 0, E_OrderSide.buy, orders, deals, cancels);
+                        this.last_price = price ?? this.last_price;
+                        if (order.state == E_OrderState.completed || order.state == E_OrderState.cancel)
+                        {
+                            break;
+                        }
+                    }
+                    this.fixed_ask.RemoveAll(P => P.state == E_OrderState.completed || P.state == E_OrderState.cancel);
+                    if (order.state == E_OrderState.unsold || order.state == E_OrderState.partial)
+                    {
+                        order.state = E_OrderState.cancel;
+                        cancels.Add(order);
+                    }
+                }
+            }
+            else if (order.type == E_OrderType.limit)
+            {
+                //限价买单与限价卖单撮合
+                if ((order.state == E_OrderState.unsold || order.state == E_OrderState.partial) && fixed_ask.Count() > 0)
+                {
+                    int index = fixed_ask.FindIndex(P => P.price <= order.price);
+                    if (index != -1)
+                    {
+                        for (int i = index; i < fixed_ask.Count; i++)
+                        {
+                            decimal new_price = GetNewPrice(order.price ?? 0, fixed_ask[i].price ?? 0, this.last_price);
+                            if (new_price <= 0)
+                            {
+                                break;
+                            }
+                            price = CreateDeal(order, fixed_ask[i], new_price, E_OrderSide.buy, orders, deals, cancels);
+                            this.last_price = price ?? this.last_price;
+                            if (order.state == E_OrderState.completed || order.state == E_OrderState.cancel)
+                            {
+                                break;
+                            }
+                        }
+                        fixed_ask.RemoveAll(P => P.state == E_OrderState.completed || P.state == E_OrderState.cancel);
+                    }
+                }
+                //限价买单没成交部分添加到限价买单相应的位置,(价格优先,时间优先原则)
+                if (order.state == E_OrderState.unsold || order.state == E_OrderState.partial)
+                {
+                    fixed_bid.Add(order);
+                    fixed_bid = fixed_bid.OrderByDescending(P => P.price).ThenBy(P => P.create_time).ToList();
+                }
+            }
+        }
+        else if (order.side == E_OrderSide.sell)
+        {
+            if (order.type == E_OrderType.market)
+            {
+                //市价卖单与限价买单撮合
+                if ((order.state == E_OrderState.unsold || order.state == E_OrderState.partial) && fixed_bid.Count() > 0)
+                {
+                    archives = this.fixed_bid.Count > archives - 1 ? archives - 1 : this.fixed_bid.Count;
+                    for (int i = 0; i < archives; i++)
+                    {
+                        price = CreateDeal(fixed_bid[i], order, fixed_bid[i].price ?? 0, E_OrderSide.sell, orders, deals, cancels);
+                        this.last_price = price ?? this.last_price;
+                        if (order.state == E_OrderState.completed || order.state == E_OrderState.cancel)
+                        {
+                            break;
+                        }
+                    }
+                    fixed_bid.RemoveAll(P => P.state == E_OrderState.completed || P.state == E_OrderState.cancel);
+                    if (order.state == E_OrderState.unsold || order.state == E_OrderState.partial)
+                    {
+                        order.state = E_OrderState.cancel;
+                        cancels.Add(order);
+                    }
+                }
+            }
+            else if (order.type == E_OrderType.limit)
+            {
                 //限价卖单与限价买单撮合
                 if ((order.state == E_OrderState.unsold || order.state == E_OrderState.partial) && fixed_bid.Count() > 0)
                 {

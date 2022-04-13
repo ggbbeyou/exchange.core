@@ -103,8 +103,8 @@ public class OrderController : ControllerBase
     /// <param name="data"></param>
     /// <returns></returns>
     [HttpPost]
-    [ResponseCache(CacheProfileName = "cache_2")]
     [Route("GetOrderById")]
+    [ResponseCache(CacheProfileName = "cache_2")]
     public Res<List<ResOrder>> GetOrderById(long market, List<long> data)
     {
         return this.service_order.GetOrder(market: market, uid: login.user_id, ids: data);
@@ -119,8 +119,8 @@ public class OrderController : ControllerBase
     /// <param name="end"></param>
     /// <returns></returns>
     [HttpPost]
-    [ResponseCache(CacheProfileName = "cache_2")]
     [Route("GetOrderByState")]
+    [ResponseCache(CacheProfileName = "cache_2")]
     public Res<List<ResOrder>> GetOrderByState(long market, E_OrderState state, DateTimeOffset start, DateTimeOffset end)
     {
         return this.service_order.GetOrder(market: market, uid: login.user_id, state: state, start: start, end: end);
@@ -134,8 +134,8 @@ public class OrderController : ControllerBase
     /// <param name="end"></param>
     /// <returns></returns>
     [HttpPost]
-    [ResponseCache(CacheProfileName = "cache_2")]
     [Route("GetOrderByDate")]
+    [ResponseCache(CacheProfileName = "cache_2")]
     public Res<List<ResOrder>> GetOrderByDate(long market, DateTimeOffset start, DateTimeOffset end)
     {
         return this.service_order.GetOrder(market: market, uid: login.user_id, start: start, end: end);

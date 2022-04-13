@@ -87,7 +87,7 @@ public class MQ
                         FactoryService.instance.constant.stopwatch.Restart();
                         foreach (Orders item in req.data)
                         {
-                            (List<Orders> orders, List<Deal> deals, List<Orders> cancels) match = this.model.match_core.Match(item);
+                            (List<Orders> orders, List<Deal> deals, List<Orders> cancels) match = this.model.match_core.MatchByArchives(item, 10);
                             if (match.orders.Count == 0 && match.deals.Count == 0 && match.cancels.Count == 0)
                             {
                                 continue;

@@ -29,12 +29,6 @@ builder.Services.AddStackExchangeRedisCache(options =>
     options.Configuration = builder.Configuration.GetConnectionString("Redis");
     options.InstanceName = "redisInstance";
 });
-builder.Services.AddControllers(options =>
-{
-    options.CacheProfiles.Add("cache_1", new CacheProfile() { Duration = 5 });
-    options.CacheProfiles.Add("cache_2", new CacheProfile() { Duration = 10 });
-    options.CacheProfiles.Add("cache_3", new CacheProfile() { Duration = 60 });
-});
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -53,7 +47,12 @@ builder.Services.AddAuthentication(options =>
     };
 });
 builder.Services.AddResponseCompression();
-builder.Services.AddControllers().AddNewtonsoftJson();
+builder.Services.AddControllers(options =>
+{
+    options.CacheProfiles.Add("cache_1", new CacheProfile() { Duration = 5 });
+    options.CacheProfiles.Add("cache_2", new CacheProfile() { Duration = 10 });
+    options.CacheProfiles.Add("cache_3", new CacheProfile() { Duration = 60 });
+}).AddNewtonsoftJson();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {

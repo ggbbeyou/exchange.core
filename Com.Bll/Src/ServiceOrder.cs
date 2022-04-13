@@ -542,4 +542,32 @@ public class ServiceOrder
         return (buys, sells);
     }
 
+    /// <summary>
+    /// 订单查询
+    /// </summary>
+    /// <param name="market">交易对</param>
+    /// <param name="uid">用户id</param>
+    /// <param name="state">订单状态</param>
+    /// <param name="start">开始时间</param>
+    /// <param name="end">结束时间</param>
+    /// <param name="ids">订单id</param>
+    /// <returns></returns>
+    public Res<List<ResOrder>> GetOrder(long? market = null, long? uid = null, E_OrderState? state = null, DateTimeOffset? start = null, DateTimeOffset? end = null, List<long>? ids = null)
+    {
+        Res<List<ResOrder>> res = new Res<List<ResOrder>>();
+        res.data = new List<ResOrder>();
+        using (var scope = FactoryService.instance.constant.provider.CreateScope())
+        {
+            using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
+            {
+                List<OrderBuy> buys = db.OrderBuy.WhereIf(ids != null && ids.Count > 0, P => ids!.Contains(P.order_id)).WhereIf(market != null, P => P.market == market).WhereIf(uid != null, P => P.uid == uid).WhereIf(state != null, P => P.state == state).WhereIf(start != null, P => P.create_time >= start).WhereIf(end != null, P => P.create_time <= end).AsNoTracking().ToList();
+                List<OrderSell> sells = db.OrderSell.WhereIf(ids != null && ids.Count > 0, P => ids!.Contains(P.order_id)).WhereIf(market != null, P => P.market == market).WhereIf(uid != null, P => P.uid == uid).WhereIf(state != null, P => P.state == state).WhereIf(start != null, P => P.create_time == start).WhereIf(end != null, P => P.create_time <= end).AsNoTracking().ToList();
+                res.data.AddRange(buys);
+                res.data.AddRange(sells);
+                res.data = res.data.OrderBy(P => P.create_time).ToList();
+                return res;
+            }
+        }
+    }
+
 }

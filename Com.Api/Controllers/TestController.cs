@@ -404,15 +404,4 @@ public class TestController : ControllerBase
         return res;
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="a"></param>
-    [HttpPost]
-    [Route("Test")]
-    public void aaa(CallOrder a)
-    {
-
-    }
-
 }

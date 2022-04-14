@@ -147,22 +147,25 @@ public class WebSocketController : ControllerBase
         if (str.ToLower() == "ping")
         {
             webSocket.SendAsync(new ArraySegment<byte>(pong, 0, pong.Length), WebSocketMessageType.Text, true, CancellationToken.None);
+            return;
         }
         ReqWebsocker? req = null;
+        ResWebsocker<string> resWebsocker = new ResWebsocker<string>();
         try
         {
             req = JsonConvert.DeserializeObject<ReqWebsocker>(str);
         }
         catch (System.Exception ex)
         {
-            byte[] b = System.Text.Encoding.UTF8.GetBytes($"无法解析请求命令:{str},{ex.Message}");
+            resWebsocker.success = false;
+            resWebsocker.message = $"无法解析请求命令:{str},{ex.Message}";
+            byte[] b = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(resWebsocker));
             webSocket.SendAsync(new ArraySegment<byte>(b, 0, b.Length), WebSocketMessageType.Text, true, CancellationToken.None);
         }
         if (req == null)
         {
             return;
         }
-        ResWebsocker<string> resWebsocker = new ResWebsocker<string>();
         resWebsocker.success = true;
         resWebsocker.op = req.op;
         if (uid == 0 && req.op == E_WebsockerOp.subscribe)
@@ -218,7 +221,7 @@ public class WebSocketController : ControllerBase
                         string key = FactoryService.instance.GetMqSubscribe(item.channel, market.market);
                         if (login_channel.Contains(item.channel))
                         {
-                            key = FactoryService.instance.GetMqSubscribe(item.channel, uid);                           
+                            key = FactoryService.instance.GetMqSubscribe(item.channel, uid);
                         }
                         if (channel.ContainsKey(key))
                         {

@@ -15,7 +15,7 @@ public enum E_WebsockerOp
     /// <summary>
     /// 登出
     /// </summary>
-    Logout = 2,
+    logout = 2,
     /// <summary>
     /// 订阅
     /// </summary>

@@ -192,7 +192,7 @@ public class WebSocketController : ControllerBase
             byte[] b = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(resWebsocker));
             webSocket.SendAsync(new ArraySegment<byte>(b, 0, b.Length), WebSocketMessageType.Text, true, CancellationToken.None);
         }
-        else if (req.op == E_WebsockerOp.Logout)
+        else if (req.op == E_WebsockerOp.logout)
         {
             uid = 0;
             resWebsocker.channel = E_WebsockerChannel.none;

@@ -214,7 +214,7 @@ public class Core
                     {
                         wallet_type = E_WalletType.spot;
                     }
-                    List<Orders> order_buy = orders.Distinct().Where(P => P.state == E_OrderState.completed && P.unsold > 0 && P.side == E_OrderSide.buy).ToList();
+                    List<Orders> order_buy = orders.Distinct().Where(P => (P.state == E_OrderState.completed || P.state == E_OrderState.cancel) && P.unsold > 0 && P.side == E_OrderSide.buy).ToList();
                     var order_buy_uid = from o in order_buy
                                         group o by o.uid into g
                                         select new { uid = g.Key, unsold = g.Sum(P => P.unsold), order = g.ToList() };
@@ -226,7 +226,7 @@ public class Core
                             process.order_complete_thaw = process.order_complete_thaw && service_order.UpdateOrder(item.order);
                         }
                     }
-                    List<Orders> order_sell = orders.Distinct().Where(P => P.state == E_OrderState.completed && P.unsold > 0 && P.side == E_OrderSide.sell).ToList();
+                    List<Orders> order_sell = orders.Distinct().Where(P => (P.state == E_OrderState.completed || P.state == E_OrderState.cancel) && P.unsold > 0 && P.side == E_OrderSide.sell).ToList();
                     var order_sell_uid = from o in order_sell
                                          group o by o.uid into g
                                          select new { uid = g.Key, unsold = g.Sum(P => P.unsold), order = g.ToList() };

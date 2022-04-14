@@ -97,6 +97,40 @@ public class OrderController : ControllerBase
     }
 
     /// <summary>
+    /// 当前用户委托挂单
+    /// </summary>
+    /// <param name="start">开始时间</param>
+    /// <param name="end">结束时间</param>
+    /// <param name="skip">跳过多少行</param>
+    /// <param name="take">获取多少行</param>
+    /// <returns></returns>
+    [HttpGet]
+    [ResponseCache(CacheProfileName = "cache_0")]
+    [Route("GetOrderEntrust")]
+    public Res<List<ResOrder>> GetOrderEntrust(DateTimeOffset? start, DateTimeOffset? end, int skip = 0, int take = 50)
+    {
+        return this.service_order.GetOrder(login.user_id, skip, take, start, end);
+    }
+
+    /// <summary>
+    /// 当前用户历史委托挂单
+    /// </summary>
+    /// <param name="start">开始时间</param>
+    /// <param name="end">结束时间</param>
+    /// <param name="skip">跳过多少行</param>
+    /// <param name="take">获取多少行</param>
+    /// <returns></returns>
+    [HttpGet]
+    [ResponseCache(CacheProfileName = "cache_1")]
+    [Route("GetOrderHistory")]
+    public Res<List<ResOrder>> GetOrderHistory(DateTimeOffset? start, DateTimeOffset? end, int skip = 0, int take = 50)
+    {
+        return this.service_order.GetOrder(login.user_id, skip, take, start, end);
+    }
+
+
+
+    /// <summary>
     /// 按订单id查询
     /// </summary>
     /// <param name="market"></param>
@@ -118,7 +152,7 @@ public class OrderController : ControllerBase
     /// <param name="start"></param>
     /// <param name="end"></param>
     /// <returns></returns>
-    [HttpPost]
+    [HttpGet]
     [Route("GetOrderByState")]
     [ResponseCache(CacheProfileName = "cache_2")]
     public Res<List<ResOrder>> GetOrderByState(long market, E_OrderState state, DateTimeOffset start, DateTimeOffset end)
@@ -133,7 +167,7 @@ public class OrderController : ControllerBase
     /// <param name="start"></param>
     /// <param name="end"></param>
     /// <returns></returns>
-    [HttpPost]
+    [HttpGet]
     [Route("GetOrderByDate")]
     [ResponseCache(CacheProfileName = "cache_2")]
     public Res<List<ResOrder>> GetOrderByDate(long market, DateTimeOffset start, DateTimeOffset end)

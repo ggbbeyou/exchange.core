@@ -43,6 +43,9 @@ namespace Com.Bll;
 public class ServiceWallet
 {
 
+    /// <summary>
+    /// 事务等级
+    /// </summary>
     private IsolationLevel isolationLevel = IsolationLevel.RepeatableRead;
 
     /// <summary>
@@ -128,7 +131,6 @@ public class ServiceWallet
                 }
             }
         }
-
     }
 
     /// <summary>
@@ -195,7 +197,6 @@ public class ServiceWallet
             }
         }
     }
-
 
     /// <summary>
     /// 资产冻结变更
@@ -465,7 +466,6 @@ public class ServiceWallet
             }
         }
     }
-
 
     /// <summary>
     /// 添加钱包流水

@@ -322,5 +322,29 @@ public class ServiceDeal
         };
     }
 
+    /// <summary>
+    /// 订单查询
+    /// </summary>
+    /// <param name="market">交易对</param>
+    /// <param name="uid">用户id</param>
+    /// <param name="state">订单状态</param>
+    /// <param name="start">开始时间</param>
+    /// <param name="end">结束时间</param>
+    /// <param name="ids">订单id</param>
+    /// <returns></returns>
+    public Res<List<ResDeal>> GetDealByuid(long uid, int skip, int take, DateTimeOffset? start = null, DateTimeOffset? end = null)
+    {
+        Res<List<ResDeal>> res = new Res<List<ResDeal>>();
+        res.data = new List<ResDeal>();
+        using (var scope = FactoryService.instance.constant.provider.CreateScope())
+        {
+            using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
+            {
+                res.data = db.Deal.Where(P => P.ask_uid == uid || P.bid_uid == uid).WhereIf(start == null, P => P.time >= start).WhereIf(start == null, P => P.time <= end).OrderByDescending(P => P.time).Skip(skip).Take(take).ToList().ConvertAll(P => (ResDeal)P);
+                return res;
+            }
+        }
+    }
+
 
 }

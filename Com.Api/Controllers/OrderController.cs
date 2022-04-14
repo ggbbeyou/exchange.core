@@ -105,8 +105,8 @@ public class OrderController : ControllerBase
     /// <param name="take">获取多少行</param>
     /// <returns></returns>
     [HttpGet]
-    [ResponseCache(CacheProfileName = "cache_0")]
     [Route("GetOrderEntrust")]
+    [ResponseCache(CacheProfileName = "cache_0")]
     public Res<List<ResOrder>> GetOrderEntrust(DateTimeOffset? start, DateTimeOffset? end, int skip = 0, int take = 50)
     {
         return this.service_order.GetOrder(true, login.user_id, skip, take, start, end);
@@ -121,14 +121,12 @@ public class OrderController : ControllerBase
     /// <param name="take">获取多少行</param>
     /// <returns></returns>
     [HttpGet]
-    [ResponseCache(CacheProfileName = "cache_1")]
     [Route("GetOrderHistory")]
+    [ResponseCache(CacheProfileName = "cache_1")]
     public Res<List<ResOrder>> GetOrderHistory(DateTimeOffset? start, DateTimeOffset? end, int skip = 0, int take = 50)
     {
         return this.service_order.GetOrder(false, login.user_id, skip, take, start, end);
     }
-
-
 
     /// <summary>
     /// 按订单id查询

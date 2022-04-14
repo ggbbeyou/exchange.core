@@ -73,7 +73,7 @@ public class MQ
         string consume_tag = FactoryService.instance.constant.MqReceive(queue_name, (e) =>
         {
             string json = Encoding.UTF8.GetString(e);
-            ReqCall<string>? reqCall = JsonConvert.DeserializeObject<ReqCall<string>>(json);
+            ReqCall<object>? reqCall = JsonConvert.DeserializeObject<ReqCall<object>>(json);
             if (reqCall != null)
             {
                 if (reqCall.op == E_Op.place)

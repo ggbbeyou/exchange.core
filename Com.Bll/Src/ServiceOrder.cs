@@ -546,6 +546,7 @@ public class ServiceOrder
     /// <summary>
     /// 订单查询
     /// </summary>
+    /// <param name="entrust">是否是当前委托</param>
     /// <param name="market">交易对</param>
     /// <param name="uid">用户id</param>
     /// <param name="state">订单状态</param>
@@ -553,7 +554,7 @@ public class ServiceOrder
     /// <param name="end">结束时间</param>
     /// <param name="ids">订单id</param>
     /// <returns></returns>
-    public Res<List<ResOrder>> GetOrder(long uid, int skip, int take, DateTimeOffset? start = null, DateTimeOffset? end = null)
+    public Res<List<ResOrder>> GetOrder(bool entrust, long uid, int skip, int take, DateTimeOffset? start = null, DateTimeOffset? end = null)
     {
         Res<List<ResOrder>> res = new Res<List<ResOrder>>();
         res.data = new List<ResOrder>();
@@ -561,28 +562,38 @@ public class ServiceOrder
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
-                IQueryable<ResOrder> buy = db.OrderBuy.Where(P => P.uid == uid).WhereIf(start != null, P => P.create_time >= start).WhereIf(end != null, P => P.create_time <= end).Select(P => new ResOrder { order_id = P.order_id, create_time = P.create_time });
-                IQueryable<ResOrder> sell = db.OrderSell.Where(P => P.uid == uid).WhereIf(start != null, P => P.create_time >= start).WhereIf(end != null, P => P.create_time <= end).Select(P => new ResOrder { order_id = P.order_id, create_time = P.create_time });
-                List<ResOrder> bbb11 = buy.Union(sell).ToList();
-
-
-
-
-                // IQueryable<Orders> aaa = buy.Union(sell).OrderByDescending(P => P.create_time).Skip(skip).Take(take);
-                // var bbb1 = buy.ToList();
-                // var bbb2 = sell.ToList();
-
-                // var bbb = aaa.ToList();
-
-
-
-
-
-                //                 List < OrderBuy > buys = db.OrderBuy.WhereIf(ids != null && ids.Count > 0, P => ids!.Contains(P.order_id)).WhereIf(market != null, P => P.market == market).WhereIf(uid != null, P => P.uid == uid).WhereIf(state != null, P => P.state == state).WhereIf(start != null, P => P.create_time >= start).WhereIf(end != null, P => P.create_time <= end).AsNoTracking().ToList();
-                // List<OrderSell> sells = db.OrderSell.WhereIf(ids != null && ids.Count > 0, P => ids!.Contains(P.order_id)).WhereIf(market != null, P => P.market == market).WhereIf(uid != null, P => P.uid == uid).WhereIf(state != null, P => P.state == state).WhereIf(start != null, P => P.create_time == start).WhereIf(end != null, P => P.create_time <= end).AsNoTracking().ToList();
-                // res.data.AddRange(buys);
-                // res.data.AddRange(sells);
-                // res.data = res.data.OrderBy(P => P.create_time).ToList();
+                IQueryable<ResOrder> buy = db.OrderBuy.Where(P => P.uid == uid).WhereIf(entrust, (P => P.state == E_OrderState.unsold || P.state == E_OrderState.partial)).WhereIf(start != null, P => P.create_time >= start).WhereIf(end != null, P => P.create_time <= end).Select(P => new ResOrder
+                {
+                    order_id = P.order_id,
+                    create_time = P.create_time,
+                    client_id = P.client_id,
+                    symbol = P.symbol,
+                    side = P.side,
+                    type = P.type,
+                    trade_model = P.trade_model,
+                    price = P.price,
+                    amount = P.amount,
+                    total = P.total,
+                    trigger_hanging_price = P.trigger_hanging_price,
+                    trigger_cancel_price = P.trigger_cancel_price,
+                });
+                IQueryable<ResOrder> sell = db.OrderSell.Where(P => P.uid == uid).WhereIf(entrust, (P => P.state == E_OrderState.unsold || P.state == E_OrderState.partial)).WhereIf(start != null, P => P.create_time >= start).WhereIf(end != null, P => P.create_time <= end).Select(P => new ResOrder
+                {
+                    order_id = P.order_id,
+                    create_time = P.create_time,
+                    client_id = P.client_id,
+                    symbol = P.symbol,
+                    side = P.side,
+                    type = P.type,
+                    trade_model = P.trade_model,
+                    price = P.price,
+                    amount = P.amount,
+                    total = P.total,
+                    trigger_hanging_price = P.trigger_hanging_price,
+                    trigger_cancel_price = P.trigger_cancel_price,
+                });
+                IQueryable<ResOrder> orders = buy.Union(sell).OrderByDescending(P => P.create_time).Skip(skip).Take(take);
+                res.data = orders.ToList();
                 return res;
             }
         }

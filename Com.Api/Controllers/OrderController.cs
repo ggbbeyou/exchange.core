@@ -109,7 +109,7 @@ public class OrderController : ControllerBase
     [Route("GetOrderEntrust")]
     public Res<List<ResOrder>> GetOrderEntrust(DateTimeOffset? start, DateTimeOffset? end, int skip = 0, int take = 50)
     {
-        return this.service_order.GetOrder(login.user_id, skip, take, start, end);
+        return this.service_order.GetOrder(true, login.user_id, skip, take, start, end);
     }
 
     /// <summary>
@@ -125,7 +125,7 @@ public class OrderController : ControllerBase
     [Route("GetOrderHistory")]
     public Res<List<ResOrder>> GetOrderHistory(DateTimeOffset? start, DateTimeOffset? end, int skip = 0, int take = 50)
     {
-        return this.service_order.GetOrder(login.user_id, skip, take, start, end);
+        return this.service_order.GetOrder(false, login.user_id, skip, take, start, end);
     }
 
 

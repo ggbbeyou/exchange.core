@@ -97,19 +97,7 @@ public class Core
     /// <typeparam name="Kline?"></typeparam>
     /// <returns></returns>
     private ResWebsocker<List<Orders>> res_order = new ResWebsocker<List<Orders>>();
-    /// <summary>
-    /// 临时变量
-    /// </summary>
-    /// <typeparam name="long"></typeparam>
-    /// <typeparam name="decimal"></typeparam>
-    /// <returns></returns>
-    private Dictionary<long, decimal> temp_map = new Dictionary<long, decimal>();
-    /// <summary>
-    /// 临时变量
-    /// </summary>
-    /// <typeparam name="Orders"></typeparam>
-    /// <returns></returns>
-    private List<Orders> temp_order = new List<Orders>();
+
     /// <summary>
     /// 初始化
     /// </summary>
@@ -215,58 +203,39 @@ public class Core
             {
                 if (process.order_complete_thaw == false)
                 {
+                    process.order_complete_thaw = true;
                     FactoryService.instance.constant.stopwatch.Restart();
                     E_WalletType wallet_type = E_WalletType.main;
                     if (this.model.info.market_type == E_MarketType.spot)
                     {
                         wallet_type = E_WalletType.spot;
                     }
-                    temp_map.Clear();
-                    temp_order.Clear();
-                    foreach (var item in orders.Distinct().Where(P => P.state == E_OrderState.completed && P.unsold > 0 && P.side == E_OrderSide.buy))
+                    List<Orders> order_buy = orders.Distinct().Where(P => P.state == E_OrderState.completed && P.unsold > 0 && P.side == E_OrderSide.buy).ToList();
+                    var order_buy_uid = from o in order_buy
+                                        group o by o.uid into g
+                                        select new { uid = g.Key, unsold = g.Sum(P => P.unsold), order = g.ToList() };
+                    foreach (var item in order_buy_uid)
                     {
-                        item.complete_thaw = item.unsold;
-                        item.unsold -= item.unsold;
-                        if (temp_map.ContainsKey(item.uid))
+                        if (service_wallet.FreezeChange(wallet_type, item.uid, this.model.info.coin_id_quote, -item.unsold))
                         {
-                            temp_map[item.uid] += item.unsold;
-                        }
-                        else
-                        {
-                            temp_map.Add(item.uid, item.unsold);
+                            item.order.ForEach(P => { P.complete_thaw = P.unsold; P.unsold = 0; });
+                            process.order_complete_thaw = process.order_complete_thaw && service_order.UpdateOrder(item.order);
                         }
                     }
-                    foreach (var item in temp_map)
+                    List<Orders> order_sell = orders.Distinct().Where(P => P.state == E_OrderState.completed && P.unsold > 0 && P.side == E_OrderSide.sell).ToList();
+                    var order_sell_uid = from o in order_sell
+                                         group o by o.uid into g
+                                         select new { uid = g.Key, unsold = g.Sum(P => P.unsold), order = g.ToList() };
+                    foreach (var item in order_sell_uid)
                     {
-                        if (service_wallet.FreezeChange(wallet_type, item.Key, this.model.info.coin_id_quote, -item.Value))
+                        if (service_wallet.FreezeChange(wallet_type, item.uid, this.model.info.coin_id_base, -item.unsold))
                         {
-                            temp_order.AddRange(orders.Where(P => P.side == E_OrderSide.buy && P.uid == item.Key));
+                            item.order.ForEach(P => { P.complete_thaw = P.unsold; P.unsold = 0; });
+                            process.order_complete_thaw = process.order_complete_thaw && service_order.UpdateOrder(item.order);
                         }
                     }
-                    temp_map.Clear();
-                    foreach (var item in orders.Distinct().Where(P => P.state == E_OrderState.completed && P.unsold > 0 && P.side == E_OrderSide.sell))
-                    {
-                        item.complete_thaw = item.unsold;
-                        item.unsold -= item.unsold;
-                        if (temp_map.ContainsKey(item.uid))
-                        {
-                            temp_map[item.uid] += item.unsold;
-                        }
-                        else
-                        {
-                            temp_map.Add(item.uid, item.unsold);
-                        }
-                    }
-                    foreach (var item in temp_map)
-                    {
-                        if (service_wallet.FreezeChange(wallet_type, item.Key, this.model.info.coin_id_base, -item.Value))
-                        {
-                            temp_order.AddRange(orders.Where(P => P.side == E_OrderSide.sell && P.uid == item.Key));
-                        }
-                    }
-                    process.order_complete_thaw = service_order.UpdateOrder(temp_order);
                     FactoryService.instance.constant.stopwatch.Stop();
-                    FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>更新{temp_order.Count}条订单记录(完成解冻多余资金)");
+                    FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>更新订单记录(完成解冻多余资金)");
                 }
                 if (process.push_order == false)
                 {

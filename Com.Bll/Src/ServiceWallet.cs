@@ -524,12 +524,17 @@ public class ServiceWallet
     {
         try
         {
+            ResWebsocker<List<Wallet>> res = new ResWebsocker<List<Wallet>>();
+            res.success = true;
+            res.channel = E_WebsockerChannel.assets;
+            res.op = E_WebsockerOp.subscribe_date;
             var aaa = from w in wallets
                       group w by new { w.user_id } into g
                       select new { g.Key.user_id, g };
             foreach (var item in aaa)
             {
-                FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.assets, item.user_id), JsonConvert.SerializeObject(item.g.ToList()));
+                res.data = item.g.ToList();
+                FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.assets, item.user_id), JsonConvert.SerializeObject(res));
             }
         }
         catch (System.Exception ex)

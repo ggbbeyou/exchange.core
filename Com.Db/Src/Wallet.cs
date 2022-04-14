@@ -17,6 +17,7 @@ public class Wallet
     /// 钱包id
     /// </summary>
     /// <value></value>
+    [JsonIgnore]
     public long wallet_id { get; set; }
     /// <summary>
     /// 钱包类型
@@ -29,6 +30,7 @@ public class Wallet
     /// 用户id
     /// </summary>
     /// <value></value>
+    [JsonIgnore]
     public long user_id { get; set; }
     /// <summary>
     /// 用户名
@@ -39,6 +41,7 @@ public class Wallet
     /// 币id
     /// </summary>
     /// <value></value>
+    [JsonIgnore]
     public long coin_id { get; set; }
     /// <summary>
     /// 币名称

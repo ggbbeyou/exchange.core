@@ -128,6 +128,10 @@ public class Core
             (long no, List<Orders> orders, List<Deal> deals, List<Orders> cancels) deals = JsonConvert.DeserializeObject<(long no, List<Orders> orders, List<Deal> deals, List<Orders> cancels)>(json);
             this.stopwatch.Restart();
             RedisValue rv = FactoryService.instance.constant.redis.HashGet(FactoryService.instance.GetRedisProcess(), deals.no);
+            if (!rv.HasValue)
+            {
+                return true;
+            }
             Processing? process = JsonConvert.DeserializeObject<Processing>(rv);
             if (process == null || process.match == false)
             {

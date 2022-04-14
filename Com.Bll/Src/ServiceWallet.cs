@@ -33,6 +33,7 @@ using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 using System.Data;
 using Com.Api.Sdk.Models;
+using Newtonsoft.Json;
 
 namespace Com.Bll;
 
@@ -101,6 +102,7 @@ public class ServiceWallet
                         wallet_to.total = wallet_from.available + wallet_from.freeze;
                         db.SaveChanges();
                         transaction.Commit();
+                        PushWallet(new List<Wallet>() { wallet_from, wallet_to });
                         res.success = true;
                         res.code = E_Res_Code.ok;
                         return res;
@@ -174,6 +176,7 @@ public class ServiceWallet
                         wallet.available -= amount;
                         db.SaveChanges();
                         transaction.Commit();
+                        PushWallet(new List<Wallet>() { wallet });
                         return true;
                     }
                     catch (DbUpdateConcurrencyException ex)
@@ -262,6 +265,7 @@ public class ServiceWallet
                         wallet_quote.available -= amount_quote;
                         db.SaveChanges();
                         transaction.Commit();
+                        PushWallet(new List<Wallet>() { wallet_base, wallet_quote });
                         return true;
                     }
                     catch (DbUpdateConcurrencyException ex)
@@ -377,6 +381,7 @@ public class ServiceWallet
                         db.Wallet.UpdateRange(wallets_settlement);
                         int savecount = db.SaveChanges();
                         transaction.Commit();
+                        PushWallet(wallets);
                         return (savecount > 0, runnings);
                     }
                     catch (DbUpdateConcurrencyException ex)
@@ -441,6 +446,7 @@ public class ServiceWallet
                         wallet_to.total = wallet_to.available + wallet_to.freeze;
                         db.SaveChanges();
                         transaction.Commit();
+                        PushWallet(new List<Wallet>() { wallet_from, wallet_to });
                         return true;
                     }
                     catch (DbUpdateConcurrencyException ex)
@@ -510,5 +516,26 @@ public class ServiceWallet
         }
     }
 
+    /// <summary>
+    /// 推送变更资金
+    /// </summary>
+    /// <param name="wallets"></param>
+    private void PushWallet(List<Wallet> wallets)
+    {
+        try
+        {
+            var aaa = from w in wallets
+                      group w by new { w.user_id } into g
+                      select new { g.Key.user_id, g };
+            foreach (var item in aaa)
+            {
+                FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.assets, item.user_id), JsonConvert.SerializeObject(item.g.ToList()));
+            }
+        }
+        catch (System.Exception ex)
+        {
+            FactoryService.instance.constant.logger.LogError(ex, "PushWallet" + ex.Message);
+        }
+    }
 
 }

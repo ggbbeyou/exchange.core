@@ -50,26 +50,26 @@ public class Wallet
     /// </summary>
     /// <value></value>
     [JsonConverter(typeof(JsonConverterDecimal))]
-    // .IsConcurrencyToken()
-    // [ConcurrencyCheck]
+    [ConcurrencyCheck]
     public decimal total { get; set; }
     /// <summary>
     /// 可用
     /// </summary>
     /// <value></value>
     [JsonConverter(typeof(JsonConverterDecimal))]
-    // [ConcurrencyCheck]
+    [ConcurrencyCheck]
     public decimal available { get; set; }
     /// <summary>
     /// 冻结
     /// </summary>
     /// <value></value>
     [JsonConverter(typeof(JsonConverterDecimal))]
-    // [ConcurrencyCheck]
+    [ConcurrencyCheck]
     public decimal freeze { get; set; }
     /// <summary>
     /// 行版本
     /// </summary>
     /// <value></value>
+    [JsonIgnore]
     public byte[] timestamp { get; set; } = null!;
 }

@@ -218,7 +218,14 @@ public class WebSocketController : ControllerBase
                         string key = FactoryService.instance.GetMqSubscribe(item.channel, market.market);
                         if (login_channel.Contains(item.channel))
                         {
-                            key = FactoryService.instance.GetMqSubscribe(item.channel, market.market, uid);
+                            if (item.channel == E_WebsockerChannel.assets)
+                            {
+                                key = FactoryService.instance.GetMqSubscribe(item.channel, uid);
+                            }
+                            else
+                            {
+                                key = FactoryService.instance.GetMqSubscribe(item.channel, market.market, uid);
+                            }
                         }
                         if (channel.ContainsKey(key))
                         {

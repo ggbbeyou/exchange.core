@@ -133,7 +133,7 @@ public class MQ
                         }
                         if (cancel.Count > 0)
                         {
-                            DepthChange(orders, deal, cancel);
+                            DepthChange(orders, new List<Deal>(), cancel);
                         }
                     }
                 }

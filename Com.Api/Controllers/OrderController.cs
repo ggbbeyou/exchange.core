@@ -105,9 +105,9 @@ public class OrderController : ControllerBase
     /// <param name="take">获取多少行</param>
     /// <returns></returns>
     [HttpGet]
-    [Route("GetOrderEntrust")]
+    [Route("GetOrderCurrent")]
     [ResponseCache(CacheProfileName = "cache_0")]
-    public Res<List<ResOrder>> GetOrderEntrust(DateTimeOffset? start, DateTimeOffset? end, int skip = 0, int take = 50)
+    public Res<List<ResOrder>> GetOrderCurrent(DateTimeOffset? start, DateTimeOffset? end, int skip = 0, int take = 50)
     {
         return this.service_order.GetOrder(true, login.user_id, skip, take, start, end);
     }

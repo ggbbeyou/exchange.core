@@ -233,7 +233,7 @@ public class ServiceDeal
             {
                 ResWebsocker<ResTicker> resWebsocker = new ResWebsocker<ResTicker>();
                 resWebsocker.success = true;
-                resWebsocker.op = E_WebsockerOp.subscribe_date;
+                resWebsocker.op = E_WebsockerOp.subscribe_event;
                 resWebsocker.channel = E_WebsockerChannel.tickers;
                 resWebsocker.data = ticker;
                 FactoryService.instance.constant.redis.HashSet(FactoryService.instance.GetRedisTicker(), ticker.market, JsonConvert.SerializeObject(ticker));

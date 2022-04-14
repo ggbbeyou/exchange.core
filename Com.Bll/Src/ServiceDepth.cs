@@ -97,9 +97,9 @@ public class ServiceDepth
     public Dictionary<E_WebsockerChannel, ResDepth> ConvertDepth(long market, string symbol, (List<(int index, OrderBook orderbook)> bid, List<(int index, OrderBook orderbook)> ask) orderbook)
     {
         Dictionary<E_WebsockerChannel, ResDepth> depths = new Dictionary<E_WebsockerChannel, ResDepth>();
-        depths.Add(E_WebsockerChannel.books10_inc, new ResDepth());
-        depths.Add(E_WebsockerChannel.books50_inc, new ResDepth());
-        depths.Add(E_WebsockerChannel.books200_inc, new ResDepth());
+        depths.Add(E_WebsockerChannel.books10_inc, new ResDepth() { symbol = symbol });
+        depths.Add(E_WebsockerChannel.books50_inc, new ResDepth() { symbol = symbol });
+        depths.Add(E_WebsockerChannel.books200_inc, new ResDepth() { symbol = symbol });
         foreach (var item in orderbook.bid)
         {
             if (item.index <= 10)
@@ -147,7 +147,7 @@ public class ServiceDepth
     {
         ResWebsocker<ResDepth> resWebsocker = new ResWebsocker<ResDepth>();
         resWebsocker.success = true;
-        resWebsocker.op = E_WebsockerOp.subscribe_date;
+        resWebsocker.op = E_WebsockerOp.subscribe_event;
         foreach (var item in depths)
         {
             if (all)

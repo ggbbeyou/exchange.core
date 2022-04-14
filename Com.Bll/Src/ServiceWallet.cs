@@ -527,7 +527,7 @@ public class ServiceWallet
             ResWebsocker<List<Wallet>> res = new ResWebsocker<List<Wallet>>();
             res.success = true;
             res.channel = E_WebsockerChannel.assets;
-            res.op = E_WebsockerOp.subscribe_date;
+            res.op = E_WebsockerOp.subscribe_event;
             var aaa = from w in wallets
                       group w by new { w.user_id } into g
                       select new { g.Key.user_id, g };

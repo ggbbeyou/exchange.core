@@ -118,13 +118,13 @@ public class Core
     {
         this.model = model;
         res_order.success = true;
-        res_order.op = E_WebsockerOp.subscribe_date;
+        res_order.op = E_WebsockerOp.subscribe_event;
         res_order.channel = E_WebsockerChannel.orders;
         res_deal.success = true;
-        res_deal.op = E_WebsockerOp.subscribe_date;
+        res_deal.op = E_WebsockerOp.subscribe_event;
         res_deal.channel = E_WebsockerChannel.trades;
         res_kline.success = true;
-        res_kline.op = E_WebsockerOp.subscribe_date;
+        res_kline.op = E_WebsockerOp.subscribe_event;
         res_kline.data = new List<Kline>();
     }
 

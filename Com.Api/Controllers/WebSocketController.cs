@@ -254,7 +254,7 @@ public class WebSocketController : ControllerBase
                             {
                                 ResWebsocker<ResDepth> depth_res = new ResWebsocker<ResDepth>();
                                 depth_res.success = true;
-                                depth_res.op = E_WebsockerOp.subscribe_date;
+                                depth_res.op = E_WebsockerOp.subscribe_event;
                                 depth_res.channel = item.channel;
                                 depth_res.data = depth;
                                 byte[] bb1 = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(depth_res));

@@ -74,7 +74,7 @@ public class AccountController : ControllerBase
         {
             res.success = false;
             res.code = E_Res_Code.email_not_found;
-            res.message = "邮箱不能为空";
+            res.message = "邮箱地址不能为空";
             res.data = false;
             return res;
         }
@@ -85,7 +85,15 @@ public class AccountController : ControllerBase
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
-                if (!db.Users.Any(P => P.email == email))
+                if (db.Users.Any(P => P.email == email))
+                {
+                    res.success = false;
+                    res.code = E_Res_Code.email_repeat;
+                    res.message = "邮箱地址已存在";
+                    res.data = false;
+                    return res;
+                }
+                else
                 {
                     if (service_common.SendEmail(email, content))
                     {

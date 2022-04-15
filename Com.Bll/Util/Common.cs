@@ -9,12 +9,7 @@ using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.IdentityModel.Tokens;
-using SixLabors;
-using SixLabors.Fonts;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Drawing.Processing;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
+
 
 namespace Com.Bll.Util;
 
@@ -91,95 +86,6 @@ public class Common
             randomCode += CharArray[t];
         }
         return randomCode;
-    }
-
-    /// <summary>
-    /// 生成验证码图片流
-    /// </summary>
-    /// <param name="code">验证码</param>
-    /// <returns></returns>
-    public byte[] CreateImage(string code)
-    {
-        using var ms = new System.IO.MemoryStream();
-        try
-        {
-            SixLabors.ImageSharp.Color[] Colors = { SixLabors.ImageSharp.Color.Black, SixLabors.ImageSharp.Color.Red, SixLabors.ImageSharp.Color.Blue, SixLabors.ImageSharp.Color.Green };
-            char[] Chars = { '0' };
-            int Width = 90;
-            int Height = 35;
-            var r = new Random();
-            using var image = new Image<Rgba32>(Width, Height);
-            // 字体
-            var font = SystemFonts.CreateFont(SystemFonts.Families.First().Name, 25, FontStyle.Bold);
-            image.Mutate(ctx =>
-            {
-                // 白底背景
-                ctx.Fill(Color.White);
-                // 画验证码
-                for (int i = 0; i < code.Length; i++)
-                {
-                    ctx.DrawText(code[i].ToString(), font, Colors[r.Next(Colors.Length)], new PointF(20 * i + 10, r.Next(2, 12)));
-                }
-                // 画干扰线
-                for (int i = 0; i < 10; i++)
-                {
-                    var pen = new Pen(Colors[r.Next(Colors.Length)], 1);
-                    var p1 = new PointF(r.Next(Width), r.Next(Height));
-                    var p2 = new PointF(r.Next(Width), r.Next(Height));
-                    ctx.DrawLines(pen, p1, p2);
-                }
-                // 画噪点
-                for (int i = 0; i < 80; i++)
-                {
-                    var pen = new Pen(Colors[r.Next(Colors.Length)], 1);
-                    var p1 = new PointF(r.Next(Width), r.Next(Height));
-                    var p2 = new PointF(p1.X + 1f, p1.Y + 1f);
-                    ctx.DrawLines(pen, p1, p2);
-                }
-            });
-            // gif 格式
-            image.SaveAsGif(ms);
-        }
-        catch (System.Exception ex)
-        {
-            this.logger.LogError(ex, $"生成图片出错");
-        }
-        return ms.ToArray();
-    }
-
-    // /// <summary>
-    // /// 生成token
-    // /// </summary>
-    // /// <param name="host">发布者</param>
-    // /// <param name="public_key">公钥</param>
-    // /// <param name="user_id">id</param>
-    // /// <param name="no">登录唯一码</param>
-    // /// <param name="account">账号</param>
-    // /// <param name="name">名称</param>
-    // /// <param name="timeout">超时</param>
-    // /// <param name="app">终端</param>
-    // /// <returns></returns>       
-    // public string CreateToken(string host, string public_key, long user_id, string no, string account, string name, DateTime timeout, string app = "html5")
-    // {
-    //     var claims = new[]
-    //                 {
-    //                     new Claim(JwtRegisteredClaimNames.Iss,host),
-    //                     new Claim(JwtRegisteredClaimNames.Aud,user_id.ToString()),
-    //                     new Claim(JwtRegisteredClaimNames.Amr,no),
-    //                     new Claim(JwtRegisteredClaimNames.GivenName,account),
-    //                     new Claim(JwtRegisteredClaimNames.FamilyName,name),
-    //                     new Claim(JwtRegisteredClaimNames.AuthTime,$"{new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds()}"),
-    //                     new Claim("app",app),
-    //                 };
-    //     var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(public_key));
-    //     var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-    //     var token = new JwtSecurityToken(
-    //         issuer: host,
-    //         audience: host,
-    //         claims: claims,
-    //         expires: timeout,
-    //         signingCredentials: creds);
-    //     return new JwtSecurityTokenHandler().WriteToken(token);
-    // }
+    }    
 
 }

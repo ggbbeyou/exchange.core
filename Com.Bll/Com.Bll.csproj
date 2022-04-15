@@ -23,10 +23,7 @@
     <PackageReference Include="StackExchange.Redis" Version="2.5.43" />
     <PackageReference Include="LinqKit" Version="1.1.21" />
     <PackageReference Include="Snowflake.Core" Version="2.0.0" />
-    <PackageReference Include="NLog.Web.AspNetCore" Version="4.14.0" />
-    <PackageReference Include="SixLabors.Fonts" Version="1.0.0-beta0013" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-rc0003" />
-    <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="1.0.0-beta0010" />
+    <PackageReference Include="NLog.Web.AspNetCore" Version="4.14.0" />    
     <PackageReference Include="Google-Authenticator-netcore" Version="1.1.0" />
     <PackageReference Include="Google.Protobuf" Version="3.19.4" />
     <PackageReference Include="Grpc" Version="2.44.0" />

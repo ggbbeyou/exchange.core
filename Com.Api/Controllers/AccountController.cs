@@ -80,6 +80,8 @@ public class AccountController : ControllerBase
     /// </summary>
     /// <param name="email"></param>
     /// <returns></returns>
+    [HttpPost]
+    [Route("SendVerificationByRegister")]
     public Res<bool> SendVerificationByRegister(string email)
     {
         Res<bool> res = new Res<bool>();
@@ -120,22 +122,5 @@ public class AccountController : ControllerBase
         res.data = true;
         return res;
     }
-
-
-    // /// <summary>
-    // /// 5:获取图形验证码
-    // /// </summary>
-    // /// <returns></returns>  
-    // [HttpGet]
-    // [Route("GetVerificationCode")]
-    // public Res<KeyValuePair<string, string>> GetVerificationCode()
-    // {
-    //     Res<KeyValuePair<string, string>> res = new Res<KeyValuePair<string, string>>();
-    //     res.success = true;
-    //     res.code = E_Res_Code.ok;
-    //     (long no, string code) verifiction = service_common.GetVerificationCode();
-    //     res.data = new KeyValuePair<string, string>(verifiction.no.ToString(), verifiction.code);
-    //     return res;
-    // }
 
 }

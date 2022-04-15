@@ -292,7 +292,7 @@ public class DbContextEF : DbContext
             o.Property(P => P.transaction).IsRequired().HasColumnType("bit").HasComment("是否交易");
             o.Property(P => P.withdrawal).IsRequired().HasColumnType("bit").HasComment("是否提现");
             o.Property(P => P.phone).HasColumnType("nvarchar").HasMaxLength(500).HasComment("用户手机号码");
-            o.Property(P => P.email).HasColumnType("nvarchar").HasMaxLength(500).HasComment("邮箱");
+            o.Property(P => P.email).IsRequired().HasColumnType("nvarchar").HasMaxLength(500).HasComment("邮箱");
             o.Property(P => P.vip).IsRequired().HasColumnType("bigint").HasComment("用户等级");
             o.Property(P => P.google_key).HasColumnType("nvarchar").HasMaxLength(50).HasComment("google验证码");
             o.Property(P => P.google_private_key).HasColumnType("nvarchar").HasMaxLength(500).HasComment("google验证器密钥");

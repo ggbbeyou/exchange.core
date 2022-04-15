@@ -113,7 +113,7 @@ public class ServiceUser
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
-                var user = db.Users.FirstOrDefault(P => P.disabled == false && (P.user_name == account || P.phone == account || P.email == account) && P.password == password);
+                var user = db.Users.FirstOrDefault(P => P.disabled == false && (P.phone == account || P.email == account) && P.password == password);
                 if (user == null)
                 {
                     res.message = "账户名或密码错误";

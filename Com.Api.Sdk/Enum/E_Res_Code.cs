@@ -81,6 +81,10 @@ public enum E_Res_Code
     /// 未找到该用户vip
     /// </summary>
     vip_not_found,
+    /// <summary>
+    /// 未找到该Email
+    /// </summary>
+    email_not_found,
 
 
     //////订单相关错误码/////////////////////////////////////////////////////////////////////

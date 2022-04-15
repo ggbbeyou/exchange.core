@@ -43,38 +43,76 @@ public class AccountController : ControllerBase
     /// <summary>
     /// 登录
     /// </summary>
-    /// <param name="account">账户(用户/手机号码/emal)</param>
+    /// <param name="email">emal)</param>
     /// <param name="password">密码</param>
-    /// <param name="no">验证码编号</param>
     /// <param name="code">验证码</param>
     /// <param name="app">终端</param>
     /// <returns></returns>
     [HttpPost]
     [Route("login")]
-    public Res<ResUser> Login(string account, string password, long no, string code, string app)
+    public Res<ResUser> Login(string email, string password, string code, string app)
     {
         string ip = "";
         if (Request.Headers.TryGetValue("X-Real-IP", out var ip_addr))
         {
             ip = ip_addr;
         }
-        return service_user.Login(account, password, no, code, app, ip);
+        return service_user.Login(email, password, code, app, ip);
     }
 
     /// <summary>
-    /// 5:获取图形验证码
+    /// 注册时发送Email验证码
     /// </summary>
-    /// <returns></returns>  
-    [HttpGet]
-    [Route("GetVerificationCode")]
-    public Res<KeyValuePair<string, string>> GetVerificationCode()
+    /// <param name="email"></param>
+    /// <returns></returns>
+    public Res<bool> SendVerificationByRegister(string email)
     {
-        Res<KeyValuePair<string, string>> res = new Res<KeyValuePair<string, string>>();
+        Res<bool> res = new Res<bool>();
         res.success = true;
         res.code = E_Res_Code.ok;
-        (long no, string code) verifiction = service_common.GetVerificationCode();
-        res.data = new KeyValuePair<string, string>(verifiction.no.ToString(), verifiction.code);
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            res.success = false;
+            res.code = E_Res_Code.email_not_found;
+            res.message = "邮箱不能为空";
+            res.data = false;
+            return res;
+        }
+        email = email.Trim().ToLower();
+        string code = "123456";
+        string content = $"Exchange Code:{code}";
+        using (var scope = FactoryService.instance.constant.provider.CreateScope())
+        {
+            using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
+            {
+                if (!db.Users.Any(P => P.email == email))
+                {
+                    if (service_common.SendEmail(email, content))
+                    {
+                        FactoryService.instance.constant.redis.StringSet(FactoryService.instance.GetRedisVerificationCode(email), code, TimeSpan.FromMinutes(10));
+                    }
+                }
+            }
+        }
+        res.data = true;
         return res;
     }
+
+
+    // /// <summary>
+    // /// 5:获取图形验证码
+    // /// </summary>
+    // /// <returns></returns>  
+    // [HttpGet]
+    // [Route("GetVerificationCode")]
+    // public Res<KeyValuePair<string, string>> GetVerificationCode()
+    // {
+    //     Res<KeyValuePair<string, string>> res = new Res<KeyValuePair<string, string>>();
+    //     res.success = true;
+    //     res.code = E_Res_Code.ok;
+    //     (long no, string code) verifiction = service_common.GetVerificationCode();
+    //     res.data = new KeyValuePair<string, string>(verifiction.no.ToString(), verifiction.code);
+    //     return res;
+    // }
 
 }

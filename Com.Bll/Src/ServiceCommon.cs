@@ -30,34 +30,34 @@ public class ServiceCommon
     {
     }
 
-    /// <summary>
-    /// 获取图形验证码
-    /// </summary>
-    /// <returns></returns>
-    public (long, string) GetVerificationCode()
-    {
-        long no = FactoryService.instance.constant.worker.NextId();
-        string verify = common.CreateRandomCode(4);
-        byte[] b = common.CreateImage(verify);
-        FactoryService.instance.constant.redis.StringSet(FactoryService.instance.GetRedisVerificationCode(no), verify, TimeSpan.FromMinutes(5));
-        return (no, Convert.ToBase64String(b));
-    }
+    // /// <summary>
+    // /// 获取图形验证码
+    // /// </summary>
+    // /// <returns></returns>
+    // public (long, string) GetVerificationCode()
+    // {
+    //     long no = FactoryService.instance.constant.worker.NextId();
+    //     string verify = common.CreateRandomCode(4);
+    //     byte[] b = common.CreateImage(verify);
+    //     FactoryService.instance.constant.redis.StringSet(FactoryService.instance.GetRedisVerificationCode(no), verify, TimeSpan.FromMinutes(5));
+    //     return (no, Convert.ToBase64String(b));
+    // }
 
-    /// <summary>
-    /// 校验图形验证码
-    /// </summary>
-    /// <param name="no">编号</param>
-    /// <param name="code">验证码</param>
-    /// <returns></returns>
-    public bool VerificationCode(long no, string code)
-    {
-        string verify = FactoryService.instance.constant.redis.StringGet(FactoryService.instance.GetRedisVerificationCode(no));
-        if (verify != null && verify.ToLower() == code.ToLower())
-        {
-            return true;
-        }
-        return false;
-    }
+    // /// <summary>
+    // /// 校验图形验证码
+    // /// </summary>
+    // /// <param name="no">编号</param>
+    // /// <param name="code">验证码</param>
+    // /// <returns></returns>
+    // public bool VerificationCode(long no, string code)
+    // {
+    //     string verify = FactoryService.instance.constant.redis.StringGet(FactoryService.instance.GetRedisVerificationCode(no));
+    //     if (verify != null && verify.ToLower() == code.ToLower())
+    //     {
+    //         return true;
+    //     }
+    //     return false;
+    // }
 
     /// <summary>
     /// 给用户创建google验证器
@@ -168,4 +168,16 @@ public class ServiceCommon
         }
         return (user_id, no, user_name, app, public_key);
     }
+
+    /// <summary>
+    /// 发送邮件
+    /// </summary>
+    /// <param name="email"></param>
+    /// <param name="content"></param>
+    /// <returns></returns>
+    public bool SendEmail(string email, string content)
+    {
+        return true;
+    }
+
 }

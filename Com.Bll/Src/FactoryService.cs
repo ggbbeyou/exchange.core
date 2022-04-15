@@ -110,7 +110,7 @@ public class FactoryService
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    public string GetRedisVerificationCode(long id)
+    public string GetRedisVerificationCode(string id)
     {
         return string.Format("verification_code:{0}", id);
     }

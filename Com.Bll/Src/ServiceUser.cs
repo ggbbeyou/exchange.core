@@ -39,9 +39,10 @@ public class ServiceUser
     /// </summary>
     /// <param name="email">Email</param>
     /// <param name="password">密码</param>
+    /// <param name="code">邮箱验证码</param>
     /// <param name="recommend">推荐人id</param>
     /// <param name="ip">ip地址</param>
-    public Res<long> Register(string email, string password, string? recommend, string ip)
+    public Res<long> Register(string email, string password, string code, string? recommend, string ip)
     {
         Res<long> res = new Res<long>();
         res.success = false;
@@ -61,16 +62,24 @@ public class ServiceUser
                     res.message = "邮箱已重复";
                     return res;
                 }
+                string user_name = FactoryService.instance.constant.random.NextInt64(10_001_000, 99_999_999).ToString();
+                while (db.Users.Any(P => P.user_name == user_name))
+                {
+                    user_name = FactoryService.instance.constant.random.NextInt64(10_001_000, 99_999_999).ToString();
+                }
                 Users settlement_btc_usdt = new Users()
                 {
                     user_id = FactoryService.instance.constant.worker.NextId(),
                     user_name = user_name,
                     password = Encryption.SHA256Encrypt(password),
+                    email = email,
+                    phone = null,
+                    verify_email = false,
+                    verify_phone = false,
+                    verify_google = false,
                     disabled = false,
                     transaction = true,
                     withdrawal = true,
-                    phone = null,
-                    email = email,
                     vip = 0,
                     public_key = key_btc_user.public_key,
                     private_key = key_btc_user.private_key,
@@ -97,11 +106,11 @@ public class ServiceUser
         Res<ResUser> res = new Res<ResUser>();
         res.success = false;
         res.code = E_Res_Code.fail;
-        if (!service_common.VerificationCode(no, code))
-        {
-            res.message = "验证码错误";
-            return res;
-        }
+        // if (!service_common.VerificationCode(no, code))
+        // {
+        //     res.message = "验证码错误";
+        //     return res;
+        // }
         using (var scope = FactoryService.instance.constant.provider.CreateScope())
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)

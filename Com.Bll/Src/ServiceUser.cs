@@ -52,6 +52,11 @@ public class ServiceUser
             res.message = "邮箱或密码不能为空";
             return res;
         }
+        if (!service_common.VerificationCode(email, code))
+        {
+            res.message = "验证码错误";
+            return res;
+        }
         (string public_key, string private_key) key_btc_user = Encryption.GetRsaKey();
         using (var scope = FactoryService.instance.constant.provider.CreateScope())
         {
@@ -101,16 +106,12 @@ public class ServiceUser
     /// <param name="app">登录终端</param>
     /// <param name="ip">登录ip</param>
     /// <returns></returns>
-    public Res<ResUser> Login(string email, string password, long no, string code, string app, string ip)
+    public Res<ResUser> Login(string email, string password, string app, string ip)
     {
         Res<ResUser> res = new Res<ResUser>();
         res.success = false;
         res.code = E_Res_Code.fail;
-        // if (!service_common.VerificationCode(no, code))
-        // {
-        //     res.message = "验证码错误";
-        //     return res;
-        // }
+
         using (var scope = FactoryService.instance.constant.provider.CreateScope())
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
@@ -121,7 +122,7 @@ public class ServiceUser
                     res.message = "账户名或密码错误";
                     return res;
                 }
-                FactoryService.instance.constant.redis.KeyDelete(FactoryService.instance.GetRedisVerificationCode(no));
+                FactoryService.instance.constant.redis.KeyDelete(FactoryService.instance.GetRedisVerificationCode(email));
                 var token = service_common.GenerateToken(FactoryService.instance.constant.worker.NextId(), user, app);
                 res.data = user;
                 res.data.token = token;

@@ -43,21 +43,21 @@ public class ServiceCommon
     //     return (no, Convert.ToBase64String(b));
     // }
 
-    // /// <summary>
-    // /// 校验图形验证码
-    // /// </summary>
-    // /// <param name="no">编号</param>
-    // /// <param name="code">验证码</param>
-    // /// <returns></returns>
-    // public bool VerificationCode(long no, string code)
-    // {
-    //     string verify = FactoryService.instance.constant.redis.StringGet(FactoryService.instance.GetRedisVerificationCode(no));
-    //     if (verify != null && verify.ToLower() == code.ToLower())
-    //     {
-    //         return true;
-    //     }
-    //     return false;
-    // }
+    /// <summary>
+    /// 校验图形验证码
+    /// </summary>
+    /// <param name="no">编号</param>
+    /// <param name="code">验证码</param>
+    /// <returns></returns>
+    public bool VerificationCode(string no, string code)
+    {
+        string verify = FactoryService.instance.constant.redis.StringGet(FactoryService.instance.GetRedisVerificationCode(no));
+        if (verify != null && verify.ToLower() == code.ToLower())
+        {
+            return true;
+        }
+        return false;
+    }
 
     /// <summary>
     /// 给用户创建google验证器

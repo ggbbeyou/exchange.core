@@ -41,23 +41,38 @@ public class AccountController : ControllerBase
     }
 
     /// <summary>
+    /// 注册账号
+    /// </summary>
+    /// <param name="email"></param>
+    /// <param name="password"></param>
+    /// <param name="code"></param>
+    /// <param name="recommend"></param>
+    /// <param name="ip"></param>
+    /// <returns></returns>
+    [HttpPost]
+    [Route("register")]
+    public Res<long> Register(string email, string password, string code, string? recommend, string ip)
+    {
+        return service_user.Register(email, password, code, recommend, ip);
+    }
+
+    /// <summary>
     /// 登录
     /// </summary>
     /// <param name="email">emal)</param>
     /// <param name="password">密码</param>
-    /// <param name="code">验证码</param>
     /// <param name="app">终端</param>
     /// <returns></returns>
     [HttpPost]
     [Route("login")]
-    public Res<ResUser> Login(string email, string password, string code, string app)
+    public Res<ResUser> Login(string email, string password, string app)
     {
         string ip = "";
         if (Request.Headers.TryGetValue("X-Real-IP", out var ip_addr))
         {
             ip = ip_addr;
         }
-        return service_user.Login(email, password, code, app, ip);
+        return service_user.Login(email, password, app, ip);
     }
 
     /// <summary>

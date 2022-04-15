@@ -9,10 +9,9 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using System.Data.Entity;
 using System.Linq.Expressions;
-using LinqKit;
 using Com.Api.Sdk.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Com.Bll;
 

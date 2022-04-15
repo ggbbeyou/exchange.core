@@ -1,4 +1,3 @@
-using System.Data.Entity;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Com.Api.Sdk.Enum;
@@ -7,6 +6,7 @@ using Com.Bll;
 using Com.Db;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Com.Api.Controllers;
 

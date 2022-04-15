@@ -1,7 +1,6 @@
 using System.Linq.Expressions;
 using Com.Db;
 using Com.Api.Sdk.Enum;
-using LinqKit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -32,20 +31,11 @@ public class ServiceDeal
     /// <returns></returns>
     public List<Deal> GetDeals(long market, DateTimeOffset? start, DateTimeOffset? end)
     {
-        Expression<Func<Deal, bool>> predicate = P => P.market == market;
-        if (start != null)
-        {
-            predicate = predicate.And(P => start <= P.time);
-        }
-        if (end != null)
-        {
-            predicate = predicate.And(P => P.time <= end);
-        }
         using (var scope = FactoryService.instance.constant.provider.CreateScope())
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
-                return db.Deal.Where(predicate).OrderBy(P => P.time).AsNoTracking().ToList();
+                return db.Deal.Where(P => P.market == market).WhereIf(start != null, P => start <= P.time).WhereIf(end != null, P => P.time <= end).OrderBy(P => P.time).AsNoTracking().ToList();
             }
         }
     }
@@ -85,22 +75,13 @@ public class ServiceDeal
     /// <returns></returns>
     public List<Kline>? GetKlinesMin1ByDeal(long market, DateTimeOffset? start, DateTimeOffset? end)
     {
-        Expression<Func<Deal, bool>> predicate = P => P.market == market;
-        if (start != null)
-        {
-            predicate = predicate.And(P => start <= P.time);
-        }
-        if (end != null)
-        {
-            predicate = predicate.And(P => P.time <= end);
-        }
         try
         {
             using (var scope = FactoryService.instance.constant.provider.CreateScope())
             {
                 using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
                 {
-                    var sql = from deal in db.Deal.Where(predicate)
+                    var sql = from deal in db.Deal.Where(P => P.market == market).WhereIf(start != null, P => start <= P.time).WhereIf(end != null, P => P.time <= end).OrderBy(P => P.time)
                               group deal by EF.Functions.DateDiffMinute(FactoryService.instance.system_init, deal.time) into g
                               select new Kline
                               {
@@ -137,18 +118,13 @@ public class ServiceDeal
     /// <returns></returns>
     public Kline? GetKlinesByDeal(long market, E_KlineType type, DateTimeOffset start, DateTimeOffset? end)
     {
-        Expression<Func<Deal, bool>> predicate = P => P.market == market && start <= P.time;
-        if (end != null)
-        {
-            predicate = predicate.And(P => P.time <= end);
-        }
         try
         {
             using (var scope = FactoryService.instance.constant.provider.CreateScope())
             {
                 using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
                 {
-                    var sql = from deal in db.Deal.Where(predicate)
+                    var sql = from deal in db.Deal.Where(P => P.market == market && start <= P.time).WhereIf(end != null, P => P.time <= end)
                               group deal by new { deal.market, deal.symbol } into g
                               select new Kline
                               {

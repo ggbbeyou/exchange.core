@@ -119,6 +119,9 @@ public class Core
     /// <summary>
     /// 接收撮合传过来的成交订单
     /// </summary>
+    /// <param name="queue_name">列队名称</param>
+    /// <param name="consume_tag">消费器标签</param>
+    /// <returns></returns>
     public (string queue_name, string consume_tag) ReceiveMatchOrder()
     {
         string queue_name = FactoryService.instance.GetMqOrderDeal(this.model.info.market);
@@ -158,7 +161,10 @@ public class Core
     /// <summary>
     /// 接收到成交订单
     /// </summary>
-    /// <param name="deals"></param>
+    /// <param name="process">处理进度</param>
+    /// <param name="orders">成交的订单</param>
+    /// <param name="deals">成交记录</param>
+    /// <param name="cancels">撤单订单</param>
     private void ReceiveDealOrder(Processing process, List<Orders> orders, List<Deal> deals, List<Orders> cancels)
     {
         if (deals.Count > 0)

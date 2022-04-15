@@ -453,7 +453,7 @@ public class ServiceWallet
     }
 
     /// <summary>
-    /// 可用余额转账
+    /// 可用余额转账(不能开发此接口，非常危险)
     /// </summary>
     /// <param name="wallet_type">钱包类型</param>
     /// <param name="coin_id">币ID</param>
@@ -463,6 +463,7 @@ public class ServiceWallet
     /// <returns></returns>
     public bool TransferAvailable(E_WalletType wallet_type, long coin_id, long from, long to, decimal amount)
     {
+        return false;
         if (amount == 0)
         {
             return false;

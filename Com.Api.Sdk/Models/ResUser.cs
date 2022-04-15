@@ -6,7 +6,7 @@ namespace Com.Api.Sdk.Models;
 /// 用户信息
 /// </summary>
 public class ResUser
-{   
+{
     /// <summary>
     /// 用户名(系统生成内部账号)
     /// </summary>
@@ -22,7 +22,6 @@ public class ResUser
     /// </summary>
     /// <value></value>
     public string? phone { get; set; }
-    
     /// <summary>
     /// 是否验证邮箱 true:验证,false:未验证
     /// </summary>
@@ -42,7 +41,7 @@ public class ResUser
     /// 用户等级
     /// </summary>
     /// <value></value>
-    public long vip { get; set; } 
+    public long vip { get; set; }
     /// <summary>
     /// 令牌
     /// </summary>

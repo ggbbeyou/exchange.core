@@ -37,20 +37,18 @@ public class ServiceUser
     /// <summary>
     /// 注册
     /// </summary>
-    /// <param name="user_name">用户名</param>
-    /// <param name="password">密码</param>
-    /// <param name="phone">手机号</param>
     /// <param name="email">Email</param>
-    /// <param name="app">终端</param>
+    /// <param name="password">密码</param>
+    /// <param name="recommend">推荐人id</param>
     /// <param name="ip">ip地址</param>
-    public Res<long> Register(string user_name, string password, string phone, string email, string app, string ip)
+    public Res<long> Register(string email, string password, string? recommend, string ip)
     {
         Res<long> res = new Res<long>();
         res.success = false;
         res.code = E_Res_Code.fail;
-        if (string.IsNullOrEmpty(user_name) || string.IsNullOrEmpty(password))
+        if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
         {
-            res.message = "用户名或密码不能为空";
+            res.message = "邮箱或密码不能为空";
             return res;
         }
         (string public_key, string private_key) key_btc_user = Encryption.GetRsaKey();
@@ -58,11 +56,6 @@ public class ServiceUser
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
-                if (db.Users.Any(P => P.phone == phone))
-                {
-                    res.message = "手机号已重复";
-                    return res;
-                }
                 if (db.Users.Any(P => P.email == email))
                 {
                     res.message = "邮箱已重复";
@@ -76,7 +69,7 @@ public class ServiceUser
                     disabled = false,
                     transaction = true,
                     withdrawal = true,
-                    phone = phone,
+                    phone = null,
                     email = email,
                     vip = 0,
                     public_key = key_btc_user.public_key,
@@ -92,14 +85,14 @@ public class ServiceUser
     /// <summary>
     /// 登录
     /// </summary>
-    /// <param name="account">账号</param>
+    /// <param name="email">账号</param>
     /// <param name="password">密码</param>
     /// <param name="no">验证码编号</param>
     /// <param name="code">验证码</param>
     /// <param name="app">登录终端</param>
     /// <param name="ip">登录ip</param>
     /// <returns></returns>
-    public Res<ResUser> Login(string account, string password, long no, string code, string app, string ip)
+    public Res<ResUser> Login(string email, string password, long no, string code, string app, string ip)
     {
         Res<ResUser> res = new Res<ResUser>();
         res.success = false;
@@ -113,7 +106,7 @@ public class ServiceUser
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
-                var user = db.Users.FirstOrDefault(P => P.disabled == false && (P.phone == account || P.email == account) && P.password == password);
+                var user = db.Users.FirstOrDefault(P => P.disabled == false && (P.phone == email || P.email == email) && P.password == password);
                 if (user == null)
                 {
                     res.message = "账户名或密码错误";

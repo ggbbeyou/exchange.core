@@ -451,69 +451,68 @@ public class ServiceWallet
         }
     }
 
-    /// <summary>
-    /// 可用余额转账(不能开发此接口，非常危险)
-    /// </summary>
-    /// <param name="wallet_type">钱包类型</param>
-    /// <param name="coin_id">币ID</param>
-    /// <param name="from">来源:用户id</param>
-    /// <param name="to">目的:用户id</param>
-    /// <param name="amount">数量</param>
-    /// <returns></returns>
-    public bool TransferAvailable(E_WalletType wallet_type, long coin_id, long from, long to, decimal amount)
-    {
-        return false;
-        if (amount == 0)
-        {
-            return false;
-        }
-        using (var scope = FactoryService.instance.constant.provider.CreateScope())
-        {
-            using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
-            {
-                using (var transaction = db.Database.BeginTransaction(isolationLevel))
-                {
-                    try
-                    {
-                        Wallet? wallet_from = db.Wallet.Where(P => P.wallet_type == wallet_type && P.coin_id == coin_id && P.user_id == from).SingleOrDefault();
-                        Wallet? wallet_to = db.Wallet.Where(P => P.wallet_type == wallet_type && P.coin_id == coin_id && P.user_id == to).SingleOrDefault();
-                        if (wallet_from == null || wallet_to == null)
-                        {
-                            return false;
-                        }
-                        if (amount > 0 && wallet_from.available < amount)
-                        {
-                            return false;
-                        }
-                        else if (amount < 0 && wallet_to.available < Math.Abs(amount))
-                        {
-                            return false;
-                        }
-                        wallet_from.available -= amount;
-                        wallet_from.total = wallet_from.available + wallet_from.freeze;
-                        wallet_to.available += amount;
-                        wallet_to.total = wallet_to.available + wallet_to.freeze;
-                        db.SaveChanges();
-                        transaction.Commit();
-                        PushWallet(new List<Wallet>() { wallet_from, wallet_to });
-                        return true;
-                    }
-                    catch (DbUpdateConcurrencyException ex)
-                    {
-                        transaction.Rollback();
-                        FactoryService.instance.constant.logger.LogError(ex, "TansferAvailable(并发):" + ex.Message);
-                        return false;
-                    }
-                    catch (Exception ex)
-                    {
-                        transaction.Rollback();
-                        FactoryService.instance.constant.logger.LogError(ex, "TansferAvailable" + ex.Message);
-                        return false;
-                    }
-                }
-            }
-        }
-    }
+    // /// <summary>
+    // /// 可用余额转账(不能开发此接口，非常危险)
+    // /// </summary>
+    // /// <param name="wallet_type">钱包类型</param>
+    // /// <param name="coin_id">币ID</param>
+    // /// <param name="from">来源:用户id</param>
+    // /// <param name="to">目的:用户id</param>
+    // /// <param name="amount">数量</param>
+    // /// <returns></returns>
+    // public bool TransferAvailable(E_WalletType wallet_type, long coin_id, long from, long to, decimal amount)
+    // {
+    //     if (amount == 0)
+    //     {
+    //         return false;
+    //     }
+    //     using (var scope = FactoryService.instance.constant.provider.CreateScope())
+    //     {
+    //         using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
+    //         {
+    //             using (var transaction = db.Database.BeginTransaction(isolationLevel))
+    //             {
+    //                 try
+    //                 {
+    //                     Wallet? wallet_from = db.Wallet.Where(P => P.wallet_type == wallet_type && P.coin_id == coin_id && P.user_id == from).SingleOrDefault();
+    //                     Wallet? wallet_to = db.Wallet.Where(P => P.wallet_type == wallet_type && P.coin_id == coin_id && P.user_id == to).SingleOrDefault();
+    //                     if (wallet_from == null || wallet_to == null)
+    //                     {
+    //                         return false;
+    //                     }
+    //                     if (amount > 0 && wallet_from.available < amount)
+    //                     {
+    //                         return false;
+    //                     }
+    //                     else if (amount < 0 && wallet_to.available < Math.Abs(amount))
+    //                     {
+    //                         return false;
+    //                     }
+    //                     wallet_from.available -= amount;
+    //                     wallet_from.total = wallet_from.available + wallet_from.freeze;
+    //                     wallet_to.available += amount;
+    //                     wallet_to.total = wallet_to.available + wallet_to.freeze;
+    //                     db.SaveChanges();
+    //                     transaction.Commit();
+    //                     PushWallet(new List<Wallet>() { wallet_from, wallet_to });
+    //                     return true;
+    //                 }
+    //                 catch (DbUpdateConcurrencyException ex)
+    //                 {
+    //                     transaction.Rollback();
+    //                     FactoryService.instance.constant.logger.LogError(ex, "TansferAvailable(并发):" + ex.Message);
+    //                     return false;
+    //                 }
+    //                 catch (Exception ex)
+    //                 {
+    //                     transaction.Rollback();
+    //                     FactoryService.instance.constant.logger.LogError(ex, "TansferAvailable" + ex.Message);
+    //                     return false;
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
 
     /// <summary>
     /// 添加钱包流水

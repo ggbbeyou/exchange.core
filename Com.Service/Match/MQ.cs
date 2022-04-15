@@ -27,11 +27,6 @@ public class MQ
     /// </summary>
     private MatchModel model;
     /// <summary>
-    /// 互斥锁
-    /// </summary>
-    /// <returns></returns>
-    private Mutex mutex = new Mutex(false);
-    /// <summary>
     /// 上次深度行情
     /// </summary>
     (List<OrderBook> bid, List<OrderBook> ask) orderbook_old;

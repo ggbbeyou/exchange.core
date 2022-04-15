@@ -85,12 +85,28 @@ public class ServiceWallet
                     {
                         Wallet? wallet_from = db.Wallet.Where(P => P.user_id == uid && P.wallet_type == from && P.coin_id == coin_id).SingleOrDefault();
                         Wallet? wallet_to = db.Wallet.Where(P => P.user_id == uid && P.wallet_type == to && P.coin_id == coin_id).SingleOrDefault();
-                        if (wallet_from == null || wallet_to == null)
+                        if (wallet_from == null)
                         {
                             res.success = false;
                             res.code = E_Res_Code.wallet_not_found;
                             res.message = "钱包不存在";
                             return res;
+                        }
+                        if (wallet_to == null)
+                        {
+                            wallet_to = new Wallet()
+                            {
+                                wallet_id = FactoryService.instance.constant.worker.NextId(),
+                                wallet_type = to,
+                                user_id = wallet_from.user_id,
+                                user_name = wallet_from.user_name,
+                                coin_id = wallet_from.coin_id,
+                                coin_name = wallet_from.coin_name,
+                                total = 0,
+                                available = 0,
+                                freeze = 0,
+                            };
+                            db.Wallet.Add(wallet_to);
                         }
                         if (wallet_from.available < amount)
                         {
@@ -101,7 +117,7 @@ public class ServiceWallet
                         }
                         wallet_from.available -= amount;
                         wallet_from.total = wallet_from.available + wallet_from.freeze;
-                        wallet_to.available -= amount;
+                        wallet_to!.available += amount;
                         wallet_to.total = wallet_from.available + wallet_from.freeze;
                         db.SaveChanges();
                         transaction.Commit();

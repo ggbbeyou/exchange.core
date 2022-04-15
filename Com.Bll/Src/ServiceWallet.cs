@@ -117,7 +117,7 @@ public class ServiceWallet
                         }
                         wallet_from.available -= amount;
                         wallet_from.total = wallet_from.available + wallet_from.freeze;
-                        wallet_to!.available += amount;
+                        wallet_to.available += amount;
                         wallet_to.total = wallet_from.available + wallet_from.freeze;
                         db.SaveChanges();
                         transaction.Commit();

@@ -575,10 +575,10 @@ public class ServiceWallet
             res.success = true;
             res.channel = E_WebsockerChannel.assets;
             res.op = E_WebsockerOp.subscribe_event;
-            var aaa = from w in wallets
-                      group w by new { w.user_id } into g
-                      select new { g.Key.user_id, g };
-            foreach (var item in aaa)
+            var wallet_uid = from wallet in wallets
+                             group wallet by new { wallet.user_id } into g
+                             select new { g.Key.user_id, g };
+            foreach (var item in wallet_uid)
             {
                 res.data = item.g.ToList();
                 FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.assets, item.user_id), JsonConvert.SerializeObject(res));

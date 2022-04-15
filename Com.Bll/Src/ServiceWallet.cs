@@ -92,6 +92,13 @@ public class ServiceWallet
                             res.message = "钱包不存在";
                             return res;
                         }
+                        if (wallet_from.available < amount)
+                        {
+                            res.success = false;
+                            res.code = E_Res_Code.available_not_enough;
+                            res.message = "可用资产不足";
+                            return res;
+                        }
                         if (wallet_to == null)
                         {
                             wallet_to = new Wallet()
@@ -107,13 +114,6 @@ public class ServiceWallet
                                 freeze = 0,
                             };
                             db.Wallet.Add(wallet_to);
-                        }
-                        if (wallet_from.available < amount)
-                        {
-                            res.success = false;
-                            res.code = E_Res_Code.available_not_enough;
-                            res.message = "可用资产不足";
-                            return res;
                         }
                         wallet_from.available -= amount;
                         wallet_from.total = wallet_from.available + wallet_from.freeze;
@@ -347,10 +347,42 @@ public class ServiceWallet
                         foreach (Deal item in deals)
                         {
                             Wallet? buy_base = wallets.Where(P => P.coin_id == market.coin_id_base && P.user_id == item.bid_uid).SingleOrDefault();
+                            if (buy_base == null)
+                            {
+                                buy_base = new Wallet()
+                                {
+                                    wallet_id = FactoryService.instance.constant.worker.NextId(),
+                                    wallet_type = wallet_type,
+                                    user_id = item.bid_uid,
+                                    user_name = item.bid_name,
+                                    coin_id = market.coin_id_base,
+                                    coin_name = market.coin_name_base,
+                                    total = 0,
+                                    available = 0,
+                                    freeze = 0,
+                                };
+                                db.Wallet.Add(buy_base);
+                            }
                             Wallet? buy_quote = wallets.Where(P => P.coin_id == market.coin_id_quote && P.user_id == item.bid_uid).SingleOrDefault();
                             Wallet? sell_base = wallets.Where(P => P.coin_id == market.coin_id_base && P.user_id == item.ask_uid).SingleOrDefault();
                             Wallet? sell_quote = wallets.Where(P => P.coin_id == market.coin_id_quote && P.user_id == item.ask_uid).SingleOrDefault();
-                            if (buy_base == null || buy_quote == null || sell_base == null || sell_quote == null)
+                            if (sell_quote == null)
+                            {
+                                sell_quote = new Wallet()
+                                {
+                                    wallet_id = FactoryService.instance.constant.worker.NextId(),
+                                    wallet_type = wallet_type,
+                                    user_id = item.ask_uid,
+                                    user_name = item.ask_name,
+                                    coin_id = market.coin_id_quote,
+                                    coin_name = market.coin_name_quote,
+                                    total = 0,
+                                    available = 0,
+                                    freeze = 0,
+                                };
+                                db.Wallet.Add(sell_quote);
+                            }
+                            if (buy_quote == null || sell_base == null)
                             {
                                 FactoryService.instance.constant.logger.LogError($"{market.symbol}:用户:{item.bid_uid}/{item.ask_uid},未找到交易账户钱包");
                                 return (false, runnings);

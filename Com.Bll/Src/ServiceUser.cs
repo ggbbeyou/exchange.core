@@ -86,7 +86,7 @@ public class ServiceUser
                     verify_realname = false,
                     disabled = false,
                     transaction = true,
-                    withdrawal = true,
+                    withdrawal = false,
                     user_type = E_UserType.general,
                     vip = vip0?.id ?? 0,
                     google_key = null,

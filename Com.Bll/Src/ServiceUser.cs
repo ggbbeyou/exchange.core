@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Text.RegularExpressions;
 using Com.Api.Sdk.Enum;
 using Com.Api.Sdk.Models;
 using Com.Bll.Util;
@@ -57,6 +58,20 @@ public class ServiceUser
             res.message = "验证码错误";
             return res;
         }
+
+        var regex = new Regex(@"
+                            (?=.*[0-9])                     #必须包含数字
+                            (?=.*[a-zA-Z])                  #必须包含小写或大写字母
+                            (?=([\x21-\x7e]+)[^a-zA-Z0-9])  #必须包含特殊符号
+                            .{8,30}                         #至少8个字符,最多30个字符
+                            ", RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace);
+        if (!regex.IsMatch(password))
+        {
+            res.message = "密码必须包含数字、小写字母、大写字母、特殊符号,长度8-30位";
+            return res;
+        }
+
+
         (string public_key, string private_key) key_res = Encryption.GetRsaKey();
         using (var scope = FactoryService.instance.constant.provider.CreateScope())
         {

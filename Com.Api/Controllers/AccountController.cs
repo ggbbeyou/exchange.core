@@ -43,16 +43,20 @@ public class AccountController : ControllerBase
     /// <summary>
     /// 注册账号
     /// </summary>
-    /// <param name="email"></param>
-    /// <param name="password"></param>
-    /// <param name="code"></param>
-    /// <param name="recommend"></param>
-    /// <param name="ip"></param>
+    /// <param name="email">邮箱地址</param>
+    /// <param name="password">密码</param>
+    /// <param name="code">邮箱验证码</param>
+    /// <param name="recommend">推荐人id</param>
     /// <returns></returns>
     [HttpPost]
     [Route("register")]
-    public Res<long> Register(string email, string password, string code, string? recommend, string ip)
+    public Res<long> Register(string email, string password, string code, string? recommend)
     {
+        string ip = "";
+        if (Request.Headers.TryGetValue("X-Real-IP", out var ip_addr))
+        {
+            ip = ip_addr;
+        }
         return service_user.Register(email, password, code, recommend, ip);
     }
 

@@ -293,6 +293,7 @@ public class DbContextEF : DbContext
             o.Property(P => P.transaction).IsRequired().HasColumnType("bit").HasComment("是否交易");
             o.Property(P => P.withdrawal).IsRequired().HasColumnType("bit").HasComment("是否提现");
             o.Property(P => P.user_type).IsRequired().HasColumnType("tinyint").HasComment("用户类型");
+            o.Property(P => P.recommend).HasColumnType("nvarchar").HasMaxLength(20).HasComment("推荐人id");
             o.Property(P => P.verify_email).IsRequired().HasColumnType("bit").HasComment("是否验证邮箱 true:验证,false:未验证");
             o.Property(P => P.verify_phone).IsRequired().HasColumnType("bit").HasComment("是否验证手机 true:验证,false:未验证");
             o.Property(P => P.verify_google).IsRequired().HasColumnType("bit").HasComment("是否验证谷歌验证器 true:验证,false:未验证");

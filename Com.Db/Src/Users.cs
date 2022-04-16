@@ -45,6 +45,11 @@ public class Users : ResUser
     //[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
     public E_UserType user_type { get; set; }
     /// <summary>
+    /// 推荐人id
+    /// </summary>
+    /// <value></value>
+    public string? recommend { get; set; }
+    /// <summary>
     /// google验证码
     /// </summary>
     /// <value></value>

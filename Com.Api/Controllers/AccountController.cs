@@ -59,22 +59,7 @@ public class AccountController : ControllerBase
     [Route("register")]
     public Res<bool> Register(string email, string password, string code, string? recommend)
     {
-        string ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "";
-        if (string.IsNullOrWhiteSpace(ip) || ip == "::1" || ip == "127.0.0.1" || ip == "localhost")
-        {
-            if (Request.Headers.TryGetValue("X-Real-IP", out var ip_addr))
-            {
-                ip = ip_addr;
-            }
-        }
-        if (string.IsNullOrWhiteSpace(ip) || ip == "::1" || ip == "127.0.0.1" || ip == "localhost")
-        {
-            if (Request.Headers.TryGetValue("X-Forwarded-For", out var ip_addr))
-            {
-                ip = ip_addr;
-            }
-        }
-        return service_user.Register(email, password, code, recommend, ip);
+        return service_user.Register(email, password, code, recommend, Request.GetIp());
     }
 
     /// <summary>
@@ -88,22 +73,7 @@ public class AccountController : ControllerBase
     [Route("login")]
     public Res<ResUser> Login(string email, string password, string app)
     {
-        string ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "";
-        if (string.IsNullOrWhiteSpace(ip) || ip == "::1" || ip == "127.0.0.1" || ip == "localhost")
-        {
-            if (Request.Headers.TryGetValue("X-Real-IP", out var ip_addr))
-            {
-                ip = ip_addr;
-            }
-        }
-        if (string.IsNullOrWhiteSpace(ip) || ip == "::1" || ip == "127.0.0.1" || ip == "localhost")
-        {
-            if (Request.Headers.TryGetValue("X-Forwarded-For", out var ip_addr))
-            {
-                ip = ip_addr;
-            }
-        }
-        return service_user.Login(email, password, app, ip);
+        return service_user.Login(email, password, app, Request.GetIp());
     }
 
     /// <summary>

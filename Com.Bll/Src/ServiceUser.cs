@@ -234,4 +234,55 @@ public class ServiceUser
         return (true, users, api);
     }
 
+    /// <summary>
+    /// 判断Api账户是否可以交易
+    /// </summary>
+    /// <param name="api_key"></param>
+    /// <returns></returns>
+    public (bool, Users?, UsersApi?) ApiUserWithdraw(string api_key)
+    {
+        UsersApi? api = GetApi(api_key);
+        if (api == null || !api.withdrawal)
+        {
+            return (false, null, null);
+        }
+        Users? users = GetUser(api.user_id);
+        if (users == null || users.disabled || !users.withdrawal)
+        {
+            return (false, null, null);
+        }
+        return (true, users, api);
+    }
+
+    /// <summary>
+    /// 判断Api账户是否可以交易
+    /// </summary>
+    /// <param name="uid">用户id</param>
+    /// <returns></returns>
+    public (bool, Users?) UserTransaction(long uid)
+    {
+        Users? users = GetUser(uid);
+        if (users == null || users.disabled || !users.transaction)
+        {
+            return (false, null);
+        }
+        return (true, users);
+    }
+
+    /// <summary>
+    /// 判断Api账户是否可以交易
+    /// </summary>
+    /// <param name="uid">用户id</param>
+    /// <returns></returns>
+    public (bool, Users?) UserWithdraw(long uid)
+    {
+        Users? users = GetUser(uid);
+        if (users == null || users.disabled || !users.disabled)
+        {
+            return (false, null);
+        }
+        return (true, users);
+    }
+
+
 }

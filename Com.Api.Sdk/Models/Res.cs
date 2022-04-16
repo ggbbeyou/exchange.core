@@ -19,7 +19,7 @@ public class Res<T>
     /// 返回编号
     /// </summary>
     /// <value></value>
-    // [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter))]
     // //[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
     public E_Res_Code code { get; set; }
     /// <summary>

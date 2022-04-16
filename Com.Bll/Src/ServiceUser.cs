@@ -43,11 +43,12 @@ public class ServiceUser
     /// <param name="code">邮箱验证码</param>
     /// <param name="recommend">推荐人id</param>
     /// <param name="ip">ip地址</param>
-    public Res<long> Register(string email, string password, string code, string? recommend, string ip)
+    public Res<bool> Register(string email, string password, string code, string? recommend, string ip)
     {
-        Res<long> res = new Res<long>();
+        Res<bool> res = new Res<bool>();
         res.success = false;
         res.code = E_Res_Code.fail;
+        res.data = false;
         if (!Regex.IsMatch(email, @"^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+((\.[a-zA-Z0-9_-]{2,3}){1,2})$"))
         {
             res.code = E_Res_Code.email_format_error;
@@ -62,11 +63,12 @@ public class ServiceUser
                             ", RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace))
         {
             res.code = E_Res_Code.password_format_error;
-            res.message = "密码必须包含数字、小写字母、大写字母、特殊符号,长度6-20位";
+            res.message = "密码必须包含数字、小写字母或大写字母、特殊符号,长度6-20位";
             return res;
         }
         if (!service_common.VerificationCode(email, code))
         {
+            res.code = E_Res_Code.verification_error;
             res.message = "验证码错误";
             return res;
         }
@@ -77,6 +79,7 @@ public class ServiceUser
             {
                 if (db.Users.Any(P => P.email == email))
                 {
+                    res.code = E_Res_Code.email_repeat;
                     res.message = "邮箱已重复";
                     return res;
                 }
@@ -108,7 +111,13 @@ public class ServiceUser
                     private_key = key_res.private_key,
                 };
                 db.Users.Add(settlement_btc_usdt);
-                db.SaveChanges();
+                if (db.SaveChanges() > 0)
+                {
+                    res.success = true;
+                    res.code = E_Res_Code.ok;
+                    res.data = true;
+                    return res;
+                }
             }
         }
         return res;

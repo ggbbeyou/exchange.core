@@ -57,7 +57,7 @@ public class AccountController : ControllerBase
     /// <returns></returns>
     [HttpPost]
     [Route("register")]
-    public Res<long> Register(string email, string password, string code, string? recommend)
+    public Res<bool> Register(string email, string password, string code, string? recommend)
     {
         string ip = "";
         if (Request.Headers.TryGetValue("X-Real-IP", out var ip_addr))
@@ -98,6 +98,7 @@ public class AccountController : ControllerBase
         Res<bool> res = new Res<bool>();
         res.success = false;
         res.code = E_Res_Code.fail;
+        res.data = false;
         email = email.Trim().ToLower();
         if (!Regex.IsMatch(email, @"^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+((\.[a-zA-Z0-9_-]{2,3}){1,2})$"))
         {
@@ -116,10 +117,8 @@ public class AccountController : ControllerBase
             {
                 if (db.Users.Any(P => P.email.ToLower() == email))
                 {
-                    res.success = false;
                     res.code = E_Res_Code.email_repeat;
                     res.message = "邮箱地址已存在";
-                    res.data = false;
                     return res;
                 }
                 else
@@ -129,6 +128,7 @@ public class AccountController : ControllerBase
                         FactoryService.instance.constant.redis.StringSet(FactoryService.instance.GetRedisVerificationCode(email), code, TimeSpan.FromMinutes(10));
                         res.success = true;
                         res.code = E_Res_Code.ok;
+                        res.data = true;
                         return res;
                     }
                 }

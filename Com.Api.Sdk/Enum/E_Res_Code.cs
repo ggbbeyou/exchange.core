@@ -73,6 +73,10 @@ public enum E_Res_Code
     /// 密码不合规则
     /// </summary>
     password_format_error,
+    /// <summary>
+    /// 验证码错误
+    /// </summary>
+    verification_error,
     //////用户相关错误码/////////////////////////////////////////////////////////////////////
 
 

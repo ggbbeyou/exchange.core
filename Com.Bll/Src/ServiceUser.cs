@@ -58,7 +58,6 @@ public class ServiceUser
             res.message = "验证码错误";
             return res;
         }
-
         var regex = new Regex(@"
                             (?=.*[0-9])                     #必须包含数字
                             (?=.*[a-zA-Z])                  #必须包含小写或大写字母

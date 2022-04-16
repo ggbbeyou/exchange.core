@@ -58,11 +58,11 @@ public class ServiceUser
                             (?=.*[0-9])                     #必须包含数字
                             (?=.*[a-zA-Z])                  #必须包含小写或大写字母
                             (?=([\x21-\x7e]+)[^a-zA-Z0-9])  #必须包含特殊符号
-                            .{8,30}                         #至少8个字符,最多30个字符
+                            .{6,20}                         #至少6个字符,最多20个字符
                             ", RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace))
         {
             res.code = E_Res_Code.password_format_error;
-            res.message = "密码必须包含数字、小写字母、大写字母、特殊符号,长度8-30位";
+            res.message = "密码必须包含数字、小写字母、大写字母、特殊符号,长度6-20位";
             return res;
         }
         if (!service_common.VerificationCode(email, code))

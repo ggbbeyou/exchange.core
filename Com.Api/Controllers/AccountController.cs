@@ -1,5 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text.RegularExpressions;
 using Com.Api.Sdk.Enum;
 using Com.Api.Sdk.Models;
 using Com.Bll;
@@ -82,24 +83,22 @@ public class AccountController : ControllerBase
     /// <summary>
     /// 注册时发送Email验证码
     /// </summary>
-    /// <param name="email"></param>
+    /// <param name="email">邮件地址</param>
     /// <returns></returns>
     [HttpPost]
-    [Route("SendVerificationByRegister")]
-    public Res<bool> SendVerificationByRegister(string email)
+    [Route("SendEmailCodeByRegister")]
+    public Res<bool> SendEmailCodeByRegister(string email)
     {
         Res<bool> res = new Res<bool>();
-        res.success = true;
-        res.code = E_Res_Code.ok;
-        if (string.IsNullOrWhiteSpace(email))
+        res.success = false;
+        res.code = E_Res_Code.fail;
+        email = email.Trim().ToLower();
+        if (!Regex.IsMatch(email, @"^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+((\.[a-zA-Z0-9_-]{2,3}){1,2})$"))
         {
-            res.success = false;
-            res.code = E_Res_Code.email_not_found;
-            res.message = "邮箱地址不能为空";
-            res.data = false;
+            res.code = E_Res_Code.email_format_error;
+            res.message = "邮箱格式错误";
             return res;
         }
-        email = email.Trim().ToLower();
         string code = "123456";
         string content = $"Exchange Code:{code}";
         using (var scope = FactoryService.instance.constant.provider.CreateScope())
@@ -119,11 +118,14 @@ public class AccountController : ControllerBase
                     if (service_common.SendEmail(email, content))
                     {
                         FactoryService.instance.constant.redis.StringSet(FactoryService.instance.GetRedisVerificationCode(email), code, TimeSpan.FromMinutes(10));
+                        res.success = true;
+                        res.code = E_Res_Code.ok;
+                        return res;
                     }
                 }
             }
         }
-        res.data = true;
+
         return res;
     }
 

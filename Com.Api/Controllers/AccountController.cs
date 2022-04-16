@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using Com.Api.Sdk.Enum;
 using Com.Api.Sdk.Models;
 using Com.Bll;
+using Com.Bll.Util;
 using Com.Db;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -31,6 +32,11 @@ public class AccountController : ControllerBase
     /// service:公共服务
     /// </summary>
     private ServiceCommon service_common = new ServiceCommon();
+    /// <summary>
+    /// 公共类
+    /// </summary>
+    /// <returns></returns>
+    private Common common = new Common();
 
     /// <summary>
     /// 初始化
@@ -99,13 +105,16 @@ public class AccountController : ControllerBase
             res.message = "邮箱格式错误";
             return res;
         }
-        string code = "123456";
+        string code = common.CreateRandomCode(6);
+#if (DEBUG)
+        code = "123456";
+#endif
         string content = $"Exchange 注册验证码:{code}";
         using (var scope = FactoryService.instance.constant.provider.CreateScope())
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
-                if (db.Users.Any(P => P.email == email))
+                if (db.Users.Any(P => P.email.ToLower() == email))
                 {
                     res.success = false;
                     res.code = E_Res_Code.email_repeat;
@@ -125,7 +134,6 @@ public class AccountController : ControllerBase
                 }
             }
         }
-
         return res;
     }
 

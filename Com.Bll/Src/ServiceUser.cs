@@ -197,7 +197,6 @@ public class ServiceUser
         }
     }
 
-
     /// <summary>
     /// 获取user api用户
     /// </summary>
@@ -235,7 +234,7 @@ public class ServiceUser
     }
 
     /// <summary>
-    /// 判断Api账户是否可以交易
+    /// 判断Api账户是否可以取款
     /// </summary>
     /// <param name="api_key"></param>
     /// <returns></returns>
@@ -255,7 +254,7 @@ public class ServiceUser
     }
 
     /// <summary>
-    /// 判断Api账户是否可以交易
+    /// 判断账户是否可以交易
     /// </summary>
     /// <param name="uid">用户id</param>
     /// <returns></returns>
@@ -270,7 +269,7 @@ public class ServiceUser
     }
 
     /// <summary>
-    /// 判断Api账户是否可以交易
+    /// 判断账户是否可以取款
     /// </summary>
     /// <param name="uid">用户id</param>
     /// <returns></returns>

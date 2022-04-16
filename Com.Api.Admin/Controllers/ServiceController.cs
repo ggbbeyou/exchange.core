@@ -35,7 +35,7 @@ public class ServiceController : ControllerBase
     {
         get
         {
-            return this.service_common.GetLoginUser(User);
+            return this.service_user.GetLoginUser(User);
         }
     }
 

@@ -38,6 +38,11 @@ public class ResUser
     /// <value></value>
     public bool verify_google { get; set; }
     /// <summary>
+    /// 是否验证实名认证 true:验证,false:未验证
+    /// </summary>
+    /// <value></value>
+    public bool verify_realname { get; set; }
+    /// <summary>
     /// 用户等级
     /// </summary>
     /// <value></value>

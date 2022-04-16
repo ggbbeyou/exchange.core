@@ -57,7 +57,7 @@ public class ServiceUser
             res.message = "验证码错误";
             return res;
         }
-        (string public_key, string private_key) key_btc_user = Encryption.GetRsaKey();
+        (string public_key, string private_key) key_res = Encryption.GetRsaKey();
         using (var scope = FactoryService.instance.constant.provider.CreateScope())
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
@@ -67,6 +67,7 @@ public class ServiceUser
                     res.message = "邮箱已重复";
                     return res;
                 }
+                Vip? vip0 = db.Vip.SingleOrDefault(P => P.name == "vip0");
                 string user_name = FactoryService.instance.constant.random.NextInt64(10_001_000, 99_999_999).ToString();
                 while (db.Users.Any(P => P.user_name == user_name))
                 {
@@ -82,12 +83,16 @@ public class ServiceUser
                     verify_email = false,
                     verify_phone = false,
                     verify_google = false,
+                    verify_realname = false,
                     disabled = false,
                     transaction = true,
                     withdrawal = true,
-                    vip = 0,
-                    public_key = key_btc_user.public_key,
-                    private_key = key_btc_user.private_key,
+                    user_type = E_UserType.general,
+                    vip = vip0?.id ?? 0,
+                    google_key = null,
+                    google_private_key = null,
+                    public_key = key_res.public_key,
+                    private_key = key_res.private_key,
                 };
                 db.Users.Add(settlement_btc_usdt);
                 db.SaveChanges();

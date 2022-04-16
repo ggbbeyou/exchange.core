@@ -100,7 +100,7 @@ public class AccountController : ControllerBase
             return res;
         }
         string code = "123456";
-        string content = $"Exchange Code:{code}";
+        string content = $"Exchange 注册验证码:{code}";
         using (var scope = FactoryService.instance.constant.provider.CreateScope())
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)

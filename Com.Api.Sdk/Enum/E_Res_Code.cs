@@ -69,6 +69,10 @@ public enum E_Res_Code
     /// 不是白名单用户
     /// </summary>
     not_white_ip,
+    /// <summary>
+    /// 密码不合规则
+    /// </summary>
+    password_format_error,
     //////用户相关错误码/////////////////////////////////////////////////////////////////////
 
 
@@ -89,6 +93,10 @@ public enum E_Res_Code
     /// Email已存在
     /// </summary>
     email_repeat,
+    /// <summary>
+    /// Email地址不合规则
+    /// </summary>
+    email_format_error,
 
     //////订单相关错误码/////////////////////////////////////////////////////////////////////
 

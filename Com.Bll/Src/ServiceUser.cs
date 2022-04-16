@@ -48,9 +48,21 @@ public class ServiceUser
         Res<long> res = new Res<long>();
         res.success = false;
         res.code = E_Res_Code.fail;
-        if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+        if (!Regex.IsMatch(email, @"^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+((\.[a-zA-Z0-9_-]{2,3}){1,2})$"))
         {
-            res.message = "邮箱或密码不能为空";
+            res.code = E_Res_Code.email_format_error;
+            res.message = "邮箱格式错误";
+            return res;
+        }
+        if (!Regex.IsMatch(password, @"
+                            (?=.*[0-9])                     #必须包含数字
+                            (?=.*[a-zA-Z])                  #必须包含小写或大写字母
+                            (?=([\x21-\x7e]+)[^a-zA-Z0-9])  #必须包含特殊符号
+                            .{8,30}                         #至少8个字符,最多30个字符
+                            ", RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace))
+        {
+            res.code = E_Res_Code.password_format_error;
+            res.message = "密码必须包含数字、小写字母、大写字母、特殊符号,长度8-30位";
             return res;
         }
         if (!service_common.VerificationCode(email, code))
@@ -58,19 +70,6 @@ public class ServiceUser
             res.message = "验证码错误";
             return res;
         }
-        var regex = new Regex(@"
-                            (?=.*[0-9])                     #必须包含数字
-                            (?=.*[a-zA-Z])                  #必须包含小写或大写字母
-                            (?=([\x21-\x7e]+)[^a-zA-Z0-9])  #必须包含特殊符号
-                            .{8,30}                         #至少8个字符,最多30个字符
-                            ", RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace);
-        if (!regex.IsMatch(password))
-        {
-            res.message = "密码必须包含数字、小写字母、大写字母、特殊符号,长度8-30位";
-            return res;
-        }
-
-
         (string public_key, string private_key) key_res = Encryption.GetRsaKey();
         using (var scope = FactoryService.instance.constant.provider.CreateScope())
         {

@@ -65,7 +65,7 @@ public class AccountController : ControllerBase
     /// <summary>
     /// 登录
     /// </summary>
-    /// <param name="email">emal)</param>
+    /// <param name="email">email</param>
     /// <param name="password">密码</param>
     /// <param name="app">终端</param>
     /// <returns></returns>

@@ -2,6 +2,7 @@ using System.Reflection;
 using System.Security.Claims;
 using System.Text;
 using Com.Api;
+using Com.Bll;
 using Com.Db;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
@@ -9,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using NLog.Web;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
@@ -54,7 +56,7 @@ builder.Services.AddAuthentication(options =>
                 ClaimsIdentity? identity = context.Principal.Identities.FirstOrDefault();
                 if (identity != null)
                 {
-                    long no, user_id;
+                    long no = 0, user_id = 0;
                     Claim? claim = identity.Claims.FirstOrDefault(P => P.Type == "no");
                     if (claim != null)
                     {
@@ -66,31 +68,10 @@ builder.Services.AddAuthentication(options =>
                         user_id = long.Parse(claim.Value);
                     }
                     // context.Fail("无效的用户");
-
-
-
-
-
-
-
-
-
-                    var userId = context.Principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-                    if (userId == null)
+                    RedisValue rv = FactoryService.instance.constant.redis.HashGet(FactoryService.instance.GetRedisBlacklist(), $"{user_id}_{no}");
+                    if (rv.HasValue)
                     {
                         context.Fail("无效的用户");
-                    }
-                    else
-                    {
-                        // var user = builder.Services.GetService<DbContextEF>().Users.FirstOrDefault(u => u.Id == userId);
-                        // if (user == null)
-                        // {
-                        //     context.Fail("无效的用户");
-                        // }
-                        // else
-                        // {
-                        //     context.Success();
-                        // }
                     }
                 }
             }

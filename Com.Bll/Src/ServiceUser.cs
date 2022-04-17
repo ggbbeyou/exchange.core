@@ -174,6 +174,7 @@ public class ServiceUser
                     transaction = true,
                     withdrawal = false,
                     user_type = E_UserType.general,
+                    recommend = recommend,
                     vip = vip0?.id ?? 0,
                     google_key = null,
                     google_private_key = null,

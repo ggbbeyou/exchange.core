@@ -21,6 +21,7 @@ public class Users : ResUser
     /// 用户密码
     /// </summary>
     /// <value></value>
+    [JsonIgnore]
     public string password { get; set; } = null!;
     /// <summary>
     /// 禁用,true:禁用,false:启用
@@ -53,11 +54,13 @@ public class Users : ResUser
     /// google验证码
     /// </summary>
     /// <value></value>
+    [JsonIgnore]
     public string? google_key { get; set; }
     /// <summary>
     /// google验证器密钥
     /// </summary>
     /// <value></value>
+    [JsonIgnore]
     public string? google_private_key { get; set; }
     /// <summary>
     /// sha公钥
@@ -68,5 +71,6 @@ public class Users : ResUser
     /// sha私钥
     /// </summary>
     /// <value></value>
+    [JsonIgnore]
     public string private_key { get; set; } = null!;
 }

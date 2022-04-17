@@ -99,7 +99,7 @@ public class ServiceUser
         var token = new JwtSecurityToken(
             issuer: FactoryService.instance.constant.config["Jwt:Issuer"],// 签发者
             audience: FactoryService.instance.constant.config["Jwt:Audience"],// 接收者
-            expires: DateTime.Now.AddMinutes(double.Parse(FactoryService.instance.constant.config["Jwt:Expires"])),// 过期时间
+            expires: DateTimeOffset.UtcNow.AddMinutes(double.Parse(FactoryService.instance.constant.config["Jwt:Expires"])).DateTime,// 过期时间
             claims: claims,
             signingCredentials: creds);// 令牌
         return new JwtSecurityTokenHandler().WriteToken(token);
@@ -223,7 +223,7 @@ public class ServiceUser
                 FactoryService.instance.constant.redis.KeyDelete(FactoryService.instance.GetRedisVerificationCode(email));
                 long no = FactoryService.instance.constant.worker.NextId();
                 FactoryService.instance.constant.redis.HashDelete(FactoryService.instance.GetRedisBlacklist(), $"{user.user_id}_{app}_*");
-                FactoryService.instance.constant.redis.StringSet(FactoryService.instance.GetRedisOnline(no), $"{user.user_id}_{user.user_name}_{app}", new TimeSpan(0, 0, int.Parse(FactoryService.instance.constant.config["Jwt:Expires"])));
+                FactoryService.instance.constant.redis.StringSet(FactoryService.instance.GetRedisOnline(no), $"{user.user_id}_{user.user_name}_{app}", new TimeSpan(0, int.Parse(FactoryService.instance.constant.config["Jwt:Expires"]), 0));
                 res.success = true;
                 res.code = E_Res_Code.ok;
                 res.data = user;

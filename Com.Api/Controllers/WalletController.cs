@@ -73,18 +73,40 @@ public class WalletController : ControllerBase
     /// <summary>
     /// 获取用户所有钱包
     /// </summary>
+    /// <param name="coin_name">币名</param>
+    /// <param name="wallet_type">钱包类型</param>
     /// <returns></returns>
     [HttpGet]
-    [Route("Transfer")]
-    public List<Wallet> GetWallet()
+    [Route("GetWallet")]
+    public Res<List<Wallet>?> GetWallet(string? coin_name, E_WalletType wallet_type)
     {
+        Res<List<Wallet>?> res = new Res<List<Wallet>?>();
+        res.success = false;
+        res.code = E_Res_Code.fail;
         using (var scope = FactoryService.instance.constant.provider.CreateScope())
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
-                return db.Wallet.Where(P => P.user_id == login.user_id).AsNoTracking().ToList();
+                var linq = from coin in db.Coin
+                           join wallet in db.Wallet.Where(P => P.user_id == this.login.user_id && P.wallet_type == wallet_type).WhereIf(!string.IsNullOrWhiteSpace(coin_name), P => P.coin_name.Contains(coin_name!))
+                           on coin.coin_id equals wallet.coin_id into temp
+                           from bb in temp.DefaultIfEmpty()
+                           select new Wallet
+                           {
+                               wallet_id = bb == null ? 0 : bb.user_id,
+                               wallet_type = wallet_type,
+                               user_id = this.login.user_id,
+                               user_name = this.login.user_name,
+                               coin_id = coin.coin_id,
+                               coin_name = coin.coin_name,
+                               total = bb == null ? 0 : bb.total,
+                               available = bb == null ? 0 : bb.available,
+                               freeze = bb == null ? 0 : bb.freeze,
+                           };
+                res.data = linq.ToList();
             }
         }
+        return res;
     }
 
 }

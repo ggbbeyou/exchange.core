@@ -26,7 +26,7 @@ public class ServiceCommon
     /// 用户服务
     /// </summary>
     /// <returns></returns>
-    private ServiceUser service_user = new ServiceUser();
+    // private ServiceUser service_user = new ServiceUser();
 
     /// <summary>
     /// 初始化
@@ -87,18 +87,10 @@ public class ServiceCommon
     /// <param name="google_key">google key</param>
     /// <param name="_2FA">google验证码</param>
     /// <returns></returns>
-    public bool Verification2FA(long uid, string _2FA)
+    public bool Verification2FA(string google_key, string _2FA)
     {
-        Users? user = service_user.GetUser(uid);
-        if (user == null || user.disabled == true || user.verify_google == false)
-        {
-            return false;
-        }
-        return new TwoFactorAuthenticator().ValidateTwoFactorPIN(user.google_key, _2FA);
+        return new TwoFactorAuthenticator().ValidateTwoFactorPIN(google_key, _2FA);
     }
-
-
-
 
     /// <summary>
     /// 发送邮件

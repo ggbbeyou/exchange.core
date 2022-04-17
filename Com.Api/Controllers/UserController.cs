@@ -91,7 +91,7 @@ public class UserController : ControllerBase
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
                 Users? user = db.Users.SingleOrDefault(P => P.user_id == this.login.user_id);
-                if (user == null || user.disabled == true || user.verify_google == true)
+                if (user == null || user.disabled == true || user.verify_google == true || string.IsNullOrWhiteSpace(user.google_key))
                 {
                     res.success = false;
                     res.code = E_Res_Code.user_disable;
@@ -101,7 +101,7 @@ public class UserController : ControllerBase
                 }
                 else
                 {
-                    res.data = service_common.Verification2FA(user.user_id, _2FA);
+                    res.data = service_common.Verification2FA(user.google_key, _2FA);
                     if (res.data == false)
                     {
                         res.success = false;

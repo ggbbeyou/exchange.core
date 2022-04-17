@@ -77,6 +77,10 @@ public enum E_Res_Code
     /// 验证码错误
     /// </summary>
     verification_error,
+    /// <summary>
+    /// 禁用验证,没有权限或已验证时
+    /// </summary>
+    verification_disable,
     //////用户相关错误码/////////////////////////////////////////////////////////////////////
 
 

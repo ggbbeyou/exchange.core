@@ -101,7 +101,7 @@ public class UserController : ControllerBase
                 }
                 else
                 {
-                    res.data = service_common.Verification2FA(user.email, _2FA);
+                    res.data = service_common.Verification2FA(user.google_key, _2FA);
                     if (res.data == false)
                     {
                         res.success = false;
@@ -113,14 +113,17 @@ public class UserController : ControllerBase
                     {
                         user.verify_google = true;
                         db.Users.Update(user);
-                        db.SaveChanges();
-                        res.success = true;
-                        res.code = E_Res_Code.ok;
-                        return res;
+                        if (db.SaveChanges() > 0)
+                        {
+                            res.success = true;
+                            res.code = E_Res_Code.ok;
+                            return res;
+                        }
                     }
                 }
             }
         }
+        return res;
     }
 
     /// <summary>
@@ -138,8 +141,8 @@ public class UserController : ControllerBase
         if (string.IsNullOrWhiteSpace(res.data))
         {
             res.success = false;
-            res.code = E_Res_Code.user_disable;
-            res.message = "用户已禁用";
+            res.code = E_Res_Code.verification_disable;
+            res.message = "用户被禁用或已申请过验证";
             return res;
         }
         else

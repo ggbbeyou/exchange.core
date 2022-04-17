@@ -66,7 +66,7 @@ public class ServiceCommon
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
                 Users? user = db.Users.FirstOrDefault(P => P.user_id == user_id);
-                if (user != null && user.disabled == false)
+                if (user != null && user.disabled == false && user.verify_google == false)
                 {
                     SetupCode setupInfo = tfa.GenerateSetupCode(issuer, user.email, tempKey, 300, 300);
                     user.google_key = tempKey;

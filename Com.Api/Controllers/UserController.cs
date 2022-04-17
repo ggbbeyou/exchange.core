@@ -101,7 +101,7 @@ public class UserController : ControllerBase
                 }
                 else
                 {
-                    res.data = service_common.Verification2FA(user.google_key, _2FA);
+                    res.data = service_common.Verification2FA(user.email, _2FA);
                     if (res.data == false)
                     {
                         res.success = false;

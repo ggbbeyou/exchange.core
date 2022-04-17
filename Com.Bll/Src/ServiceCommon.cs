@@ -68,7 +68,7 @@ public class ServiceCommon
                 Users? user = db.Users.FirstOrDefault(P => P.user_id == user_id);
                 if (user != null && user.disabled == false)
                 {
-                    SetupCode setupInfo = tfa.GenerateSetupCode(issuer, user.user_name, tempKey, 300, 300);
+                    SetupCode setupInfo = tfa.GenerateSetupCode(issuer, user.email, tempKey, 300, 300);
                     user.google_key = tempKey;
                     // user.google_private_key = setupInfo.ManualEntryKey;
                     if (db.SaveChanges() > 0)

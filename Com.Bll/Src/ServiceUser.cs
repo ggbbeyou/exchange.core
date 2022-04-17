@@ -171,7 +171,7 @@ public class ServiceUser
                     password = Encryption.SHA256Encrypt(password),
                     email = email,
                     phone = null,
-                    verify_email = false,
+                    verify_email = true,
                     verify_phone = false,
                     verify_google = false,
                     verify_realname = false,

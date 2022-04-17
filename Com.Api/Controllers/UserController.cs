@@ -62,6 +62,43 @@ public class UserController : ControllerBase
         return this.service_user.Logout(this.login.no, this.login.user_id, this.login.app);
     }
 
+    /// <summary>
+    /// 验证手机号码
+    /// </summary>   
+    /// <returns></returns>
+    [HttpPost]
+    [Route("VerifyPhone")]
+    public Res<bool> VerifyPhone()
+    {
+        Res<bool> res = new Res<bool>();
+        return res;
+    }
+
+    /// <summary>
+    /// 验证Google验证码
+    /// </summary>   
+    /// <returns></returns>
+    [HttpPost]
+    [Route("VerifyGoogle")]
+    public Res<bool> VerifyGoogle()
+    {
+        Res<bool> res = new Res<bool>();
+        return res;
+    }
+
+    /// <summary>
+    /// 验证实名认证
+    /// </summary>   
+    /// <returns></returns>
+    [HttpPost]
+    [Route("VerifyRealname")]
+    public Res<bool> VerifyRealname()
+    {
+        Res<bool> res = new Res<bool>();
+        return res;
+    }
+
+
 
 
 }

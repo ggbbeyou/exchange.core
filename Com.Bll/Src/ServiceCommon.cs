@@ -69,7 +69,6 @@ public class ServiceCommon
                 if (user != null && user.disabled == false)
                 {
                     SetupCode setupInfo = tfa.GenerateSetupCode(issuer, user.user_name, tempKey, 300, 300);
-                    user.verify_google = true;
                     user.google_key = tempKey;
                     // user.google_private_key = setupInfo.ManualEntryKey;
                     if (db.SaveChanges() > 0)

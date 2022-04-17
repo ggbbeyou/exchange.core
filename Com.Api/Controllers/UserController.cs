@@ -124,12 +124,12 @@ public class UserController : ControllerBase
     }
 
     /// <summary>
-    /// 创建Google验证码
+    /// 申请Google验证码
     /// </summary>   
     /// <returns></returns>
     [HttpPost]
-    [Route("CreateGoogle")]
-    public Res<string?> CreateGoogle()
+    [Route("ApplyGoogle")]
+    public Res<string?> ApplyGoogle()
     {
         Res<string?> res = new Res<string?>();
         res.success = false;

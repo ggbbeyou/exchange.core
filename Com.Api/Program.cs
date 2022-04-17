@@ -74,7 +74,7 @@ builder.Services.AddAuthentication(options =>
                     {
                         app = (E_App)Enum.Parse(typeof(E_App), claim.Value);
                     }
-                    RedisValue rv = FactoryService.instance.constant.redis.HashGet(FactoryService.instance.GetRedisBlacklist(), $"{user_id}_{no}_{app}");
+                    RedisValue rv = FactoryService.instance.constant.redis.HashGet(FactoryService.instance.GetRedisBlacklist(), $"{user_id}_{app}_{no}");
                     if (rv.HasValue)
                     {
                         context.Fail("无效的用户");

@@ -2,6 +2,7 @@ using System.Reflection;
 using System.Security.Claims;
 using System.Text;
 using Com.Api;
+using Com.Api.Sdk.Enum;
 using Com.Bll;
 using Com.Db;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -57,6 +58,7 @@ builder.Services.AddAuthentication(options =>
                 if (identity != null)
                 {
                     long no = 0, user_id = 0;
+                    E_App app = E_App.undefined;
                     Claim? claim = identity.Claims.FirstOrDefault(P => P.Type == "no");
                     if (claim != null)
                     {
@@ -67,8 +69,12 @@ builder.Services.AddAuthentication(options =>
                     {
                         user_id = long.Parse(claim.Value);
                     }
-                    // context.Fail("无效的用户");
-                    RedisValue rv = FactoryService.instance.constant.redis.HashGet(FactoryService.instance.GetRedisBlacklist(), $"{user_id}_{no}");
+                    claim = identity.Claims.FirstOrDefault(P => P.Type == "app");
+                    if (claim != null)
+                    {
+                        app = (E_App)Enum.Parse(typeof(E_App), claim.Value);
+                    }
+                    RedisValue rv = FactoryService.instance.constant.redis.HashGet(FactoryService.instance.GetRedisBlacklist(), $"{user_id}_{no}_{app}");
                     if (rv.HasValue)
                     {
                         context.Fail("无效的用户");

@@ -223,7 +223,7 @@ public class ServiceUser
                 }
                 FactoryService.instance.constant.redis.KeyDelete(FactoryService.instance.GetRedisVerificationCode(email));
                 long no = FactoryService.instance.constant.worker.NextId();
-
+                FactoryService.instance.constant.redis.HashDelete(FactoryService.instance.GetRedisBlacklist(), $"{user.user_id}_{app}_*");
                 var token = GenerateToken(no, user, app);
                 res.success = true;
                 res.code = E_Res_Code.ok;
@@ -241,7 +241,7 @@ public class ServiceUser
     public Res<bool> Logout(long no, long uid, E_App app)
     {
         Res<bool> res = new Res<bool>();
-        FactoryService.instance.constant.redis.HashSet(FactoryService.instance.GetRedisBlacklist(), $"{uid}_{no}", $"{app}");
+        FactoryService.instance.constant.redis.HashSet(FactoryService.instance.GetRedisBlacklist(), $"{uid}_{app}_{no}", $"{app}");
 
         // ModelResult<bool> result = new ModelResult<bool>();
         // result.data = true;

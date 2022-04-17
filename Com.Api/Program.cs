@@ -39,11 +39,63 @@ builder.Services.AddAuthentication(options =>
     {
         ValidateIssuer = true,//是否在令牌期间验证签发者
         ValidateAudience = true,//是否验证接收者
-        ValidateLifetime = false,//是否验证失效时间
+        ValidateLifetime = true,//是否验证失效时间
         ValidateIssuerSigningKey = true,//是否验证签名
         ValidIssuer = builder.Configuration["Jwt:Issuer"],//签发者，签发的Token的人
         ValidAudience = builder.Configuration["Jwt:Audience"],//接收者
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"])),
+    };
+    options.Events = new JwtBearerEvents()
+    {
+        OnTokenValidated = context =>
+        {
+            if (context != null && context.Principal != null && context.Principal.Claims != null)
+            {
+                ClaimsIdentity? identity = context.Principal.Identities.FirstOrDefault();
+                if (identity != null)
+                {
+                    long no, user_id;
+                    Claim? claim = identity.Claims.FirstOrDefault(P => P.Type == "no");
+                    if (claim != null)
+                    {
+                        no = long.Parse(claim.Value);
+                    }
+                    claim = identity.Claims.FirstOrDefault(P => P.Type == "user_id");
+                    if (claim != null)
+                    {
+                        user_id = long.Parse(claim.Value);
+                    }
+                    // context.Fail("无效的用户");
+
+
+
+
+
+
+
+
+
+                    var userId = context.Principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+                    if (userId == null)
+                    {
+                        context.Fail("无效的用户");
+                    }
+                    else
+                    {
+                        // var user = builder.Services.GetService<DbContextEF>().Users.FirstOrDefault(u => u.Id == userId);
+                        // if (user == null)
+                        // {
+                        //     context.Fail("无效的用户");
+                        // }
+                        // else
+                        // {
+                        //     context.Success();
+                        // }
+                    }
+                }
+            }
+            return Task.CompletedTask;
+        }
     };
 });
 builder.Services.AddResponseCompression();

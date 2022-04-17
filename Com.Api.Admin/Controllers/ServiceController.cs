@@ -31,7 +31,7 @@ public class ServiceController : ControllerBase
     /// <summary>
     /// 登录信息
     /// </summary>
-    private (long user_id, long no, string user_name, string app, string public_key) login
+    private (long no, long user_id, string user_name, E_App app, string public_key) login
     {
         get
         {

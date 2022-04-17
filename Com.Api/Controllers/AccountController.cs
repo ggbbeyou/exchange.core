@@ -71,7 +71,7 @@ public class AccountController : ControllerBase
     /// <returns></returns>
     [HttpPost]
     [Route("login")]
-    public Res<ResUser> Login(string email, string password, string app)
+    public Res<ResUser> Login(string email, string password, E_App app)
     {
         return service_user.Login(email, password, app, Request.GetIp());
     }

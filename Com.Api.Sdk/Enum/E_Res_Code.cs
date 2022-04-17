@@ -101,6 +101,10 @@ public enum E_Res_Code
     /// Email地址不合规则
     /// </summary>
     email_format_error,
+    /// <summary>
+    /// 登录账号或密码错误
+    /// </summary>
+    name_password_error,
 
     //////订单相关错误码/////////////////////////////////////////////////////////////////////
 

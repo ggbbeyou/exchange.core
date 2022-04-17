@@ -116,6 +116,24 @@ public class FactoryService
     }
 
     /// <summary>
+    /// 登陆用户
+    /// </summary>
+    /// <returns></returns>
+    public string GetRedisOnline()
+    {
+        return string.Format("online");
+    }
+
+    /// <summary>
+    /// 黑名单登录用户
+    /// </summary>
+    /// <returns></returns>
+    public string GetRedisBlacklist()
+    {
+        return string.Format("blacklist");
+    }
+
+    /// <summary>
     /// 用户api账户信息(注意,当修改时记得删除redis数据)
     /// </summary>
     /// <param name="id"></param>

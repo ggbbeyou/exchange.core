@@ -24,7 +24,7 @@ public class UserController : ControllerBase
     /// <summary>
     /// 登录信息
     /// </summary>
-    private (long user_id, long no, string user_name, string app, string public_key) login
+    private (long user_id, long no, string user_name, E_App app, string public_key) login
     {
         get
         {
@@ -40,7 +40,7 @@ public class UserController : ControllerBase
     /// </summary>
     /// <returns></returns>
     private ServiceUser service_user = new ServiceUser();
-    
+
 
     /// <summary>
     /// 初始化
@@ -59,7 +59,7 @@ public class UserController : ControllerBase
     [Route("logout")]
     public Res<bool> Logout()
     {
-        return this.service_user.Logout(this.login.user_id);
+        return this.service_user.Logout(this.login.no, this.login.user_id, this.login.app);
     }
 
 

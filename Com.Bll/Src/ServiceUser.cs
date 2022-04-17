@@ -38,15 +38,16 @@ public class ServiceUser
     /// <summary>
     /// 获取登录信息
     /// </summary>
-    /// <param name="user_id"></param>
     /// <param name="no"></param>
+    /// <param name="user_id"></param>
     /// <param name="user_name"></param>
     /// <param name="app"></param>
     /// <param name="claims_principal"></param>
     /// <returns></returns>
-    public (long user_id, long no, string user_name, string app, string public_key) GetLoginUser(System.Security.Claims.ClaimsPrincipal claims_principal)
+    public (long no, long user_id, string user_name, E_App app, string public_key) GetLoginUser(System.Security.Claims.ClaimsPrincipal claims_principal)
     {
-        string user_name = "", app = "", public_key = "";
+        E_App app = E_App.undefined;
+        string user_name = "", public_key = "";
         long user_id = 0, no = 0;
         Claim? claim = claims_principal.Claims.FirstOrDefault(P => P.Type == "no");
         if (claim != null)
@@ -66,14 +67,14 @@ public class ServiceUser
         claim = claims_principal.Claims.FirstOrDefault(P => P.Type == "app");
         if (claim != null)
         {
-            app = claim.Value;
+            app = (E_App)Enum.Parse(typeof(E_App), claim.Value);
         }
         claim = claims_principal.Claims.FirstOrDefault(P => P.Type == "public_key");
         if (claim != null)
         {
             public_key = claim.Value;
         }
-        return (user_id, no, user_name, app, public_key);
+        return (no, user_id, user_name, app, public_key);
     }
 
     /// <summary>
@@ -81,18 +82,16 @@ public class ServiceUser
     /// </summary>
     /// <param name="no">登录唯一码</param>
     /// <param name="user">用户信息</param>
-    /// <param name="timeout"></param>
-    /// <param name="app"></param>
-    /// <returns></returns>
-    public string GenerateToken(long no, Users user, string app)
+    /// <param name="app">终端类型</param>
+    /// <returns>jwt</returns>
+    public string GenerateToken(long no, Users user, E_App app)
     {
         var claims = new[]
             {
                 new Claim("no",no.ToString()),
                 new Claim("user_id",user.user_id.ToString()),
                 new Claim("user_name",user.user_name),
-                new Claim("app", app),
-                new Claim("public_key", user.public_key),
+                new Claim("app", app.ToString()),
             };
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(FactoryService.instance.constant.config["Jwt:SecretKey"]));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -100,7 +99,7 @@ public class ServiceUser
             issuer: FactoryService.instance.constant.config["Jwt:Issuer"],// 签发者
             audience: FactoryService.instance.constant.config["Jwt:Audience"],// 接收者
             expires: DateTime.Now.AddMinutes(double.Parse(FactoryService.instance.constant.config["Jwt:Expires"])),// 过期时间
-            claims: claims,// payload
+            claims: claims,
             signingCredentials: creds);// 令牌
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
@@ -204,28 +203,31 @@ public class ServiceUser
     /// <param name="app">登录终端</param>
     /// <param name="ip">登录ip</param>
     /// <returns></returns>
-    public Res<ResUser> Login(string email, string password, string app, string ip)
+    public Res<ResUser> Login(string email, string password, E_App app, string ip)
     {
         Res<ResUser> res = new Res<ResUser>();
         res.success = false;
         res.code = E_Res_Code.fail;
-
         using (var scope = FactoryService.instance.constant.provider.CreateScope())
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
-                var user = db.Users.FirstOrDefault(P => P.disabled == false && (P.phone == email || P.email == email) && P.password == password);
+                var user = db.Users.FirstOrDefault(P => P.disabled == false && (P.phone == email || P.email == email) && P.password == Encryption.SHA256Encrypt(password));
                 if (user == null)
                 {
-                    res.message = "账户名或密码错误";
+                    res.success = false;
+                    res.code = E_Res_Code.name_password_error;
+                    res.message = "账户或密码错误,登陆失败";
                     return res;
                 }
                 FactoryService.instance.constant.redis.KeyDelete(FactoryService.instance.GetRedisVerificationCode(email));
-                var token = GenerateToken(FactoryService.instance.constant.worker.NextId(), user, app);
-                res.data = user;
-                res.data.token = token;
+                long no = FactoryService.instance.constant.worker.NextId();
+
+                var token = GenerateToken(no, user, app);
                 res.success = true;
                 res.code = E_Res_Code.ok;
+                res.data = user;
+                res.data.token = token;
                 return res;
             }
         }
@@ -235,9 +237,36 @@ public class ServiceUser
     /// 登出
     /// </summary>
     /// <returns></returns>
-    public Res<bool> Logout(long uid)
+    public Res<bool> Logout(long no, long uid, E_App app)
     {
         Res<bool> res = new Res<bool>();
+        FactoryService.instance.constant.redis.HashSet(FactoryService.instance.GetRedisBlacklist(), $"{uid}_{no}", $"{app}");
+
+        // ModelResult<bool> result = new ModelResult<bool>();
+        // result.data = true;
+        // try
+        // {
+        //     if (login_playInfo_id <= 0)
+        //     {
+        //         return result;
+        //     }
+        //     int LoginTimeout = this._config.GetValue<int>("LoginTimeout");
+        //     long timeout = new DateTimeOffset(DateTime.UtcNow.AddMinutes(LoginTimeout)).ToUnixTimeSeconds();
+        //     this.redisCacheClient.GetDbFromConfiguration().HashDeleteAsync(Const.redis_online, $"{this.login_playInfo_id}_{this.login_playInfo_no}").Wait();
+        //     this.redisCacheClient.GetDbFromConfiguration().HashSetAsync(Const.redis_blacklist, $"{this.login_playInfo_id}_{this.login_playInfo_no}", $"{timeout.ToString()}_{(int)ResultCode.no_permission}").Wait();
+        //     this._logger.LogTrace(eventId, $"url:/play/Logout.描述:1:退出登录.参数:无.结果:{JsonConvert.SerializeObject(result)}");
+        // }
+        // catch (System.Exception ex)
+        // {
+        //     result.code = ResultCode.error_server;
+        //     result.message = ex.Message;
+        //     this._logger.LogError(eventId, ex, $"url:/play/Logout.描述:1:退出登录.参数:无.");
+        // }
+        // return result;
+
+
+
+
         return res;
     }
 

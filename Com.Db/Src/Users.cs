@@ -60,8 +60,8 @@ public class Users : ResUser
     /// google验证器密钥
     /// </summary>
     /// <value></value>
-    [JsonIgnore]
-    public string? google_private_key { get; set; }
+    // [JsonIgnore]
+    // public string? google_private_key { get; set; }
     /// <summary>
     /// sha公钥
     /// </summary>

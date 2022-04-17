@@ -182,7 +182,7 @@ public class ServiceUser
                     recommend = recommend,
                     vip = vip0?.id ?? 0,
                     google_key = null,
-                    google_private_key = null,
+                    // google_private_key = null,
                     public_key = key_res.public_key,
                     private_key = key_res.private_key,
                 };

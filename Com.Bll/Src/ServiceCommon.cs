@@ -22,6 +22,11 @@ public class ServiceCommon
     /// </summary>
     /// <returns></returns>
     private Common common = new Common();
+    /// <summary>
+    /// 用户服务
+    /// </summary>
+    /// <returns></returns>
+    private ServiceUser service_user = new ServiceUser();
 
     /// <summary>
     /// 初始化
@@ -52,7 +57,7 @@ public class ServiceCommon
     /// <param name="issuer">签发者</param>
     /// <param name="user_id">用户id</param>
     /// <returns></returns>
-    public string Create2FA(string issuer, long user_id)
+    public string? CreateGoogle2FA(string issuer, long user_id)
     {
         TwoFactorAuthenticator tfa = new TwoFactorAuthenticator();
         string tempKey = common.CreateRandomCode(40);
@@ -61,18 +66,20 @@ public class ServiceCommon
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
                 Users? user = db.Users.FirstOrDefault(P => P.user_id == user_id);
-                if (user != null)
+                if (user != null && user.disabled == false)
                 {
                     SetupCode setupInfo = tfa.GenerateSetupCode(issuer, user.user_name, tempKey, 300, 300);
                     user.verify_google = true;
                     user.google_key = tempKey;
-                    user.google_private_key = setupInfo.ManualEntryKey;
-                    db.SaveChanges();
-                    return setupInfo.ManualEntryKey;
+                    // user.google_private_key = setupInfo.ManualEntryKey;
+                    if (db.SaveChanges() > 0)
+                    {
+                        return setupInfo.ManualEntryKey;
+                    }
                 }
             }
         }
-        return "";
+        return null;
     }
 
     /// <summary>
@@ -81,21 +88,37 @@ public class ServiceCommon
     /// <param name="google_key">google key</param>
     /// <param name="_2FA">google验证码</param>
     /// <returns></returns>
-    public bool Verification2FA(string google_key, string _2FA)
+    public bool Verification2FA(long uid, string _2FA)
     {
-        return new TwoFactorAuthenticator().ValidateTwoFactorPIN(google_key, _2FA);
+        Users? user = service_user.GetUser(uid);
+        if (user == null || user.disabled == true || user.verify_google == false)
+        {
+            return false;
+        }
+        return new TwoFactorAuthenticator().ValidateTwoFactorPIN(user.google_key, _2FA);
     }
 
-    
 
-    
+
+
     /// <summary>
     /// 发送邮件
     /// </summary>
-    /// <param name="email"></param>
-    /// <param name="content"></param>
+    /// <param name="email">邮箱地址</param>
+    /// <param name="content">内容</param>
     /// <returns></returns>
     public bool SendEmail(string email, string content)
+    {
+        return true;
+    }
+
+    /// <summary>
+    /// 发送手机短信
+    /// </summary>
+    /// <param name="phone">手机号码</param>
+    /// <param name="content">内容</param>
+    /// <returns></returns>
+    public bool SendPhone(string phone, string content)
     {
         return true;
     }

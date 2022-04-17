@@ -105,6 +105,10 @@ public enum E_Res_Code
     /// 登录账号或密码错误
     /// </summary>
     name_password_error,
+    /// <summary>
+    /// 用户禁用
+    /// </summary>
+    user_disable,
 
     //////订单相关错误码/////////////////////////////////////////////////////////////////////
 

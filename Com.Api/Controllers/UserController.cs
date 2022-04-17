@@ -76,14 +76,57 @@ public class UserController : ControllerBase
 
     /// <summary>
     /// 验证Google验证码
-    /// </summary>   
+    /// </summary>
+    /// <param name="_2FA">google验证码</param>
     /// <returns></returns>
     [HttpPost]
     [Route("VerifyGoogle")]
-    public Res<bool> VerifyGoogle()
+    public Res<bool> VerifyGoogle(string _2FA)
     {
         Res<bool> res = new Res<bool>();
-        return res;
+        res.success = false;
+        res.code = E_Res_Code.fail;
+        res.data = service_common.Verification2FA(this.login.user_id, _2FA);
+        if (res.data == false)
+        {
+            res.success = false;
+            res.code = E_Res_Code.verification_error;
+            res.message = "验证码错误";
+            return res;
+        }
+        else
+        {
+            res.success = true;
+            res.code = E_Res_Code.ok;
+            return res;
+        }
+    }
+
+    // <summary>
+    /// 创建Google验证码
+    /// </summary>   
+    /// <returns></returns>
+    [HttpPost]
+    [Route("CreateGoogle")]
+    public Res<string?> CreateGoogle()
+    {
+        Res<string?> res = new Res<string?>();
+        res.success = false;
+        res.code = E_Res_Code.fail;
+        res.data = service_common.CreateGoogle2FA(FactoryService.instance.constant.config["Jwt:Issuer"], this.login.user_id);
+        if (string.IsNullOrWhiteSpace(res.data))
+        {
+            res.success = false;
+            res.code = E_Res_Code.user_disable;
+            res.message = "用户已禁用";
+            return res;
+        }
+        else
+        {
+            res.success = true;
+            res.code = E_Res_Code.ok;
+            return res;
+        }
     }
 
     /// <summary>

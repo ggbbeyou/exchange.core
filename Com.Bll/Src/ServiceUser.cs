@@ -200,8 +200,6 @@ public class ServiceUser
     /// </summary>
     /// <param name="email">账号</param>
     /// <param name="password">密码</param>
-    /// <param name="no">验证码编号</param>
-    /// <param name="code">验证码</param>
     /// <param name="app">登录终端</param>
     /// <param name="ip">登录ip</param>
     /// <returns></returns>
@@ -225,12 +223,11 @@ public class ServiceUser
                 FactoryService.instance.constant.redis.KeyDelete(FactoryService.instance.GetRedisVerificationCode(email));
                 long no = FactoryService.instance.constant.worker.NextId();
                 FactoryService.instance.constant.redis.HashDelete(FactoryService.instance.GetRedisBlacklist(), $"{user.user_id}_{app}_*");
-                FactoryService.instance.constant.redis.HashSet(FactoryService.instance.GetRedisOnline(), $"{user.user_id}", $"{user.user_name}_{JsonConvert.SerializeObject(DateTimeOffset.UtcNow)}");
-                var token = GenerateToken(no, user, app);
+                FactoryService.instance.constant.redis.StringSet(FactoryService.instance.GetRedisOnline(no), $"{user.user_id}_{user.user_name}_{app}", new TimeSpan(0, 0, int.Parse(FactoryService.instance.constant.config["Jwt:Expires"])));
                 res.success = true;
                 res.code = E_Res_Code.ok;
                 res.data = user;
-                res.data.token = token;
+                res.data.token = GenerateToken(no, user, app);
                 return res;
             }
         }
@@ -239,37 +236,18 @@ public class ServiceUser
     /// <summary>
     /// 登出
     /// </summary>
+    /// <param name="no">登录编号</param>
+    /// <param name="uid">用户id</param>
+    /// <param name="app">终端</param>
     /// <returns></returns>
     public Res<bool> Logout(long no, long uid, E_App app)
     {
         Res<bool> res = new Res<bool>();
         FactoryService.instance.constant.redis.HashSet(FactoryService.instance.GetRedisBlacklist(), $"{uid}_{app}_{no}", DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
-        FactoryService.instance.constant.redis.HashDelete(FactoryService.instance.GetRedisOnline(), $"{uid}");
-        // ModelResult<bool> result = new ModelResult<bool>();
-        // result.data = true;
-        // try
-        // {
-        //     if (login_playInfo_id <= 0)
-        //     {
-        //         return result;
-        //     }
-        //     int LoginTimeout = this._config.GetValue<int>("LoginTimeout");
-        //     long timeout = new DateTimeOffset(DateTime.UtcNow.AddMinutes(LoginTimeout)).ToUnixTimeSeconds();
-        //     this.redisCacheClient.GetDbFromConfiguration().HashDeleteAsync(Const.redis_online, $"{this.login_playInfo_id}_{this.login_playInfo_no}").Wait();
-        //     this.redisCacheClient.GetDbFromConfiguration().HashSetAsync(Const.redis_blacklist, $"{this.login_playInfo_id}_{this.login_playInfo_no}", $"{timeout.ToString()}_{(int)ResultCode.no_permission}").Wait();
-        //     this._logger.LogTrace(eventId, $"url:/play/Logout.描述:1:退出登录.参数:无.结果:{JsonConvert.SerializeObject(result)}");
-        // }
-        // catch (System.Exception ex)
-        // {
-        //     result.code = ResultCode.error_server;
-        //     result.message = ex.Message;
-        //     this._logger.LogError(eventId, ex, $"url:/play/Logout.描述:1:退出登录.参数:无.");
-        // }
-        // return result;
-
-
-
-
+        FactoryService.instance.constant.redis.StringGetDelete(FactoryService.instance.GetRedisOnline(no));
+        res.success = true;
+        res.code = E_Res_Code.ok;
+        res.data = true;
         return res;
     }
 

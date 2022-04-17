@@ -119,9 +119,9 @@ public class FactoryService
     /// 登陆用户
     /// </summary>
     /// <returns></returns>
-    public string GetRedisOnline()
+    public string GetRedisOnline(long no)
     {
-        return string.Format("online");
+        return string.Format($"online:{no}");
     }
 
     /// <summary>

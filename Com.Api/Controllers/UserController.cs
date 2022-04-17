@@ -80,8 +80,8 @@ public class UserController : ControllerBase
     /// <param name="_2FA">google验证码</param>
     /// <returns></returns>
     [HttpPost]
-    [Route("VerifyCreateGoogle")]
-    public Res<bool> VerifyCreateGoogle(string _2FA)
+    [Route("VerifyApplyGoogle")]
+    public Res<bool> VerifyApplyGoogle(string _2FA)
     {
         Res<bool> res = new Res<bool>();
         res.success = false;

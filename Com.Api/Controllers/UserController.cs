@@ -75,34 +75,55 @@ public class UserController : ControllerBase
     }
 
     /// <summary>
-    /// 验证Google验证码
+    /// 新建Google验证,初次验证 
     /// </summary>
     /// <param name="_2FA">google验证码</param>
     /// <returns></returns>
     [HttpPost]
-    [Route("VerifyGoogle")]
-    public Res<bool> VerifyGoogle(string _2FA)
+    [Route("VerifyCreateGoogle")]
+    public Res<bool> VerifyCreateGoogle(string _2FA)
     {
         Res<bool> res = new Res<bool>();
         res.success = false;
         res.code = E_Res_Code.fail;
-        res.data = service_common.Verification2FA(this.login.user_id, _2FA);
-        if (res.data == false)
+        using (var scope = FactoryService.instance.constant.provider.CreateScope())
         {
-            res.success = false;
-            res.code = E_Res_Code.verification_error;
-            res.message = "验证码错误";
-            return res;
-        }
-        else
-        {
-            res.success = true;
-            res.code = E_Res_Code.ok;
-            return res;
+            using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
+            {
+                Users? user = db.Users.SingleOrDefault(P => P.user_id == this.login.user_id);
+                if (user == null || user.disabled == true || user.verify_google == true)
+                {
+                    res.success = false;
+                    res.code = E_Res_Code.user_disable;
+                    res.data = false;
+                    res.message = "用户被禁用或已经验证过";
+                    return res;
+                }
+                else
+                {
+                    res.data = service_common.Verification2FA(user.user_id, _2FA);
+                    if (res.data == false)
+                    {
+                        res.success = false;
+                        res.code = E_Res_Code.verification_error;
+                        res.message = "验证码错误";
+                        return res;
+                    }
+                    else
+                    {
+                        user.verify_google = true;
+                        db.Users.Update(user);
+                        db.SaveChanges();
+                        res.success = true;
+                        res.code = E_Res_Code.ok;
+                        return res;
+                    }
+                }
+            }
         }
     }
 
-    // <summary>
+    /// <summary>
     /// 创建Google验证码
     /// </summary>   
     /// <returns></returns>

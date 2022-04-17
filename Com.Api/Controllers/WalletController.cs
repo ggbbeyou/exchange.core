@@ -93,7 +93,7 @@ public class WalletController : ControllerBase
                            from bb in temp.DefaultIfEmpty()
                            select new Wallet
                            {
-                               wallet_id = bb == null ? 0 : bb.user_id,
+                               wallet_id = bb == null ? FactoryService.instance.constant.worker.NextId() : bb.user_id,
                                wallet_type = wallet_type,
                                user_id = this.login.user_id,
                                user_name = this.login.user_name,

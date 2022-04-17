@@ -93,13 +93,17 @@ public class ServiceUser
                 new Claim("user_id",user.user_id.ToString()),
                 new Claim("user_name",user.user_name),
                 new Claim("app", app.ToString()),
+                // new Claim("name",user.user_name),
+                // new Claim("iis",FactoryService.instance.constant.config["Jwt:Issuer"]),
+                // new Claim("aud",FactoryService.instance.constant.config["Jwt:Audience"]),
+                // new Claim("sub","aaa"),
             };
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(FactoryService.instance.constant.config["Jwt:SecretKey"]));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
         var token = new JwtSecurityToken(
             issuer: FactoryService.instance.constant.config["Jwt:Issuer"],// 签发者
             audience: FactoryService.instance.constant.config["Jwt:Audience"],// 接收者
-            expires: DateTimeOffset.UtcNow.AddMinutes(double.Parse(FactoryService.instance.constant.config["Jwt:Expires"])).DateTime,// 过期时间
+            expires: DateTimeOffset.UtcNow.AddMinutes(double.Parse(FactoryService.instance.constant.config["Jwt:Expires"])).LocalDateTime,// 过期时间
             claims: claims,
             signingCredentials: creds);// 令牌
         return new JwtSecurityTokenHandler().WriteToken(token);

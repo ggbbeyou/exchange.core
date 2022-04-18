@@ -484,11 +484,11 @@ public class MatchCore
                         }
                     }
                     this.fixed_ask.RemoveAll(P => P.state == E_OrderState.completed || P.state == E_OrderState.cancel);
-                    if (order.state == E_OrderState.unsold || order.state == E_OrderState.partial)
-                    {
-                        order.state = E_OrderState.cancel;
-                        cancels.Add(order);
-                    }
+                }
+                if (order.state == E_OrderState.unsold || order.state == E_OrderState.partial)
+                {
+                    order.state = E_OrderState.cancel;
+                    cancels.Add(order);
                 }
             }
             else if (order.type == E_OrderType.limit)
@@ -516,12 +516,12 @@ public class MatchCore
                         fixed_ask.RemoveAll(P => P.state == E_OrderState.completed || P.state == E_OrderState.cancel);
                     }
                 }
-            }
-            //限价买单没成交部分添加到限价买单相应的位置,(价格优先,时间优先原则)
-            if (order.state == E_OrderState.unsold || order.state == E_OrderState.partial)
-            {
-                fixed_bid.Add(order);
-                fixed_bid = fixed_bid.OrderByDescending(P => P.price).ThenBy(P => P.create_time).ToList();
+                //限价买单没成交部分添加到限价买单相应的位置,(价格优先,时间优先原则)
+                if (order.state == E_OrderState.unsold || order.state == E_OrderState.partial)
+                {
+                    fixed_bid.Add(order);
+                    fixed_bid = fixed_bid.OrderByDescending(P => P.price).ThenBy(P => P.create_time).ToList();
+                }
             }
         }
         else if (order.side == E_OrderSide.sell)
@@ -542,11 +542,11 @@ public class MatchCore
                         }
                     }
                     fixed_bid.RemoveAll(P => P.state == E_OrderState.completed || P.state == E_OrderState.cancel);
-                    if (order.state == E_OrderState.unsold || order.state == E_OrderState.partial)
-                    {
-                        order.state = E_OrderState.cancel;
-                        cancels.Add(order);
-                    }
+                }
+                if (order.state == E_OrderState.unsold || order.state == E_OrderState.partial)
+                {
+                    order.state = E_OrderState.cancel;
+                    cancels.Add(order);
                 }
             }
             else if (order.type == E_OrderType.limit)
@@ -574,12 +574,12 @@ public class MatchCore
                         fixed_bid.RemoveAll(P => P.state == E_OrderState.completed || P.state == E_OrderState.cancel);
                     }
                 }
-            }
-            //限价卖单没成交部分添加到限价卖单相应的位置,(价格优先,时间优先原则)
-            if (order.state == E_OrderState.unsold || order.state == E_OrderState.partial)
-            {
-                fixed_ask.Add(order);
-                fixed_ask = fixed_ask.OrderBy(P => P.price).ThenBy(P => P.create_time).ToList();
+                //限价卖单没成交部分添加到限价卖单相应的位置,(价格优先,时间优先原则)
+                if (order.state == E_OrderState.unsold || order.state == E_OrderState.partial)
+                {
+                    fixed_ask.Add(order);
+                    fixed_ask = fixed_ask.OrderBy(P => P.price).ThenBy(P => P.create_time).ToList();
+                }
             }
         }
         return (orders, deals, cancels);

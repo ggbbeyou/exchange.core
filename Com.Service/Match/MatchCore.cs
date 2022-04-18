@@ -605,6 +605,22 @@ public class MatchCore
             return null;
         }
         DateTimeOffset now = DateTimeOffset.UtcNow;
+        if ((bid.state == E_OrderState.unsold || bid.state == E_OrderState.partial) && ((bid.trigger_cancel_price > 0 && bid.trigger_cancel_price >= price)))
+        {
+            bid.state = E_OrderState.cancel;
+            bid.deal_last_time = now;
+            cancels.Add(CopyOrders(bid));
+        }
+        if ((ask.state == E_OrderState.unsold || ask.state == E_OrderState.partial) && ((ask.trigger_cancel_price > 0 && ask.trigger_cancel_price <= price)))
+        {
+            ask.state = E_OrderState.cancel;
+            ask.deal_last_time = now;
+            cancels.Add(CopyOrders(ask));
+        }
+        if (bid.state == E_OrderState.cancel || ask.state == E_OrderState.cancel)
+        {
+            return null;
+        }
         decimal bid_amount_unsold = Math.Round(bid.unsold / price, this.model.info.places_amount, MidpointRounding.ToNegativeInfinity);
         decimal amount = 0;
         if (bid_amount_unsold > ask.unsold)
@@ -669,18 +685,7 @@ public class MatchCore
         orders.RemoveAll(P => P.order_id == bid.order_id || P.order_id == ask.order_id);
         orders.Add(CopyOrders(bid));
         orders.Add(CopyOrders(ask));
-        if ((bid.state == E_OrderState.unsold || bid.state == E_OrderState.partial) && ((bid.trigger_cancel_price > 0 && bid.trigger_cancel_price >= price)))
-        {
-            bid.state = E_OrderState.cancel;
-            bid.deal_last_time = now;
-            cancels.Add(CopyOrders(bid));
-        }
-        if ((ask.state == E_OrderState.unsold || ask.state == E_OrderState.partial) && ((ask.trigger_cancel_price > 0 && ask.trigger_cancel_price <= price)))
-        {
-            ask.state = E_OrderState.cancel;
-            ask.deal_last_time = now;
-            cancels.Add(CopyOrders(ask));
-        }
+
         List<Orders> trigger_order = trigger.Where(P => (P.side == E_OrderSide.buy && P.trigger_hanging_price <= price) || (P.side == E_OrderSide.sell && P.trigger_hanging_price >= price)).ToList();
         if (trigger_order.Count > 0)
         {

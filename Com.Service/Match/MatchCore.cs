@@ -632,7 +632,7 @@ public class MatchCore
         bid.deal_total += (amount * price);
         ask.deal_total += (amount * price);
         bid.deal_price = Math.Round(bid.deal_total / bid.deal_amount, this.model.info.places_price);
-        ask.deal_price = Math.Round(bid.deal_total / bid.deal_amount, this.model.info.places_price);
+        ask.deal_price = Math.Round(ask.deal_total / ask.deal_amount, this.model.info.places_price);
         bid.unsold -= (amount * price);
         ask.unsold -= amount;
         bid.deal_last_time = now;

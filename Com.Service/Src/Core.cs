@@ -229,9 +229,10 @@ public class Core
                         if (service_wallet.FreezeChange(wallet_type, item.uid, this.model.info.coin_id_quote, -item.unsold))
                         {
                             item.order.ForEach(P => { P.complete_thaw = P.unsold; P.unsold = 0; });
-                            process.order_complete_thaw = process.order_complete_thaw && service_order.UpdateOrder(item.order);
                         }
                     }
+                    process.order_complete_thaw = process.order_complete_thaw && service_order.UpdateOrder(order_buy);
+
                     List<Orders> order_sell = orders.Distinct().Where(P => P.state == E_OrderState.completed && P.unsold > 0 && P.side == E_OrderSide.sell).ToList();
                     var order_sell_uid = from o in order_sell
                                          group o by o.uid into g
@@ -241,9 +242,9 @@ public class Core
                         if (service_wallet.FreezeChange(wallet_type, item.uid, this.model.info.coin_id_base, -item.unsold))
                         {
                             item.order.ForEach(P => { P.complete_thaw = P.unsold; P.unsold = 0; });
-                            process.order_complete_thaw = process.order_complete_thaw && service_order.UpdateOrder(item.order);
                         }
                     }
+                    process.order_complete_thaw = process.order_complete_thaw && service_order.UpdateOrder(order_sell);
                     FactoryService.instance.constant.stopwatch.Stop();
                     FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>更新订单记录(完成解冻多余资金)");
                 }

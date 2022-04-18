@@ -666,16 +666,9 @@ public class MatchCore
             time = now,
         };
         deals.Add(deal);
+        orders.RemoveAll(P => P.order_id == bid.order_id || P.order_id == ask.order_id);
         orders.Add(CopyOrders(bid));
         orders.Add(CopyOrders(ask));
-        // if (!orders.Any(P => P.order_id == bid.order_id))
-        // {
-        //     orders.Add(CopyOrders(bid));
-        // }
-        // if (!orders.Any(P => P.order_id == ask.order_id))
-        // {
-        //     orders.Add(CopyOrders(ask));
-        // }
         if ((bid.state == E_OrderState.unsold || bid.state == E_OrderState.partial) && ((bid.trigger_cancel_price > 0 && bid.trigger_cancel_price >= price)))
         {
             bid.state = E_OrderState.cancel;

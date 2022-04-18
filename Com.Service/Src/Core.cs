@@ -232,7 +232,6 @@ public class Core
                         }
                     }
                     process.order_complete_thaw = process.order_complete_thaw && service_order.UpdateOrder(order_buy);
-
                     List<Orders> order_sell = orders.Distinct().Where(P => P.state == E_OrderState.completed && P.unsold > 0 && P.side == E_OrderSide.sell).ToList();
                     var order_sell_uid = from o in order_sell
                                          group o by o.uid into g

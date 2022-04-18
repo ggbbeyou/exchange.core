@@ -598,7 +598,7 @@ public class MatchCore
     /// <returns>最新成交价</returns>
     public decimal? CreateDeal(Orders bid, Orders ask, decimal price, E_OrderSide trigger_side, List<Orders> orders, List<Deal> deals, List<Orders> cancels)
     {
-        if (price <= 0 || bid.state == E_OrderState.completed || bid.state == E_OrderState.cancel || ask.state == E_OrderState.completed || ask.state == E_OrderState.cancel)
+        if (price <= 0 || bid.state == E_OrderState.completed || bid.state == E_OrderState.cancel || ask.state == E_OrderState.completed || ask.state == E_OrderState.cancel || bid.trade_model != ask.trade_model)
         {
             return null;
         }
@@ -664,14 +664,16 @@ public class MatchCore
             time = now,
         };
         deals.Add(deal);
-        if (!orders.Any(P => P.order_id == bid.order_id))
-        {
-            orders.Add(CopyOrders(bid));
-        }
-        if (!orders.Any(P => P.order_id == ask.order_id))
-        {
-            orders.Add(CopyOrders(ask));
-        }
+        orders.Add(CopyOrders(bid));
+        orders.Add(CopyOrders(ask));
+        // if (!orders.Any(P => P.order_id == bid.order_id))
+        // {
+        //     orders.Add(CopyOrders(bid));
+        // }
+        // if (!orders.Any(P => P.order_id == ask.order_id))
+        // {
+        //     orders.Add(CopyOrders(ask));
+        // }
         if ((bid.state == E_OrderState.unsold || bid.state == E_OrderState.partial) && ((bid.trigger_cancel_price > 0 && bid.trigger_cancel_price >= price)))
         {
             bid.state = E_OrderState.cancel;
@@ -685,11 +687,12 @@ public class MatchCore
         List<Orders> trigger_order = trigger.Where(P => (P.side == E_OrderSide.buy && P.trigger_hanging_price <= price) || (P.side == E_OrderSide.sell && P.trigger_hanging_price >= price)).ToList();
         if (trigger_order.Count > 0)
         {
-            this.trigger.RemoveAll(P => trigger_order.Select(T => T.order_id).Contains(P.order_id));
             trigger_order.ForEach(P =>
             {
                 P.state = E_OrderState.unsold;
+                P.create_time = now;
             });
+            this.trigger.RemoveAll(P => trigger_order.Select(T => T.order_id).Contains(P.order_id));
             ReqCall<List<Orders>> call_req = new ReqCall<List<Orders>>();
             call_req.op = E_Op.place;
             call_req.market = this.model.info.market;

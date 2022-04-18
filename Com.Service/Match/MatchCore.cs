@@ -666,21 +666,21 @@ public class MatchCore
         deals.Add(deal);
         if (!orders.Any(P => P.order_id == bid.order_id))
         {
-            orders.Add(bid);
+            orders.Add(CopyOrders(bid));
         }
         if (!orders.Any(P => P.order_id == ask.order_id))
         {
-            orders.Add(ask);
+            orders.Add(CopyOrders(ask));
         }
         if ((bid.state == E_OrderState.unsold || bid.state == E_OrderState.partial) && ((bid.trigger_cancel_price > 0 && bid.trigger_cancel_price >= price)))
         {
             bid.state = E_OrderState.cancel;
-            cancels.Add(bid);
+            cancels.Add(CopyOrders(bid));
         }
         if ((ask.state == E_OrderState.unsold || ask.state == E_OrderState.partial) && ((ask.trigger_cancel_price > 0 && ask.trigger_cancel_price <= price)))
         {
             ask.state = E_OrderState.cancel;
-            cancels.Add(ask);
+            cancels.Add(CopyOrders(ask));
         }
         List<Orders> trigger_order = trigger.Where(P => (P.side == E_OrderSide.buy && P.trigger_hanging_price <= price) || (P.side == E_OrderSide.sell && P.trigger_hanging_price >= price)).ToList();
         if (trigger_order.Count > 0)
@@ -697,5 +697,43 @@ public class MatchCore
             FactoryService.instance.constant.MqSend(FactoryService.instance.GetMqOrderPlace(this.model.info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(call_req)));
         }
         return price;
+    }
+
+    /// <summary>
+    /// 复制订单
+    /// </summary>
+    /// <param name="orders"></param>
+    /// <returns></returns>
+    private Orders CopyOrders(Orders orders)
+    {
+        Orders new_orders = new Orders()
+        {
+            order_id = orders.order_id,
+            client_id = orders.client_id,
+            market = orders.market,
+            symbol = orders.symbol,
+            uid = orders.uid,
+            user_name = orders.user_name,
+            side = orders.side,
+            state = orders.state,
+            type = orders.type,
+            trade_model = orders.trade_model,
+            price = orders.price,
+            amount = orders.amount,
+            total = orders.total,
+            deal_price = orders.deal_price,
+            deal_amount = orders.deal_amount,
+            deal_total = orders.deal_total,
+            unsold = orders.unsold,
+            complete_thaw = orders.complete_thaw,
+            fee_maker = orders.fee_maker,
+            fee_taker = orders.fee_taker,
+            trigger_hanging_price = orders.trigger_hanging_price,
+            trigger_cancel_price = orders.trigger_cancel_price,
+            create_time = orders.create_time,
+            deal_last_time = orders.deal_last_time,
+            remarks = orders.remarks,
+        };
+        return new_orders;
     }
 }

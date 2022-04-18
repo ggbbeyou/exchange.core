@@ -370,8 +370,7 @@ public class Core
                         item.order.ForEach(P => { P.complete_thaw = P.unsold; P.unsold = 0; });
                     }
                 }
-                List<Orders> order_sell = 
-                .Distinct().Where(P => P.state == E_OrderState.cancel && P.unsold > 0 && P.side == E_OrderSide.sell).ToList();
+                List<Orders> order_sell = cancels.Distinct().Where(P => P.state == E_OrderState.cancel && P.unsold > 0 && P.side == E_OrderSide.sell).ToList();
                 var order_sell_uid = from o in order_sell
                                      group o by o.uid into g
                                      select new { uid = g.Key, unsold = g.Sum(P => P.unsold), order = g.ToList() };

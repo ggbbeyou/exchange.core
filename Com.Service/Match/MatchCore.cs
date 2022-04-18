@@ -488,6 +488,7 @@ public class MatchCore
                 if (order.state == E_OrderState.unsold || order.state == E_OrderState.partial)
                 {
                     order.state = E_OrderState.cancel;
+                    order.deal_last_time = DateTimeOffset.UtcNow;
                     cancels.Add(order);
                 }
             }
@@ -546,6 +547,7 @@ public class MatchCore
                 if (order.state == E_OrderState.unsold || order.state == E_OrderState.partial)
                 {
                     order.state = E_OrderState.cancel;
+                    order.deal_last_time = DateTimeOffset.UtcNow;
                     cancels.Add(order);
                 }
             }
@@ -677,11 +679,13 @@ public class MatchCore
         if ((bid.state == E_OrderState.unsold || bid.state == E_OrderState.partial) && ((bid.trigger_cancel_price > 0 && bid.trigger_cancel_price >= price)))
         {
             bid.state = E_OrderState.cancel;
+            bid.deal_last_time = now;
             cancels.Add(CopyOrders(bid));
         }
         if ((ask.state == E_OrderState.unsold || ask.state == E_OrderState.partial) && ((ask.trigger_cancel_price > 0 && ask.trigger_cancel_price <= price)))
         {
             ask.state = E_OrderState.cancel;
+            ask.deal_last_time = now;
             cancels.Add(CopyOrders(ask));
         }
         List<Orders> trigger_order = trigger.Where(P => (P.side == E_OrderSide.buy && P.trigger_hanging_price <= price) || (P.side == E_OrderSide.sell && P.trigger_hanging_price >= price)).ToList();

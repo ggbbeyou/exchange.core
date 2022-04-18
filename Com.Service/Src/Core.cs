@@ -220,7 +220,7 @@ public class Core
                     {
                         wallet_type = E_WalletType.spot;
                     }
-                    List<Orders> order_buy = orders.Distinct().Where(P => (P.state == E_OrderState.completed || P.state == E_OrderState.cancel) && P.unsold > 0 && P.side == E_OrderSide.buy).ToList();
+                    List<Orders> order_buy = orders.Distinct().Where(P => P.state == E_OrderState.completed && P.unsold > 0 && P.side == E_OrderSide.buy).ToList();
                     var order_buy_uid = from o in order_buy
                                         group o by o.uid into g
                                         select new { uid = g.Key, unsold = g.Sum(P => P.unsold), order = g.ToList() };
@@ -232,7 +232,7 @@ public class Core
                             process.order_complete_thaw = process.order_complete_thaw && service_order.UpdateOrder(item.order);
                         }
                     }
-                    List<Orders> order_sell = orders.Distinct().Where(P => (P.state == E_OrderState.completed || P.state == E_OrderState.cancel) && P.unsold > 0 && P.side == E_OrderSide.sell).ToList();
+                    List<Orders> order_sell = orders.Distinct().Where(P => P.state == E_OrderState.completed && P.unsold > 0 && P.side == E_OrderSide.sell).ToList();
                     var order_sell_uid = from o in order_sell
                                          group o by o.uid into g
                                          select new { uid = g.Key, unsold = g.Sum(P => P.unsold), order = g.ToList() };
@@ -354,6 +354,33 @@ public class Core
             if (process.order_cancel == false)
             {
                 FactoryService.instance.constant.stopwatch.Restart();
+                E_WalletType wallet_type = E_WalletType.main;
+                if (this.model.info.market_type == E_MarketType.spot)
+                {
+                    wallet_type = E_WalletType.spot;
+                }
+                List<Orders> order_buy = cancels.Distinct().Where(P => P.state == E_OrderState.cancel && P.unsold > 0 && P.side == E_OrderSide.buy).ToList();
+                var order_buy_uid = from o in order_buy
+                                    group o by o.uid into g
+                                    select new { uid = g.Key, unsold = g.Sum(P => P.unsold), order = g.ToList() };
+                foreach (var item in order_buy_uid)
+                {
+                    if (service_wallet.FreezeChange(wallet_type, item.uid, this.model.info.coin_id_quote, -item.unsold))
+                    {
+                        item.order.ForEach(P => { P.complete_thaw = P.unsold; P.unsold = 0; });
+                    }
+                }
+                List<Orders> order_sell = cancels.Distinct().Where(P => P.state == E_OrderState.cancel && P.unsold > 0 && P.side == E_OrderSide.sell).ToList();
+                var order_sell_uid = from o in order_sell
+                                     group o by o.uid into g
+                                     select new { uid = g.Key, unsold = g.Sum(P => P.unsold), order = g.ToList() };
+                foreach (var item in order_sell_uid)
+                {
+                    if (service_wallet.FreezeChange(wallet_type, item.uid, this.model.info.coin_id_base, -item.unsold))
+                    {
+                        item.order.ForEach(P => { P.complete_thaw = P.unsold; P.unsold = 0; });
+                    }
+                }
                 process.order_cancel = service_order.UpdateOrder(cancels);
                 FactoryService.instance.constant.stopwatch.Stop();
                 FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>撤单{cancels.Count}条订单记录");

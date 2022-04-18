@@ -677,7 +677,7 @@ public class MatchCore
             bid.state = E_OrderState.cancel;
             cancels.Add(bid);
         }
-        if ((ask.state == E_OrderState.unsold || ask.state == E_OrderState.partial) && ((bid.trigger_cancel_price > 0 && ask.trigger_cancel_price <= price)))
+        if ((ask.state == E_OrderState.unsold || ask.state == E_OrderState.partial) && ((ask.trigger_cancel_price > 0 && ask.trigger_cancel_price <= price)))
         {
             ask.state = E_OrderState.cancel;
             cancels.Add(ask);

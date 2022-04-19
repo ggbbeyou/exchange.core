@@ -326,7 +326,7 @@ public class TestController : ControllerBase
         for (int i = 0; i < count; i++)
         {
             Users user = users[FactoryService.instance.constant.random.Next(0, 10)];
-            Market market = markets[FactoryService.instance.constant.random.Next(0, 1)];
+            Market market = markets[FactoryService.instance.constant.random.Next(0, 2)];
             List<ReqOrder> reqOrders = new List<ReqOrder>();
             for (int j = 0; j < 1000; j++)
             {
@@ -346,7 +346,7 @@ public class TestController : ControllerBase
                     {
                         if (side == E_OrderSide.buy)
                         {
-                            total = FactoryService.instance.constant.random.NextInt64(10, 20) + Math.Round((decimal)FactoryService.instance.constant.random.NextDouble() + market.trade_min, market.places_price + market.places_amount);
+                            total = FactoryService.instance.constant.random.NextInt64(30, 50) + Math.Round((decimal)FactoryService.instance.constant.random.NextDouble() + market.trade_min, market.places_price + market.places_amount);
                         }
                         else if (side == E_OrderSide.sell)
                         {

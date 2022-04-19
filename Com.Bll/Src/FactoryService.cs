@@ -174,4 +174,13 @@ public class FactoryService
         return string.Format("{0}_{1}", channel, data);
     }
 
+    /// <summary>
+    /// Minio:实名认证
+    /// </summary>
+    /// <returns></returns>
+    public string GetMinioRealname()
+    {
+        return string.Format("realname");
+    }
+
 }

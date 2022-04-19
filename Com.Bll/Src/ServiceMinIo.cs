@@ -113,22 +113,22 @@ public class ServiceMinio
     /// 文件上传，并返回http地址
     /// </summary>
     /// <param name="data">数据</param>
-    /// <param name="bucketName">桶名</param>
-    /// <param name="objectName">对象名 : /test/test.png</param>
+    /// <param name="bucket_name">桶名</param>
+    /// <param name="object_name">对象名 : /test/test.png</param>
     /// <param name="contentType">http内容类型</param>
     /// <returns></returns>
-    public async Task UploadFile(Stream data, string bucketName, string objectName, string contentType)
+    public async Task UploadFile(Stream data, string bucket_name, string object_name, string file_name, string contentType)
     {
         try
         {
             // bool found = await this.minio.BucketExistsAsync(bucketName);  
-            bool found = await this.minio.BucketExistsAsync(new BucketExistsArgs().WithBucket(bucketName));
+            bool found = await this.minio.BucketExistsAsync(new BucketExistsArgs().WithBucket(bucket_name));
             if (!found)
             {
-                await this.minio.MakeBucketAsync(new MakeBucketArgs().WithBucket(bucketName));
+                await this.minio.MakeBucketAsync(new MakeBucketArgs().WithBucket(bucket_name));
             }
             // var ssec = new SSEC(aesEncryption.Key);
-            PutObjectArgs putObjectArgs = new PutObjectArgs().WithBucket(bucketName).WithObject(objectName).WithFileName("/mnt/photos/island.jpg").WithStreamData(data).WithContentType(contentType);
+            PutObjectArgs putObjectArgs = new PutObjectArgs().WithBucket(bucket_name).WithObject(object_name).WithContentType(contentType).WithStreamData(data).WithObjectSize(data.Length);
             //  .WithServerSideEncryption(ssec);
             await this.minio.PutObjectAsync(putObjectArgs);//, objectName, data, data.Length, contentType);
             //return await this._minio.PresignedGetObjectAsync(bucketName, objectName, 60, contentType);

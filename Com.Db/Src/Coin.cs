@@ -21,17 +21,15 @@ public class Coin
     /// <value></value>
     public string coin_name { get; set; } = null!;
     /// <summary>
-    /// 价格小数位数
+    /// 全名
     /// </summary>
     /// <value></value>
-    [JsonConverter(typeof(JsonConverterDecimal))]
-    public decimal price_places { get; set; }
+    public string full_name { get; set; } = null!;
     /// <summary>
-    /// 量小数位数
+    /// 图标地址
     /// </summary>
     /// <value></value>
-    [JsonConverter(typeof(JsonConverterDecimal))]
-    public decimal amount_places { get; set; }
+    public string icon { get; set; } = null!;
     /// <summary>
     /// 合约地址
     /// </summary>

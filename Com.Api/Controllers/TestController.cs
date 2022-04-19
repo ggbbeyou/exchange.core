@@ -80,24 +80,24 @@ public class TestController : ControllerBase
         {
             coin_id = FactoryService.instance.constant.worker.NextId(),
             coin_name = "usdt",
-            price_places = 8,
-            amount_places = 8,
+            full_name = "USDT",
+            icon = "https://www.baidu.com/img/bd_logo1.png",
             contract = "",
         };
         Coin btc = new Coin()
         {
             coin_id = FactoryService.instance.constant.worker.NextId(),
             coin_name = "btc",
-            price_places = 8,
-            amount_places = 8,
+            full_name = "BTC",
+            icon = "https://www.baidu.com/img/bd_logo1.png",
             contract = "",
         };
         Coin eth = new Coin()
         {
             coin_id = FactoryService.instance.constant.worker.NextId(),
             coin_name = "eth",
-            price_places = 8,
-            amount_places = 8,
+            full_name = "ETH",
+            icon = "https://www.baidu.com/img/bd_logo1.png",
             contract = "",
         };
         this.db.Coin.Add(usdt);

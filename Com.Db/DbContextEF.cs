@@ -111,9 +111,9 @@ public class DbContextEF : DbContext
             o.HasKey(p => p.coin_id);
             o.HasIndex(P => new { P.coin_name }).IsUnique();
             o.Property(P => P.coin_id).IsRequired().ValueGeneratedNever().HasColumnType("bigint").HasComment("币id");
-            o.Property(P => P.coin_name).HasColumnType("nvarchar").HasMaxLength(20).HasComment("币名称");
-            o.Property(P => P.price_places).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("价格小数位数");
-            o.Property(P => P.amount_places).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("量小数位数");
+            o.Property(P => P.coin_name).IsRequired().HasColumnType("nvarchar").HasMaxLength(20).HasComment("币名称");
+            o.Property(P => P.full_name).HasColumnType("nvarchar").HasMaxLength(50).HasComment("全名");
+            o.Property(P => P.icon).HasColumnType("nvarchar").HasMaxLength(200).HasComment("图标地址");
             o.Property(P => P.contract).HasColumnType("nvarchar").HasMaxLength(200).HasComment("合约地址");
             o.ToTable(nameof(Coin));
         });

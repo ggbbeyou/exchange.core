@@ -40,15 +40,23 @@ public class UserController : ControllerBase
     /// </summary>
     /// <returns></returns>
     private ServiceUser service_user = new ServiceUser();
+    /// <summary>
+    /// 文件服务
+    /// </summary>
+    /// <returns></returns>
+    private ServiceMinio service_minio = new ServiceMinio();
+
 
 
     /// <summary>
     /// 初始化
     /// </summary>
     /// <param name="logger"></param>
-    public UserController(ILogger<UserController> logger)
+    /// <param name="config"></param>
+    public UserController(ILogger<UserController> logger, IConfiguration config)
     {
         this.logger = logger;
+        this.service_minio.Init(config["minio:endpoint"], config["minio:accessKey"], config["minio:secretKey"], bool.Parse(config["minio:ssl"]));
     }
 
     /// <summary>
@@ -162,6 +170,28 @@ public class UserController : ControllerBase
     public Res<bool> VerifyRealname()
     {
         Res<bool> res = new Res<bool>();
+        return res;
+    }
+
+
+    /// <summary>
+    /// 验证实名认证
+    /// </summary>   
+    /// <returns></returns>
+    [HttpPost]
+    [Route("ApplyRealname")]
+    [AllowAnonymous]
+    public async Task<Res<bool>> ApplyRealname(IFormFile files)
+    {
+        Res<bool> res = new Res<bool>();
+        if (files == null || files.Length <= 0)
+        {
+            res.code = E_Res_Code.fail;
+            res.message = "未找到文件";
+            return res;
+        }
+        Stream stream = files.OpenReadStream();
+        await service_minio.UploadFile(stream, "", files.FileName, files.ContentType);
         return res;
     }
 

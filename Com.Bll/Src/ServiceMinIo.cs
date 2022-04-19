@@ -19,7 +19,7 @@ namespace Com.Bll;
 /// <summary>
 /// minio服务
 /// </summary>
-public class ServiceMinIo
+public class ServiceMinio
 {
     /// <summary>
     /// 日志接口
@@ -28,7 +28,7 @@ public class ServiceMinIo
     /// <summary>
     /// minio服务器
     /// </summary>
-    public readonly MinioClient minio;
+    public MinioClient minio;
     /// <summary>
     /// 默认桶名
     /// </summary>
@@ -79,15 +79,10 @@ public class ServiceMinIo
     /// <param name="access">账号</param>
     /// <param name="secret">密码</param>
     /// <param name="ssl">是否支持ssl</param>
-    public ServiceMinIo(ILogger logger, string endpoint, string access, string secret, bool ssl)
+    public ServiceMinio(ILogger? logger = null)
     {
         this.logger = logger ?? NullLogger.Instance;
-        this.minio = new MinioClient().WithEndpoint(endpoint).WithCredentials(access, secret);
-        if (ssl)
-        {
-            this.minio.WithSSL();
-        }
-        this.minio = this.minio.Build();
+
         this.dir.Add(0, "backstage");
         this.dir.Add(1, "avatar");
         this.dir.Add(2, "backstage");
@@ -95,6 +90,23 @@ public class ServiceMinIo
         this.dir.Add(4, "withdrawal");
         this.dir.Add(5, "complaint");
         this.dir.Add(6, "game");
+    }
+
+    /// <summary>
+    /// 初始化
+    /// </summary>    
+    /// <param name="endpoint">minio服务地址</param>
+    /// <param name="accessKey">账号</param>
+    /// <param name="secretKey">密码</param>
+    /// <param name="ssl">是否支持ssl</param>
+    public void Init(string endpoint, string accessKey, string secretKey, bool ssl)
+    {
+        this.minio = new MinioClient().WithEndpoint(endpoint).WithCredentials(accessKey, secretKey);
+        if (ssl)
+        {
+            this.minio.WithSSL();
+        }
+        this.minio = this.minio.Build();
     }
 
     /// <summary>

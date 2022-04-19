@@ -88,13 +88,8 @@ public class MQ
                                 continue;
                             }
                             deal.AddRange(match.deals);
-                            foreach (var item1 in match.orders)
-                            {
-                                if (!orders.Exists(P => P.order_id == item1.order_id))
-                                {
-                                    orders.Add(item1);
-                                }
-                            }
+                            orders.RemoveAll(P => match.orders.Select(P => P.order_id).Contains(P.order_id));
+                            orders.AddRange(match.orders);
                             cancel.AddRange(match.cancels);
                         }
                         FactoryService.instance.constant.stopwatch.Stop();

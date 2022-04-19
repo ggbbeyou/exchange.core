@@ -683,8 +683,10 @@ public class MatchCore
         };
         deals.Add(deal);
         orders.RemoveAll(P => P.order_id == bid.order_id || P.order_id == ask.order_id);
-        orders.Add(CopyOrders(bid));
-        orders.Add(CopyOrders(ask));
+        // orders.Add(CopyOrders(bid));
+        // orders.Add(CopyOrders(ask));
+        orders.Add(bid);
+        orders.Add(ask);
 
         List<Orders> trigger_order = trigger.Where(P => (P.side == E_OrderSide.buy && P.trigger_hanging_price <= price) || (P.side == E_OrderSide.sell && P.trigger_hanging_price >= price)).ToList();
         if (trigger_order.Count > 0)

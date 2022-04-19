@@ -24,11 +24,11 @@ public class ServiceMinIo
     /// <summary>
     /// 日志接口
     /// </summary>
-    private readonly ILogger _logger;
+    private readonly ILogger logger;
     /// <summary>
     /// minio服务器
     /// </summary>
-    public readonly MinioClient _minio;
+    public readonly MinioClient minio;
     /// <summary>
     /// 默认桶名
     /// </summary>
@@ -81,12 +81,13 @@ public class ServiceMinIo
     /// <param name="ssl">是否支持ssl</param>
     public ServiceMinIo(ILogger logger, string endpoint, string access, string secret, bool ssl)
     {
-        this._logger = logger ?? NullLogger.Instance;
-        this._minio = new MinioClient(endpoint, access, secret);
+        this.logger = logger ?? NullLogger.Instance;
+        this.minio = new MinioClient().WithEndpoint(endpoint).WithCredentials(access, secret);
         if (ssl)
         {
-            this._minio = this._minio.WithSSL();
+            this.minio.WithSSL();
         }
+        this.minio = this.minio.Build();
         this.dir.Add(0, "backstage");
         this.dir.Add(1, "avatar");
         this.dir.Add(2, "backstage");
@@ -108,17 +109,21 @@ public class ServiceMinIo
     {
         try
         {
-            bool found = await this._minio.BucketExistsAsync(bucketName);
+            // bool found = await this.minio.BucketExistsAsync(bucketName);  
+            bool found = await this.minio.BucketExistsAsync(new BucketExistsArgs().WithBucket(bucketName));
             if (!found)
             {
-                await this._minio.MakeBucketAsync(bucketName);
+                await this.minio.MakeBucketAsync(new MakeBucketArgs().WithBucket(bucketName));
             }
-            await this._minio.PutObjectAsync(bucketName, objectName, data, data.Length, contentType);
+            // var ssec = new SSEC(aesEncryption.Key);
+            PutObjectArgs putObjectArgs = new PutObjectArgs().WithBucket(bucketName).WithObject(objectName).WithFileName("/mnt/photos/island.jpg").WithStreamData(data).WithContentType(contentType);
+            //  .WithServerSideEncryption(ssec);
+            await this.minio.PutObjectAsync(putObjectArgs);//, objectName, data, data.Length, contentType);
             //return await this._minio.PresignedGetObjectAsync(bucketName, objectName, 60, contentType);
         }
         catch (System.Exception ex)
         {
-            this._logger.LogError(this.eventId, ex, "minio上传文件失败");
+            this.logger.LogError(this.eventId, ex, "minio上传文件失败");
         }
     }
 
@@ -135,17 +140,17 @@ public class ServiceMinIo
     {
         try
         {
-            bool found = await this._minio.BucketExistsAsync(bucketName);
+            bool found = await this.minio.BucketExistsAsync(bucketName);
             if (!found)
             {
-                await this._minio.MakeBucketAsync(bucketName);
+                await this.minio.MakeBucketAsync(bucketName);
             }
-            await this._minio.PutObjectAsync(bucketName, objectName, filePath, contentType);
+            await this.minio.PutObjectAsync(bucketName, objectName, filePath, contentType);
             //return await this._minio.PresignedGetObjectAsync(bucketName, objectName, 60, contentType);
         }
         catch (System.Exception ex)
         {
-            this._logger.LogError(this.eventId, ex, "minio上传文件失败");
+            this.logger.LogError(this.eventId, ex, "minio上传文件失败");
         }
     }
 
@@ -159,11 +164,11 @@ public class ServiceMinIo
     {
         try
         {
-            await this._minio.RemoveObjectAsync(bucketName, objectName);
+            await this.minio.RemoveObjectAsync(bucketName, objectName);
         }
         catch (System.Exception ex)
         {
-            this._logger.LogError(this.eventId, ex, "minio删除文件失败");
+            this.logger.LogError(this.eventId, ex, "minio删除文件失败");
         }
     }
 
@@ -176,11 +181,11 @@ public class ServiceMinIo
     {
         try
         {
-            await this._minio.RemoveBucketAsync(bucketName);
+            await this.minio.RemoveBucketAsync(bucketName);
         }
         catch (System.Exception ex)
         {
-            this._logger.LogError(this.eventId, ex, "minio删除桶失败");
+            this.logger.LogError(this.eventId, ex, "minio删除桶失败");
         }
     }
 
@@ -195,11 +200,11 @@ public class ServiceMinIo
     {
         try
         {
-            return await this._minio.PresignedGetObjectAsync(bucketName, objectName, 60 * 60 * 24);
+            return await this.minio.PresignedGetObjectAsync(bucketName, objectName, 60 * 60 * 24);
         }
         catch (MinioException e)
         {
-            this._logger.LogError(this.eventId, e, "minio创建下载地址失败");
+            this.logger.LogError(this.eventId, e, "minio创建下载地址失败");
             return "";
         }
     }
@@ -215,21 +220,21 @@ public class ServiceMinIo
     {
         try
         {
-            bool found = await this._minio.BucketExistsAsync(bucketName);
+            bool found = await this.minio.BucketExistsAsync(bucketName);
             if (found)
             {
-                IObservable<Item> observable = this._minio.ListObjectsAsync(bucketName, prefix, recursive);
+                IObservable<Item> observable = this.minio.ListObjectsAsync(bucketName, prefix, recursive);
                 return observable;
             }
             else
             {
-                this._logger.LogInformation(this.eventId, $"minio获取指定目录文件列表桶名不存在prefix：{prefix}");
+                this.logger.LogInformation(this.eventId, $"minio获取指定目录文件列表桶名不存在prefix：{prefix}");
                 return null;
             }
         }
         catch (MinioException e)
         {
-            this._logger.LogError(this.eventId, e, "minio获取指定目录文件列表异常");
+            this.logger.LogError(this.eventId, e, "minio获取指定目录文件列表异常");
             return null;
         }
     }
@@ -244,19 +249,19 @@ public class ServiceMinIo
     {
         try
         {
-            IObservable<DeleteError> observable = await _minio.RemoveObjectAsync(bucketName, objectNamesList);
+            IObservable<DeleteError> observable = await minio.RemoveObjectAsync(bucketName, objectNamesList);
             IDisposable subscription = observable.Subscribe(
-                deleteError => this._logger.LogInformation(this.eventId, $"minio批量删除失败objectNames:{deleteError.Key}"),
-                ex => this._logger.LogError(this.eventId, ex, $"minio批量删除异常"),
+                deleteError => this.logger.LogInformation(this.eventId, $"minio批量删除失败objectNames:{deleteError.Key}"),
+                ex => this.logger.LogError(this.eventId, ex, $"minio批量删除异常"),
                 () =>
                 {
-                    this._logger.LogInformation(this.eventId, $"minio批量删除失败{bucketName}");
+                    this.logger.LogInformation(this.eventId, $"minio批量删除失败{bucketName}");
                 });
             return true;
         }
         catch (MinioException e)
         {
-            this._logger.LogError(this.eventId, e, $"minio批量删除异常objectNamesList:{Newtonsoft.Json.JsonConvert.SerializeObject(objectNamesList)}");
+            this.logger.LogError(this.eventId, e, $"minio批量删除异常objectNamesList:{Newtonsoft.Json.JsonConvert.SerializeObject(objectNamesList)}");
             return false;
         }
     }
@@ -287,11 +292,11 @@ public class ServiceMinIo
     public async Task<List<string>> GetObjectList(string prefix)
     {
         List<string> filelist = new List<string>();
-        bool found = await this._minio.BucketExistsAsync(defalut_bucketName);
+        bool found = await this.minio.BucketExistsAsync(defalut_bucketName);
         bool onCompleted = false;
         if (found)
         {
-            IObservable<Item> observable = this._minio.ListObjectsAsync(defalut_bucketName, prefix, true);
+            IObservable<Item> observable = this.minio.ListObjectsAsync(defalut_bucketName, prefix, true);
             IDisposable subscription = observable.Subscribe(
                     item => filelist.Add($"/{defalut_bucketName}/{item.Key}"),
                     ex => Console.WriteLine("", ex.Message),

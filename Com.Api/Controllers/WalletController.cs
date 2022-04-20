@@ -73,12 +73,12 @@ public class WalletController : ControllerBase
     /// <summary>
     /// 获取用户所有钱包
     /// </summary>
-    /// <param name="coin_name">币名</param>
     /// <param name="wallet_type">钱包类型</param>
+    /// <param name="coin_name">币名</param>
     /// <returns></returns>
     [HttpGet]
     [Route("GetWallet")]
-    public Res<List<Wallet>?> GetWallet(string? coin_name, E_WalletType wallet_type)
+    public Res<List<Wallet>?> GetWallet(E_WalletType wallet_type, string? coin_name)
     {
         Res<List<Wallet>?> res = new Res<List<Wallet>?>();
         res.success = false;
@@ -104,6 +104,29 @@ public class WalletController : ControllerBase
                                freeze = bb == null ? 0 : bb.freeze,
                            };
                 res.data = linq.ToList();
+            }
+        }
+        return res;
+    }
+
+    /// <summary>
+    /// 获取手续费
+    /// </summary>
+    /// <param name="start">开始时间</param>
+    /// <param name="end">结束时间</param>
+    /// <param name="skip">跳过行数</param>
+    /// <param name="take">提取行数</param>
+    /// <returns></returns>
+    public Res<List<Running>> GetRunning(DateTimeOffset? start, DateTimeOffset? end, int skip, int take)
+    {
+        Res<List<Running>> res = new Res<List<Running>>();
+        res.success = false;
+        res.code = E_Res_Code.fail;
+        using (var scope = FactoryService.instance.constant.provider.CreateScope())
+        {
+            using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
+            {
+                res.data = db.Running.AsNoTracking().Where(P => P.uid_from == this.login.user_id && P.type == E_RunningType.fee).WhereIf(start != null, P => P.time >= start).WhereIf(end != null, P => P.time <= end).Skip(skip).Take(take).ToList();
             }
         }
         return res;

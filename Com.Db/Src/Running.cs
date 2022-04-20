@@ -24,6 +24,11 @@ public class Running
     /// <value></value>
     public long relation_id { get; set; }
     /// <summary>
+    /// 流水类型
+    /// </summary>
+    /// <value></value>
+    public E_RunningType type { get; set; }
+    /// <summary>
     /// 币id
     /// </summary>
     /// <value></value>

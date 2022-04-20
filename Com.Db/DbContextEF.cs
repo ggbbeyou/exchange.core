@@ -262,6 +262,7 @@ public class DbContextEF : DbContext
             o.HasIndex(P => new { P.coin_id, P.uid_from, P.uid_to, P.time });
             o.Property(P => P.id).IsRequired().ValueGeneratedNever().HasColumnType("bigint").HasComment("id");
             o.Property(P => P.relation_id).IsRequired().HasColumnType("bigint").HasComment("关联id");
+            o.Property(P => P.type).IsRequired().HasColumnType("tinyint").HasComment("流水类型");
             o.Property(P => P.coin_id).IsRequired().HasColumnType("bigint").HasComment("币id");
             o.Property(P => P.coin_name).HasColumnType("nvarchar").HasMaxLength(20).HasComment("币名称");
             o.Property(P => P.wallet_from).IsRequired().HasColumnType("bigint").HasComment("来源 钱包id");

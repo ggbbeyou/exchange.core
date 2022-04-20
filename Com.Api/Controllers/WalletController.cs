@@ -117,16 +117,16 @@ public class WalletController : ControllerBase
     /// <param name="skip">跳过行数</param>
     /// <param name="take">提取行数</param>
     /// <returns></returns>
-    public Res<List<Running>> GetRunning(DateTimeOffset? start, DateTimeOffset? end, int skip, int take)
+    public Res<List<ResRunning>> GetRunning(DateTimeOffset? start, DateTimeOffset? end, int skip, int take)
     {
-        Res<List<Running>> res = new Res<List<Running>>();
+        Res<List<ResRunning>> res = new Res<List<ResRunning>>();
         res.success = false;
         res.code = E_Res_Code.fail;
         using (var scope = FactoryService.instance.constant.provider.CreateScope())
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
-                res.data = db.Running.AsNoTracking().Where(P => P.uid_from == this.login.user_id && P.type == E_RunningType.fee).WhereIf(start != null, P => P.time >= start).WhereIf(end != null, P => P.time <= end).Skip(skip).Take(take).ToList();
+                res.data = db.Running.AsNoTracking().Where(P => P.uid_from == this.login.user_id && P.type == E_RunningType.fee).WhereIf(start != null, P => P.time >= start).WhereIf(end != null, P => P.time <= end).Skip(skip).Take(take).ToList().ConvertAll(P => (ResRunning)P);
             }
         }
         return res;

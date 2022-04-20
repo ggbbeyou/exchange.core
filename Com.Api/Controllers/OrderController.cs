@@ -18,7 +18,7 @@ namespace Com.Api.Controllers;
 public class OrderController : ControllerBase
 {
     /// <summary>
-    /// 日志
+    /// 日志接口
     /// </summary>
     private readonly ILogger<OrderController> logger;
     /// <summary>
@@ -36,7 +36,7 @@ public class OrderController : ControllerBase
     /// </summary>
     private ServiceCommon service_common = new ServiceCommon();
     /// <summary>
-    /// 用户服务
+    /// Service:用户服务
     /// </summary>
     /// <returns></returns>
     private ServiceUser service_user = new ServiceUser();
@@ -48,7 +48,7 @@ public class OrderController : ControllerBase
     /// <summary>
     /// 初始化
     /// </summary>
-    /// <param name="logger"></param>
+    /// <param name="logger">日志接口</param>
     public OrderController(ILogger<OrderController> logger)
     {
         this.logger = logger;

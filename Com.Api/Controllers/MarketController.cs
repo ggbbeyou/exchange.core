@@ -40,7 +40,7 @@ public class MarketController : ControllerBase
     /// <summary>
     /// 获取聚合行情
     /// </summary>
-    /// <param name="symbol"></param>
+    /// <param name="symbol">交易对</param>
     /// <returns></returns>
     [HttpPost]
     [Route("ticker")]

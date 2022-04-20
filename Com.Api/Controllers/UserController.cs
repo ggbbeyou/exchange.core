@@ -314,11 +314,11 @@ public class UserController : ControllerBase
     /// </summary>
     /// <param name="name"></param>
     /// <param name="ip"></param>
-    /// <param name="_2fa"></param>
+    /// <param name="code"></param>
     /// <returns></returns>
     [HttpPost]
     [Route("ApplyApiUser")]
-    public Res<KeyValuePair<string, string>> ApplyApiUser(string name, string ip, string _2fa)
+    public Res<KeyValuePair<string, string>> ApplyApiUser(string code, string name, bool transaction, bool withdrawal, string ip)
     {
         Res<KeyValuePair<string, string>> res = new Res<KeyValuePair<string, string>>();
 

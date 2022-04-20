@@ -78,7 +78,8 @@ public class UserController : ControllerBase
 
     /// <summary>
     /// 申请手机验证
-    /// </summary>   
+    /// </summary>
+    /// <param name="phone">手机号</param>
     /// <returns></returns>
     [HttpPost]
     [Route("ApplyPhone")]
@@ -124,7 +125,9 @@ public class UserController : ControllerBase
 
     /// <summary>
     /// 验证手机申请
-    /// </summary>   
+    /// </summary>
+    /// <param name="phone">手机号</param>
+    /// <param name="code">短信验证码</param>
     /// <returns></returns>
     [HttpPost]
     [Route("VerifyPhone")]
@@ -260,7 +263,8 @@ public class UserController : ControllerBase
 
     /// <summary>
     /// 验证实名认证
-    /// </summary>   
+    /// </summary>
+    /// <param name="files">实名凭证</param>
     /// <returns></returns>
     [HttpPost]
     [Route("ApplyRealname")]

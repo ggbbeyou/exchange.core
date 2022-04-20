@@ -33,6 +33,7 @@ public class UsersApi
     /// 账户密钥
     /// </summary>
     /// <value></value>    
+    [JsonIgnore]
     public string api_secret { get; set; } = null!;
     /// <summary>
     /// 是否交易,true:交易,false:非交易

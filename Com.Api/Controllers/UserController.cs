@@ -328,16 +328,13 @@ public class UserController : ControllerBase
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="name"></param>
-    /// <param name="ip"></param>
-    /// <param name="_2fa"></param>
     /// <returns></returns>
     [HttpPost]
     [Route("ApplyApiUser")]
     public Res<List<UsersApi>> GetApiUser()
     {
         Res<List<UsersApi>> res = new Res<List<UsersApi>>();
-        
+
         return res;
     }
 

@@ -117,27 +117,27 @@ public class ApiOrderController : ControllerBase
         }
     }
 
-    /// <summary>
-    ///  按用户,交易对,用户自定义id撤单
-    /// </summary>
-    /// <param name="model">订单id</param>
-    /// <returns></returns>
-    [HttpPost]
-    [Route("OrderCancelByClientId")]
-    public Res<bool> OrderCancelByClientId(CallOrderCancel model)
-    {
-        (bool transaction, Users? users, UsersApi? api) user_api = service_user.ApiUserTransaction(Request.Headers["api_key"]);
-        if (user_api.transaction == false || user_api.users == null)
-        {
-            Res<bool> result = new Res<bool>();
-            result.code = E_Res_Code.user_disable_place_order;
-            result.message = "用户禁止撤单";
-            return result;
-        }
-        else
-        {
-            return this.service_order.CancelOrder(model.symbol, user_api.users.user_id, 4, model.data);
-        }
-    }
+    // /// <summary>
+    // ///  按用户,交易对,用户自定义id撤单
+    // /// </summary>
+    // /// <param name="model">订单id</param>
+    // /// <returns></returns>
+    // [HttpPost]
+    // [Route("OrderCancelByClientId")]
+    // public Res<bool> OrderCancelByClientId(CallOrderCancel model)
+    // {
+    //     (bool transaction, Users? users, UsersApi? api) user_api = service_user.ApiUserTransaction(Request.Headers["api_key"]);
+    //     if (user_api.transaction == false || user_api.users == null)
+    //     {
+    //         Res<bool> result = new Res<bool>();
+    //         result.code = E_Res_Code.user_disable_place_order;
+    //         result.message = "用户禁止撤单";
+    //         return result;
+    //     }
+    //     else
+    //     {
+    //         return this.service_order.CancelOrder(model.symbol, user_api.users.user_id, 4, model.data);
+    //     }
+    // }
 
 }

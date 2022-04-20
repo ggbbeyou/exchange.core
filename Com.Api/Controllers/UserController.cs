@@ -182,16 +182,48 @@ public class UserController : ControllerBase
     public async Task<Res<bool>> ApplyRealname(IFormFile files)
     {
         Res<bool> res = new Res<bool>();
+        res.success = false;
+        res.code = E_Res_Code.fail;
+        res.data = false;
         if (files == null || files.Length <= 0)
         {
-            res.code = E_Res_Code.fail;
+            res.success = false;
+            res.code = E_Res_Code.file_not_found;
+            res.data = false;
             res.message = "未找到文件";
             return res;
         }
         this.service_minio = new ServiceMinio(config, logger);
-        string file_path = await service_minio.UploadFile(files.OpenReadStream(), FactoryService.instance.GetMinioRealname(), FactoryService.instance.constant.worker.NextId().ToString() + Path.GetExtension(files.FileName), files.ContentType);
-
-
+        string object_name = FactoryService.instance.constant.worker.NextId().ToString() + Path.GetExtension(files.FileName);
+        await service_minio.UploadFile(files.OpenReadStream(), FactoryService.instance.GetMinioRealname(), object_name, files.ContentType);
+        using (var scope = FactoryService.instance.constant.provider.CreateScope())
+        {
+            using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
+            {
+                Users? users = db.Users.SingleOrDefault(P => P.user_id == this.login.user_id);
+                if (users != null)
+                {
+                    if (users.verify_realname == E_Verify.verify_ok)
+                    {
+                        res.success = false;
+                        res.code = E_Res_Code.apply_fail;
+                        res.data = false;
+                        res.message = "已经验证通过,不需要重复申请";
+                        return res;
+                    }
+                    users.realname_object_name = object_name;
+                    users.verify_realname = E_Verify.verify_apply;
+                    db.Users.Update(users);
+                    if (db.SaveChanges() > 0)
+                    {
+                        res.success = true;
+                        res.code = E_Res_Code.ok;
+                        res.data = true;
+                        return res;
+                    }
+                }
+            }
+        }
         return res;
     }
 

@@ -70,6 +70,14 @@ public enum E_Res_Code
     /// </summary>
     not_white_ip,
     /// <summary>
+    /// 未找到文件
+    /// </summary>
+    file_not_found,
+    /// <summary>
+    /// 申请失败
+    /// </summary>
+    apply_fail,
+    /// <summary>
     /// 密码不合规则
     /// </summary>
     password_format_error,

@@ -318,10 +318,26 @@ public class UserController : ControllerBase
     /// <returns></returns>
     [HttpPost]
     [Route("ApplyApiUser")]
-    public Res<bool> ApplyApiUser(string name, string ip, string _2fa)
+    public Res<KeyValuePair<string, string>> ApplyApiUser(string name, string ip, string _2fa)
     {
-        Res<bool> res = new Res<bool>();
+        Res<KeyValuePair<string, string>> res = new Res<KeyValuePair<string, string>>();
 
+        return res;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="ip"></param>
+    /// <param name="_2fa"></param>
+    /// <returns></returns>
+    [HttpPost]
+    [Route("ApplyApiUser")]
+    public Res<List<UsersApi>> GetApiUser()
+    {
+        Res<List<UsersApi>> res = new Res<List<UsersApi>>();
+        
         return res;
     }
 

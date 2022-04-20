@@ -21,6 +21,7 @@ public class UserController : ControllerBase
     /// 日志
     /// </summary>
     private readonly ILogger<UserController> logger;
+    private readonly IConfiguration config;
     /// <summary>
     /// 登录信息
     /// </summary>
@@ -44,7 +45,7 @@ public class UserController : ControllerBase
     /// 文件服务
     /// </summary>
     /// <returns></returns>
-    private ServiceMinio service_minio = new ServiceMinio();
+    private ServiceMinio service_minio = null!;
 
 
 
@@ -56,7 +57,7 @@ public class UserController : ControllerBase
     public UserController(ILogger<UserController> logger, IConfiguration config)
     {
         this.logger = logger;
-        this.service_minio.Init(config["minio:endpoint"], config["minio:accessKey"], config["minio:secretKey"], bool.Parse(config["minio:ssl"]));
+        this.config = config;
     }
 
     /// <summary>
@@ -190,8 +191,9 @@ public class UserController : ControllerBase
             res.message = "未找到文件";
             return res;
         }
+        this.service_minio = new ServiceMinio(config, logger);
         Stream stream = files.OpenReadStream();
-        await service_minio.UploadFile(stream, FactoryService.instance.GetMinioRealname(), FactoryService.instance.constant.worker.NextId().ToString() + Path.GetExtension(files.FileName), files.FileName, files.ContentType);
+        await service_minio.UploadFile(stream, FactoryService.instance.GetMinioRealname(), FactoryService.instance.constant.worker.NextId().ToString() + Path.GetExtension(files.FileName), files.ContentType);
         return res;
     }
 

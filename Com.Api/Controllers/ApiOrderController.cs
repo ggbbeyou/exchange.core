@@ -52,8 +52,8 @@ public class ApiOrderController : ControllerBase
     /// <param name="data"></param>
     /// <returns></returns>
     [HttpPost]
-    [Route("OrderPlace")]
-    public Res<List<ResOrder>> OrderPlace(CallOrder data)
+    [Route("OrderPlaces")]
+    public Res<List<ResOrder>> OrderPlaces(CallOrder data)
     {
         // List<ReqOrder> orders = JsonConvert.DeserializeObject<List<ReqOrder>>(a);
         //判断用户api是否有交易权限

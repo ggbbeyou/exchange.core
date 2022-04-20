@@ -47,9 +47,57 @@ public class ApiOrderController : ControllerBase
     }
 
     /// <summary>
+    /// 挂单
+    /// </summary>
+    /// <param name="symbol">交易对名称</param>
+    /// <param name="trade_model">交易模式,现货(cash)</param>
+    /// <param name="type">订单类型</param>
+    /// <param name="side">交易方向</param>
+    /// <param name="price">挂单价:限价单(有效),其它无效</param>
+    /// <param name="amount">挂单量:限价单/市场卖价(有效),其它无效</param>
+    /// <param name="total">挂单额:市价买单(有效),其它无效</param>
+    /// <param name="trigger_hanging_price">触发挂单价格</param>
+    /// <param name="trigger_cancel_price">触发撤单价格</param>
+    /// <param name="client_id">客户自定义订单id</param>
+    /// <returns></returns>
+    [HttpPost]
+    [Route("OrderPlace")]
+    public Res<List<ResOrder>> OrderPlace(string symbol, E_TradeModel trade_model, E_OrderType type, E_OrderSide side, decimal? price, decimal? amount, decimal? total, decimal? trigger_hanging_price, decimal? trigger_cancel_price, string? client_id)
+    {
+        (bool transaction, Users? users, UsersApi? api) user_api = service_user.ApiUserTransaction(Request.Headers["api_key"]);
+        if (user_api.transaction == false || user_api.users == null)
+        {
+            Res<List<ResOrder>> result = new Res<List<ResOrder>>();
+            result.code = E_Res_Code.user_disable_place_order;
+            result.message = "用户禁止交易";
+            return result;
+        }
+        else
+        {
+            List<ReqOrder> orders = new List<ReqOrder>()
+            {
+                new ReqOrder()
+                {
+                    symbol = symbol,
+                    trade_model = trade_model,
+                    type = type,
+                    side = side,
+                    price = price,
+                    amount = amount,
+                    total = total,
+                    trigger_hanging_price = trigger_hanging_price??0,
+                    trigger_cancel_price = trigger_cancel_price??0,
+                    client_id = client_id
+                }
+            };
+            return service_order.PlaceOrder(symbol, user_api.users.user_id, user_api.users.user_name, orders);
+        };
+    }
+
+    /// <summary>
     /// 批量挂单
     /// </summary>
-    /// <param name="data"></param>
+    /// <param name="data">挂单数据</param>
     /// <returns></returns>
     [HttpPost]
     [Route("OrderPlaces")]
@@ -60,7 +108,7 @@ public class ApiOrderController : ControllerBase
         {
             Res<List<ResOrder>> result = new Res<List<ResOrder>>();
             result.code = E_Res_Code.user_disable_place_order;
-            result.message = "用户禁止下单";
+            result.message = "用户禁止交易";
             return result;
         }
         else
@@ -137,5 +185,88 @@ public class ApiOrderController : ControllerBase
     //         return this.service_order.CancelOrder(model.symbol, user_api.users.user_id, 4, model.data);
     //     }
     // }
+
+    /// <summary>
+    /// 当前用户正在委托挂单
+    /// </summary>
+    /// <param name="start">开始时间</param>
+    /// <param name="end">结束时间</param>
+    /// <param name="skip">跳过多少行</param>
+    /// <param name="take">获取多少行</param>
+    /// <returns></returns>
+    [HttpGet]
+    [Route("GetOrderCurrent")]
+    [ResponseCache(CacheProfileName = "cache_0")]
+    public Res<List<ResOrder>> GetOrderCurrent(DateTimeOffset? start, DateTimeOffset? end, int skip = 0, int take = 50)
+    {
+        UsersApi? api = this.service_user.GetApi(Request.Headers["api_key"]);
+        return this.service_order.GetOrder(true, api!.user_id, skip, take, start, end);
+    }
+
+    /// <summary>
+    /// 当前用户历史委托挂单
+    /// </summary>
+    /// <param name="start">开始时间</param>
+    /// <param name="end">结束时间</param>
+    /// <param name="skip">跳过多少行</param>
+    /// <param name="take">获取多少行</param>
+    /// <returns></returns>
+    [HttpGet]
+    [Route("GetOrderHistory")]
+    [ResponseCache(CacheProfileName = "cache_1")]
+    public Res<List<ResOrder>> GetOrderHistory(DateTimeOffset? start, DateTimeOffset? end, int skip = 0, int take = 50)
+    {
+        UsersApi? api = this.service_user.GetApi(Request.Headers["api_key"]);
+        return this.service_order.GetOrder(false, api!.user_id, skip, take, start, end);
+    }
+
+    /// <summary>
+    /// 按订单id查询
+    /// </summary>
+    /// <param name="market"></param>
+    /// <param name="data"></param>
+    /// <returns></returns>
+    [HttpGet]
+    [Route("GetOrderById")]
+    [ResponseCache(CacheProfileName = "cache_0")]
+    public Res<List<ResOrder>> GetOrderById(long market, List<long> data)
+    {
+        UsersApi? api = this.service_user.GetApi(Request.Headers["api_key"]);
+        return this.service_order.GetOrder(market: market, uid: api!.user_id, ids: data);
+    }
+
+    /// <summary>
+    /// 按订单状态查询
+    /// </summary>
+    /// <param name="market"></param>
+    /// <param name="state"></param>
+    /// <param name="start"></param>
+    /// <param name="end"></param>
+    /// <returns></returns>
+    [HttpGet]
+    [Route("GetOrderByState")]
+    [ResponseCache(CacheProfileName = "cache_0")]
+    public Res<List<ResOrder>> GetOrderByState(long market, E_OrderState state, DateTimeOffset start, DateTimeOffset end)
+    {
+        UsersApi? api = this.service_user.GetApi(Request.Headers["api_key"]);
+        return this.service_order.GetOrder(market: market, uid: api!.user_id, state: state, start: start, end: end);
+    }
+
+    /// <summary>
+    /// 订单时间查询
+    /// </summary>
+    /// <param name="market"></param>
+    /// <param name="start"></param>
+    /// <param name="end"></param>
+    /// <returns></returns>
+    [HttpGet]
+    [Route("GetOrderByDate")]
+    [ResponseCache(CacheProfileName = "cache_2")]
+    public Res<List<ResOrder>> GetOrderByDate(long market, DateTimeOffset start, DateTimeOffset end)
+    {
+        UsersApi? api = this.service_user.GetApi(Request.Headers["api_key"]);
+        return this.service_order.GetOrder(market: market, uid: api!.user_id, start: start, end: end);
+    }
+
 
 }

@@ -160,7 +160,7 @@ public class ServiceOrder
         if (users.disabled || !users.transaction)
         {
             res.code = E_Res_Code.user_disable_place_order;
-            res.message = "用户禁止下单";
+            res.message = "用户禁止交易";
             return res;
         }
         Vip? vip = service_user.GetVip(users.vip);

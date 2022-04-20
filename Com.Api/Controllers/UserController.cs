@@ -261,7 +261,6 @@ public class UserController : ControllerBase
     /// <returns></returns>
     [HttpPost]
     [Route("ApplyRealname")]
-    [AllowAnonymous]
     public async Task<Res<bool>> ApplyRealname(IFormFile files)
     {
         Res<bool> res = new Res<bool>();
@@ -318,9 +317,8 @@ public class UserController : ControllerBase
     /// <param name="_2fa"></param>
     /// <returns></returns>
     [HttpPost]
-    [Route("ApplyRealname")]
-    [AllowAnonymous]
-    public Res<bool> ApplyApi(string name, string ip, string _2fa)
+    [Route("ApplyApiUser")]
+    public Res<bool> ApplyApiUser(string name, string ip, string _2fa)
     {
         Res<bool> res = new Res<bool>();
 

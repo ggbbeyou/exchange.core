@@ -47,8 +47,6 @@ public class UserController : ControllerBase
     /// <returns></returns>
     private ServiceMinio service_minio = null!;
 
-
-
     /// <summary>
     /// 初始化
     /// </summary>
@@ -174,7 +172,6 @@ public class UserController : ControllerBase
         return res;
     }
 
-
     /// <summary>
     /// 验证实名认证
     /// </summary>   
@@ -196,8 +193,5 @@ public class UserController : ControllerBase
         await service_minio.UploadFile(stream, FactoryService.instance.GetMinioRealname(), FactoryService.instance.constant.worker.NextId().ToString() + Path.GetExtension(files.FileName), files.ContentType);
         return res;
     }
-
-
-
 
 }

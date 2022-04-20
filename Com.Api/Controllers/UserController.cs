@@ -189,8 +189,9 @@ public class UserController : ControllerBase
             return res;
         }
         this.service_minio = new ServiceMinio(config, logger);
-        Stream stream = files.OpenReadStream();
-        await service_minio.UploadFile(stream, FactoryService.instance.GetMinioRealname(), FactoryService.instance.constant.worker.NextId().ToString() + Path.GetExtension(files.FileName), files.ContentType);
+        string file_path = await service_minio.UploadFile(files.OpenReadStream(), FactoryService.instance.GetMinioRealname(), FactoryService.instance.constant.worker.NextId().ToString() + Path.GetExtension(files.FileName), files.ContentType);
+
+
         return res;
     }
 

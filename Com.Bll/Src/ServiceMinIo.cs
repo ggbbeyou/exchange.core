@@ -100,7 +100,7 @@ public class ServiceMinio
     /// <param name="object_name">对象名</param>
     /// <param name="contentType">内容类型</param>
     /// <returns></returns>
-    public async Task UploadFile(Stream data, string bucket_name, string object_name, string contentType)
+    public async Task<string> UploadFile(Stream data, string bucket_name, string object_name, string contentType)
     {
         try
         {
@@ -111,6 +111,33 @@ public class ServiceMinio
         {
             this.logger.LogError(this.eventId, ex, "minio上传文件失败");
         }
+        return $"{bucket_name}/{object_name}";
+    }
+
+    /// <summary>
+    /// 读取文件
+    /// </summary>
+    /// <param name="bucket_name">桶名</param>
+    /// <param name="object_name">对象名</param>.
+    /// <param name="stream">目标流</param>
+    /// <returns></returns>
+    public async Task<byte[]?> GetObject(string bucket_name, string object_name)
+    {
+        try
+        {
+            MemoryStream memoryStream = new MemoryStream();
+            await this.minio.StatObjectAsync(new StatObjectArgs().WithBucket(bucket_name).WithObject(object_name));
+            await this.minio.GetObjectAsync(new GetObjectArgs().WithBucket(bucket_name).WithObject(object_name).WithCallbackStream(stream =>
+            {
+                stream.CopyToAsync(memoryStream).ConfigureAwait(false);
+            }));
+            return memoryStream.ToArray();
+        }
+        catch (MinioException e)
+        {
+            Console.Out.WriteLine("Error occurred: " + e);
+        }
+        return null;
     }
 
     /// <summary>

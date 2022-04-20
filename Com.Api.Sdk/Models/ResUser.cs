@@ -1,4 +1,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using Com.Api.Sdk.Enum;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Com.Api.Sdk.Models;
 
@@ -38,10 +41,16 @@ public class ResUser
     /// <value></value>
     public bool verify_google { get; set; }
     /// <summary>
-    /// 是否验证实名认证 true:验证,false:未验证
+    /// 是否验证实名认证
     /// </summary>
     /// <value></value>
-    public bool verify_realname { get; set; }
+    [JsonConverter(typeof(StringEnumConverter))]
+    public E_Verify verify_realname { get; set; }
+    /// <summary>
+    /// 实名审核文件对象名
+    /// </summary>
+    /// <value></value>
+    public string? realname_object_name { get; set; }
     /// <summary>
     /// 用户等级
     /// </summary>

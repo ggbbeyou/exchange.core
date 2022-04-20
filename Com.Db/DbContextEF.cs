@@ -297,10 +297,10 @@ public class DbContextEF : DbContext
             o.Property(P => P.verify_email).IsRequired().HasColumnType("bit").HasComment("是否验证邮箱 true:验证,false:未验证");
             o.Property(P => P.verify_phone).IsRequired().HasColumnType("bit").HasComment("是否验证手机 true:验证,false:未验证");
             o.Property(P => P.verify_google).IsRequired().HasColumnType("bit").HasComment("是否验证谷歌验证器 true:验证,false:未验证");
-            o.Property(P => P.verify_realname).IsRequired().HasColumnType("bit").HasComment("是否验证实名认证 true:验证,false:未验证");
+            o.Property(P => P.verify_realname).IsRequired().HasColumnType("tinyint").HasComment("是否验证实名认证");
+            o.Property(P => P.realname_object_name).HasColumnType("nvarchar").HasMaxLength(50).HasComment("实名审核文件对象名");
             o.Property(P => P.vip).IsRequired().HasColumnType("bigint").HasComment("用户等级");
             o.Property(P => P.google_key).HasColumnType("nvarchar").HasMaxLength(50).HasComment("google验证码");
-            // o.Property(P => P.google_private_key).HasColumnType("nvarchar").HasMaxLength(500).HasComment("google验证器密钥");
             o.Property(P => P.public_key).IsRequired().HasColumnType("nvarchar").HasMaxLength(1000).HasComment("公钥");
             o.Property(P => P.private_key).IsRequired().HasColumnType("nvarchar").HasMaxLength(3000).HasComment("私钥");
             o.ToTable(nameof(Users));

@@ -44,6 +44,10 @@ namespace Com.Api
             try
             {
                 FactoryService.instance.Init(this.constant);
+                ServiceMinio service_minio = new ServiceMinio(this.constant.config, this.constant.logger);
+                await service_minio.MakeBucket(FactoryService.instance.GetMinioRealname());
+
+
                 this.constant.logger.LogInformation("启动Api后台服务成功");
             }
             catch (Exception ex)

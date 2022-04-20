@@ -15,6 +15,11 @@ public class UsersApi
     /// <value></value>
     public long id { get; set; }
     /// <summary>
+    /// 名称
+    /// </summary>
+    /// <value></value>
+    public string name { get; set; } = null!;
+    /// <summary>
     /// 用户id
     /// </summary>
     /// <value></value>

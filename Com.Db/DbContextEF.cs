@@ -312,6 +312,7 @@ public class DbContextEF : DbContext
             o.HasIndex(P => new { P.user_id, P.api_key });
             o.HasIndex(P => new { P.api_key }).IsUnique();
             o.Property(P => P.id).IsRequired().ValueGeneratedNever().HasColumnType("bigint").HasComment("ID");
+            o.Property(P => P.name).IsRequired().HasColumnType("nvarchar").HasMaxLength(50).HasComment("名称");
             o.Property(P => P.user_id).IsRequired().HasColumnType("bigint").HasComment("用户id");
             o.Property(P => P.api_key).HasColumnType("nvarchar").HasMaxLength(50).HasComment("账户key");
             o.Property(P => P.api_secret).HasColumnType("nvarchar").HasMaxLength(500).HasComment("账户密钥");

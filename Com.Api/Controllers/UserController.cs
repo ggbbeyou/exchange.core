@@ -24,16 +24,19 @@ public class UserController : ControllerBase
     /// 日志
     /// </summary>
     private readonly ILogger<UserController> logger;
+    /// <summary>
+    /// 配置接口
+    /// </summary>
     private readonly IConfiguration config;
     /// <summary>
     /// 公共类
     /// </summary>
     /// <returns></returns>
     private Common common = new Common();
-
     /// <summary>
     /// 登录信息
     /// </summary>
+    /// <value></value>
     private (long no, long user_id, string user_name, E_App app, string public_key) login
     {
         get
@@ -54,8 +57,8 @@ public class UserController : ControllerBase
     /// <summary>
     /// 初始化
     /// </summary>
-    /// <param name="logger"></param>
-    /// <param name="config"></param>
+    /// <param name="logger">日志接口</param>
+    /// <param name="config">配置接口</param>
     public UserController(ILogger<UserController> logger, IConfiguration config)
     {
         this.logger = logger;

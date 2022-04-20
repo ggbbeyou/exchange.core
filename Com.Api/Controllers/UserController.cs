@@ -41,13 +41,8 @@ public class UserController : ControllerBase
     /// </summary>
     /// <returns></returns>
     private ServiceUser service_user = new ServiceUser();
-    /// <summary>
-    /// 文件服务
-    /// </summary>
-    /// <returns></returns>
-    private ServiceMinio service_minio = null!;
 
-    /// <summary>
+   /// <summary>
     /// 初始化
     /// </summary>
     /// <param name="logger"></param>
@@ -158,19 +153,7 @@ public class UserController : ControllerBase
             res.code = E_Res_Code.ok;
             return res;
         }
-    }
-
-    /// <summary>
-    /// 验证实名认证
-    /// </summary>   
-    /// <returns></returns>
-    [HttpPost]
-    [Route("VerifyRealname")]
-    public Res<bool> VerifyRealname()
-    {
-        Res<bool> res = new Res<bool>();
-        return res;
-    }
+    }   
 
     /// <summary>
     /// 验证实名认证
@@ -193,7 +176,7 @@ public class UserController : ControllerBase
             res.message = "未找到文件";
             return res;
         }
-        this.service_minio = new ServiceMinio(config, logger);
+        ServiceMinio service_minio = new ServiceMinio(config, logger);
         string object_name = FactoryService.instance.constant.worker.NextId().ToString() + Path.GetExtension(files.FileName);
         await service_minio.UploadFile(files.OpenReadStream(), FactoryService.instance.GetMinioRealname(), object_name, files.ContentType);
         using (var scope = FactoryService.instance.constant.provider.CreateScope())

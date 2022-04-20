@@ -18,7 +18,7 @@ public class ResUsersApi
     /// 名称
     /// </summary>
     /// <value></value>
-    public string name { get; set; } = null!;
+    public string? name { get; set; }
     /// <summary>
     /// 账户key
     /// </summary>

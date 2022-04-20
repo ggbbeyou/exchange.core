@@ -22,9 +22,5 @@ public class UsersApi : ResUsersApi
     /// <value></value>    
     [JsonIgnore]
     public string api_secret { get; set; } = null!;
-    /// <summary>
-    /// 最后登录IP地址
-    /// </summary>
-    /// <value></value>
-    public string? last_login_ip { get; set; }
+   
 }

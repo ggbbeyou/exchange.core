@@ -310,31 +310,113 @@ public class UserController : ControllerBase
     }
 
     /// <summary>
-    /// 
+    /// 申请api用户
     /// </summary>
-    /// <param name="name"></param>
-    /// <param name="ip"></param>
-    /// <param name="code"></param>
+    /// <param name="code">google验证码</param>
+    /// <param name="name">名称</param>
+    /// <param name="transaction">是否可交易</param>
+    /// <param name="withdrawal">是否可提现</param>
+    /// <param name="ip">白名单,多个使用;进行隔离</param>
     /// <returns></returns>
     [HttpPost]
     [Route("ApplyApiUser")]
-    public Res<KeyValuePair<string, string>> ApplyApiUser(string code, string name, bool transaction, bool withdrawal, string ip)
+    public Res<KeyValuePair<string, string>> ApplyApiUser(string code, string? name, bool transaction, bool withdrawal, string ip)
     {
         Res<KeyValuePair<string, string>> res = new Res<KeyValuePair<string, string>>();
-
+        res.success = false;
+        res.code = E_Res_Code.fail;
+        res.data = new KeyValuePair<string, string>();
+        using (var scope = FactoryService.instance.constant.provider.CreateScope())
+        {
+            using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
+            {
+                UsersApi api = new UsersApi()
+                {
+                    id = FactoryService.instance.constant.worker.NextId(),
+                    name = name,
+                    user_id = this.login.user_id,
+                    api_key = Encryption.SHA256Encrypt(FactoryService.instance.constant.worker.NextId().ToString()),
+                    api_secret = Encryption.SHA256Encrypt(FactoryService.instance.constant.worker.NextId().ToString()) + Encryption.SHA256Encrypt(FactoryService.instance.constant.worker.NextId().ToString()),
+                    transaction = transaction,
+                    withdrawal = withdrawal,
+                    white_list_ip = ip,
+                    create_time = DateTimeOffset.UtcNow,
+                };
+                db.UsersApi.Add(api);
+                if (db.SaveChanges() > 0)
+                {
+                    res.success = true;
+                    res.code = E_Res_Code.ok;
+                    res.data = new KeyValuePair<string, string>(api.api_key, api.api_secret);
+                    return res;
+                }
+            }
+        }
         return res;
     }
 
     /// <summary>
-    /// 
+    /// 修改api用户信息
     /// </summary>
+    /// <param name="code">google验证码</param>
+    /// <param name="id">数据id</param>
+    /// <param name="name">名称</param>
+    /// <param name="transaction">是否可交易</param>
+    /// <param name="withdrawal">是否可提现</param>
+    /// <param name="ip">白名单,多个使用;进行隔离</param>
     /// <returns></returns>
     [HttpPost]
-    [Route("GetApiUser")]
-    public Res<List<UsersApi>> GetApiUser()
+    [Route("UpdateApiUser")]
+    public Res<bool> UpdateApiUser(string code, long id, string? name, bool transaction, bool withdrawal, string ip)
     {
-        Res<List<UsersApi>> res = new Res<List<UsersApi>>();
+        Res<bool> res = new Res<bool>();
+        res.success = false;
+        res.code = E_Res_Code.fail;
+        using (var scope = FactoryService.instance.constant.provider.CreateScope())
+        {
+            using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
+            {
+                UsersApi? api = db.UsersApi.AsNoTracking().SingleOrDefault(P => P.id == id);
+                if (api != null)
+                {
+                    api.name = name;
+                    api.transaction = transaction;
+                    api.withdrawal = withdrawal;
+                    api.white_list_ip = ip;
+                    db.UsersApi.Update(api);
+                    if (db.SaveChanges() > 0)
+                    {
+                        res.success = true;
+                        res.code = E_Res_Code.ok;
+                        res.data = true;
+                        return res;
+                    }
+                }
+            }
+        }
+        return res;
+    }
 
+    /// <summary>
+    /// 获取api用户
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet]
+    [Route("GetApiUser")]
+    public Res<List<ResUsersApi>> GetApiUser()
+    {
+        Res<List<ResUsersApi>> res = new Res<List<ResUsersApi>>();
+        res.success = false;
+        res.code = E_Res_Code.fail;
+        using (var scope = FactoryService.instance.constant.provider.CreateScope())
+        {
+            using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
+            {
+                res.success = true;
+                res.code = E_Res_Code.ok;
+                res.data = db.UsersApi.AsNoTracking().Where(P => P.user_id == this.login.user_id).ToList().ConvertAll(P => (ResUsersApi)P);
+            }
+        }
         return res;
     }
 

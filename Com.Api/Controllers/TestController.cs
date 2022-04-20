@@ -159,7 +159,7 @@ public class TestController : ControllerBase
                 withdrawal = false,
                 white_list_ip = "",
                 create_time = DateTimeOffset.UtcNow,
-                last_login_ip = ""
+                
             };
             this.db.UsersApi.Add(api);
             Wallet wallet_usdt = new Wallet()

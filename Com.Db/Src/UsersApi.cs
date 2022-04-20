@@ -13,6 +13,7 @@ public class UsersApi
     /// id
     /// </summary>
     /// <value></value>
+    [JsonIgnore]
     public long id { get; set; }
     /// <summary>
     /// 名称
@@ -23,6 +24,7 @@ public class UsersApi
     /// 用户id
     /// </summary>
     /// <value></value>
+    [JsonIgnore]
     public long user_id { get; set; }
     /// <summary>
     /// 账户key

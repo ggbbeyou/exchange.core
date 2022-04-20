@@ -70,7 +70,6 @@ public class ServiceCommon
                 {
                     SetupCode setupInfo = tfa.GenerateSetupCode(issuer, user.email, tempKey, 300, 300);
                     user.google_key = tempKey;
-                    // user.google_private_key = setupInfo.ManualEntryKey;
                     if (db.SaveChanges() > 0)
                     {
                         return setupInfo.ManualEntryKey;

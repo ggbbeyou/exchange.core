@@ -3,9 +3,12 @@ using System.Security.Claims;
 using Com.Api.Sdk.Enum;
 using Com.Api.Sdk.Models;
 using Com.Bll;
+using Com.Bll.Util;
 using Com.Db;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using StackExchange.Redis;
 
 namespace Com.Api.Controllers;
 
@@ -22,6 +25,12 @@ public class UserController : ControllerBase
     /// </summary>
     private readonly ILogger<UserController> logger;
     private readonly IConfiguration config;
+    /// <summary>
+    /// 公共类
+    /// </summary>
+    /// <returns></returns>
+    private Common common = new Common();
+
     /// <summary>
     /// 登录信息
     /// </summary>
@@ -42,7 +51,7 @@ public class UserController : ControllerBase
     /// <returns></returns>
     private ServiceUser service_user = new ServiceUser();
 
-   /// <summary>
+    /// <summary>
     /// 初始化
     /// </summary>
     /// <param name="logger"></param>
@@ -65,62 +74,44 @@ public class UserController : ControllerBase
     }
 
     /// <summary>
-    /// 验证手机号码
+    /// 申请手机验证
     /// </summary>   
     /// <returns></returns>
     [HttpPost]
     [Route("VerifyPhone")]
-    public Res<bool> VerifyPhone()
-    {
-        Res<bool> res = new Res<bool>();
-        return res;
-    }
-
-    /// <summary>
-    /// 新建Google验证,初次验证 
-    /// </summary>
-    /// <param name="_2FA">google验证码</param>
-    /// <returns></returns>
-    [HttpPost]
-    [Route("VerifyApplyGoogle")]
-    public Res<bool> VerifyApplyGoogle(string _2FA)
+    public Res<bool> ApplyPhone(string phone)
     {
         Res<bool> res = new Res<bool>();
         res.success = false;
         res.code = E_Res_Code.fail;
+        res.data = false;
         using (var scope = FactoryService.instance.constant.provider.CreateScope())
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
-                Users? user = db.Users.SingleOrDefault(P => P.user_id == this.login.user_id);
-                if (user == null || user.disabled == true || user.verify_google == true || string.IsNullOrWhiteSpace(user.google_key))
+                Users? user = db.Users.AsNoTracking().SingleOrDefault(P => P.user_id == this.login.user_id);
+                if (user == null || user.disabled == true || user.verify_phone == true)
                 {
                     res.success = false;
-                    res.code = E_Res_Code.user_disable;
+                    res.code = E_Res_Code.apply_fail;
                     res.data = false;
                     res.message = "用户被禁用或已经验证过";
                     return res;
                 }
                 else
                 {
-                    res.data = service_common.Verification2FA(user.google_key, _2FA);
-                    if (res.data == false)
+                    string code = common.CreateRandomCode(6);
+#if (DEBUG)
+                    code = "123456";
+#endif
+                    string content = $"Exchange 手机验证码:{code}";
+                    if (service_common.SendPhone(phone, content))
                     {
-                        res.success = false;
-                        res.code = E_Res_Code.verification_error;
-                        res.message = "验证码错误";
+                        FactoryService.instance.constant.redis.StringSet(FactoryService.instance.GetRedisVerificationCode(this.login.user_id + phone.Trim()), code, TimeSpan.FromMinutes(10));
+                        res.success = true;
+                        res.code = E_Res_Code.ok;
+                        res.data = true;
                         return res;
-                    }
-                    else
-                    {
-                        user.verify_google = true;
-                        db.Users.Update(user);
-                        if (db.SaveChanges() > 0)
-                        {
-                            res.success = true;
-                            res.code = E_Res_Code.ok;
-                            return res;
-                        }
                     }
                 }
             }
@@ -129,7 +120,64 @@ public class UserController : ControllerBase
     }
 
     /// <summary>
-    /// 申请Google验证码
+    /// 验证手机申请
+    /// </summary>   
+    /// <returns></returns>
+    [HttpPost]
+    [Route("VerifyPhone")]
+    public Res<bool> VerifyPhone(string phone, string code)
+    {
+        Res<bool> res = new Res<bool>();
+        res.success = false;
+        res.code = E_Res_Code.fail;
+        res.data = false;
+        RedisValue rv = FactoryService.instance.constant.redis.StringGet(FactoryService.instance.GetRedisVerificationCode(this.login.user_id + phone.Trim()));
+        if (rv.HasValue)
+        {
+            if (rv.ToString().ToUpper() == code.Trim().ToUpper())
+            {
+                using (var scope = FactoryService.instance.constant.provider.CreateScope())
+                {
+                    using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
+                    {
+                        Users? user = db.Users.SingleOrDefault(P => P.user_id == this.login.user_id);
+                        if (user == null || user.disabled == true || user.verify_phone == true)
+                        {
+                            res.success = false;
+                            res.code = E_Res_Code.apply_fail;
+                            res.data = false;
+                            res.message = "用户被禁用或已经验证过";
+                            return res;
+                        }
+                        else
+                        {
+                            user.verify_phone = true;
+                            user.phone = phone.Trim();
+                            if (db.SaveChanges() > 0)
+                            {
+                                res.success = true;
+                                res.code = E_Res_Code.ok;
+                                res.data = true;
+                                return res;
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                res.success = false;
+                res.code = E_Res_Code.verification_error;
+                res.data = false;
+                res.message = "验证码错误";
+                return res;
+            }
+        }
+        return res;
+    }
+
+    /// <summary>
+    /// 申请Google验证
     /// </summary>   
     /// <returns></returns>
     [HttpPost]
@@ -153,7 +201,59 @@ public class UserController : ControllerBase
             res.code = E_Res_Code.ok;
             return res;
         }
-    }   
+    }
+
+    /// <summary>
+    /// 验证google申请
+    /// </summary>
+    /// <param name="code">google验证码</param>
+    /// <returns></returns>
+    [HttpPost]
+    [Route("VerifyGoogle")]
+    public Res<bool> VerifyGoogle(string code)
+    {
+        Res<bool> res = new Res<bool>();
+        res.success = false;
+        res.code = E_Res_Code.fail;
+        using (var scope = FactoryService.instance.constant.provider.CreateScope())
+        {
+            using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
+            {
+                Users? user = db.Users.SingleOrDefault(P => P.user_id == this.login.user_id);
+                if (user == null || user.disabled == true || user.verify_google == true || string.IsNullOrWhiteSpace(user.google_key))
+                {
+                    res.success = false;
+                    res.code = E_Res_Code.apply_fail;
+                    res.data = false;
+                    res.message = "用户被禁用或已经验证过";
+                    return res;
+                }
+                else
+                {
+                    res.data = service_common.Verification2FA(user.google_key, code);
+                    if (res.data == false)
+                    {
+                        res.success = false;
+                        res.code = E_Res_Code.verification_error;
+                        res.message = "验证码错误";
+                        return res;
+                    }
+                    else
+                    {
+                        user.verify_google = true;
+                        db.Users.Update(user);
+                        if (db.SaveChanges() > 0)
+                        {
+                            res.success = true;
+                            res.code = E_Res_Code.ok;
+                            return res;
+                        }
+                    }
+                }
+            }
+        }
+        return res;
+    }
 
     /// <summary>
     /// 验证实名认证
@@ -184,16 +284,16 @@ public class UserController : ControllerBase
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
                 Users? users = db.Users.SingleOrDefault(P => P.user_id == this.login.user_id);
-                if (users != null)
+                if (users == null || users.disabled == true || users.verify_realname == E_Verify.verify_ok)
                 {
-                    if (users.verify_realname == E_Verify.verify_ok)
-                    {
-                        res.success = false;
-                        res.code = E_Res_Code.apply_fail;
-                        res.data = false;
-                        res.message = "已经验证通过,不需要重复申请";
-                        return res;
-                    }
+                    res.success = false;
+                    res.code = E_Res_Code.apply_fail;
+                    res.data = false;
+                    res.message = "用户被禁用或已经验证过";
+                    return res;
+                }
+                else
+                {
                     users.realname_object_name = object_name;
                     users.verify_realname = E_Verify.verify_apply;
                     db.Users.Update(users);

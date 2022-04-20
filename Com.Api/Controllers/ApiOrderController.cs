@@ -55,8 +55,6 @@ public class ApiOrderController : ControllerBase
     [Route("OrderPlaces")]
     public Res<List<ResOrder>> OrderPlaces(CallOrder data)
     {
-        // List<ReqOrder> orders = JsonConvert.DeserializeObject<List<ReqOrder>>(a);
-        //判断用户api是否有交易权限
         (bool transaction, Users? users, UsersApi? api) user_api = service_user.ApiUserTransaction(Request.Headers["api_key"]);
         if (user_api.transaction == false || user_api.users == null)
         {

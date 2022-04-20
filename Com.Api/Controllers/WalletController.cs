@@ -117,6 +117,8 @@ public class WalletController : ControllerBase
     /// <param name="skip">跳过行数</param>
     /// <param name="take">提取行数</param>
     /// <returns></returns>
+    [HttpGet]
+    [Route("GetRunning")]
     public Res<List<ResRunning>> GetRunning(DateTimeOffset? start, DateTimeOffset? end, int skip, int take)
     {
         Res<List<ResRunning>> res = new Res<List<ResRunning>>();

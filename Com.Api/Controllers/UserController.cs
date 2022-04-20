@@ -78,7 +78,7 @@ public class UserController : ControllerBase
     /// </summary>   
     /// <returns></returns>
     [HttpPost]
-    [Route("VerifyPhone")]
+    [Route("ApplyPhone")]
     public Res<bool> ApplyPhone(string phone)
     {
         Res<bool> res = new Res<bool>();
@@ -330,7 +330,7 @@ public class UserController : ControllerBase
     /// </summary>
     /// <returns></returns>
     [HttpPost]
-    [Route("ApplyApiUser")]
+    [Route("GetApiUser")]
     public Res<List<UsersApi>> GetApiUser()
     {
         Res<List<UsersApi>> res = new Res<List<UsersApi>>();

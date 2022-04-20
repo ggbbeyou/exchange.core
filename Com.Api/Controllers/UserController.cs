@@ -310,4 +310,21 @@ public class UserController : ControllerBase
         return res;
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="ip"></param>
+    /// <param name="_2fa"></param>
+    /// <returns></returns>
+    [HttpPost]
+    [Route("ApplyRealname")]
+    [AllowAnonymous]
+    public Res<bool> ApplyApi(string name, string ip, string _2fa)
+    {
+        Res<bool> res = new Res<bool>();
+
+        return res;
+    }
+
 }

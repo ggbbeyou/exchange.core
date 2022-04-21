@@ -22,6 +22,10 @@ public class HomeController : ControllerBase
     /// </summary>
     private readonly ILogger<HomeController> logger;
     /// <summary>
+    /// 配置接口
+    /// </summary>
+    private readonly IConfiguration config;
+    /// <summary>
     /// 登录信息
     /// </summary>
     private (long no, long user_id, string user_name, E_App app, string public_key) login
@@ -48,27 +52,36 @@ public class HomeController : ControllerBase
     /// <summary>
     /// 初始化
     /// </summary>
+    /// <param name="config"></param>
     /// <param name="logger"></param>
-    public HomeController(ILogger<HomeController> logger)
+    public HomeController(IConfiguration config, ILogger<HomeController> logger)
     {
         this.logger = logger;
+        this.config = config;
     }
 
-    // /// <summary>
-    // /// 当前用户成交记录
-    // /// </summary>
-    // /// <param name="skip">跳过多少行</param>
-    // /// <param name="take">获取多少行</param>
-    // /// <param name="start">开始时间</param>
-    // /// <param name="end">结束时间</param>
-    // /// <returns></returns>
-    // [HttpGet]
-    // [Route("GetDealByuid")]
-    // [ResponseCache(CacheProfileName = "cache_1")]
-    // public Res<List<ResDeal>> GetDealByuid(int skip, int take, DateTimeOffset? start = null, DateTimeOffset? end = null)
-    // {
-    //     return this.service_deal.GetDealByuid(login.user_id, skip, take, start, end);
-    // }
+    /// <summary>
+    /// 获取基本信息
+    /// </summary>
+    /// <param name="site">站点</param>
+    /// <returns></returns>
+    [HttpGet]
+    [Route("GetBaseInfo")]
+    [ResponseCache(CacheProfileName = "cache_3")]
+    public Res<ResBaseInfo> GetBaseInfo(int site = 1)
+    {
+        Res<ResBaseInfo> res = new Res<ResBaseInfo>();
+        res.data = new ResBaseInfo()
+        {
+            website_name = "模拟交易",
+            website_icon = "https://freeware.iconfactory.com/assets/engb/preview.png",
+            website_time = DateTimeOffset.Now,
+            website_serivcefile = config["minio:endpoint"],
+        };
+        return res;
+    }
+
+
 
 
 

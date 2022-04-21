@@ -85,9 +85,9 @@ public class HomeController : ControllerBase
     }
 
     /// <summary>
-    /// 获取基本信息
+    /// 设置会话时区
     /// </summary>
-    /// <param name="time_zone">时区,+8:东八区</param>
+    /// <param name="time_zone">时区,8:东八区</param>
     /// <returns></returns>
     [HttpPost]
     [Route("SetTimeZone")]
@@ -99,34 +99,5 @@ public class HomeController : ControllerBase
         HttpContext.Session.SetInt32("time_zone", time_zone);
         return res;
     }
-
-    /// <summary>
-    /// 获取基本信息
-    /// </summary>
-    /// <param name="site">站点</param>
-    /// <returns></returns>
-    [HttpGet]
-    [Route("GetBaseInfo1")]
-    // [ResponseCache(CacheProfileName = "cache_3")]
-    public string GetBaseInfo1(int site = 1)
-    {
-        Res<ResBaseInfo> res = new Res<ResBaseInfo>();
-        res.success = true;
-        res.code = E_Res_Code.ok;
-        res.data = new ResBaseInfo()
-        {
-            website_name = "模拟交易",
-            website_icon = "https://freeware.iconfactory.com/assets/engb/preview.png",
-            website_time = DateTimeOffset.UtcNow,
-            website_serivcefile = config["minio:endpoint"],
-        };
-        return JsonConvert.SerializeObject(DateTime.UtcNow, new JsonSerializerSettings()
-        {
-            DateTimeZoneHandling = DateTimeZoneHandling.Utc
-        });
-    }
-
-
-
 
 }

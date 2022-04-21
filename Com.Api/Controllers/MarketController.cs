@@ -30,7 +30,7 @@ public class MarketController : ControllerBase
     /// </summary>
     /// <param name="symbol">交易对</param>
     /// <returns></returns>
-    [HttpPost]
+    [HttpGet]
     [Route("market")]
     public Res<List<ResMarket>> Market(List<string> symbol)
     {
@@ -42,7 +42,7 @@ public class MarketController : ControllerBase
     /// </summary>
     /// <param name="symbol">交易对</param>
     /// <returns></returns>
-    [HttpPost]
+    [HttpGet]
     [Route("ticker")]
     public Res<List<ResTicker>> Ticker(List<string> symbol)
     {
@@ -55,7 +55,7 @@ public class MarketController : ControllerBase
     /// <param name="symbol">交易对</param>
     /// <param name="sz">深度档数,只支持10,50,200</param>
     /// <returns></returns>
-    [HttpPost]
+    [HttpGet]
     [Route("depth")]
     public Res<ResDepth?> Depth(string symbol, int sz = 50)
     {

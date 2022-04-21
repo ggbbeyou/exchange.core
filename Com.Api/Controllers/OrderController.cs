@@ -103,7 +103,6 @@ public class OrderController : ControllerBase
             }
         };
         return service_order.PlaceOrder(symbol, users.user_id, users.user_name, orders);
-
     }
 
     /// <summary>
@@ -112,8 +111,8 @@ public class OrderController : ControllerBase
     /// <param name="data">挂单数据</param>
     /// <returns></returns>
     [HttpPost]
-    [Route("OrderPlace")]
-    public Res<List<ResOrder>> OrderPlace(CallOrder data)
+    [Route("OrderPlaces")]
+    public Res<List<ResOrder>> OrderPlaces(CallOrder data)
     {
         Res<List<ResOrder>> result = new Res<List<ResOrder>>();
         Users? users = service_user.GetUser(login.user_id);

@@ -134,4 +134,8 @@ public class WalletController : ControllerBase
         return res;
     }
 
+    // public Res<string> GetRechargeAddress(long wallet_id,)
+    // {
+        
+    // }
 }

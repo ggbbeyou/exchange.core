@@ -25,9 +25,14 @@ public class ResBaseInfo
     /// <value></value>
     public DateTimeOffset website_time { get; set; }
     /// <summary>
+    /// 时区
+    /// </summary>
+    /// <value></value>
+    public int time_zone { get; set; }
+    /// <summary>
     ///  网站:文件服务器地址
     /// </summary>
     /// <value></value>
     public string website_serivcefile { get; set; } = null!;
-    
+
 }

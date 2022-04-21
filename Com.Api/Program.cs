@@ -30,7 +30,13 @@ builder.Services.AddDbContextPool<DbContextEF>(options =>
 builder.Services.AddStackExchangeRedisCache(options =>
 {
     options.Configuration = builder.Configuration.GetConnectionString("Redis");
-    options.InstanceName = "redisInstance";
+    options.InstanceName = "session:";
+});
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromHours(10);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
 });
 builder.Services.AddAuthentication(options =>
 {
@@ -150,6 +156,7 @@ app.UseResponseCaching();
 app.UseWebSockets();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseSession();
 app.UseResponseCompression();
 app.MapControllers();
 app.Run();

@@ -92,7 +92,19 @@ builder.Services.AddControllers(options =>
     options.CacheProfiles.Add("cache_1", new CacheProfile() { Duration = 5 });
     options.CacheProfiles.Add("cache_2", new CacheProfile() { Duration = 10 });
     options.CacheProfiles.Add("cache_3", new CacheProfile() { Duration = 60 });
-}).AddNewtonsoftJson();
+}).AddNewtonsoftJson(setupAction =>
+{
+    // setupAction.SerializerSettings.DateFormatString = "yyyy-MM-dd HH:mm:ss";
+    setupAction.SerializerSettings.DateTimeZoneHandling = Newtonsoft.Json.DateTimeZoneHandling.Local;
+    // setupAction.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+    // setupAction.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
+    // setupAction.SerializerSettings.ContractResolver = new Newtonsoft.Json.Serialization.DefaultContractResolver();
+    // setupAction.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
+    // setupAction.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.IsoDateTimeConverter()
+    // {
+    //     DateTimeFormat = "yyyy-MM-dd HH:mm:ss"
+    // });
+});
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {

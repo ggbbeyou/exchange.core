@@ -1,0 +1,10 @@
+
+
+###  api接口
+
+@baseUrl = http://localhost:5227
+
+GET {{baseUrl}}/Home/GetBaseInfo?site=1 HTTP/1.1
+
+###
+GET {{baseUrl}}/Home/GetBaseInfo1?site=1 HTTP/1.1

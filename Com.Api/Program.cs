@@ -2,8 +2,10 @@ using System.Reflection;
 using System.Security.Claims;
 using System.Text;
 using Com.Api;
+using Com.Api.Sdk;
 using Com.Api.Sdk.Enum;
 using Com.Bll;
+using Com.Bll.Util;
 using Com.Db;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
@@ -30,7 +32,13 @@ builder.Services.AddDbContextPool<DbContextEF>(options =>
 builder.Services.AddStackExchangeRedisCache(options =>
 {
     options.Configuration = builder.Configuration.GetConnectionString("Redis");
-    options.InstanceName = "redisInstance";
+    options.InstanceName = "session:";
+});
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromHours(10);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
 });
 builder.Services.AddAuthentication(options =>
 {
@@ -86,18 +94,34 @@ builder.Services.AddAuthentication(options =>
     };
 });
 builder.Services.AddResponseCompression();
+// builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddControllers(options =>
 {
     options.CacheProfiles.Add("cache_0", new CacheProfile() { Duration = 1 });
     options.CacheProfiles.Add("cache_1", new CacheProfile() { Duration = 5 });
     options.CacheProfiles.Add("cache_2", new CacheProfile() { Duration = 10 });
     options.CacheProfiles.Add("cache_3", new CacheProfile() { Duration = 60 });
-}).AddNewtonsoftJson();
+}).AddNewtonsoftJson(setupAction =>
+{
+    // setupAction.SerializerSettings.DateFormatString = "yyyy-MM-dd HH:mm:ss";
+    // setupAction.SerializerSettings.DateTimeZoneHandling = Newtonsoft.Json.DateTimeZoneHandling.Utc;
+    // setupAction.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+    // setupAction.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
+    // setupAction.SerializerSettings.ContractResolver = new Newtonsoft.Json.Serialization.DefaultContractResolver();
+    // setupAction.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
+    ServiceProvider build = builder.Services.BuildServiceProvider();
+    IHttpContextAccessor? httpContextAccessor = build.GetService<IHttpContextAccessor>();
+    if (httpContextAccessor != null)
+    {
+        setupAction.SerializerSettings.Converters.Add(new JsonConverterDateTimeOffset(httpContextAccessor));
+    }
+});
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
-    // var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    // options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Type = SecuritySchemeType.Http,
@@ -138,6 +162,7 @@ app.UseResponseCaching();
 app.UseWebSockets();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseSession();
 app.UseResponseCompression();
 app.MapControllers();
 app.Run();

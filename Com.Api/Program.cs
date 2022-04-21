@@ -36,7 +36,7 @@ builder.Services.AddStackExchangeRedisCache(options =>
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromHours(10);
-    // options.Cookie.HttpOnly = true;
+    options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
 builder.Services.AddAuthentication(options =>
@@ -108,7 +108,7 @@ builder.Services.AddControllers(options =>
     // setupAction.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
     // setupAction.SerializerSettings.ContractResolver = new Newtonsoft.Json.Serialization.DefaultContractResolver();
     // setupAction.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
-    ServiceProvider build = builder.Services.BuildServiceProvider();
+    ServiceProvider build = builder!.Services.BuildServiceProvider();
     IHttpContextAccessor? httpContextAccessor = build.GetService<IHttpContextAccessor>();
     setupAction.SerializerSettings.Converters.Add(new JsonConverterDateTimeOffset(httpContextAccessor));
 });

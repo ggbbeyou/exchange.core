@@ -13,7 +13,6 @@ namespace Com.Api.Controllers;
 /// 基础接口
 /// </summary>
 [Route("[controller]")]
-[Authorize]
 [ApiController]
 public class HomeController : ControllerBase
 {
@@ -75,7 +74,7 @@ public class HomeController : ControllerBase
         {
             website_name = "模拟交易",
             website_icon = "https://freeware.iconfactory.com/assets/engb/preview.png",
-            website_time = DateTimeOffset.Now,
+            website_time = DateTimeOffset.UtcNow,
             website_serivcefile = config["minio:endpoint"],
         };
         return res;

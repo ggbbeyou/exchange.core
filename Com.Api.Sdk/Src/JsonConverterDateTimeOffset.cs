@@ -14,6 +14,7 @@ public class JsonConverterDateTimeOffset : JsonConverter<DateTimeOffset>
     {
         this.httpContextAccessor = httpContextAccessor;
     }
+
     public override DateTimeOffset ReadJson(JsonReader reader, Type objectType, DateTimeOffset existingValue, bool hasExistingValue, JsonSerializer serializer)
     {
         return existingValue;

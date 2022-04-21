@@ -111,7 +111,10 @@ builder.Services.AddControllers(options =>
     // setupAction.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
     ServiceProvider build = builder.Services.BuildServiceProvider();
     IHttpContextAccessor? httpContextAccessor = build.GetService<IHttpContextAccessor>();
-    setupAction.SerializerSettings.Converters.Add(new JsonConverterDateTimeOffset(httpContextAccessor));
+    if (httpContextAccessor != null)
+    {
+        setupAction.SerializerSettings.Converters.Add(new JsonConverterDateTimeOffset(httpContextAccessor));
+    }
 });
 
 builder.Services.AddEndpointsApiExplorer();

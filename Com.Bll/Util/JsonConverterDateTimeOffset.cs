@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 
-namespace Com.Api.Sdk;
+namespace Com.Bll.Util;
 
 /// <summary>
 /// 
@@ -28,14 +28,21 @@ public class JsonConverterDateTimeOffset : JsonConverter<DateTimeOffset>
         }
         else
         {
-            int? time_zone = httpContextAccessor.HttpContext.Session.GetInt32("time_zone");
-            if (time_zone == null)
+            if (httpContextAccessor.HttpContext == null)
             {
                 writer.WriteValue(value);
             }
             else
             {
-                writer.WriteValue(value.ToOffset(new TimeSpan(time_zone.Value, 0, 0)));
+                int? time_zone = httpContextAccessor.HttpContext.Session.GetInt32("time_zone");
+                if (time_zone == null)
+                {
+                    writer.WriteValue(value);
+                }
+                else
+                {
+                    writer.WriteValue(value.ToOffset(new TimeSpan(time_zone.Value, 0, 0)));
+                }
             }
         }
     }

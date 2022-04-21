@@ -5,6 +5,7 @@ using Com.Api;
 using Com.Api.Sdk;
 using Com.Api.Sdk.Enum;
 using Com.Bll;
+using Com.Bll.Util;
 using Com.Db;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
@@ -108,7 +109,7 @@ builder.Services.AddControllers(options =>
     // setupAction.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
     // setupAction.SerializerSettings.ContractResolver = new Newtonsoft.Json.Serialization.DefaultContractResolver();
     // setupAction.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
-    ServiceProvider build = builder!.Services.BuildServiceProvider();
+    ServiceProvider build = builder.Services.BuildServiceProvider();
     IHttpContextAccessor? httpContextAccessor = build.GetService<IHttpContextAccessor>();
     setupAction.SerializerSettings.Converters.Add(new JsonConverterDateTimeOffset(httpContextAccessor));
 });

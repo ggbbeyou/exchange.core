@@ -23,6 +23,7 @@ public class ResBaseInfo
     ///  网站:系统时间
     /// </summary>
     /// <value></value>
+    // [JsonConverter(typeof(JsonConverterDateTimeOffset))]
     public DateTimeOffset website_time { get; set; }
     /// <summary>
     /// 时区

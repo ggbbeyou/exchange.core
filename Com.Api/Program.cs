@@ -2,6 +2,7 @@ using System.Reflection;
 using System.Security.Claims;
 using System.Text;
 using Com.Api;
+using Com.Api.Sdk;
 using Com.Api.Sdk.Enum;
 using Com.Bll;
 using Com.Db;
@@ -35,7 +36,7 @@ builder.Services.AddStackExchangeRedisCache(options =>
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromHours(10);
-    options.Cookie.HttpOnly = true;
+    // options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
 builder.Services.AddAuthentication(options =>
@@ -92,6 +93,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 builder.Services.AddResponseCompression();
+// builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddControllers(options =>
 {
     options.CacheProfiles.Add("cache_0", new CacheProfile() { Duration = 1 });
@@ -101,16 +103,16 @@ builder.Services.AddControllers(options =>
 }).AddNewtonsoftJson(setupAction =>
 {
     // setupAction.SerializerSettings.DateFormatString = "yyyy-MM-dd HH:mm:ss";
-    setupAction.SerializerSettings.DateTimeZoneHandling = Newtonsoft.Json.DateTimeZoneHandling.Local;
+    // setupAction.SerializerSettings.DateTimeZoneHandling = Newtonsoft.Json.DateTimeZoneHandling.Utc;
     // setupAction.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
     // setupAction.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
     // setupAction.SerializerSettings.ContractResolver = new Newtonsoft.Json.Serialization.DefaultContractResolver();
     // setupAction.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
-    // setupAction.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.IsoDateTimeConverter()
-    // {
-    //     DateTimeFormat = "yyyy-MM-dd HH:mm:ss"
-    // });
+    ServiceProvider build = builder.Services.BuildServiceProvider();
+    IHttpContextAccessor? httpContextAccessor = build.GetService<IHttpContextAccessor>();
+    setupAction.SerializerSettings.Converters.Add(new JsonConverterDateTimeOffset(httpContextAccessor));
 });
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {

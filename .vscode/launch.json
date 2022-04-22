@@ -12,9 +12,9 @@
             "console": "internalConsole",
             "stopAtEntry": false,
             "env": {
-                // "DOTNET_ENVIRONMENT": "Development"
+                "DOTNET_ENVIRONMENT": "Development"
                 // "DOTNET_ENVIRONMENT": "Staging"
-                "DOTNET_ENVIRONMENT": "Production"
+                // "DOTNET_ENVIRONMENT": "Production"
             }
         },
         {
@@ -31,9 +31,9 @@
                 "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
             },
             "env": {
-                // "ASPNETCORE_ENVIRONMENT": "Development"
+                "ASPNETCORE_ENVIRONMENT": "Development"
                 // "ASPNETCORE_ENVIRONMENT": "Staging"
-                "ASPNETCORE_ENVIRONMENT": "Production"
+                // "ASPNETCORE_ENVIRONMENT": "Production"
             },
             "sourceFileMap": {
                 "/Views": "${workspaceFolder}/Views"
@@ -53,9 +53,9 @@
                 "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
             },
             "env": {
-                // "ASPNETCORE_ENVIRONMENT": "Development"
+                "ASPNETCORE_ENVIRONMENT": "Development"
                 // "ASPNETCORE_ENVIRONMENT": "Staging"
-                "ASPNETCORE_ENVIRONMENT": "Production"
+                // "ASPNETCORE_ENVIRONMENT": "Production"
             },
             "sourceFileMap": {
                 "/Views": "${workspaceFolder}/Views"
@@ -75,9 +75,9 @@
                 "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
             },
             "env": {
-                // "ASPNETCORE_ENVIRONMENT": "Development"
+                "ASPNETCORE_ENVIRONMENT": "Development"
                 // "ASPNETCORE_ENVIRONMENT": "Staging"
-                "ASPNETCORE_ENVIRONMENT": "Production"
+                // "ASPNETCORE_ENVIRONMENT": "Production"
             },
             "sourceFileMap": {
                 "/Views": "${workspaceFolder}/Views"

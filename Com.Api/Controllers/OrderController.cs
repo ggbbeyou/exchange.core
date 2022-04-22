@@ -160,11 +160,11 @@ public class OrderController : ControllerBase
     /// <summary>
     ///  按交易对,订单id撤单
     /// </summary>
-    /// <param name="model">订单id</param>
+    /// <param name="model">订单id key:symbol,data:订单id数组</param>
     /// <returns></returns>
     [HttpPost]
     [Route("OrderCancelByOrderid")]
-    public Res<bool> OrderCancelByOrderid(CallOrderCancel model)
+    public Res<bool> OrderCancelByOrderid(KeyList<string, long> model)
     {
         Res<bool> result = new Res<bool>();
         Users? users = service_user.GetUser(login.user_id);
@@ -180,7 +180,7 @@ public class OrderController : ControllerBase
             result.message = "用户禁止交易";
             return result;
         }
-        return this.service_order.CancelOrder(model.symbol, users.user_id, 3, model.data);
+        return this.service_order.CancelOrder(model.key, users.user_id, 3, model.data);
 
     }
 
@@ -219,11 +219,11 @@ public class OrderController : ControllerBase
     /// <param name="take">获取多少行</param>
     /// <returns></returns>
     [HttpGet]
-    [Route("GetOrderCurrent")]
+    [Route("GetOrderHanging")]
     [ResponseCache(CacheProfileName = "cache_0")]
-    public Res<List<ResOrder>> GetOrderCurrent(DateTimeOffset? start, DateTimeOffset? end, int skip = 0, int take = 50)
+    public Res<List<ResOrder>> GetOrderHanging(DateTimeOffset? start, DateTimeOffset? end, int skip = 0, int take = 50)
     {
-        return this.service_order.GetOrder(true, login.user_id, skip, take, start, end);
+        return this.service_order.GetOrder(uid: login.user_id, state: new List<E_OrderState>() { E_OrderState.unsold, E_OrderState.partial }, start: start, end: end, skip: skip, take: take);
     }
 
     /// <summary>
@@ -239,52 +239,55 @@ public class OrderController : ControllerBase
     [ResponseCache(CacheProfileName = "cache_1")]
     public Res<List<ResOrder>> GetOrderHistory(DateTimeOffset? start, DateTimeOffset? end, int skip = 0, int take = 50)
     {
-        return this.service_order.GetOrder(false, login.user_id, skip, take, start, end);
+        return this.service_order.GetOrder(uid: login.user_id, state: new List<E_OrderState>() { E_OrderState.completed, E_OrderState.cancel }, start: start, end: end, skip: skip, take: take);
     }
 
     /// <summary>
     /// 按订单id查询
     /// </summary>
-    /// <param name="market"></param>
-    /// <param name="data"></param>
+    /// <param name="model">key:symbol,data:订单id数组</param>
     /// <returns></returns>
     [HttpPost]
     [Route("GetOrderById")]
     [ResponseCache(CacheProfileName = "cache_0")]
-    public Res<List<ResOrder>> GetOrderById(long market, List<long> data)
+    public Res<List<ResOrder>> GetOrderById(KeyList<string, long> model)
     {
-        return this.service_order.GetOrder(market: market, uid: login.user_id, ids: data);
+        return this.service_order.GetOrder(symbol: model.key, uid: login.user_id, ids: model.data);
     }
 
     /// <summary>
     /// 按订单状态查询
     /// </summary>
-    /// <param name="market"></param>
-    /// <param name="state"></param>
+    /// <param name="symbol">交易对</param>
+    /// <param name="state">订单状态</param>
     /// <param name="start"></param>
     /// <param name="end"></param>
+    /// <param name="skip">跳过多少行</param>
+    /// <param name="take">获取多少行</param>
     /// <returns></returns>
     [HttpGet]
     [Route("GetOrderByState")]
     [ResponseCache(CacheProfileName = "cache_0")]
-    public Res<List<ResOrder>> GetOrderByState(long market, E_OrderState state, DateTimeOffset start, DateTimeOffset end)
+    public Res<List<ResOrder>> GetOrderByState(string symbol, E_OrderState state, DateTimeOffset start, DateTimeOffset end, int skip = 0, int take = 50)
     {
-        return this.service_order.GetOrder(market: market, uid: login.user_id, state: state, start: start, end: end);
+        return this.service_order.GetOrder(symbol: symbol, uid: login.user_id, state: new List<E_OrderState>() { state }, start: start, end: end, skip: skip, take: take);
     }
 
     /// <summary>
     /// 订单时间查询
     /// </summary>
-    /// <param name="market"></param>
-    /// <param name="start"></param>
-    /// <param name="end"></param>
+    /// <param name="symbol">交易对</param>
+    /// <param name="start">开始时间</param>
+    /// <param name="end">结束时间</param>
+    /// <param name="skip">跳过多少行</param>
+    /// <param name="take">获取多少行</param>
     /// <returns></returns>
     [HttpGet]
     [Route("GetOrderByDate")]
     [ResponseCache(CacheProfileName = "cache_2")]
-    public Res<List<ResOrder>> GetOrderByDate(long market, DateTimeOffset start, DateTimeOffset end)
+    public Res<List<ResOrder>> GetOrderByDate(string symbol, DateTimeOffset start, DateTimeOffset end, int skip = 0, int take = 50)
     {
-        return this.service_order.GetOrder(market: market, uid: login.user_id, start: start, end: end);
+        return this.service_order.GetOrder(symbol: symbol, uid: login.user_id, start: start, end: end, skip: skip, take: take);
     }
 
 }

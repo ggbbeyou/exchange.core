@@ -245,26 +245,26 @@ public class ApiOrderController : ControllerBase
     [HttpGet]
     [Route("GetOrderByState")]
     [ResponseCache(CacheProfileName = "cache_0")]
-    public Res<List<ResOrder>> GetOrderByState(string symbol, E_OrderState state, DateTimeOffset start, DateTimeOffset end)
+    public Res<List<ResOrder>> GetOrderByState(string symbol, E_OrderState state, DateTimeOffset start, DateTimeOffset end, int skip = 0, int take = 50)
     {
         UsersApi? api = this.service_user.GetApi(Request.Headers["api_key"]);
-        return this.service_order.GetOrder(symbol: symbol, uid: api!.user_id, state: new List<E_OrderState>() { state }, start: start, end: end);
+        return this.service_order.GetOrder(symbol: symbol, uid: api!.user_id, state: new List<E_OrderState>() { state }, start: start, end: end, skip: skip, take: take);
     }
 
     /// <summary>
     /// 订单时间查询
     /// </summary>
-    /// <param name="symbol"></param>
-    /// <param name="start"></param>
-    /// <param name="end"></param>
+    /// <param name="symbol">交易对</param>
+    /// <param name="start">开始时间</param>
+    /// <param name="end">结束时间</param>
     /// <returns></returns>
     [HttpGet]
     [Route("GetOrderByDate")]
     [ResponseCache(CacheProfileName = "cache_2")]
-    public Res<List<ResOrder>> GetOrderByDate(string symbol, DateTimeOffset start, DateTimeOffset end)
+    public Res<List<ResOrder>> GetOrderByDate(string symbol, DateTimeOffset start, DateTimeOffset end, int skip = 0, int take = 50)
     {
         UsersApi? api = this.service_user.GetApi(Request.Headers["api_key"]);
-        return this.service_order.GetOrder(symbol: symbol, uid: api!.user_id, start: start, end: end);
+        return this.service_order.GetOrder(symbol: symbol, uid: api!.user_id, start: start, end: end, skip: skip, take: take);
     }
 
 

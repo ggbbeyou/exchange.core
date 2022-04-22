@@ -241,6 +241,8 @@ public class ApiOrderController : ControllerBase
     /// <param name="state">订单状态</param>
     /// <param name="start"></param>
     /// <param name="end"></param>
+    /// <param name="skip">跳过多少行</param>
+    /// <param name="take">获取多少行</param>
     /// <returns></returns>
     [HttpGet]
     [Route("GetOrderByState")]
@@ -257,6 +259,8 @@ public class ApiOrderController : ControllerBase
     /// <param name="symbol">交易对</param>
     /// <param name="start">开始时间</param>
     /// <param name="end">结束时间</param>
+    /// <param name="skip">跳过多少行</param>
+    /// <param name="take">获取多少行</param>
     /// <returns></returns>
     [HttpGet]
     [Route("GetOrderByDate")]

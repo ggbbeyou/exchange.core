@@ -248,7 +248,7 @@ public class OrderController : ControllerBase
     /// <param name="market"></param>
     /// <param name="data"></param>
     /// <returns></returns>
-    [HttpGet]
+    [HttpPost]
     [Route("GetOrderById")]
     [ResponseCache(CacheProfileName = "cache_0")]
     public Res<List<ResOrder>> GetOrderById(long market, List<long> data)

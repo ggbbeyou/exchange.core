@@ -38,6 +38,7 @@ public class ReqChannel
     public E_WebsockerChannel channel { get; set; }
     /// <summary>
     /// 数据 交易对或其它数据
+    /// login:{api_key:"",timestamp:123,sign:""}, sign:HMACSHA256(secret).ComputeHash(timestamp)
     /// </summary>
     /// <value></value>
     public string data { get; set; } = null!;

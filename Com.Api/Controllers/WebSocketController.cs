@@ -46,6 +46,7 @@ using Microsoft.AspNetCore.Authorization;
 using StackExchange.Redis;
 using Com.Api.Sdk.Models;
 using System.Text;
+using Com.Bll.Util;
 
 namespace Com.Api.Controllers;
 
@@ -73,6 +74,11 @@ public class WebSocketController : ControllerBase
     /// </summary>
     /// <returns></returns>
     public ServiceMarket market_info_service = new ServiceMarket();
+    /// <summary>
+    /// 用户服务
+    /// </summary>
+    /// <returns></returns>
+    private ServiceUser service_user = new ServiceUser();
 
     /// <summary>
     /// 
@@ -184,13 +190,31 @@ public class WebSocketController : ControllerBase
         }
         if (req.op == E_WebsockerOp.login)
         {
-            //执行登录操作，并设置用户id            
-            uid = 1;
+            //执行登录操作，并设置用户id
+            Req_Login? req_login = JsonConvert.DeserializeObject<Req_Login>(req.args[0].data);
+            if (req_login != null)
+            {
+                UsersApi? users_api = service_user.GetApi(req_login.api_key);
+                if (users_api != null)
+                {
+                    if (req_login.sign == Encryption.HmacSHA256Encrypt(users_api.api_secret, req_login.timestamp.ToString()))
+                    {
+                        uid = users_api.user_id;
+                        resWebsocker.channel = E_WebsockerChannel.none;
+                        resWebsocker.data = "";
+                        resWebsocker.message = "登录成功!";
+                        byte[] b = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(resWebsocker));
+                        webSocket.SendAsync(new ArraySegment<byte>(b, 0, b.Length), WebSocketMessageType.Text, true, CancellationToken.None);
+                        return;
+                    }
+                }
+            }
+            resWebsocker.success = false;
             resWebsocker.channel = E_WebsockerChannel.none;
-            resWebsocker.data = "";
-            resWebsocker.message = "登录成功!";
-            byte[] b = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(resWebsocker));
-            webSocket.SendAsync(new ArraySegment<byte>(b, 0, b.Length), WebSocketMessageType.Text, true, CancellationToken.None);
+            resWebsocker.message = "签名失败";
+            byte[] bb = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(resWebsocker));
+            webSocket.SendAsync(new ArraySegment<byte>(bb, 0, bb.Length), WebSocketMessageType.Text, true, CancellationToken.None);
+            return;
         }
         else if (req.op == E_WebsockerOp.logout)
         {

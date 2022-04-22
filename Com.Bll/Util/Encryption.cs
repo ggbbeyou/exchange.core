@@ -37,12 +37,28 @@ public class Encryption
     {
         byte[] bytes = Encoding.UTF8.GetBytes(content);
         byte[] hash = SHA256.Create().ComputeHash(bytes);
+        HMACSHA256 hmac = new HMACSHA256(Encoding.UTF8.GetBytes("com.bll.util.sha256"));
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < hash.Length; i++)
         {
             builder.Append(hash[i].ToString("x2"));
         }
         return builder.ToString();
+    }
+
+    /// <summary>
+    /// HmacSHA256加密,不可逆
+    /// </summary>
+    /// <param name="secret">密钥</param>
+    /// <param name="content">内容</param>
+    /// <returns></returns>
+    public static string HmacSHA256Encrypt(string secret, string message)
+    {
+        using (var hmacsha256 = new HMACSHA256(Encoding.UTF8.GetBytes(secret)))
+        {
+            byte[] hashmessage = hmacsha256.ComputeHash(Encoding.UTF8.GetBytes(message));
+            return Convert.ToBase64String(hashmessage);
+        }
     }
 
     #endregion

@@ -1,9 +1,10 @@
 ﻿
 /*
 
-http://www.easyswoole.com/wstool.html
-ws://localhost:5210/WebSocket/WebSocket
+websocket工具:http://www.easyswoole.com/wstool.html
+websocket地址:ws://localhost/WebSocket/push
 
+公共订阅
 {"op":"subscribe","args":[
     {"channel":"tickers","data":"btc/usdt"},
     {"channel":"trades","data":"btc/usdt"},
@@ -26,9 +27,14 @@ ws://localhost:5210/WebSocket/WebSocket
     {"channel":"month1","data":"btc/usdt"}
 ]}
 
-
-{"op":"login","args":[{"channel":"","data":"密文"}]}
-{"op":"Logout","args":[{"channel":"","data":""}]}
+私有订阅
+登录:{"op":"login","args":[{"channel":"","data":"{api_key:'你的api用户key',timestamp:时间戳(毫秒),sign:'签名'}"}]}    签名算法 HMACSHA256(secret).ComputeHash(timestamp)
+订阅
+{"op":"subscribe","args":[
+    {"channel":"assets","data":"用户id"},
+    {"channel":"orders","data":"用户id"},
+]}
+登出:{"op":"Logout","args":[{"channel":"","data":""}]}
 
 */
 

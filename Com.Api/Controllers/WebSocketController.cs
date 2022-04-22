@@ -191,27 +191,36 @@ public class WebSocketController : ControllerBase
         if (req.op == E_WebsockerOp.login)
         {
             //执行登录操作，并设置用户id
-            Req_Login? req_login = JsonConvert.DeserializeObject<Req_Login>(req.args[0].data);
-            if (req_login != null)
+            if (req.args != null && req.args.Count > 0 && !string.IsNullOrWhiteSpace(req.args[0].data))
             {
-                UsersApi? users_api = service_user.GetApi(req_login.api_key);
-                if (users_api != null)
+                try
                 {
-                    if (req_login.sign == Encryption.HmacSHA256Encrypt(users_api.api_secret, req_login.timestamp.ToString()))
+                    Req_Login? req_login = JsonConvert.DeserializeObject<Req_Login>(req.args[0].data);
+                    if (req_login != null)
                     {
-                        uid = users_api.user_id;
-                        resWebsocker.channel = E_WebsockerChannel.none;
-                        resWebsocker.data = "";
-                        resWebsocker.message = "登录成功!";
-                        byte[] b = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(resWebsocker));
-                        webSocket.SendAsync(new ArraySegment<byte>(b, 0, b.Length), WebSocketMessageType.Text, true, CancellationToken.None);
-                        return;
+                        UsersApi? users_api = service_user.GetApi(req_login.api_key);
+                        if (users_api != null)
+                        {
+                            if (req_login.sign == Encryption.HmacSHA256Encrypt(users_api.api_secret, req_login.timestamp.ToString()))
+                            {
+                                uid = users_api.user_id;
+                                resWebsocker.channel = E_WebsockerChannel.none;
+                                resWebsocker.data = "";
+                                resWebsocker.message = "登录成功!";
+                                byte[] b = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(resWebsocker));
+                                webSocket.SendAsync(new ArraySegment<byte>(b, 0, b.Length), WebSocketMessageType.Text, true, CancellationToken.None);
+                                return;
+                            }
+                        }
                     }
+                }
+                catch
+                {
                 }
             }
             resWebsocker.success = false;
             resWebsocker.channel = E_WebsockerChannel.none;
-            resWebsocker.message = "签名失败";
+            resWebsocker.message = "签名失败. {api_key:'你的api用户key',timestamp:时间戳(毫秒),sign:'签名'},签名算法 HMACSHA256(secret).ComputeHash(timestamp)";
             byte[] bb = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(resWebsocker));
             webSocket.SendAsync(new ArraySegment<byte>(bb, 0, bb.Length), WebSocketMessageType.Text, true, CancellationToken.None);
             return;

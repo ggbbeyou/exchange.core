@@ -8,3 +8,8 @@ GET {{baseUrl}}/Home/GetBaseInfo?site=1 HTTP/1.1
 
 ###
 GET {{baseUrl}}/Home/GetBaseInfo1?site=1 HTTP/1.1
+
+
+###
+
+GET http://43.138.142.228:8001/Home/GetBaseInfo?site=1 HTTP/1.1

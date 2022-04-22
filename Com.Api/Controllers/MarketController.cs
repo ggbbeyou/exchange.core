@@ -30,7 +30,7 @@ public class MarketController : ControllerBase
     /// </summary>
     /// <param name="symbol">交易对</param>
     /// <returns></returns>
-    [HttpGet]
+    [HttpPost]
     [Route("market")]
     public Res<List<ResMarket>> Market(List<string> symbol)
     {
@@ -42,7 +42,7 @@ public class MarketController : ControllerBase
     /// </summary>
     /// <param name="symbol">交易对</param>
     /// <returns></returns>
-    [HttpGet]
+    [HttpPost]
     [Route("ticker")]
     public Res<List<ResTicker>> Ticker(List<string> symbol)
     {

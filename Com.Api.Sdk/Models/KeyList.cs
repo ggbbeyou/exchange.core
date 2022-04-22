@@ -9,17 +9,17 @@ namespace Com.Api.Sdk.Models;
 /// <summary>
 /// 请求操作动作
 /// </summary>
-public class CallOrderCancel
+public class KeyList<T, K>
 {
     /// <summary>
-    /// 交易对
+    /// key
     /// </summary>
     /// <value></value>
-    public string symbol { get; set; } = null!;
+    public T key { get; set; } = default(T)!;
     /// <summary>
-    /// 撤单数据
+    /// list
     /// </summary>
     /// <value></value>
-    public List<long> data { get; set; } = null!;
+    public List<K> data { get; set; } = null!;
 
 }

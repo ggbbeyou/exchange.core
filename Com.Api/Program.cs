@@ -152,7 +152,7 @@ builder.Host.ConfigureLogging((context, logging) =>
 });
 builder.Host.UseNLog();
 var app = builder.Build();
-if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
+// if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
 {
     app.UseSwagger();
     app.UseSwaggerUI();

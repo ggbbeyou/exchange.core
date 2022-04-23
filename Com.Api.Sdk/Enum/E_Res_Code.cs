@@ -89,6 +89,10 @@ public enum E_Res_Code
     /// 禁用验证,没有权限或已验证时
     /// </summary>
     verification_disable,
+    /// <summary>
+    /// 名称重复
+    /// </summary>
+    name_repeat,
     //////用户相关错误码/////////////////////////////////////////////////////////////////////
 
 

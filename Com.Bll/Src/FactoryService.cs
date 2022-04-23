@@ -44,7 +44,13 @@ public class FactoryService
     public void Init(FactoryConstant constant)
     {
         this.constant = constant;
-
+        string minio_endpoint = constant.config.GetSection("minio:endpoint").Get<string>();
+        if (!string.IsNullOrWhiteSpace(minio_endpoint))
+        {
+            ServiceMinio minio = new ServiceMinio(constant.config, constant.logger);
+            minio.MakeBucket(this.GetMinioCoin()).Wait();
+            minio.MakeBucket(this.GetMinioRealname()).Wait();
+        }
     }
 
     /// <summary>
@@ -181,6 +187,15 @@ public class FactoryService
     public string GetMinioRealname()
     {
         return string.Format("realname");
+    }
+
+    /// <summary>
+    /// Minio:币图标
+    /// </summary>
+    /// <returns></returns>
+    public string GetMinioCoin()
+    {
+        return string.Format("coin");
     }
 
 }

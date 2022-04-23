@@ -56,7 +56,7 @@ public class ResRunning
     /// 量
     /// </summary>
     /// <value></value>
-    [JsonConverter(typeof(JsonConverterDecimal))]
+    //[JsonConverter(typeof(JsonConverterDecimal))]
     public decimal amount { get; set; }
     /// <summary>
     /// 时间

@@ -93,6 +93,10 @@ public enum E_Res_Code
     /// 名称重复
     /// </summary>
     name_repeat,
+    /// <summary>
+    /// 不能小于0
+    /// </summary>
+    not_less_0,
     //////用户相关错误码/////////////////////////////////////////////////////////////////////
 
 
@@ -173,6 +177,10 @@ public enum E_Res_Code
     /// 未找到钱包
     /// </summary>
     wallet_not_found,
+    /// <summary>
+    /// 未找到币种
+    /// </summary>
+    coin_not_found,
     /// <summary>
     /// 资金不能低于0
     /// </summary>

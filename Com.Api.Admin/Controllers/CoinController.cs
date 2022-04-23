@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 using Com.Api.Sdk.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Com.Api.Admin.Controllers;
 
@@ -123,6 +124,23 @@ public class CoinController : ControllerBase
             res.message = "";
             return res;
         }
+        return res;
+    }
+
+    /// <summary>
+    /// 获取币种列表
+    /// </summary>
+    /// <param name="coin_name">币名称</param>
+    /// <returns></returns>
+    [HttpGet]
+    [Route("GetCoin")]
+
+    public Res<List<Coin>> GetCoin(string coin_name)
+    {
+        Res<List<Coin>> res = new Res<List<Coin>>();
+        res.success = false;
+        res.code = E_Res_Code.fail;
+        res.data = db.Coin.WhereIf(coin_name != null, P => P.coin_name == coin_name!.ToUpper()).AsNoTracking().ToList();
         return res;
     }
 

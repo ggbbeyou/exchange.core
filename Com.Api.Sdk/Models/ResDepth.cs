@@ -26,13 +26,13 @@ public class ResDepth
     /// 总额,可作为推送校检深度
     /// </summary>
     /// <value></value>
-    [JsonConverter(typeof(JsonConverterDecimal))]
+    //[JsonConverter(typeof(JsonConverterDecimal))]
     public decimal total_bid { get; set; }
     /// <summary>
     /// 总额,可作为推送校检深度
     /// </summary>
     /// <value></value>
-    [JsonConverter(typeof(JsonConverterDecimal))]
+    //[JsonConverter(typeof(JsonConverterDecimal))]
     public decimal total_ask { get; set; }
     /// <summary>
     /// orderbook时间

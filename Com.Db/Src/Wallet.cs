@@ -52,21 +52,21 @@ public class Wallet
     /// 总额
     /// </summary>
     /// <value></value>
-    [JsonConverter(typeof(JsonConverterDecimal))]
+    //[JsonConverter(typeof(JsonConverterDecimal))]
     [ConcurrencyCheck]
     public decimal total { get; set; }
     /// <summary>
     /// 可用
     /// </summary>
     /// <value></value>
-    [JsonConverter(typeof(JsonConverterDecimal))]
+    //[JsonConverter(typeof(JsonConverterDecimal))]
     [ConcurrencyCheck]
     public decimal available { get; set; }
     /// <summary>
     /// 冻结
     /// </summary>
     /// <value></value>
-    [JsonConverter(typeof(JsonConverterDecimal))]
+    //[JsonConverter(typeof(JsonConverterDecimal))]
     [ConcurrencyCheck]
     public decimal freeze { get; set; }
     /// <summary>

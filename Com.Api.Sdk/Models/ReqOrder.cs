@@ -45,31 +45,31 @@ public class ReqOrder
     /// 挂单价:限价单(有效),其它无效
     /// </summary>
     /// <value></value>
-    [JsonConverter(typeof(JsonConverterDecimal))]
+    //[JsonConverter(typeof(JsonConverterDecimal))]
     public decimal? price { get; set; }
     /// <summary>
     /// 挂单量:限价单/市场卖价(有效),其它无效
     /// </summary>
     /// <value></value>
-    [JsonConverter(typeof(JsonConverterDecimal))]
+    //[JsonConverter(typeof(JsonConverterDecimal))]
     public decimal? amount { get; set; }
     /// <summary>
     /// 挂单额:市价买单(有效),其它无效
     /// </summary>
     /// <value></value>
-    [JsonConverter(typeof(JsonConverterDecimal))]
+    //[JsonConverter(typeof(JsonConverterDecimal))]
     public decimal? total { get; set; }
     /// <summary>
     /// 触发挂单价格
     /// </summary>
     /// <value></value>   
-    [JsonConverter(typeof(JsonConverterDecimal))]
+    //[JsonConverter(typeof(JsonConverterDecimal))]
     public decimal trigger_hanging_price { get; set; }
     /// <summary>
     /// 触发撤单价格
     /// </summary>
     /// <value></value>
-    [JsonConverter(typeof(JsonConverterDecimal))]
+    //[JsonConverter(typeof(JsonConverterDecimal))]
     public decimal trigger_cancel_price { get; set; }
 
 }

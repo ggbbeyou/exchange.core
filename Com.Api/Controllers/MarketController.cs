@@ -34,7 +34,6 @@ public class MarketController : ControllerBase
     [Route("market")]
     public Res<List<ResMarket>> Market(List<string> symbol)
     {
-        Res<List<ResMarket>> aa = service_market.Market(symbol);
         return service_market.Market(symbol);
     }
 

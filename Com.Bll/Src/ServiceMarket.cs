@@ -30,7 +30,21 @@ public class ServiceMarket
     public Res<List<ResMarket>> Market(List<string> symbol)
     {
         Res<List<ResMarket>> res = new Res<List<ResMarket>>();
-        List<ResMarket> market = this.GetMarketBySymbol(symbol).ConvertAll(P => (ResMarket)P);
+        List<ResMarket> market = this.GetMarketBySymbol(symbol).ConvertAll(P => new ResMarket()
+        {
+            market = P.market,
+            symbol = P.symbol,
+            coin_name_base = P.coin_name_base,
+            coin_name_quote = P.coin_name_quote,
+            market_type = P.market_type,
+            transaction = P.transaction,
+            status = P.status,
+            places_price = P.places_price,
+            places_amount = P.places_amount,
+            trade_min = P.trade_min,
+            trade_min_market_sell = P.trade_min_market_sell,
+            sort = P.sort
+        });
         if (market != null)
         {
             res.success = true;
@@ -225,7 +239,7 @@ public class ServiceMarket
                 }
             }
         }
-    }   
+    }
 
 
 }

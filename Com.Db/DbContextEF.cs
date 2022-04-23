@@ -188,6 +188,7 @@ public class DbContextEF : DbContext
             o.Property(P => P.last_price).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("最后的成交价");
             o.Property(P => P.service_url).IsRequired().HasColumnType("nvarchar").HasMaxLength(50).HasComment("服务地址");
             o.Property(P => P.sort).IsRequired().HasColumnType("float").HasComment("排序");
+            o.Property(P => P.tag).HasColumnType("nvarchar").HasMaxLength(20).HasComment("标签");
             o.ToTable(nameof(Market));
         });
         modelBuilder.Entity<OrderBuy>(o =>
@@ -320,7 +321,7 @@ public class DbContextEF : DbContext
             o.Property(P => P.withdrawal).IsRequired().HasColumnType("bit").HasComment("是否提现");
             o.Property(P => P.white_list_ip).HasColumnType("nvarchar").HasMaxLength(200).HasComment("IP白名单");
             o.Property(P => P.create_time).IsRequired().HasColumnType("datetimeoffset").HasComment("创建时间");
-            
+
             o.ToTable(nameof(UsersApi));
         });
         modelBuilder.Entity<Vip>(o =>

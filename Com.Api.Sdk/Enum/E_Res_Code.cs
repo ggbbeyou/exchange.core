@@ -131,7 +131,10 @@ public enum E_Res_Code
     user_disable,
 
     //////订单相关错误码/////////////////////////////////////////////////////////////////////
-
+    /// <summary>
+    /// 交易对不存在
+    /// </summary>
+    not_found_symbol,
     /// <summary>
     /// 系统禁止挂单
     /// </summary>

@@ -74,4 +74,9 @@ public class ResMarket
     /// </summary>
     /// <value></value>
     public float sort { get; set; }
+    /// <summary>
+    /// 标签
+    /// </summary>
+    /// <value></value>
+    public string? tag { get; set; }
 }

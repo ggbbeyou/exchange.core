@@ -138,8 +138,8 @@ public class CoinController : ControllerBase
     public Res<List<Coin>> GetCoin(string coin_name)
     {
         Res<List<Coin>> res = new Res<List<Coin>>();
-        res.success = false;
-        res.code = E_Res_Code.fail;
+        res.success = true;
+        res.code = E_Res_Code.ok;
         res.data = db.Coin.WhereIf(coin_name != null, P => P.coin_name == coin_name!.ToUpper()).AsNoTracking().ToList();
         return res;
     }

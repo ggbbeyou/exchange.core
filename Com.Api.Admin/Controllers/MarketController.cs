@@ -10,6 +10,7 @@ using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 using Com.Api.Sdk.Models;
 using Com.Bll.Util;
+using Microsoft.EntityFrameworkCore;
 
 namespace Com.Api.Admin.Controllers;
 
@@ -69,32 +70,32 @@ public class MarketController : ControllerBase
     }
 
     /// <summary>
-    /// 
+    /// 添加交易对
     /// </summary>
-    /// <param name="type"></param>
-    /// <param name="coin_id_base"></param>
-    /// <param name="coin_id_quote"></param>
-    /// <param name="places_price"></param>
-    /// <param name="places_amount"></param>
-    /// <param name="trade_min"></param>
-    /// <param name="trade_min_market_sell"></param>
-    /// <param name="last_price"></param>
-    /// <param name="service_url"></param>
+    /// <param name="type">交易对类型</param>
+    /// <param name="coin_id_base">基础币种id</param>
+    /// <param name="coin_id_quote">报价币种id</param>
+    /// <param name="places_price">交易价小数位数</param>
+    /// <param name="places_amount">交易量小数位数</param>
+    /// <param name="trade_min">除了市价卖单外每一笔最小交易额</param>
+    /// <param name="trade_min_market_sell">市价卖单每一笔最小交易量</param>
+    /// <param name="service_url">服务地址</param>
     /// <param name="market_email">作市账号邮箱</param>
     /// <param name="market_password">作市账号密码</param>
     /// <param name="settlement_email">结算账号邮箱</param>
     /// <param name="settlement_password">结算账号密码</param>
-    /// <param name="sort"></param>
-    /// <returns></returns>
+    /// <param name="sort">排序</param>
+    /// <param name="tag">标签</param>
+    /// <returns>排序</returns>
     [HttpPost]
     [Route("AddMarket")]
-    public Res<bool> AddMarket(E_MarketType type, long coin_id_base, long coin_id_quote, int places_price, int places_amount, decimal trade_min, decimal trade_min_market_sell, decimal last_price, string service_url, string market_email, string market_password, string settlement_email, string settlement_password, float sort)
+    public Res<bool> AddMarket(E_MarketType type, long coin_id_base, long coin_id_quote, int places_price, int places_amount, decimal trade_min, decimal trade_min_market_sell, string service_url, string market_email, string market_password, string settlement_email, string settlement_password, float sort, string? tag)
     {
         Res<bool> res = new Res<bool>();
         res.success = false;
         res.code = E_Res_Code.fail;
         res.data = false;
-        if (places_price < 0 || places_amount < 0 || trade_min <= 0 || trade_min_market_sell <= 0 || last_price < 0)
+        if (places_price < 0 || places_amount < 0 || trade_min <= 0 || trade_min_market_sell <= 0)
         {
             res.success = false;
             res.code = E_Res_Code.not_less_0;
@@ -117,7 +118,6 @@ public class MarketController : ControllerBase
         }
         Coin coin_base = db.Coin.Single(P => P.coin_id == coin_id_base);
         Coin coin_quote = db.Coin.Single(P => P.coin_id == coin_id_quote);
-
         Market market = new Market();
         market.market = FactoryService.instance.constant.worker.NextId();
         if (type == E_MarketType.spot)
@@ -135,9 +135,10 @@ public class MarketController : ControllerBase
         market.places_amount = places_amount;
         market.trade_min = trade_min;
         market.trade_min_market_sell = trade_min_market_sell;
-        market.last_price = last_price;
+        market.last_price = 0;
         market.service_url = service_url;
         market.sort = sort;
+        market.tag = tag;
         (string public_key, string private_key) key_res = Encryption.GetRsaKey();
         Users market_user = new Users()
         {
@@ -198,6 +199,71 @@ public class MarketController : ControllerBase
         }
         return res;
     }
+
+    /// <summary>
+    /// 修改交易对
+    /// </summary>
+    /// <param name="market">交易对id</param>
+    /// <param name="transaction">是否交易(true:可以交易,false:禁止交易)</param>
+    /// <param name="places_price">交易价小数位数</param>
+    /// <param name="places_amount">交易量小数位数</param>
+    /// <param name="trade_min">除了市价卖单外每一笔最小交易额</param>
+    /// <param name="trade_min_market_sell">市价卖单每一笔最小交易量</param>
+    /// <param name="sort">排序</param>
+    /// <param name="tag">标签</param>
+    /// <param name="service_url">服务地址</param>
+    /// <returns></returns>
+    [HttpPost]
+    [Route("UpdateMarket")]
+    public Res<bool> UpdateMarket(long market, bool transaction, int places_price, int places_amount, decimal trade_min, decimal trade_min_market_sell, float sort, string? tag, string service_url)
+    {
+        Res<bool> res = new Res<bool>();
+        res.success = false;
+        res.code = E_Res_Code.fail;
+        if (!this.db.Market.Any(P => P.market == market))
+        {
+            res.success = false;
+            res.code = E_Res_Code.not_found_symbol;
+            res.message = "交易对不存在";
+            return res;
+        }
+        Market obj_market = db.Market.Single(P => P.market == market);
+        obj_market.transaction = transaction;
+        obj_market.places_price = places_price;
+        obj_market.places_amount = places_amount;
+        obj_market.trade_min = trade_min;
+        obj_market.trade_min_market_sell = trade_min_market_sell;
+        obj_market.sort = sort;
+        obj_market.tag = tag;
+        obj_market.service_url = service_url;
+        db.Market.Update(obj_market);
+        if (db.SaveChanges() > 0)
+        {
+            res.success = true;
+            res.code = E_Res_Code.ok;
+            res.data = true;
+            return res;
+        }
+        return res;
+    }
+
+    /// <summary>
+    /// 获取交易对列表
+    /// </summary>
+    /// <param name="symbol">交易对</param>
+    /// <returns></returns>
+    [HttpGet]
+    [Route("GetMarket")]
+
+    public Res<List<Market>> GetMarket(string? symbol)
+    {
+        Res<List<Market>> res = new Res<List<Market>>();
+        res.success = true;
+        res.code = E_Res_Code.ok;
+        res.data = db.Market.WhereIf(symbol != null, P => P.symbol == symbol!.ToUpper()).AsNoTracking().ToList();
+        return res;
+    }
+
 
 
 }

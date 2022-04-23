@@ -109,6 +109,7 @@ builder.Services.AddControllers(options =>
     // setupAction.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
     // setupAction.SerializerSettings.ContractResolver = new Newtonsoft.Json.Serialization.DefaultContractResolver();
     // setupAction.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
+    setupAction.SerializerSettings.Converters.Add(new Com.Api.JsonConverterDecimal());
     ServiceProvider build = builder.Services.BuildServiceProvider();
     IHttpContextAccessor? httpContextAccessor = build.GetService<IHttpContextAccessor>();
     if (httpContextAccessor != null)

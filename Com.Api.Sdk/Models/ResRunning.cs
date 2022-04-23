@@ -32,14 +32,14 @@ public class ResRunning
     /// 来源 钱包类型
     /// </summary>
     /// <value></value>
-    [JsonConverter(typeof(StringEnumConverter))]
+    //[JsonConverter(typeof(StringEnumConverter))]
     //[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
     public E_WalletType wallet_type_from { get; set; }
     /// <summary>
     /// 目的 钱包类型
     /// </summary>
     /// <value></value>
-    [JsonConverter(typeof(StringEnumConverter))]
+    //[JsonConverter(typeof(StringEnumConverter))]
     //[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
     public E_WalletType wallet_type_to { get; set; }
     /// <summary>

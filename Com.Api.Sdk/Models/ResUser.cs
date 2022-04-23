@@ -44,7 +44,7 @@ public class ResUser
     /// 是否验证实名认证
     /// </summary>
     /// <value></value>
-    [JsonConverter(typeof(StringEnumConverter))]
+    //[JsonConverter(typeof(StringEnumConverter))]
     public E_Verify verify_realname { get; set; }
     /// <summary>
     /// 实名审核文件对象名

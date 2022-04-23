@@ -28,7 +28,7 @@ public class Deal : ResDeal
     /// 交易模式
     /// </summary>
     /// <value></value>
-    [JsonConverter(typeof(StringEnumConverter))]
+    //[JsonConverter(typeof(StringEnumConverter))]
     //[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
     public E_TradeModel trade_model { get; set; }
     /// <summary>

@@ -23,7 +23,7 @@ public class Wallet
     /// 钱包类型
     /// </summary>
     /// <value></value>
-    [JsonConverter(typeof(StringEnumConverter))]
+    //[JsonConverter(typeof(StringEnumConverter))]
     //[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
     public E_WalletType wallet_type { get; set; }
     /// <summary>

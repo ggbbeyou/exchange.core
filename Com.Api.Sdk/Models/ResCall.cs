@@ -15,7 +15,7 @@ public class ResCall<T> : Res<T>
     /// 操作   
     /// </summary>
     /// <value></value>
-    [JsonConverter(typeof(StringEnumConverter))]
+    //[JsonConverter(typeof(StringEnumConverter))]
     //[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
     public E_Op op { get; set; }
     /// <summary>

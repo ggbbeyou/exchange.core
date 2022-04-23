@@ -14,7 +14,7 @@ public class ReqWebsocker
     /// 操作
     /// </summary>
     /// <value></value>
-    [JsonConverter(typeof(StringEnumConverter))]
+    //[JsonConverter(typeof(StringEnumConverter))]
     //[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
     public E_WebsockerOp op { get; set; }
     /// <summary>
@@ -33,7 +33,7 @@ public class ReqChannel
     /// 频道
     /// </summary>
     /// <value></value>
-    [JsonConverter(typeof(StringEnumConverter))]
+    //[JsonConverter(typeof(StringEnumConverter))]
     //[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
     public E_WebsockerChannel channel { get; set; }
     /// <summary>

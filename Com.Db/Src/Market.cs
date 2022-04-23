@@ -14,25 +14,21 @@ public class Market : ResMarket
     /// 基础币种id
     /// </summary>
     /// <value></value>
-    [JsonIgnore]
     public long coin_id_base { get; set; }
     /// <summary>
     /// 报价币种id
     /// </summary>
     /// <value></value>
-    [JsonIgnore]
     public long coin_id_quote { get; set; }
     /// <summary>
     /// 作市账号
     /// </summary>
     /// <value></value>
-    [JsonIgnore]
     public long market_uid { get; set; }
     /// <summary>
     /// 结算账号
     /// </summary>
     /// <value></value>
-    [JsonIgnore]
     public long settlement_uid { get; set; }
     /// <summary>
     /// 最后的成交价
@@ -44,6 +40,5 @@ public class Market : ResMarket
     /// 服务地址
     /// </summary>
     /// <value></value>
-    [JsonIgnore]
     public string service_url { get; set; } = null!;
 }

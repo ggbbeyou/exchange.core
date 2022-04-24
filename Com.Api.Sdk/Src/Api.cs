@@ -5,7 +5,7 @@ namespace Com.Api.Sdk;
 
 public class Api
 {
-    /// <summary>
+    /// <summary> 
     /// 请求web数据
     /// </summary>
     /// <param name="url">接口地址</param>

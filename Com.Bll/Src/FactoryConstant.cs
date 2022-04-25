@@ -113,10 +113,13 @@ public class FactoryConstant
         {
             //下面可以创建数据库   Code First
             string? dbConnection = config.GetConnectionString("Mssql");
-            var options = new DbContextOptionsBuilder<DbContextEF>().UseSqlServer(dbConnection).Options;
-            var factorydb = new PooledDbContextFactory<DbContextEF>(options);
-            DbContextEF db = factorydb.CreateDbContext();
-            db.Database.EnsureCreated();
+            if (!string.IsNullOrWhiteSpace(dbConnection))
+            {
+                var options = new DbContextOptionsBuilder<DbContextEF>().UseSqlServer(dbConnection).Options;
+                var factorydb = new PooledDbContextFactory<DbContextEF>(options);
+                DbContextEF db = factorydb.CreateDbContext();
+                db.Database.EnsureCreated();
+            }
         }
         catch (Exception ex)
         {

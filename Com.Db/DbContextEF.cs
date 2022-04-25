@@ -68,7 +68,7 @@ public class DbContextEF : DbContext
     /// <summary>
     /// 数据库连接字符串
     /// </summary>
-    public readonly string? connectionString = null!;
+    // public readonly string? connectionString = null!;
 
     /// <summary>
     /// 构造函数

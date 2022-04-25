@@ -7,3 +7,6 @@ docker run --rm -v /gitlab/exchange.core/:/app -w /app mcr.microsoft.com/dotnet/
 docker start e_admin
 #docker run -d -p 8001:80 --restart=always  --name e_admin -v /gitlab/exchange.core/Com.Api.Admin/bin/Release/net6.0/publish/:/app -w /app mcr.microsoft.com/dotnet/aspnet:6.0 dotnet Com.Api.Admin.dll
 echo 更新成功
+
+
+docker run -d -p 8001:80 --restart=always  --name e_admin -v /gitlab/exchange.core/Com.Api.Admin/bin/Release/net6.0/publish/:/app -w /app mcr.microsoft.com/dotnet/runtime:6.0 dotnet Com.Api.Admin.dll

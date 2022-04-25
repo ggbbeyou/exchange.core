@@ -120,7 +120,7 @@ public class FactoryConstant
         }
         catch (Exception ex)
         {
-            this.logger.LogError(ex, $"MQ服务器连接不上");
+            this.logger.LogError(ex, $"mssql服务器连接不上");
         }
     }
 

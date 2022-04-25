@@ -25,10 +25,10 @@ builder.ConfigureServices((hostContext, services) =>
 builder.ConfigureLogging((hostContext, logging) =>
         {
             logging.ClearProviders();
-#if (DEBUG)
+            // #if (DEBUG)
             logging.AddConsole();
-#endif
-            logging.AddNLog();
+            // #endif
+            // logging.AddNLog();
         });
 // ExceptionlessClient.Default.Startup("vRWgU1ub8e197kpI77ut5LTJAPIxPTH2mcwyeTuI");
 

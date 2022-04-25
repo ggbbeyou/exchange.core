@@ -1,6 +1,6 @@
 #!/bin/bash
 echo 准备安装服务
-cd /github/exchange.core/Com.Api/
+cd /github/exchange.core
 git pull
 docker stop e_api
 docker run --rm -v /github/exchange.core/:/app -w /app mcr.microsoft.com/dotnet/sdk:6.0 dotnet publish -c Release /app/Com.Api/Com.Api.csproj

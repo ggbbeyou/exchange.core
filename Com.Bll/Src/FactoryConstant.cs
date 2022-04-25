@@ -91,6 +91,10 @@ public class FactoryConstant
                 ConnectionMultiplexer redisMultiplexer = ConnectionMultiplexer.Connect(redisConnection);
                 this.redis = redisMultiplexer.GetDatabase();
             }
+            else
+            {
+                this.logger.LogError($"Redis服务器地址没有找到");
+            }
         }
         catch (Exception ex)
         {
@@ -119,6 +123,10 @@ public class FactoryConstant
                 var factorydb = new PooledDbContextFactory<DbContextEF>(options);
                 DbContextEF db = factorydb.CreateDbContext();
                 db.Database.EnsureCreated();
+            }
+            else
+            {
+                this.logger.LogError($"mssql服务器地址没有找到");
             }
         }
         catch (Exception ex)

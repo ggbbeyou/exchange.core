@@ -102,7 +102,7 @@ public class MarketController : ControllerBase
             res.message = "值不能小于或等于0";
             return res;
         }
-        if (this.db.Coin.Any(P => P.coin_id == coin_id_base || P.coin_id == coin_id_quote))
+        if (!this.db.Coin.Any(P => P.coin_id == coin_id_base || P.coin_id == coin_id_quote))
         {
             res.success = false;
             res.code = E_Res_Code.coin_not_found;

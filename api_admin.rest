@@ -3,7 +3,23 @@
 ###  api接口测试
 
 
-@baseUrl = http://localhost:5105
+@baseUrl = http://localhost:5211
+
+############################################################# 币种
+
+### 添加币种
+POST {{baseUrl}}/coin/addcoin HTTP/1.1
+Content-Type: application/x-www-form-urlencoded
+Content-Disposition: form-data; name="image"; filename="1.png"
+
+coin_name=ETH&full_name=eth
+
+### 获取币种列表
+GET {{baseUrl}}/coin/GetCoin HTTP/1.1
+
+############################################################# 交易对
+
+POST {{baseUrl}}/market/AddMarket HTTP/1.1
 
 POST {{baseUrl}}/Service/Manage HTTP/1.1
 Content-Type: application/x-www-form-urlencoded

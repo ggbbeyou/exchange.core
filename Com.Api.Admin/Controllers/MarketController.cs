@@ -15,7 +15,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Com.Api.Admin.Controllers;
 
 /// <summary>
-/// 
+/// 交易对
 /// </summary>
 [ApiController]
 [AllowAnonymous]

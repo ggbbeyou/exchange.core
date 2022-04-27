@@ -39,6 +39,9 @@ builder.Services.AddSwaggerGen(options =>
 {
     var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+    var basePath = Path.GetDirectoryName(typeof(Program).Assembly.Location);
+    options.IncludeXmlComments(Path.Combine(basePath!, "Com.Db.xml"));
+    options.IncludeXmlComments(Path.Combine(basePath!, "Com.Api.Admin.xml"));
     options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
     {
         Description = "JWT授权(数据将在请求头中进行传输) 参数结构: \"Authorization: Bearer {token}\"",

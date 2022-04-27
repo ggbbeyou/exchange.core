@@ -55,13 +55,7 @@ public class Users : ResUser
     /// </summary>
     /// <value></value>
     [JsonIgnore]
-    public string? google_key { get; set; }
-    /// <summary>
-    /// google验证器密钥
-    /// </summary>
-    /// <value></value>
-    // [JsonIgnore]
-    // public string? google_private_key { get; set; }
+    public string? google_key { get; set; }   
     /// <summary>
     /// sha公钥
     /// </summary>

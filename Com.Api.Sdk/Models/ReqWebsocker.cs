@@ -29,12 +29,10 @@ public class ReqWebsocker
 /// </summary>
 public class ReqChannel
 {
-    // <summary>
+    /// <summary>
     /// 频道
     /// </summary>
     /// <value></value>
-    //[JsonConverter(typeof(StringEnumConverter))]
-    //[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
     public E_WebsockerChannel channel { get; set; }
     /// <summary>
     /// 数据 交易对或其它数据

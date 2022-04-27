@@ -3,6 +3,9 @@ using System;
 
 namespace Com.Api.Sdk;
 
+/// <summary>
+/// 
+/// </summary>
 public class Api
 {
     /// <summary> 

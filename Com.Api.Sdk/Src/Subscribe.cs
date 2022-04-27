@@ -62,13 +62,10 @@ public class Subscribe
     public event Action<EventArgs>? _eventOpen;
 
     /// <summary>
-    /// 订阅初始化
+    /// 
     /// </summary>
-    /// <param name="api_host">IDCM订阅地址</param>
-    /// <param name="api_key">key</param>
-    /// <param name="contractId">合约id</param>
-    /// <param name="user_id">用户ID</param>
-    /// <param name="logger">日志接口</param>
+    /// <param name="logger"></param>
+    /// <param name="api_host"></param>
     public Subscribe(ILogger<Subscribe>? logger, string api_host = "ws://localhost:5210/WebSocket/WebSocketUI")
     {
         this.api_host = api_host;

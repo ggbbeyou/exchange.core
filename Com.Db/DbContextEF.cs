@@ -68,33 +68,12 @@ public class DbContextEF : DbContext
     /// <summary>
     /// 构造函数
     /// </summary>
-    /// <param name="connectionString">数据库连接字符串</param>
-    // public DbContextEF(string connectionString)
-    // {
-    //     this.connectionString = connectionString;
-    // }
-
-    /// <summary>
-    /// 构造函数
-    /// </summary>
     /// <param name="options"></param>
     public DbContextEF(DbContextOptions<DbContextEF> options) : base(options)
     {
 
     }
-
-    /// <summary>
-    /// 使用连接字符串来创建DB上下文
-    /// </summary>
-    /// <param name="optionsBuilder"></param>
-    // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    // {
-    //     if (!string.IsNullOrWhiteSpace(this.connectionString))
-    //     {
-    //         optionsBuilder.UseSqlServer(this.connectionString);
-    //     }
-    // }
-
+  
     /// <summary>
     /// 
     /// </summary>

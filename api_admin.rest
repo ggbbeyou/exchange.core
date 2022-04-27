@@ -3,7 +3,7 @@
 ###  api接口测试
 
 
-@baseUrl = http://localhost:5211
+@baseUrl = http://43.138.142.228:8001
 
 ############################################################# 币种
 
@@ -20,6 +20,10 @@ GET {{baseUrl}}/coin/GetCoin HTTP/1.1
 ############################################################# 交易对
 
 POST {{baseUrl}}/market/AddMarket HTTP/1.1
+Content-Type: application/x-www-form-urlencoded
+
+type=1&coin_id_base=1518615144756809728&coin_id_quote=1518615259705905152&places_price=2&places_amount=6&trade_min=10&trade_min_market_sell=0.0001&market_email=1@126.com&service_url=http://localhost:8000&market_password=123456&settlement_email=2@126.com&settlement_password=123456&sort=0&tag=主流币
+
 
 POST {{baseUrl}}/Service/Manage HTTP/1.1
 Content-Type: application/x-www-form-urlencoded

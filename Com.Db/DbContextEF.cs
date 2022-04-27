@@ -66,11 +66,6 @@ public class DbContextEF : DbContext
     public DbSet<Wallet> Wallet { get; set; } = null!;
 
     /// <summary>
-    /// 数据库连接字符串
-    /// </summary>
-    // public readonly string? connectionString = null!;
-
-    /// <summary>
     /// 构造函数
     /// </summary>
     /// <param name="connectionString">数据库连接字符串</param>

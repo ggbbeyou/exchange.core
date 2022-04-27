@@ -8,13 +8,13 @@ namespace Com.Api.Sdk;
 /// </summary>
 public class Api
 {
-    /// <summary> 
-    /// 请求web数据
-    /// </summary>
-    /// <param name="url">接口地址</param>
-    /// <param name="input">输入数据</param>
-    /// <typeparam name="T">输出类型</typeparam>
-    /// <returns>返回数据</returns>
+    // /// <summary> 
+    // /// 请求web数据
+    // /// </summary>
+    // /// <param name="url">接口地址</param>
+    // /// <param name="input">输入数据</param>
+    // /// <typeparam name="T">输出类型</typeparam>
+    // /// <returns>返回数据</returns>
     // public AjaxResult<T> GetPost<T>(string url, object input = null, Method method = Method.POST)
     // {
     //     RestRequest request = new RestRequest(url, method);

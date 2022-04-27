@@ -10,7 +10,7 @@ namespace Com.Api.Sdk.Models;
 /// </summary>
 public class ReqWebsocker
 {
-    // <summary>
+    /// <summary>
     /// 操作
     /// </summary>
     /// <value></value>

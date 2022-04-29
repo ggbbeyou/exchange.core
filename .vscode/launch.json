@@ -12,9 +12,8 @@
             "console": "internalConsole",
             "stopAtEntry": false,
             "env": {
-                // "DOTNET_ENVIRONMENT": "Development"
-                // "DOTNET_ENVIRONMENT": "Staging"
-                "DOTNET_ENVIRONMENT": "Production"
+                "DOTNET_ENVIRONMENT": "Development"
+                // "DOTNET_ENVIRONMENT": "Production"
             }
         },
         {
@@ -32,7 +31,6 @@
             },
             "env": {
                 "ASPNETCORE_ENVIRONMENT": "Development"
-                // "ASPNETCORE_ENVIRONMENT": "Staging"
                 // "ASPNETCORE_ENVIRONMENT": "Production"
             },
             "sourceFileMap": {
@@ -54,7 +52,6 @@
             },
             "env": {
                 "ASPNETCORE_ENVIRONMENT": "Development"
-                // "ASPNETCORE_ENVIRONMENT": "Staging"
                 // "ASPNETCORE_ENVIRONMENT": "Production"
             },
             "sourceFileMap": {
@@ -76,7 +73,6 @@
             },
             "env": {
                 "ASPNETCORE_ENVIRONMENT": "Development"
-                // "ASPNETCORE_ENVIRONMENT": "Staging"
                 // "ASPNETCORE_ENVIRONMENT": "Production"
             },
             "sourceFileMap": {

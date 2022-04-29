@@ -286,7 +286,7 @@ public class TestController : ControllerBase
         Market ethusdt = new Market()
         {
             market = FactoryService.instance.constant.worker.NextId(),
-            symbol = "eth/usdt",
+            symbol = "ETH/USDT",
             coin_id_base = eth.coin_id,
             coin_name_base = eth.coin_name,
             coin_id_quote = usdt.coin_id,
@@ -335,7 +335,7 @@ public class TestController : ControllerBase
                 decimal? price = null;
                 decimal? amount = null;
                 decimal? total = null;
-                if (market.symbol == "btc/usdt")
+                if (market.symbol == "BTC/USDT")
                 {
                     if (type == E_OrderType.limit)
                     {
@@ -359,7 +359,7 @@ public class TestController : ControllerBase
                         }
                     }
                 }
-                else if (market.symbol == "eth/usdt")
+                else if (market.symbol == "ETH/USDT")
                 {
                     if (type == E_OrderType.limit)
                     {

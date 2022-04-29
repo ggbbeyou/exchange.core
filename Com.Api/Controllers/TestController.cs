@@ -79,7 +79,7 @@ public class TestController : ControllerBase
         Coin usdt = new Coin()
         {
             coin_id = FactoryService.instance.constant.worker.NextId(),
-            coin_name = "usdt",
+            coin_name = "USDT",
             full_name = "USDT",
             icon = "https://www.baidu.com/img/bd_logo1.png",
             contract = "",
@@ -87,7 +87,7 @@ public class TestController : ControllerBase
         Coin btc = new Coin()
         {
             coin_id = FactoryService.instance.constant.worker.NextId(),
-            coin_name = "btc",
+            coin_name = "BTC",
             full_name = "BTC",
             icon = "https://www.baidu.com/img/bd_logo1.png",
             contract = "",
@@ -95,7 +95,7 @@ public class TestController : ControllerBase
         Coin eth = new Coin()
         {
             coin_id = FactoryService.instance.constant.worker.NextId(),
-            coin_name = "eth",
+            coin_name = "ETH",
             full_name = "ETH",
             icon = "https://www.baidu.com/img/bd_logo1.png",
             contract = "",
@@ -159,7 +159,7 @@ public class TestController : ControllerBase
                 withdrawal = false,
                 white_list_ip = "",
                 create_time = DateTimeOffset.UtcNow,
-                
+
             };
             this.db.UsersApi.Add(api);
             Wallet wallet_usdt = new Wallet()
@@ -266,7 +266,7 @@ public class TestController : ControllerBase
         Market btcusdt = new Market()
         {
             market = FactoryService.instance.constant.worker.NextId(),
-            symbol = "btc/usdt",
+            symbol = "BTC/USDT",
             coin_id_base = btc.coin_id,
             coin_name_base = btc.coin_name,
             coin_id_quote = usdt.coin_id,
@@ -281,7 +281,7 @@ public class TestController : ControllerBase
             transaction = true,
             settlement_uid = settlement_btc_usdt.user_id,
             last_price = 50000,
-            service_url = "http://localhost:8800",
+            service_url = "http://localhost:8000",
         };
         Market ethusdt = new Market()
         {
@@ -301,7 +301,7 @@ public class TestController : ControllerBase
             transaction = true,
             settlement_uid = settlement_eth_usdt.user_id,
             last_price = 5000,
-            service_url = "http://localhost:8800",
+            service_url = "http://localhost:8000",
         };
         this.db.Market.Add(btcusdt);
         this.db.Market.Add(ethusdt);

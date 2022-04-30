@@ -106,7 +106,7 @@ public class OrderController : ControllerBase
     }
 
     /// <summary>
-    /// 挂单
+    /// 批量挂单
     /// </summary>
     /// <param name="data">挂单数据</param>
     /// <returns></returns>

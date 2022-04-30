@@ -14,7 +14,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Com.Api.Admin.Controllers;
 
 /// <summary>
-/// 
+/// 币种
 /// </summary>
 [ApiController]
 [AllowAnonymous]

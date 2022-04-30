@@ -377,18 +377,21 @@ public class ServiceOrder
             res.message = "该交易对禁止下单(系统设置)";
             return res;
         }
-        Users? users = service_user.GetUser(uid);
-        if (users == null)
+        if (uid > 0)
         {
-            res.code = E_Res_Code.user_not_found;
-            res.message = "未找到该用户";
-            return res;
-        }
-        if (users.disabled || !users.transaction)
-        {
-            res.code = E_Res_Code.no_permission;
-            res.message = "用户禁止撤单";
-            return res;
+            Users? users = service_user.GetUser(uid);
+            if (users == null)
+            {
+                res.code = E_Res_Code.user_not_found;
+                res.message = "未找到该用户";
+                return res;
+            }
+            if (users.disabled || !users.transaction)
+            {
+                res.code = E_Res_Code.no_permission;
+                res.message = "用户禁止撤单";
+                return res;
+            }
         }
         ReqCall<(long, List<long>)> req = new ReqCall<(long, List<long>)>();
         req.op = op;
@@ -548,9 +551,11 @@ public class ServiceOrder
     /// <param name="market">交易对</param>
     /// <param name="uid">用户id</param>
     /// <param name="state">订单状态</param>
+    /// <param name="ids">订单id</param>
     /// <param name="start">开始时间</param>
     /// <param name="end">结束时间</param>
-    /// <param name="ids">订单id</param>
+    /// <param name="skip">跳过多少地</param>
+    /// <param name="take">提取多少行</param>
     /// <returns></returns>
     public Res<List<ResOrder>> GetOrder(string? symbol = null, long? market = null, long? uid = null, List<E_OrderState>? state = null, List<long>? ids = null, DateTimeOffset? start = null, DateTimeOffset? end = null, int skip = 0, int take = 50)
     {

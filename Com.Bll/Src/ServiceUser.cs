@@ -258,6 +258,27 @@ public class ServiceUser
     /// <summary>
     /// 获取用户
     /// </summary>
+    /// <param name="uid">用户id</param>
+    /// <param name="user_name">用户名</param>
+    /// <param name="email">邮箱地址</param>
+    /// <param name="phone">手机号</param>
+    /// <param name="skip">跳过多少行</param>
+    /// <param name="take">提取多少行</param>
+    /// <returns></returns>
+    public List<Users> GetUser(long? uid, string? user_name, string? email, string? phone, int skip = 0, int take = 50)
+    {
+        using (var scope = FactoryService.instance.constant.provider.CreateScope())
+        {
+            using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
+            {
+                return db.Users.AsNoTracking().WhereIf(uid != null, P => P.user_id == uid).WhereIf(!string.IsNullOrWhiteSpace(user_name), P => P.user_name == user_name).WhereIf(!string.IsNullOrWhiteSpace(email), P => P.email == email).WhereIf(!string.IsNullOrWhiteSpace(phone), P => P.phone == phone).Skip(skip).Take(take).ToList();
+            }
+        }
+    }
+
+    /// <summary>
+    /// 获取用户
+    /// </summary>
     /// <param name="symbol"></param>
     /// <returns></returns>
     public Users? GetUser(long uid)

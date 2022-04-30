@@ -64,7 +64,7 @@ public class OrderController : ControllerBase
     /// <param name="ids">订单id</param>
     /// <param name="start">开始时间</param>
     /// <param name="end">结束时间</param>
-    /// <param name="skip">跳过多少地</param>
+    /// <param name="skip">跳过多少行</param>
     /// <param name="take">提取多少行</param>
     /// <returns></returns>
     [HttpGet]

@@ -24,6 +24,10 @@ public class AccountController : ControllerBase
     /// </summary>
     private readonly ILogger<AccountController> logger;
     /// <summary>
+    /// db
+    /// </summary>
+    private readonly DbContextEF db;
+    /// <summary>
     /// 用户服务
     /// </summary>
     /// <returns></returns>
@@ -41,10 +45,12 @@ public class AccountController : ControllerBase
     /// <summary>
     /// 初始化
     /// </summary>
-    /// <param name="logger"></param>
-    public AccountController(ILogger<AccountController> logger)
+    /// <param name="logger">日志接口</param>
+    /// <param name="db">db</param>
+    public AccountController(ILogger<AccountController> logger, DbContextEF db)
     {
         this.logger = logger;
+        this.db = db;
     }
 
     /// <summary>
@@ -101,27 +107,21 @@ public class AccountController : ControllerBase
         code = "123456";
 #endif
         string content = $"Exchange 注册验证码:{code}";
-        using (var scope = FactoryService.instance.constant.provider.CreateScope())
+        if (db.Users.Any(P => P.email.ToLower() == email))
         {
-            using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
+            res.code = E_Res_Code.email_repeat;
+            res.message = "邮箱地址已存在";
+            return res;
+        }
+        else
+        {
+            if (service_common.SendEmail(email, content))
             {
-                if (db.Users.Any(P => P.email.ToLower() == email))
-                {
-                    res.code = E_Res_Code.email_repeat;
-                    res.message = "邮箱地址已存在";
-                    return res;
-                }
-                else
-                {
-                    if (service_common.SendEmail(email, content))
-                    {
-                        FactoryService.instance.constant.redis.StringSet(FactoryService.instance.GetRedisVerificationCode(email), code, TimeSpan.FromMinutes(10));
-                        res.success = true;
-                        res.code = E_Res_Code.ok;
-                        res.data = true;
-                        return res;
-                    }
-                }
+                FactoryService.instance.constant.redis.StringSet(FactoryService.instance.GetRedisVerificationCode(email), code, TimeSpan.FromMinutes(10));
+                res.success = true;
+                res.code = E_Res_Code.ok;
+                res.data = true;
+                return res;
             }
         }
         return res;

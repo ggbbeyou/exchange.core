@@ -23,6 +23,10 @@ public class WalletController : ControllerBase
     /// </summary>
     private readonly ILogger<WalletController> logger;
     /// <summary>
+    /// db
+    /// </summary>
+    private readonly DbContextEF db;
+    /// <summary>
     /// 登录信息
     /// </summary>
     private (long no, long user_id, string user_name, E_App app, string public_key) login
@@ -49,10 +53,12 @@ public class WalletController : ControllerBase
     /// <summary>
     /// 初始化
     /// </summary>
-    /// <param name="logger"></param>
-    public WalletController(ILogger<WalletController> logger)
+    /// <param name="logger">日志接口</param>
+    /// <param name="db">db</param>
+    public WalletController(ILogger<WalletController> logger, DbContextEF db)
     {
         this.logger = logger;
+        this.db = db;
     }
 
     /// <summary>
@@ -83,29 +89,23 @@ public class WalletController : ControllerBase
         Res<List<Wallet>?> res = new Res<List<Wallet>?>();
         res.success = false;
         res.code = E_Res_Code.fail;
-        using (var scope = FactoryService.instance.constant.provider.CreateScope())
-        {
-            using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
-            {
-                var linq = from coin in db.Coin
-                           join wallet in db.Wallet.Where(P => P.user_id == this.login.user_id && P.wallet_type == wallet_type).WhereIf(!string.IsNullOrWhiteSpace(coin_name), P => P.coin_name.Contains(coin_name!))
-                           on coin.coin_id equals wallet.coin_id into temp
-                           from bb in temp.DefaultIfEmpty()
-                           select new Wallet
-                           {
-                               wallet_id = bb == null ? FactoryService.instance.constant.worker.NextId() : bb.user_id,
-                               wallet_type = wallet_type,
-                               user_id = this.login.user_id,
-                               user_name = this.login.user_name,
-                               coin_id = coin.coin_id,
-                               coin_name = coin.coin_name,
-                               total = bb == null ? 0 : bb.total,
-                               available = bb == null ? 0 : bb.available,
-                               freeze = bb == null ? 0 : bb.freeze,
-                           };
-                res.data = linq.ToList();
-            }
-        }
+        var linq = from coin in db.Coin
+                   join wallet in db.Wallet.Where(P => P.user_id == this.login.user_id && P.wallet_type == wallet_type).WhereIf(!string.IsNullOrWhiteSpace(coin_name), P => P.coin_name.Contains(coin_name!))
+                   on coin.coin_id equals wallet.coin_id into temp
+                   from bb in temp.DefaultIfEmpty()
+                   select new Wallet
+                   {
+                       wallet_id = bb == null ? FactoryService.instance.constant.worker.NextId() : bb.user_id,
+                       wallet_type = wallet_type,
+                       user_id = this.login.user_id,
+                       user_name = this.login.user_name,
+                       coin_id = coin.coin_id,
+                       coin_name = coin.coin_name,
+                       total = bb == null ? 0 : bb.total,
+                       available = bb == null ? 0 : bb.available,
+                       freeze = bb == null ? 0 : bb.freeze,
+                   };
+        res.data = linq.ToList();
         return res;
     }
 
@@ -124,18 +124,12 @@ public class WalletController : ControllerBase
         Res<List<ResRunning>> res = new Res<List<ResRunning>>();
         res.success = false;
         res.code = E_Res_Code.fail;
-        using (var scope = FactoryService.instance.constant.provider.CreateScope())
-        {
-            using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
-            {
-                res.data = db.Running.AsNoTracking().Where(P => P.uid_from == this.login.user_id && P.type == E_RunningType.fee).WhereIf(start != null, P => P.time >= start).WhereIf(end != null, P => P.time <= end).Skip(skip).Take(take).ToList().ConvertAll(P => (ResRunning)P);
-            }
-        }
+        res.data = db.Running.AsNoTracking().Where(P => P.uid_from == this.login.user_id && P.type == E_RunningType.fee).WhereIf(start != null, P => P.time >= start).WhereIf(end != null, P => P.time <= end).Skip(skip).Take(take).ToList().ConvertAll(P => (ResRunning)P);
         return res;
     }
 
     // public Res<string> GetRechargeAddress(long wallet_id,)
     // {
-        
+
     // }
 }

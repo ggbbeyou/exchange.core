@@ -25,6 +25,10 @@ public class UserController : ControllerBase
     /// </summary>
     private readonly ILogger<UserController> logger;
     /// <summary>
+    /// db
+    /// </summary>
+    private readonly DbContextEF db;
+    /// <summary>
     /// 配置接口
     /// </summary>
     private readonly IConfiguration config;
@@ -59,10 +63,12 @@ public class UserController : ControllerBase
     /// </summary>
     /// <param name="logger">日志接口</param>
     /// <param name="config">配置接口</param>
-    public UserController(ILogger<UserController> logger, IConfiguration config)
+    /// <param name="db">db</param>
+    public UserController(ILogger<UserController> logger, IConfiguration config, DbContextEF db)
     {
         this.logger = logger;
         this.config = config;
+        this.db = db;
     }
 
     /// <summary>
@@ -89,35 +95,29 @@ public class UserController : ControllerBase
         res.success = false;
         res.code = E_Res_Code.fail;
         res.data = false;
-        using (var scope = FactoryService.instance.constant.provider.CreateScope())
+        Users? user = db.Users.AsNoTracking().SingleOrDefault(P => P.user_id == this.login.user_id);
+        if (user == null || user.disabled == true || user.verify_phone == true)
         {
-            using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
-            {
-                Users? user = db.Users.AsNoTracking().SingleOrDefault(P => P.user_id == this.login.user_id);
-                if (user == null || user.disabled == true || user.verify_phone == true)
-                {
-                    res.success = false;
-                    res.code = E_Res_Code.apply_fail;
-                    res.data = false;
-                    res.message = "用户被禁用或已经验证过";
-                    return res;
-                }
-                else
-                {
-                    string code = common.CreateRandomCode(6);
+            res.success = false;
+            res.code = E_Res_Code.apply_fail;
+            res.data = false;
+            res.message = "用户被禁用或已经验证过";
+            return res;
+        }
+        else
+        {
+            string code = common.CreateRandomCode(6);
 #if (DEBUG)
-                    code = "123456";
+            code = "123456";
 #endif
-                    string content = $"Exchange 手机验证码:{code}";
-                    if (service_common.SendPhone(phone, content))
-                    {
-                        FactoryService.instance.constant.redis.StringSet(FactoryService.instance.GetRedisVerificationCode(this.login.user_id + phone.Trim()), code, TimeSpan.FromMinutes(10));
-                        res.success = true;
-                        res.code = E_Res_Code.ok;
-                        res.data = true;
-                        return res;
-                    }
-                }
+            string content = $"Exchange 手机验证码:{code}";
+            if (service_common.SendPhone(phone, content))
+            {
+                FactoryService.instance.constant.redis.StringSet(FactoryService.instance.GetRedisVerificationCode(this.login.user_id + phone.Trim()), code, TimeSpan.FromMinutes(10));
+                res.success = true;
+                res.code = E_Res_Code.ok;
+                res.data = true;
+                return res;
             }
         }
         return res;
@@ -142,31 +142,25 @@ public class UserController : ControllerBase
         {
             if (rv.ToString().ToUpper() == code.Trim().ToUpper())
             {
-                using (var scope = FactoryService.instance.constant.provider.CreateScope())
+                Users? user = db.Users.SingleOrDefault(P => P.user_id == this.login.user_id);
+                if (user == null || user.disabled == true || user.verify_phone == true)
                 {
-                    using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
+                    res.success = false;
+                    res.code = E_Res_Code.apply_fail;
+                    res.data = false;
+                    res.message = "用户被禁用或已经验证过";
+                    return res;
+                }
+                else
+                {
+                    user.verify_phone = true;
+                    user.phone = phone.Trim();
+                    if (db.SaveChanges() > 0)
                     {
-                        Users? user = db.Users.SingleOrDefault(P => P.user_id == this.login.user_id);
-                        if (user == null || user.disabled == true || user.verify_phone == true)
-                        {
-                            res.success = false;
-                            res.code = E_Res_Code.apply_fail;
-                            res.data = false;
-                            res.message = "用户被禁用或已经验证过";
-                            return res;
-                        }
-                        else
-                        {
-                            user.verify_phone = true;
-                            user.phone = phone.Trim();
-                            if (db.SaveChanges() > 0)
-                            {
-                                res.success = true;
-                                res.code = E_Res_Code.ok;
-                                res.data = true;
-                                return res;
-                            }
-                        }
+                        res.success = true;
+                        res.code = E_Res_Code.ok;
+                        res.data = true;
+                        return res;
                     }
                 }
             }
@@ -221,40 +215,34 @@ public class UserController : ControllerBase
         Res<bool> res = new Res<bool>();
         res.success = false;
         res.code = E_Res_Code.fail;
-        using (var scope = FactoryService.instance.constant.provider.CreateScope())
+        Users? user = db.Users.SingleOrDefault(P => P.user_id == this.login.user_id);
+        if (user == null || user.disabled == true || user.verify_google == true || string.IsNullOrWhiteSpace(user.google_key))
         {
-            using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
+            res.success = false;
+            res.code = E_Res_Code.apply_fail;
+            res.data = false;
+            res.message = "用户被禁用或已经验证过";
+            return res;
+        }
+        else
+        {
+            res.data = service_common.Verification2FA(user.google_key, code);
+            if (res.data == false)
             {
-                Users? user = db.Users.SingleOrDefault(P => P.user_id == this.login.user_id);
-                if (user == null || user.disabled == true || user.verify_google == true || string.IsNullOrWhiteSpace(user.google_key))
+                res.success = false;
+                res.code = E_Res_Code.verification_error;
+                res.message = "验证码错误";
+                return res;
+            }
+            else
+            {
+                user.verify_google = true;
+                db.Users.Update(user);
+                if (db.SaveChanges() > 0)
                 {
-                    res.success = false;
-                    res.code = E_Res_Code.apply_fail;
-                    res.data = false;
-                    res.message = "用户被禁用或已经验证过";
+                    res.success = true;
+                    res.code = E_Res_Code.ok;
                     return res;
-                }
-                else
-                {
-                    res.data = service_common.Verification2FA(user.google_key, code);
-                    if (res.data == false)
-                    {
-                        res.success = false;
-                        res.code = E_Res_Code.verification_error;
-                        res.message = "验证码错误";
-                        return res;
-                    }
-                    else
-                    {
-                        user.verify_google = true;
-                        db.Users.Update(user);
-                        if (db.SaveChanges() > 0)
-                        {
-                            res.success = true;
-                            res.code = E_Res_Code.ok;
-                            return res;
-                        }
-                    }
                 }
             }
         }
@@ -285,32 +273,26 @@ public class UserController : ControllerBase
         ServiceMinio service_minio = new ServiceMinio(config, logger);
         string object_name = FactoryService.instance.constant.worker.NextId().ToString() + Path.GetExtension(files.FileName);
         await service_minio.UploadFile(files.OpenReadStream(), FactoryService.instance.GetMinioRealname(), object_name, files.ContentType);
-        using (var scope = FactoryService.instance.constant.provider.CreateScope())
+        Users? users = db.Users.SingleOrDefault(P => P.user_id == this.login.user_id);
+        if (users == null || users.disabled == true || users.verify_realname == E_Verify.verify_ok)
         {
-            using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
+            res.success = false;
+            res.code = E_Res_Code.apply_fail;
+            res.data = false;
+            res.message = "用户被禁用或已经验证过";
+            return res;
+        }
+        else
+        {
+            users.realname_object_name = object_name;
+            users.verify_realname = E_Verify.verify_apply;
+            db.Users.Update(users);
+            if (db.SaveChanges() > 0)
             {
-                Users? users = db.Users.SingleOrDefault(P => P.user_id == this.login.user_id);
-                if (users == null || users.disabled == true || users.verify_realname == E_Verify.verify_ok)
-                {
-                    res.success = false;
-                    res.code = E_Res_Code.apply_fail;
-                    res.data = false;
-                    res.message = "用户被禁用或已经验证过";
-                    return res;
-                }
-                else
-                {
-                    users.realname_object_name = object_name;
-                    users.verify_realname = E_Verify.verify_apply;
-                    db.Users.Update(users);
-                    if (db.SaveChanges() > 0)
-                    {
-                        res.success = true;
-                        res.code = E_Res_Code.ok;
-                        res.data = true;
-                        return res;
-                    }
-                }
+                res.success = true;
+                res.code = E_Res_Code.ok;
+                res.data = true;
+                return res;
             }
         }
         return res;
@@ -333,31 +315,25 @@ public class UserController : ControllerBase
         res.success = false;
         res.code = E_Res_Code.fail;
         res.data = new KeyValuePair<string, string>();
-        using (var scope = FactoryService.instance.constant.provider.CreateScope())
+        UsersApi api = new UsersApi()
         {
-            using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
-            {
-                UsersApi api = new UsersApi()
-                {
-                    id = FactoryService.instance.constant.worker.NextId(),
-                    name = name,
-                    user_id = this.login.user_id,
-                    api_key = Encryption.SHA256Encrypt(FactoryService.instance.constant.worker.NextId().ToString()),
-                    api_secret = Encryption.SHA256Encrypt(FactoryService.instance.constant.worker.NextId().ToString()) + Encryption.SHA256Encrypt(FactoryService.instance.constant.worker.NextId().ToString()),
-                    transaction = transaction,
-                    withdrawal = withdrawal,
-                    white_list_ip = ip,
-                    create_time = DateTimeOffset.UtcNow,
-                };
-                db.UsersApi.Add(api);
-                if (db.SaveChanges() > 0)
-                {
-                    res.success = true;
-                    res.code = E_Res_Code.ok;
-                    res.data = new KeyValuePair<string, string>(api.api_key, api.api_secret);
-                    return res;
-                }
-            }
+            id = FactoryService.instance.constant.worker.NextId(),
+            name = name,
+            user_id = this.login.user_id,
+            api_key = Encryption.SHA256Encrypt(FactoryService.instance.constant.worker.NextId().ToString()),
+            api_secret = Encryption.SHA256Encrypt(FactoryService.instance.constant.worker.NextId().ToString()) + Encryption.SHA256Encrypt(FactoryService.instance.constant.worker.NextId().ToString()),
+            transaction = transaction,
+            withdrawal = withdrawal,
+            white_list_ip = ip,
+            create_time = DateTimeOffset.UtcNow,
+        };
+        db.UsersApi.Add(api);
+        if (db.SaveChanges() > 0)
+        {
+            res.success = true;
+            res.code = E_Res_Code.ok;
+            res.data = new KeyValuePair<string, string>(api.api_key, api.api_secret);
+            return res;
         }
         return res;
     }
@@ -379,26 +355,20 @@ public class UserController : ControllerBase
         Res<bool> res = new Res<bool>();
         res.success = false;
         res.code = E_Res_Code.fail;
-        using (var scope = FactoryService.instance.constant.provider.CreateScope())
+        UsersApi? api = db.UsersApi.AsNoTracking().SingleOrDefault(P => P.id == id);
+        if (api != null)
         {
-            using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
+            api.name = name;
+            api.transaction = transaction;
+            api.withdrawal = withdrawal;
+            api.white_list_ip = ip;
+            db.UsersApi.Update(api);
+            if (db.SaveChanges() > 0)
             {
-                UsersApi? api = db.UsersApi.AsNoTracking().SingleOrDefault(P => P.id == id);
-                if (api != null)
-                {
-                    api.name = name;
-                    api.transaction = transaction;
-                    api.withdrawal = withdrawal;
-                    api.white_list_ip = ip;
-                    db.UsersApi.Update(api);
-                    if (db.SaveChanges() > 0)
-                    {
-                        res.success = true;
-                        res.code = E_Res_Code.ok;
-                        res.data = true;
-                        return res;
-                    }
-                }
+                res.success = true;
+                res.code = E_Res_Code.ok;
+                res.data = true;
+                return res;
             }
         }
         return res;
@@ -415,15 +385,9 @@ public class UserController : ControllerBase
         Res<List<ResUsersApi>> res = new Res<List<ResUsersApi>>();
         res.success = false;
         res.code = E_Res_Code.fail;
-        using (var scope = FactoryService.instance.constant.provider.CreateScope())
-        {
-            using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
-            {
-                res.success = true;
-                res.code = E_Res_Code.ok;
-                res.data = db.UsersApi.AsNoTracking().Where(P => P.user_id == this.login.user_id).ToList().ConvertAll(P => (ResUsersApi)P);
-            }
-        }
+        res.success = true;
+        res.code = E_Res_Code.ok;
+        res.data = db.UsersApi.AsNoTracking().Where(P => P.user_id == this.login.user_id).ToList().ConvertAll(P => (ResUsersApi)P);
         return res;
     }
 

@@ -58,7 +58,7 @@ public class OrderController : ControllerBase
     /// 订单查询
     /// </summary>
     /// <param name="symbol">交易对</param>
-    /// <param name="market">交易对</param>
+    /// <param name="market">交易对id</param>
     /// <param name="uid">用户id</param>
     /// <param name="state">订单状态</param>
     /// <param name="ids">订单id</param>
@@ -69,7 +69,7 @@ public class OrderController : ControllerBase
     /// <returns></returns>
     [HttpGet]
     [Route("GetOrder")]
-    [ResponseCache(CacheProfileName = "cache_0")]
+    [ResponseCache(CacheProfileName = "cache_1")]
     public Res<List<ResOrder>> GetOrder(string? symbol = null, long? market = null, long? uid = null, List<E_OrderState>? state = null, List<long>? ids = null, DateTimeOffset? start = null, DateTimeOffset? end = null, int skip = 0, int take = 50)
     {
         return this.service_order.GetOrder(symbol: symbol, market: market, uid: uid, state: state, ids: ids, start: start, end: end, skip: skip, take: take);

@@ -271,7 +271,7 @@ public class ServiceUser
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
-                return db.Users.AsNoTracking().WhereIf(uid != null, P => P.user_id == uid).WhereIf(!string.IsNullOrWhiteSpace(user_name), P => P.user_name == user_name).WhereIf(!string.IsNullOrWhiteSpace(email), P => P.email == email).WhereIf(!string.IsNullOrWhiteSpace(phone), P => P.phone == phone).Skip(skip).Take(take).ToList();
+                return db.Users.AsNoTracking().WhereIf(uid != null, P => P.user_id == uid).WhereIf(!string.IsNullOrWhiteSpace(user_name), P => P.user_name.Contains(user_name!)).WhereIf(!string.IsNullOrWhiteSpace(email), P => P.email == email).WhereIf(!string.IsNullOrWhiteSpace(phone), P => P.phone == phone).Skip(skip).Take(take).ToList();
             }
         }
     }

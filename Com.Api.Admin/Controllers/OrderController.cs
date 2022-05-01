@@ -13,7 +13,7 @@ namespace Com.Api.Admin.Controllers;
 /// 订单接口
 /// </summary>
 [Route("[controller]")]
-[Authorize]
+// [Authorize]
 [ApiController]
 public class OrderController : ControllerBase
 {
@@ -61,7 +61,7 @@ public class OrderController : ControllerBase
     /// <param name="market">交易对id</param>
     /// <param name="uid">用户id</param>
     /// <param name="state">订单状态</param>
-    /// <param name="ids">订单id</param>
+    /// <param name="id">订单id</param>
     /// <param name="start">开始时间</param>
     /// <param name="end">结束时间</param>
     /// <param name="skip">跳过多少行</param>
@@ -70,9 +70,19 @@ public class OrderController : ControllerBase
     [HttpGet]
     [Route("GetOrder")]
     [ResponseCache(CacheProfileName = "cache_1")]
-    public Res<List<ResOrder>> GetOrder(string? symbol = null, long? market = null, long? uid = null, List<E_OrderState>? state = null, List<long>? ids = null, DateTimeOffset? start = null, DateTimeOffset? end = null, int skip = 0, int take = 50)
+    public Res<List<ResOrder>> GetOrder(string? symbol = null, long? market = null, long? uid = null, E_OrderState? state = null, long? id = null, DateTimeOffset? start = null, DateTimeOffset? end = null, int skip = 0, int take = 50)
     {
-        return this.service_order.GetOrder(symbol: symbol, market: market, uid: uid, state: state, ids: ids, start: start, end: end, skip: skip, take: take);
+        List<E_OrderState> states = new List<E_OrderState>();
+        if (state != null)
+        {
+            states.Add(state.Value);
+        }
+        List<long>? ids = new List<long>();
+        if (id != null)
+        {
+            ids.Add(id.Value);
+        }
+        return this.service_order.GetOrder(symbol: symbol, market: market, uid: uid, state: states, ids: ids, start: start, end: end, skip: skip, take: take);
     }
 
 

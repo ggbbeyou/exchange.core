@@ -81,6 +81,8 @@ public class UserController : ControllerBase
     /// <param name="skip">跳过多少行</param>
     /// <param name="take">提取多少行</param>
     /// <returns></returns>
+    [HttpGet]
+    [Route("GetUser")]
     public Res<List<Users>> GetUser(long? uid, string? user_name, string? email, string? phone, int skip = 0, int take = 50)
     {
         Res<List<Users>> res = new Res<List<Users>>();
@@ -91,51 +93,45 @@ public class UserController : ControllerBase
     }
 
     /// <summary>
-    /// 验证实名认证
+    /// 需要实名认证用户
     /// </summary>
-    /// <param name="files">实名凭证</param>
+    /// <returns></returns>
+    [HttpGet]
+    [Route("ApplyRealname")]
+    public Res<List<ResUser>> ApplyRealname()
+    {
+        Res<List<ResUser>> res = new Res<List<ResUser>>();
+        res.success = true;
+        res.code = E_Res_Code.ok;
+        res.data = db.Users.AsNoTracking().Where(P => P.verify_realname == E_Verify.verify_no).ToList().ConvertAll(P => (ResUser)P);
+        return res;
+    }
+
+    /// <summary>
+    /// 实名认证用户
+    /// </summary>
+    /// <param name="uid">用户id</param>
+    /// <param name="verify">验证方式</param>
     /// <returns></returns>
     [HttpPost]
-    [Route("ApplyRealname")]
-    public async Task<Res<bool>> ApplyRealname(IFormFile files)
+    [Route("VerifyRealname")]
+    public Res<bool> VerifyRealname(long uid, E_Verify verify)
     {
         Res<bool> res = new Res<bool>();
-        res.success = false;
-        res.code = E_Res_Code.fail;
-        res.data = false;
-        if (files == null || files.Length <= 0)
+
+        Users? users = db.Users.FirstOrDefault(P => P.user_id == uid && P.verify_realname == E_Verify.verify_no);
+        if (users == null)
         {
-            res.success = false;
-            res.code = E_Res_Code.file_not_found;
+            res.code = E_Res_Code.fail;
+            res.message = "用户不存在或已实名认证";
             res.data = false;
-            res.message = "未找到文件";
             return res;
         }
-        ServiceMinio service_minio = new ServiceMinio(config, logger);
-        string object_name = FactoryService.instance.constant.worker.NextId().ToString() + Path.GetExtension(files.FileName);
-        await service_minio.UploadFile(files.OpenReadStream(), FactoryService.instance.GetMinioRealname(), object_name, files.ContentType);
-        Users? users = db.Users.SingleOrDefault(P => P.user_id == this.login.user_id);
-        if (users == null || users.disabled == true || users.verify_realname == E_Verify.verify_ok)
-        {
-            res.success = false;
-            res.code = E_Res_Code.apply_fail;
-            res.data = false;
-            res.message = "用户被禁用或已经验证过";
-            return res;
-        }
-        else
-        {
-            users.realname_object_name = object_name;
-            users.verify_realname = E_Verify.verify_apply;
-            db.Users.Update(users);
-            if (db.SaveChanges() > 0)
-            {
-                res.success = true;
-                res.code = E_Res_Code.ok;
-                res.data = true;
-                return res;
-            }
-        }
+        users.verify_realname = verify;
+        db.SaveChanges();
+        res.success = true;
+        res.code = E_Res_Code.ok;
+        res.data = true;
         return res;
     }
 

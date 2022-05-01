@@ -118,7 +118,6 @@ public class UserController : ControllerBase
     public Res<bool> VerifyRealname(long uid, E_Verify verify)
     {
         Res<bool> res = new Res<bool>();
-
         Users? users = db.Users.FirstOrDefault(P => P.user_id == uid && P.verify_realname == E_Verify.verify_no);
         if (users == null)
         {

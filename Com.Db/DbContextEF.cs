@@ -159,7 +159,6 @@ public class DbContextEF : DbContext
             o.Property(P => P.trade_min_market_sell).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("市价卖单每一笔最小交易量");
             o.Property(P => P.market_uid).IsRequired().HasColumnType("bigint").HasComment("作市账号");
             o.Property(P => P.settlement_uid).IsRequired().HasColumnType("bigint").HasComment("结算账号");
-            o.Property(P => P.last_price).IsRequired().HasColumnType("decimal").HasPrecision(28, 16).HasComment("最后的成交价");
             o.Property(P => P.service_url).IsRequired().HasColumnType("nvarchar").HasMaxLength(50).HasComment("服务地址");
             o.Property(P => P.sort).IsRequired().HasColumnType("float").HasComment("排序");
             o.Property(P => P.tag).HasColumnType("nvarchar").HasMaxLength(20).HasComment("标签");

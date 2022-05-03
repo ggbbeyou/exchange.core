@@ -31,12 +31,6 @@ public class Market : ResMarket
     /// <value></value>
     public long settlement_uid { get; set; }
     /// <summary>
-    /// 最后的成交价
-    /// </summary>
-    /// <value></value>
-    //[JsonConverter(typeof(JsonConverterDecimal))]
-    public decimal last_price { get; set; }
-    /// <summary>
     /// 服务地址
     /// </summary>
     /// <value></value>

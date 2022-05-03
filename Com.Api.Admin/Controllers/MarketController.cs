@@ -135,7 +135,6 @@ public class MarketController : ControllerBase
         market.places_amount = places_amount;
         market.trade_min = trade_min;
         market.trade_min_market_sell = trade_min_market_sell;
-        market.last_price = 0;
         market.service_url = service_url;
         market.sort = sort;
         market.tag = tag;

@@ -90,7 +90,6 @@ public class MatchCore
     public MatchCore(MatchModel model)
     {
         this.model = model;
-        this.last_price = model.info.last_price;
     }
 
     /// <summary>

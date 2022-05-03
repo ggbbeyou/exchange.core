@@ -75,38 +75,23 @@ public class ServiceController : ControllerBase
         }
         else
         {
-            Deal? deal = this.db.Deal.OrderByDescending(P => P.time).FirstOrDefault(P => P.market == market);
-            if (deal != null)
+            if (status == 0)
             {
-                marketInfo.last_price = deal.price;
+                marketInfo.status = await FactoryAdmin.instance.ServiceGetStatus(marketInfo) ?? marketInfo.status;
             }
-            if (marketInfo.last_price <= 0)
+            else if (status == 1)
             {
+                marketInfo.status = await FactoryAdmin.instance.ServiceStart(marketInfo) ?? marketInfo.status;
+            }
+            else if (status == 2)
+            {
+                marketInfo.status = await FactoryAdmin.instance.ServiceStop(marketInfo) ?? marketInfo.status;
+            }
+            this.db.SaveChanges();
 
-                res.code = E_Res_Code.trans_price_cannot_lower_0;
-                res.message = "最后成交价不能小于0";
-                res.data = null;
-            }
-            else
-            {
-                if (status == 0)
-                {
-                    marketInfo.status = await FactoryAdmin.instance.ServiceGetStatus(marketInfo) ?? marketInfo.status;
-                }
-                else if (status == 1)
-                {
-                    marketInfo.status = await FactoryAdmin.instance.ServiceStart(marketInfo) ?? marketInfo.status;
-                }
-                else if (status == 2)
-                {
-                    marketInfo.status = await FactoryAdmin.instance.ServiceStop(marketInfo) ?? marketInfo.status;
-                }
-                this.db.SaveChanges();
-
-                res.code = E_Res_Code.ok;
-                res.message = "操作成功";
-                res.data = marketInfo.status;
-            }
+            res.code = E_Res_Code.ok;
+            res.message = "操作成功";
+            res.data = marketInfo.status;
         }
         return res;
     }

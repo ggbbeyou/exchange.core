@@ -637,6 +637,18 @@ public class ServiceOrder
                 var query = (from buy in db.OrderBuy
                              select new Orders
                              {
+                                 user_name = buy.user_name,
+                                 deal_price = buy.deal_price,
+                                 deal_amount = buy.deal_amount,
+                                 deal_total = buy.deal_total,
+                                 unsold = buy.unsold,
+                                 complete_thaw = buy.complete_thaw,
+                                 fee_maker = buy.fee_maker,
+                                 fee_taker = buy.fee_taker,
+                                 deal_last_time = buy.deal_last_time,
+                                 remarks = buy.remarks,
+                                 uid = buy.uid,
+                                 state = buy.state,
                                  market = buy.market,
                                  order_id = buy.order_id,
                                  create_time = buy.create_time,
@@ -654,6 +666,18 @@ public class ServiceOrder
                 .Union(from sell in db.OrderSell
                        select new Orders
                        {
+                           user_name = sell.user_name,
+                           deal_price = sell.deal_price,
+                           deal_amount = sell.deal_amount,
+                           deal_total = sell.deal_total,
+                           unsold = sell.unsold,
+                           complete_thaw = sell.complete_thaw,
+                           fee_maker = sell.fee_maker,
+                           fee_taker = sell.fee_taker,
+                           deal_last_time = sell.deal_last_time,
+                           remarks = sell.remarks,
+                           uid = sell.uid,
+                           state = sell.state,
                            market = sell.market,
                            order_id = sell.order_id,
                            create_time = sell.create_time,

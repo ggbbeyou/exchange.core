@@ -27,13 +27,32 @@ builder.Services.AddStackExchangeRedisCache(options =>
 });
 builder.Services.AddControllers(options =>
 {
+    options.CacheProfiles.Add("cache_0", new CacheProfile() { Duration = 1 });
     options.CacheProfiles.Add("cache_1", new CacheProfile() { Duration = 5 });
     options.CacheProfiles.Add("cache_2", new CacheProfile() { Duration = 10 });
     options.CacheProfiles.Add("cache_3", new CacheProfile() { Duration = 60 });
+}).AddNewtonsoftJson((setupAction) =>
+{
+    // setupAction.SerializerSettings.DateFormatString = "yyyy-MM-dd HH:mm:ss";
+    // setupAction.SerializerSettings.DateTimeZoneHandling = Newtonsoft.Json.DateTimeZoneHandling.Utc;
+    // setupAction.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+    // setupAction.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
+    // setupAction.SerializerSettings.ContractResolver = new Newtonsoft.Json.Serialization.DefaultContractResolver();
+    // setupAction.SerializerSettings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Objects;
+    setupAction.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
+    setupAction.SerializerSettings.Converters.Add(new Com.Api.JsonConverterDecimal());
+#pragma warning disable 
+    ServiceProvider build = builder.Services.BuildServiceProvider();
+#pragma warning restore
+    IHttpContextAccessor? httpContextAccessor = build.GetService<IHttpContextAccessor>();
+    if (httpContextAccessor != null)
+    {
+        setupAction.SerializerSettings.Converters.Add(new JsonConverterDateTimeOffset(httpContextAccessor));
+    }
 });
 builder.Services.AddHostedService<MainService>();
 builder.Services.AddResponseCompression();
-builder.Services.AddControllers();
+// builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {

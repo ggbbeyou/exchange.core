@@ -58,10 +58,9 @@ public class OrderController : ControllerBase
     /// 订单查询
     /// </summary>
     /// <param name="symbol">交易对</param>
-    /// <param name="market">交易对id</param>
-    /// <param name="uid">用户id</param>
+    /// <param name="user_name">用户名</param>
     /// <param name="state">订单状态</param>
-    /// <param name="id">订单id</param>
+    /// <param name="order_id">订单id</param>
     /// <param name="start">开始时间</param>
     /// <param name="end">结束时间</param>
     /// <param name="skip">跳过多少行</param>
@@ -70,19 +69,9 @@ public class OrderController : ControllerBase
     [HttpGet]
     [Route("GetOrder")]
     [ResponseCache(CacheProfileName = "cache_1")]
-    public Res<List<Orders>> GetOrder(string? symbol = null, long? market = null, long? uid = null, E_OrderState? state = null, long? id = null, DateTimeOffset? start = null, DateTimeOffset? end = null, int skip = 0, int take = 50)
+    public Res<List<Orders>> GetOrder(string symbol, string? user_name = null, E_OrderState? state = null, long? order_id = null, DateTimeOffset? start = null, DateTimeOffset? end = null, int skip = 0, int take = 50)
     {
-        List<E_OrderState> states = new List<E_OrderState>();
-        if (state != null)
-        {
-            states.Add(state.Value);
-        }
-        List<long>? ids = new List<long>();
-        if (id != null)
-        {
-            ids.Add(id.Value);
-        }
-        return this.service_order.GetOrder(symbol: symbol, market: market, uid: uid, state: states, ids: ids, start: start, end: end, skip: skip, take: take);
+        return this.service_order.GetOrder(symbol: symbol, user_name: user_name, state: state, order_id: order_id, start: start, end: end, skip: skip, take: take);
     }
 
 

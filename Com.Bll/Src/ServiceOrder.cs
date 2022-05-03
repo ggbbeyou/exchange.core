@@ -546,17 +546,18 @@ public class ServiceOrder
 
 
     /// <summary>
-    /// 按用户去查询订单
+    /// 按用户去查询订单(给api使用)
     /// </summary>
     /// <param name="uid">用户id</param>
     /// <param name="symbol">交易对</param>
+    /// <param name="order_id">订单id列表</param>
     /// <param name="state">订单状态</param>
     /// <param name="start">开始时间</param>
     /// <param name="end">结束时间</param>
     /// <param name="skip">跳过多少行</param>
     /// <param name="take">提取多少行</param>
     /// <returns></returns>
-    public Res<List<ResOrder>> GetOrder(long uid, string? symbol = null, List<E_OrderState>? state = null, DateTimeOffset? start = null, DateTimeOffset? end = null, int skip = 0, int take = 50)
+    public Res<List<ResOrder>> GetOrder(long uid, string? symbol = null, List<long>? order_id = null, List<E_OrderState>? state = null, DateTimeOffset? start = null, DateTimeOffset? end = null, int skip = 0, int take = 50)
     {
         Res<List<ResOrder>> res = new Res<List<ResOrder>>();
 
@@ -602,8 +603,8 @@ public class ServiceOrder
                            trigger_hanging_price = sell.trigger_hanging_price,
                            trigger_cancel_price = sell.trigger_cancel_price,
                        })
-                .Where(P => P.uid == uid).WhereIf(symbol != null, P => P.symbol == symbol).WhereIf(state != null, P => state!.Contains(P.state)).WhereIf(start != null, P => P.create_time >= start).WhereIf(end != null, P => P.create_time <= end)
-                .OrderByDescending(P => P.order_id)
+                .Where(P => P.uid == uid).WhereIf(symbol != null, P => P.symbol == symbol).WhereIf(order_id != null && order_id.Count > 0, P => order_id!.Contains(P.order_id)).WhereIf(state != null, P => state!.Contains(P.state)).WhereIf(start != null, P => P.create_time >= start).WhereIf(end != null, P => P.create_time <= end)
+                .OrderByDescending(P => P.create_time)
                 .Skip(skip)
                 .Take(take);
                 res.data = query.ToList();
@@ -613,19 +614,18 @@ public class ServiceOrder
     }
 
     /// <summary>
-    /// 按交易对来订单查询
+    /// 按交易对来订单查询(给后台使用)
     /// </summary>
     /// <param name="symbol">交易对</param>
-    /// <param name="market">交易对</param>
-    /// <param name="uid">用户id</param>
+    /// <param name="user_name">用户名</param>
     /// <param name="state">订单状态</param>
-    /// <param name="ids">订单id</param>
+    /// <param name="order_id">订单id</param>
     /// <param name="start">开始时间</param>
     /// <param name="end">结束时间</param>
     /// <param name="skip">跳过多少行</param>
     /// <param name="take">提取多少行</param>
     /// <returns></returns>
-    public Res<List<Orders>> GetOrder(string symbol, long? market = null, long? uid = null, List<E_OrderState>? state = null, List<long>? ids = null, DateTimeOffset? start = null, DateTimeOffset? end = null, int skip = 0, int take = 50)
+    public Res<List<Orders>> GetOrder(string symbol, string? user_name, E_OrderState? state = null, long? order_id = null, DateTimeOffset? start = null, DateTimeOffset? end = null, int skip = 0, int take = 50)
     {
         Res<List<Orders>> res = new Res<List<Orders>>();
         res.code = E_Res_Code.ok;
@@ -668,8 +668,8 @@ public class ServiceOrder
                            trigger_hanging_price = sell.trigger_hanging_price,
                            trigger_cancel_price = sell.trigger_cancel_price,
                        })
-                       .Where(P => P.symbol == symbol)
-                // .WhereIf(ids != null && ids.Count > 0, P => ids!.Contains(P.order_id)).WhereIf(symbol != null, P => P.symbol == symbol).WhereIf(market != null, P => P.market == market).WhereIf(uid != null, P => P.uid == uid).WhereIf(state != null, P => state!.Contains(P.state)).WhereIf(start != null, P => P.create_time >= start).WhereIf(end != null, P => P.create_time <= end)
+                .Where(P => P.symbol == symbol)
+                .WhereIf(symbol != null, P => P.symbol == symbol).WhereIf(user_name != null, P => P.user_name == user_name).WhereIf(state != null, P => P.state == state).WhereIf(order_id != null, P => P.order_id == order_id).WhereIf(start != null, P => P.create_time >= start).WhereIf(end != null, P => P.create_time <= end)
                 .OrderByDescending(P => P.create_time)
                 .Skip(skip)
                 .Take(take);

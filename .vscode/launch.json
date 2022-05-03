@@ -2,42 +2,6 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Service",
-            "type": "coreclr",
-            "request": "launch",
-            "preLaunchTask": "build-Service",
-            "program": "${workspaceFolder}/Com.Service/bin/Debug/net6.0/Com.Service.dll",
-            "args": [],
-            "cwd": "${workspaceFolder}/Com.Service",
-            "console": "internalConsole",
-            "stopAtEntry": false,
-            "env": {
-                "DOTNET_ENVIRONMENT": "Development"
-                // "DOTNET_ENVIRONMENT": "Production"
-            }
-        },
-        {
-            "name": "Gateway",
-            "type": "coreclr",
-            "request": "launch",
-            "preLaunchTask": "build-Gateway",
-            "program": "${workspaceFolder}/Com.Gateway/bin/Debug/net6.0/Com.Gateway.dll",
-            "args": [],
-            "cwd": "${workspaceFolder}/Com.Gateway",
-            "stopAtEntry": false,
-            "serverReadyAction": {
-                "action": "openExternally",
-                "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
-            },
-            "env": {
-                "ASPNETCORE_ENVIRONMENT": "Development"
-                // "ASPNETCORE_ENVIRONMENT": "Production"
-            },
-            "sourceFileMap": {
-                "/Views": "${workspaceFolder}/Views"
-            }
-        },
-        {
             "name": "Api",
             "type": "coreclr",
             "request": "launch",
@@ -77,6 +41,21 @@
             },
             "sourceFileMap": {
                 "/Views": "${workspaceFolder}/Views"
+            }
+        },
+        {
+            "name": "Service",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build-Service",
+            "program": "${workspaceFolder}/Com.Service/bin/Debug/net6.0/Com.Service.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/Com.Service",
+            "console": "internalConsole",
+            "stopAtEntry": false,
+            "env": {
+                "DOTNET_ENVIRONMENT": "Development"
+                // "DOTNET_ENVIRONMENT": "Production"
             }
         }
     ]

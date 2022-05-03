@@ -11,11 +11,6 @@ namespace Com.Api.Sdk.Models;
 public class Res<T>
 {
     /// <summary>
-    /// 是否成功
-    /// </summary>
-    /// <value></value>
-    public bool success { get; set; }
-    /// <summary>
     /// 返回编号
     /// </summary>
     /// <value></value>

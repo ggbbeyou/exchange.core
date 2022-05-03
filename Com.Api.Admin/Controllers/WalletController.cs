@@ -87,7 +87,7 @@ public class WalletController : ControllerBase
     public Res<List<Wallet>?> GetWallet(E_WalletType wallet_type, string? coin_name)
     {
         Res<List<Wallet>?> res = new Res<List<Wallet>?>();
-        res.success = false;
+
         res.code = E_Res_Code.fail;
         var linq = from coin in db.Coin
                    join wallet in db.Wallet.Where(P => P.user_id == this.login.user_id && P.wallet_type == wallet_type).WhereIf(!string.IsNullOrWhiteSpace(coin_name), P => P.coin_name.Contains(coin_name!))
@@ -122,7 +122,7 @@ public class WalletController : ControllerBase
     public Res<List<ResRunning>> GetRunning(DateTimeOffset? start, DateTimeOffset? end, int skip, int take)
     {
         Res<List<ResRunning>> res = new Res<List<ResRunning>>();
-        res.success = false;
+
         res.code = E_Res_Code.fail;
         res.data = db.Running.AsNoTracking().Where(P => P.uid_from == this.login.user_id && P.type == E_RunningType.fee).WhereIf(start != null, P => P.time >= start).WhereIf(end != null, P => P.time <= end).Skip(skip).Take(take).ToList().ConvertAll(P => (ResRunning)P);
         return res;

@@ -68,7 +68,7 @@ public class ServiceController : ControllerBase
         Market? marketInfo = this.db.Market.FirstOrDefault(P => P.market == market);
         if (marketInfo == null)
         {
-            res.success = false;
+
             res.code = E_Res_Code.symbol_not_found;
             res.message = "交易对不存在";
             res.data = null;
@@ -82,7 +82,7 @@ public class ServiceController : ControllerBase
             }
             if (marketInfo.last_price <= 0)
             {
-                res.success = false;
+
                 res.code = E_Res_Code.trans_price_cannot_lower_0;
                 res.message = "最后成交价不能小于0";
                 res.data = null;
@@ -102,7 +102,7 @@ public class ServiceController : ControllerBase
                     marketInfo.status = await FactoryAdmin.instance.ServiceStop(marketInfo) ?? marketInfo.status;
                 }
                 this.db.SaveChanges();
-                res.success = true;
+
                 res.code = E_Res_Code.ok;
                 res.message = "操作成功";
                 res.data = marketInfo.status;

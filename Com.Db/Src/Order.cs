@@ -16,16 +16,6 @@ namespace Com.Db;
 public class Orders : ResOrder
 {
     /// <summary>
-    /// 交易对
-    /// </summary>
-    /// <value></value>
-    public long market { get; set; }
-    /// <summary>
-    /// 用户ID
-    /// </summary>
-    /// <value></value>
-    public long uid { get; set; }
-    /// <summary>
     /// 用户名
     /// </summary>
     /// <value></value>
@@ -72,13 +62,7 @@ public class Orders : ResOrder
     /// <value></value>
     //[JsonConverter(typeof(JsonConverterDecimal))]
     public decimal fee_taker { get; set; }
-    /// <summary>
-    /// 订单状态
-    /// </summary>
-    /// <value></value>
-    //[JsonConverter(typeof(StringEnumConverter))]
-    //[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-    public E_OrderState state { get; set; }
+
     /// <summary>
     /// 最后成交时间或撤单时间
     /// </summary>

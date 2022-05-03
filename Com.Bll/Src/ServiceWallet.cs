@@ -69,7 +69,7 @@ public class ServiceWallet
         Res<bool> res = new Res<bool>();
         if (amount <= 0)
         {
-            res.success = false;
+
             res.code = E_Res_Code.amount_cannot_lass_0;
             res.message = "划转金额不能低于0";
             return res;
@@ -86,14 +86,14 @@ public class ServiceWallet
                         Wallet? wallet_to = db.Wallet.Where(P => P.user_id == uid && P.wallet_type == to && P.coin_id == coin_id).SingleOrDefault();
                         if (wallet_from == null)
                         {
-                            res.success = false;
+
                             res.code = E_Res_Code.wallet_not_found;
                             res.message = "钱包不存在";
                             return res;
                         }
                         if (wallet_from.available < amount)
                         {
-                            res.success = false;
+
                             res.code = E_Res_Code.available_not_enough;
                             res.message = "可用资产不足";
                             return res;
@@ -121,7 +121,7 @@ public class ServiceWallet
                         db.SaveChanges();
                         transaction.Commit();
                         PushWallet(new List<Wallet>() { wallet_from, wallet_to });
-                        res.success = true;
+
                         res.code = E_Res_Code.ok;
                         return res;
                     }
@@ -129,7 +129,7 @@ public class ServiceWallet
                     {
                         transaction.Rollback();
                         FactoryService.instance.constant.logger.LogError(ex, "Transfer(并发):" + ex.Message);
-                        res.success = false;
+
                         res.code = E_Res_Code.db_error;
                         res.message = "钱包类型之间划转出错(并发)";
                         return res;
@@ -138,7 +138,7 @@ public class ServiceWallet
                     {
                         transaction.Rollback();
                         FactoryService.instance.constant.logger.LogError(ex, "FreezeChange:" + ex.Message);
-                        res.success = false;
+
                         res.code = E_Res_Code.db_error;
                         res.message = "钱包类型之间划转出错";
                         return res;
@@ -573,7 +573,7 @@ public class ServiceWallet
         try
         {
             ResWebsocker<List<Wallet>> res = new ResWebsocker<List<Wallet>>();
-            res.success = true;
+
             res.channel = E_WebsockerChannel.assets;
             res.op = E_WebsockerOp.subscribe_event;
             var wallet_uid = from wallet in wallets

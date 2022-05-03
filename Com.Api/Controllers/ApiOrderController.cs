@@ -220,19 +220,19 @@ public class ApiOrderController : ControllerBase
         return this.service_order.GetOrder(uid: api!.user_id, state: new List<E_OrderState>() { E_OrderState.completed, E_OrderState.cancel }, start: start, end: end, skip: skip, take: take);
     }
 
-    /// <summary>
-    /// 按订单id查询
-    /// </summary>
-    /// <param name="model">key:symbol,data:订单id数组</param>
-    /// <returns></returns>
-    [HttpPost]
-    [Route("GetOrderById")]
-    [ResponseCache(CacheProfileName = "cache_0")]
-    public Res<List<ResOrder>> GetOrderById(KeyList<string, long> model)
-    {
-        UsersApi? api = this.service_user.GetApi(Request.Headers["api_key"]);
-        return this.service_order.GetOrder(symbol: model.key, uid: api!.user_id, ids: model.data);
-    }
+    // /// <summary>
+    // /// 按订单id查询
+    // /// </summary>
+    // /// <param name="model">key:symbol,data:订单id数组</param>
+    // /// <returns></returns>
+    // [HttpPost]
+    // [Route("GetOrderById")]
+    // [ResponseCache(CacheProfileName = "cache_0")]
+    // public Res<List<ResOrder>> GetOrderById(KeyList<string, long> model)
+    // {
+    //     UsersApi? api = this.service_user.GetApi(Request.Headers["api_key"]);
+    //     return this.service_order.GetOrder(symbol: model.key, uid: api!.user_id, ids: model.data);
+    // }
 
     /// <summary>
     /// 按订单状态查询

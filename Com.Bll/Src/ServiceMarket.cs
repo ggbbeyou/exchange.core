@@ -47,7 +47,7 @@ public class ServiceMarket
         });
         if (market != null)
         {
-            res.success = true;
+
             res.code = E_Res_Code.ok;
             res.data = market;
         }
@@ -65,7 +65,7 @@ public class ServiceMarket
         List<Market> market = this.GetMarketBySymbol(symbol);
         if (market != null)
         {
-            res.success = true;
+
             res.code = E_Res_Code.ok;
             res.data = new List<ResTicker>();
             foreach (var item in market)
@@ -106,7 +106,7 @@ public class ServiceMarket
             {
                 return res;
             }
-            res.success = true;
+
             res.code = E_Res_Code.ok;
             res.data = JsonConvert.DeserializeObject<ResDepth>(rv);
         }
@@ -134,7 +134,7 @@ public class ServiceMarket
         Market? market = this.GetMarketBySymbol(symbol);
         if (market != null)
         {
-            res.success = true;
+
             res.code = E_Res_Code.ok;
             res.data = new List<ResKline>();
             RedisValue[] rv = FactoryService.instance.constant.redis.SortedSetRangeByScore(key: FactoryService.instance.GetRedisKline(market.market, type), start: start.ToUnixTimeMilliseconds(), stop: stop, exclude: Exclude.Both, skip: skip, take: take, order: StackExchange.Redis.Order.Ascending);

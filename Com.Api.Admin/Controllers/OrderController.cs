@@ -70,7 +70,7 @@ public class OrderController : ControllerBase
     [HttpGet]
     [Route("GetOrder")]
     [ResponseCache(CacheProfileName = "cache_1")]
-    public Res<List<ResOrder>> GetOrder(string? symbol = null, long? market = null, long? uid = null, E_OrderState? state = null, long? id = null, DateTimeOffset? start = null, DateTimeOffset? end = null, int skip = 0, int take = 50)
+    public Res<List<Orders>> GetOrder(string? symbol = null, long? market = null, long? uid = null, E_OrderState? state = null, long? id = null, DateTimeOffset? start = null, DateTimeOffset? end = null, int skip = 0, int take = 50)
     {
         List<E_OrderState> states = new List<E_OrderState>();
         if (state != null)

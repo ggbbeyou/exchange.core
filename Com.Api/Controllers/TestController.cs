@@ -318,7 +318,7 @@ public class TestController : ControllerBase
     public Res<List<ResOrder>> PlaceOrderText(int count)
     {
         Res<List<ResOrder>> res = new Res<List<ResOrder>>();
-        res.success = true;
+
         res.code = E_Res_Code.ok;
         res.data = new List<ResOrder>();
         List<Users> users = this.db.Users.ToList();

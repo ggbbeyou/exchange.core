@@ -291,8 +291,7 @@ public class WebSocketController : ControllerBase
                             ResDepth? depth = JsonConvert.DeserializeObject<ResDepth>(rv);
                             if (depth != null)
                             {
-                                ResWebsocker<ResDepth> depth_res = new ResWebsocker<ResDepth>();
-                                depth_res.success = true;
+                                ResWebsocker<ResDepth> depth_res = new ResWebsocker<ResDepth>();                                
                                 depth_res.op = E_WebsockerOp.subscribe_event;
                                 depth_res.channel = item.channel;
                                 depth_res.data = depth;

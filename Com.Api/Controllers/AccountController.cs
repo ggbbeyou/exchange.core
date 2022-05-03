@@ -92,7 +92,7 @@ public class AccountController : ControllerBase
     public Res<bool> SendEmailCodeByRegister(string email)
     {
         Res<bool> res = new Res<bool>();
-        res.success = false;
+
         res.code = E_Res_Code.fail;
         res.data = false;
         email = email.Trim().ToLower();
@@ -118,7 +118,7 @@ public class AccountController : ControllerBase
             if (service_common.SendEmail(email, content))
             {
                 FactoryService.instance.constant.redis.StringSet(FactoryService.instance.GetRedisVerificationCode(email), code, TimeSpan.FromMinutes(10));
-                res.success = true;
+
                 res.code = E_Res_Code.ok;
                 res.data = true;
                 return res;

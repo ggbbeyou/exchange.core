@@ -46,7 +46,7 @@ public class VerificationFilters : Attribute, IAuthorizationFilter
     public void OnAuthorization(AuthorizationFilterContext context)
     {
         Res<bool> res = new Res<bool>();
-        res.success = false;
+
         res.code = E_Res_Code.signature_error;
         res.message = "签名错误!";
         res.data = false;

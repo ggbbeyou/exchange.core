@@ -61,7 +61,7 @@ public class ServiceOrder
         Res<List<ResOrder>> res = new Res<List<ResOrder>>();
         this.stopwatch.Restart();
         FactoryService.instance.constant.stopwatch.Restart();
-        res.success = false;
+
         res.code = E_Res_Code.fail;
         res.message = "";
         res.data = new List<ResOrder>();
@@ -322,7 +322,7 @@ public class ServiceOrder
         FactoryService.instance.constant.MqSend(FactoryService.instance.GetMqOrderPlace(info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(call_req)));
         FactoryService.instance.constant.stopwatch.Stop();
         FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{info.symbol}:挂单=>插入{call_req.data.Count}条订单到Mq");
-        res.success = true;
+
         res.code = E_Res_Code.ok;
         res.message = "挂单成功";
         res.data.AddRange(temp_order);
@@ -342,7 +342,7 @@ public class ServiceOrder
     public Res<bool> CancelOrder(string symbol, long uid, int type, List<long> order)
     {
         Res<bool> res = new Res<bool>();
-        res.success = true;
+
         res.code = E_Res_Code.fail;
         res.data = false;
         res.message = null;
@@ -544,8 +544,76 @@ public class ServiceOrder
         return (buys, sells);
     }
 
+
     /// <summary>
-    /// 订单查询
+    /// 按用户去查询订单
+    /// </summary>
+    /// <param name="uid">用户id</param>
+    /// <param name="symbol">交易对</param>
+    /// <param name="state">订单状态</param>
+    /// <param name="start">开始时间</param>
+    /// <param name="end">结束时间</param>
+    /// <param name="skip">跳过多少行</param>
+    /// <param name="take">提取多少行</param>
+    /// <returns></returns>
+    public Res<List<ResOrder>> GetOrder(long uid, string? symbol = null, List<E_OrderState>? state = null, DateTimeOffset? start = null, DateTimeOffset? end = null, int skip = 0, int take = 50)
+    {
+        Res<List<ResOrder>> res = new Res<List<ResOrder>>();
+
+        res.code = E_Res_Code.ok;
+        using (var scope = FactoryService.instance.constant.provider.CreateScope())
+        {
+            using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
+            {
+
+                var query = (from buy in db.OrderBuy
+                             select new ResOrder
+                             {
+                                 uid = buy.uid,
+                                 market = buy.market,
+                                 order_id = buy.order_id,
+                                 create_time = buy.create_time,
+                                 client_id = buy.client_id,
+                                 symbol = buy.symbol,
+                                 side = buy.side,
+                                 type = buy.type,
+                                 trade_model = buy.trade_model,
+                                 price = buy.price,
+                                 amount = buy.amount,
+                                 total = buy.total,
+                                 trigger_hanging_price = buy.trigger_hanging_price,
+                                 trigger_cancel_price = buy.trigger_cancel_price,
+                             })
+                .Union(from sell in db.OrderSell
+                       select new ResOrder
+                       {
+                           uid = sell.uid,
+                           market = sell.market,
+                           order_id = sell.order_id,
+                           create_time = sell.create_time,
+                           client_id = sell.client_id,
+                           symbol = sell.symbol,
+                           side = sell.side,
+                           type = sell.type,
+                           trade_model = sell.trade_model,
+                           price = sell.price,
+                           amount = sell.amount,
+                           total = sell.total,
+                           trigger_hanging_price = sell.trigger_hanging_price,
+                           trigger_cancel_price = sell.trigger_cancel_price,
+                       })
+                .Where(P => P.uid == uid).WhereIf(symbol != null, P => P.symbol == symbol).WhereIf(state != null, P => state!.Contains(P.state)).WhereIf(start != null, P => P.create_time >= start).WhereIf(end != null, P => P.create_time <= end)
+                .OrderByDescending(P => P.order_id)
+                .Skip(skip)
+                .Take(take);
+                res.data = query.ToList();
+            }
+        }
+        return res;
+    }
+
+    /// <summary>
+    /// 按交易对来订单查询
     /// </summary>
     /// <param name="symbol">交易对</param>
     /// <param name="market">交易对</param>
@@ -554,49 +622,58 @@ public class ServiceOrder
     /// <param name="ids">订单id</param>
     /// <param name="start">开始时间</param>
     /// <param name="end">结束时间</param>
-    /// <param name="skip">跳过多少地</param>
+    /// <param name="skip">跳过多少行</param>
     /// <param name="take">提取多少行</param>
     /// <returns></returns>
-    public Res<List<ResOrder>> GetOrder(string? symbol = null, long? market = null, long? uid = null, List<E_OrderState>? state = null, List<long>? ids = null, DateTimeOffset? start = null, DateTimeOffset? end = null, int skip = 0, int take = 50)
+    public Res<List<Orders>> GetOrder(string symbol, long? market = null, long? uid = null, List<E_OrderState>? state = null, List<long>? ids = null, DateTimeOffset? start = null, DateTimeOffset? end = null, int skip = 0, int take = 50)
     {
-        Res<List<ResOrder>> res = new Res<List<ResOrder>>();
-        res.data = new List<ResOrder>();
+        Res<List<Orders>> res = new Res<List<Orders>>();
+        res.code = E_Res_Code.ok;
         using (var scope = FactoryService.instance.constant.provider.CreateScope())
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
-                IQueryable<ResOrder> buy = db.OrderBuy.WhereIf(ids != null && ids.Count > 0, P => ids!.Contains(P.order_id)).WhereIf(symbol != null, P => P.symbol == symbol).WhereIf(market != null, P => P.market == market).WhereIf(uid != null, P => P.uid == uid).WhereIf(state != null, P => state!.Contains(P.state)).WhereIf(start != null, P => P.create_time >= start).WhereIf(end != null, P => P.create_time <= end).AsNoTracking().Select(P => new ResOrder
-                {
-                    order_id = P.order_id,
-                    create_time = P.create_time,
-                    client_id = P.client_id,
-                    symbol = P.symbol,
-                    side = P.side,
-                    type = P.type,
-                    trade_model = P.trade_model,
-                    price = P.price,
-                    amount = P.amount,
-                    total = P.total,
-                    trigger_hanging_price = P.trigger_hanging_price,
-                    trigger_cancel_price = P.trigger_cancel_price,
-                });
-                IQueryable<ResOrder> sell = db.OrderSell.WhereIf(ids != null && ids.Count > 0, P => ids!.Contains(P.order_id)).WhereIf(symbol != null, P => P.symbol == symbol).WhereIf(market != null, P => P.market == market).WhereIf(uid != null, P => P.uid == uid).WhereIf(state != null, P => state!.Contains(P.state)).WhereIf(start != null, P => P.create_time == start).WhereIf(end != null, P => P.create_time <= end).AsNoTracking().Select(P => new ResOrder
-                {
-                    order_id = P.order_id,
-                    create_time = P.create_time,
-                    client_id = P.client_id,
-                    symbol = P.symbol,
-                    side = P.side,
-                    type = P.type,
-                    trade_model = P.trade_model,
-                    price = P.price,
-                    amount = P.amount,
-                    total = P.total,
-                    trigger_hanging_price = P.trigger_hanging_price,
-                    trigger_cancel_price = P.trigger_cancel_price,
-                });
-                IQueryable<ResOrder> orders = buy.Union(sell).OrderByDescending(P => P.create_time).Skip(skip).Take(take);
-                res.data = orders.ToList();
+
+                var query = (from buy in db.OrderBuy
+                             select new Orders
+                             {
+                                 market = buy.market,
+                                 order_id = buy.order_id,
+                                 create_time = buy.create_time,
+                                 client_id = buy.client_id,
+                                 symbol = buy.symbol,
+                                 side = buy.side,
+                                 type = buy.type,
+                                 trade_model = buy.trade_model,
+                                 price = buy.price,
+                                 amount = buy.amount,
+                                 total = buy.total,
+                                 trigger_hanging_price = buy.trigger_hanging_price,
+                                 trigger_cancel_price = buy.trigger_cancel_price,
+                             })
+                .Union(from sell in db.OrderSell
+                       select new Orders
+                       {
+                           market = sell.market,
+                           order_id = sell.order_id,
+                           create_time = sell.create_time,
+                           client_id = sell.client_id,
+                           symbol = sell.symbol,
+                           side = sell.side,
+                           type = sell.type,
+                           trade_model = sell.trade_model,
+                           price = sell.price,
+                           amount = sell.amount,
+                           total = sell.total,
+                           trigger_hanging_price = sell.trigger_hanging_price,
+                           trigger_cancel_price = sell.trigger_cancel_price,
+                       })
+                       .Where(P => P.symbol == symbol)
+                // .WhereIf(ids != null && ids.Count > 0, P => ids!.Contains(P.order_id)).WhereIf(symbol != null, P => P.symbol == symbol).WhereIf(market != null, P => P.market == market).WhereIf(uid != null, P => P.uid == uid).WhereIf(state != null, P => state!.Contains(P.state)).WhereIf(start != null, P => P.create_time >= start).WhereIf(end != null, P => P.create_time <= end)
+                .OrderByDescending(P => P.create_time)
+                .Skip(skip)
+                .Take(take);
+                res.data = query.ToList();
                 return res;
             }
         }

@@ -29,12 +29,12 @@ public class GreeterImpl : ExchangeService.ExchangeServiceBase
     {
         Reply reply = new Reply();
         ResCall<string> res = new ResCall<string>();
-        res.success = true;
+
         res.code = E_Res_Code.ok;
         ReqCall<string>? req = JsonConvert.DeserializeObject<ReqCall<string>>(request.Json);
         if (req == null)
         {
-            res.success = false;
+
             res.code = E_Res_Code.fail;
             res.message = $"grpc 请求参数为空:{request.Json}";
             FactoryService.instance.constant.logger.LogError($"grpc 请求参数为空:{request.Json}");
@@ -49,7 +49,7 @@ public class GreeterImpl : ExchangeService.ExchangeServiceBase
             Market? marketInfo = JsonConvert.DeserializeObject<Market>(req.data);
             if (marketInfo == null)
             {
-                res.success = false;
+
                 res.code = E_Res_Code.fail;
                 res.message = $"服务(失败):获取服务状态,未获取到请求参数:{request.Json}";
                 FactoryService.instance.constant.logger.LogError($"服务(失败):获取服务状态,未获取到请求参数:{request.Json}");

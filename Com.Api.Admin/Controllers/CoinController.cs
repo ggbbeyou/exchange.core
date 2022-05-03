@@ -80,12 +80,12 @@ public class CoinController : ControllerBase
     public async Task<Res<bool>> AddCoin(string coin_name, string full_name, IFormFile icon)
     {
         Res<bool> res = new Res<bool>();
-        res.success = false;
+
         res.code = E_Res_Code.fail;
         res.data = false;
         if (icon == null || icon.Length <= 0)
         {
-            res.success = false;
+
             res.code = E_Res_Code.file_not_found;
             res.data = false;
             res.message = "未找到文件";
@@ -93,7 +93,7 @@ public class CoinController : ControllerBase
         }
         if (this.db.Coin.Any(P => P.coin_name == coin_name.ToUpper()))
         {
-            res.success = false;
+
             res.code = E_Res_Code.name_repeat;
             res.data = false;
             res.message = "币名已重复";
@@ -101,7 +101,7 @@ public class CoinController : ControllerBase
         }
         if (this.db.Coin.Any(P => P.full_name == full_name))
         {
-            res.success = false;
+
             res.code = E_Res_Code.name_repeat;
             res.data = false;
             res.message = "全名已重复";
@@ -118,7 +118,7 @@ public class CoinController : ControllerBase
         this.db.Coin.Add(coin);
         if (this.db.SaveChanges() > 0)
         {
-            res.success = true;
+
             res.code = E_Res_Code.ok;
             res.data = true;
             res.message = "";
@@ -138,7 +138,7 @@ public class CoinController : ControllerBase
     public Res<List<Coin>> GetCoin(string? coin_name)
     {
         Res<List<Coin>> res = new Res<List<Coin>>();
-        res.success = true;
+
         res.code = E_Res_Code.ok;
         res.data = db.Coin.WhereIf(coin_name != null, P => P.coin_name == coin_name!.ToUpper()).AsNoTracking().ToList();
         return res;

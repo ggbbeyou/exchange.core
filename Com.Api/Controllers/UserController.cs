@@ -92,13 +92,13 @@ public class UserController : ControllerBase
     public Res<bool> ApplyPhone(string phone)
     {
         Res<bool> res = new Res<bool>();
-        res.success = false;
+
         res.code = E_Res_Code.fail;
         res.data = false;
         Users? user = db.Users.AsNoTracking().SingleOrDefault(P => P.user_id == this.login.user_id);
         if (user == null || user.disabled == true || user.verify_phone == true)
         {
-            res.success = false;
+
             res.code = E_Res_Code.apply_fail;
             res.data = false;
             res.message = "用户被禁用或已经验证过";
@@ -114,7 +114,7 @@ public class UserController : ControllerBase
             if (service_common.SendPhone(phone, content))
             {
                 FactoryService.instance.constant.redis.StringSet(FactoryService.instance.GetRedisVerificationCode(this.login.user_id + phone.Trim()), code, TimeSpan.FromMinutes(10));
-                res.success = true;
+
                 res.code = E_Res_Code.ok;
                 res.data = true;
                 return res;
@@ -134,7 +134,7 @@ public class UserController : ControllerBase
     public Res<bool> VerifyPhone(string phone, string code)
     {
         Res<bool> res = new Res<bool>();
-        res.success = false;
+
         res.code = E_Res_Code.fail;
         res.data = false;
         RedisValue rv = FactoryService.instance.constant.redis.StringGet(FactoryService.instance.GetRedisVerificationCode(this.login.user_id + phone.Trim()));
@@ -145,7 +145,7 @@ public class UserController : ControllerBase
                 Users? user = db.Users.SingleOrDefault(P => P.user_id == this.login.user_id);
                 if (user == null || user.disabled == true || user.verify_phone == true)
                 {
-                    res.success = false;
+
                     res.code = E_Res_Code.apply_fail;
                     res.data = false;
                     res.message = "用户被禁用或已经验证过";
@@ -157,7 +157,7 @@ public class UserController : ControllerBase
                     user.phone = phone.Trim();
                     if (db.SaveChanges() > 0)
                     {
-                        res.success = true;
+
                         res.code = E_Res_Code.ok;
                         res.data = true;
                         return res;
@@ -166,7 +166,7 @@ public class UserController : ControllerBase
             }
             else
             {
-                res.success = false;
+
                 res.code = E_Res_Code.verification_error;
                 res.data = false;
                 res.message = "验证码错误";
@@ -185,19 +185,19 @@ public class UserController : ControllerBase
     public Res<string?> ApplyGoogle()
     {
         Res<string?> res = new Res<string?>();
-        res.success = false;
+
         res.code = E_Res_Code.fail;
         res.data = service_common.CreateGoogle2FA(FactoryService.instance.constant.config["Jwt:Issuer"], this.login.user_id);
         if (string.IsNullOrWhiteSpace(res.data))
         {
-            res.success = false;
+
             res.code = E_Res_Code.verification_disable;
             res.message = "用户被禁用或已申请过验证";
             return res;
         }
         else
         {
-            res.success = true;
+
             res.code = E_Res_Code.ok;
             return res;
         }
@@ -213,12 +213,12 @@ public class UserController : ControllerBase
     public Res<bool> VerifyGoogle(string code)
     {
         Res<bool> res = new Res<bool>();
-        res.success = false;
+
         res.code = E_Res_Code.fail;
         Users? user = db.Users.SingleOrDefault(P => P.user_id == this.login.user_id);
         if (user == null || user.disabled == true || user.verify_google == true || string.IsNullOrWhiteSpace(user.google_key))
         {
-            res.success = false;
+
             res.code = E_Res_Code.apply_fail;
             res.data = false;
             res.message = "用户被禁用或已经验证过";
@@ -229,7 +229,7 @@ public class UserController : ControllerBase
             res.data = service_common.Verification2FA(user.google_key, code);
             if (res.data == false)
             {
-                res.success = false;
+
                 res.code = E_Res_Code.verification_error;
                 res.message = "验证码错误";
                 return res;
@@ -240,7 +240,7 @@ public class UserController : ControllerBase
                 db.Users.Update(user);
                 if (db.SaveChanges() > 0)
                 {
-                    res.success = true;
+
                     res.code = E_Res_Code.ok;
                     return res;
                 }
@@ -259,12 +259,12 @@ public class UserController : ControllerBase
     public async Task<Res<bool>> ApplyRealname(IFormFile files)
     {
         Res<bool> res = new Res<bool>();
-        res.success = false;
+
         res.code = E_Res_Code.fail;
         res.data = false;
         if (files == null || files.Length <= 0)
         {
-            res.success = false;
+
             res.code = E_Res_Code.file_not_found;
             res.data = false;
             res.message = "未找到文件";
@@ -276,7 +276,7 @@ public class UserController : ControllerBase
         Users? users = db.Users.SingleOrDefault(P => P.user_id == this.login.user_id);
         if (users == null || users.disabled == true || users.verify_realname == E_Verify.verify_ok)
         {
-            res.success = false;
+
             res.code = E_Res_Code.apply_fail;
             res.data = false;
             res.message = "用户被禁用或已经验证过";
@@ -289,7 +289,7 @@ public class UserController : ControllerBase
             db.Users.Update(users);
             if (db.SaveChanges() > 0)
             {
-                res.success = true;
+
                 res.code = E_Res_Code.ok;
                 res.data = true;
                 return res;
@@ -312,7 +312,7 @@ public class UserController : ControllerBase
     public Res<KeyValuePair<string, string>> ApplyApiUser(string code, string? name, bool transaction, bool withdrawal, string ip)
     {
         Res<KeyValuePair<string, string>> res = new Res<KeyValuePair<string, string>>();
-        res.success = false;
+
         res.code = E_Res_Code.fail;
         res.data = new KeyValuePair<string, string>();
         UsersApi api = new UsersApi()
@@ -330,7 +330,7 @@ public class UserController : ControllerBase
         db.UsersApi.Add(api);
         if (db.SaveChanges() > 0)
         {
-            res.success = true;
+
             res.code = E_Res_Code.ok;
             res.data = new KeyValuePair<string, string>(api.api_key, api.api_secret);
             return res;
@@ -353,7 +353,7 @@ public class UserController : ControllerBase
     public Res<bool> UpdateApiUser(string code, long id, string? name, bool transaction, bool withdrawal, string ip)
     {
         Res<bool> res = new Res<bool>();
-        res.success = false;
+
         res.code = E_Res_Code.fail;
         UsersApi? api = db.UsersApi.AsNoTracking().SingleOrDefault(P => P.id == id);
         if (api != null)
@@ -365,7 +365,7 @@ public class UserController : ControllerBase
             db.UsersApi.Update(api);
             if (db.SaveChanges() > 0)
             {
-                res.success = true;
+
                 res.code = E_Res_Code.ok;
                 res.data = true;
                 return res;
@@ -383,9 +383,9 @@ public class UserController : ControllerBase
     public Res<List<ResUsersApi>> GetApiUser()
     {
         Res<List<ResUsersApi>> res = new Res<List<ResUsersApi>>();
-        res.success = false;
+
         res.code = E_Res_Code.fail;
-        res.success = true;
+
         res.code = E_Res_Code.ok;
         res.data = db.UsersApi.AsNoTracking().Where(P => P.user_id == this.login.user_id).ToList().ConvertAll(P => (ResUsersApi)P);
         return res;

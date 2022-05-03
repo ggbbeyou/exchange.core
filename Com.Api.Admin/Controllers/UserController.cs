@@ -86,7 +86,7 @@ public class UserController : ControllerBase
     public Res<List<Users>> GetUser(long? uid, string? user_name, string? email, string? phone, int skip = 0, int take = 50)
     {
         Res<List<Users>> res = new Res<List<Users>>();
-        res.success = true;
+
         res.code = E_Res_Code.ok;
         res.data = service_user.GetUser(uid, user_name, email, phone, skip, take);
         return res;
@@ -101,7 +101,7 @@ public class UserController : ControllerBase
     public Res<List<ResUser>> ApplyRealname()
     {
         Res<List<ResUser>> res = new Res<List<ResUser>>();
-        res.success = true;
+
         res.code = E_Res_Code.ok;
         res.data = db.Users.AsNoTracking().Where(P => P.verify_realname == E_Verify.verify_no).ToList().ConvertAll(P => (ResUser)P);
         return res;
@@ -128,7 +128,7 @@ public class UserController : ControllerBase
         }
         users.verify_realname = verify;
         db.SaveChanges();
-        res.success = true;
+
         res.code = E_Res_Code.ok;
         res.data = true;
         return res;

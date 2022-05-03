@@ -121,7 +121,7 @@ public class ServiceUser
     public Res<bool> Register(string email, string password, string code, string? recommend, string ip)
     {
         Res<bool> res = new Res<bool>();
-        res.success = false;
+
         res.code = E_Res_Code.fail;
         res.data = false;
         if (!Regex.IsMatch(email, @"^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+((\.[a-zA-Z0-9_-]{2,3}){1,2})$"))
@@ -189,7 +189,7 @@ public class ServiceUser
                 db.Users.Add(settlement_btc_usdt);
                 if (db.SaveChanges() > 0)
                 {
-                    res.success = true;
+
                     res.code = E_Res_Code.ok;
                     res.data = true;
                     return res;
@@ -210,7 +210,7 @@ public class ServiceUser
     public Res<ResUser> Login(string email, string password, E_App app, string ip)
     {
         Res<ResUser> res = new Res<ResUser>();
-        res.success = false;
+
         res.code = E_Res_Code.fail;
         using (var scope = FactoryService.instance.constant.provider.CreateScope())
         {
@@ -219,7 +219,7 @@ public class ServiceUser
                 var user = db.Users.FirstOrDefault(P => P.disabled == false && (P.phone == email || P.email == email) && P.password == Encryption.SHA256Encrypt(password));
                 if (user == null)
                 {
-                    res.success = false;
+
                     res.code = E_Res_Code.name_password_error;
                     res.message = "账户或密码错误,登陆失败";
                     return res;
@@ -228,7 +228,7 @@ public class ServiceUser
                 long no = FactoryService.instance.constant.worker.NextId();
                 FactoryService.instance.constant.redis.HashDelete(FactoryService.instance.GetRedisBlacklist(), $"{user.user_id}_{app}_*");
                 FactoryService.instance.constant.redis.StringSet(FactoryService.instance.GetRedisOnline(no), $"{user.user_id}_{user.user_name}_{app}", new TimeSpan(0, int.Parse(FactoryService.instance.constant.config["Jwt:Expires"]), 0));
-                res.success = true;
+
                 res.code = E_Res_Code.ok;
                 res.data = user;
                 res.data.token = GenerateToken(no, user, app);
@@ -249,7 +249,7 @@ public class ServiceUser
         Res<bool> res = new Res<bool>();
         FactoryService.instance.constant.redis.HashSet(FactoryService.instance.GetRedisBlacklist(), $"{uid}_{app}_{no}", DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
         FactoryService.instance.constant.redis.StringGetDelete(FactoryService.instance.GetRedisOnline(no));
-        res.success = true;
+
         res.code = E_Res_Code.ok;
         res.data = true;
         return res;

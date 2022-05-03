@@ -40,14 +40,14 @@ builder.Services.AddControllers(options =>
     // setupAction.SerializerSettings.ContractResolver = new Newtonsoft.Json.Serialization.DefaultContractResolver();
     // setupAction.SerializerSettings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Objects;
     setupAction.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
-    setupAction.SerializerSettings.Converters.Add(new Com.Api.JsonConverterDecimal());
+    setupAction.SerializerSettings.Converters.Add(new Com.Api.Admin.JsonConverterDecimal());
 #pragma warning disable 
     ServiceProvider build = builder.Services.BuildServiceProvider();
 #pragma warning restore
     IHttpContextAccessor? httpContextAccessor = build.GetService<IHttpContextAccessor>();
     if (httpContextAccessor != null)
     {
-        setupAction.SerializerSettings.Converters.Add(new JsonConverterDateTimeOffset(httpContextAccessor));
+        // setupAction.SerializerSettings.Converters.Add(new JsonConverterDateTimeOffset(httpContextAccessor));
     }
 });
 builder.Services.AddHostedService<MainService>();

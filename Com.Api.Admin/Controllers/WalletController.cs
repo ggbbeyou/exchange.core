@@ -110,26 +110,41 @@ public class WalletController : ControllerBase
     }
 
     /// <summary>
-    /// 获取手续费
+    /// 获取流水(手续费)
     /// </summary>
+    /// <param name="uid">用户id</param>
     /// <param name="start">开始时间</param>
     /// <param name="end">结束时间</param>
     /// <param name="skip">跳过行数</param>
     /// <param name="take">提取行数</param>
     /// <returns></returns>
     [HttpGet]
-    [Route("GetRunning")]
-    public Res<List<ResRunning>> GetRunning(DateTimeOffset? start, DateTimeOffset? end, int skip, int take)
+    [Route("GetRunningFee")]
+    public Res<List<ResRunning>> GetRunningFee(long? uid, DateTimeOffset? start, DateTimeOffset? end, int skip, int take)
     {
         Res<List<ResRunning>> res = new Res<List<ResRunning>>();
-
-        res.code = E_Res_Code.fail;
-        res.data = db.RunningFee.AsNoTracking().Where(P => P.uid_from == this.login.user_id && P.type == E_RunningType.fee).WhereIf(start != null, P => P.time >= start).WhereIf(end != null, P => P.time <= end).Skip(skip).Take(take).ToList().ConvertAll(P => (ResRunning)P);
+        res.code = E_Res_Code.ok;
+        res.data = db.RunningFee.AsNoTracking().Where(P => P.type == E_RunningType.fee).WhereIf(uid != null, P => P.uid_from == uid).WhereIf(start != null, P => P.time >= start).WhereIf(end != null, P => P.time <= end).Skip(skip).Take(take).ToList().ConvertAll(P => (ResRunning)P);
         return res;
     }
 
-    // public Res<string> GetRechargeAddress(long wallet_id,)
-    // {
+    /// <summary>
+    /// 获取流水(币币交易)
+    /// </summary>
+    /// <param name="uid">用户id</param>
+    /// <param name="start">开始时间</param>
+    /// <param name="end">结束时间</param>
+    /// <param name="skip">跳过行数</param>
+    /// <param name="take">提取行数</param>
+    /// <returns></returns>
+    [HttpGet]
+    [Route("GetRunningTrade")]
+    public Res<List<ResRunning>> GetRunningTrade(long? uid, DateTimeOffset? start, DateTimeOffset? end, int skip, int take)
+    {
+        Res<List<ResRunning>> res = new Res<List<ResRunning>>();
+        res.code = E_Res_Code.ok;
+        res.data = db.RunningTrade.AsNoTracking().Where(P => P.type == E_RunningType.trade).WhereIf(uid != null, P => P.uid_from == uid).WhereIf(start != null, P => P.time >= start).WhereIf(end != null, P => P.time <= end).Skip(skip).Take(take).ToList().ConvertAll(P => (ResRunning)P);
+        return res;
+    }
 
-    // }
 }

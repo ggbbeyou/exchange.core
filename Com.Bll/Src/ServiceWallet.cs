@@ -192,7 +192,7 @@ public class ServiceWallet
                         wallet.available -= amount;
                         db.SaveChanges();
                         transaction.Commit();
-                        PushWallet(new List<Wallet>() { wallet }, $"冻结({wallet.coin_name}):{wallet.user_name}");
+                        PushWallet(new List<Wallet>() { wallet }, $"冻结/解冻({wallet.coin_name}):{wallet.user_name}");
                         return true;
                     }
                     catch (DbUpdateConcurrencyException ex)
@@ -280,7 +280,7 @@ public class ServiceWallet
                         wallet_quote.available -= amount_quote;
                         db.SaveChanges();
                         transaction.Commit();
-                        PushWallet(new List<Wallet>() { wallet_base, wallet_quote }, $"冻结({wallet_base.coin_name}/{wallet_quote.coin_name}):{wallet_base.user_name}");
+                        PushWallet(new List<Wallet>() { wallet_base, wallet_quote }, $"冻结/解冻({wallet_base.coin_name}/{wallet_quote.coin_name}):{wallet_base.user_name}");
                         return true;
                     }
                     catch (DbUpdateConcurrencyException ex)
@@ -641,7 +641,7 @@ public class ServiceWallet
             FactoryService.instance.constant.logger.LogError(ex, "PushWallet" + ex.Message);
         }
         FactoryService.instance.constant.stopwatch.Stop();
-        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};:Mq=>推送资金变更 ({remark})");
+        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};:Mq=>资金变更,{remark}");
     }
 
 }

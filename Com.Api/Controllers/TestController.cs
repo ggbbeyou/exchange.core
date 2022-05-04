@@ -280,7 +280,7 @@ public class TestController : ControllerBase
             status = false,
             transaction = true,
             settlement_uid = settlement_btc_usdt.user_id,
-            service_url = "http://43.138.142.228:8000",
+            service_url = "http://localhost:8000",
         };
         Market ethusdt = new Market()
         {
@@ -299,7 +299,7 @@ public class TestController : ControllerBase
             status = false,
             transaction = true,
             settlement_uid = settlement_eth_usdt.user_id,
-            service_url = "http://43.138.142.228:8000",
+            service_url = "http://localhost:8000",
         };
         this.db.Market.Add(btcusdt);
         this.db.Market.Add(ethusdt);
@@ -326,7 +326,7 @@ public class TestController : ControllerBase
             Users user = users[FactoryService.instance.constant.random.Next(0, 10)];
             Market market = markets[FactoryService.instance.constant.random.Next(0, 2)];
             List<ReqOrder> reqOrders = new List<ReqOrder>();
-            for (int j = 0; j < 100; j++)
+            for (int j = 0; j < 500; j++)
             {
                 E_OrderSide side = FactoryService.instance.constant.random.Next(0, 2) == 0 ? E_OrderSide.buy : E_OrderSide.sell;
                 E_OrderType type = FactoryService.instance.constant.random.Next(0, 2) == 0 ? E_OrderType.limit : E_OrderType.market;

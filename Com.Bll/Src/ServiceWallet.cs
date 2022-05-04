@@ -621,10 +621,10 @@ public class ServiceWallet
     /// <param name="wallets"></param>
     private void PushWallet(List<Wallet> wallets)
     {
+        FactoryService.instance.constant.stopwatch.Restart();
         try
         {
             ResWebsocker<List<Wallet>> res = new ResWebsocker<List<Wallet>>();
-
             res.channel = E_WebsockerChannel.assets;
             res.op = E_WebsockerOp.subscribe_event;
             var wallet_uid = from wallet in wallets
@@ -640,6 +640,8 @@ public class ServiceWallet
         {
             FactoryService.instance.constant.logger.LogError(ex, "PushWallet" + ex.Message);
         }
+        FactoryService.instance.constant.stopwatch.Stop();
+        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};:Mq=>推送资金变更");
     }
 
 }

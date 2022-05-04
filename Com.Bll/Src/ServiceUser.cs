@@ -127,7 +127,7 @@ public class ServiceUser
         if (!Regex.IsMatch(email, @"^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+((\.[a-zA-Z0-9_-]{2,3}){1,2})$"))
         {
             res.code = E_Res_Code.email_format_error;
-            res.message = "邮箱格式错误";
+            res.msg = "邮箱格式错误";
             return res;
         }
         if (!Regex.IsMatch(password, @"
@@ -138,13 +138,13 @@ public class ServiceUser
                             ", RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace))
         {
             res.code = E_Res_Code.password_format_error;
-            res.message = "密码必须包含数字、小写字母或大写字母、特殊符号,长度6-20位";
+            res.msg = "密码必须包含数字、小写字母或大写字母、特殊符号,长度6-20位";
             return res;
         }
         if (!service_common.VerificationCode(email, code))
         {
             res.code = E_Res_Code.verification_error;
-            res.message = "验证码错误";
+            res.msg = "验证码错误";
             return res;
         }
         (string public_key, string private_key) key_res = Encryption.GetRsaKey();
@@ -155,7 +155,7 @@ public class ServiceUser
                 if (db.Users.Any(P => P.email == email))
                 {
                     res.code = E_Res_Code.email_repeat;
-                    res.message = "邮箱已重复";
+                    res.msg = "邮箱已重复";
                     return res;
                 }
                 Vip? vip0 = db.Vip.SingleOrDefault(P => P.name == "vip0");
@@ -221,7 +221,7 @@ public class ServiceUser
                 {
 
                     res.code = E_Res_Code.name_password_error;
-                    res.message = "账户或密码错误,登陆失败";
+                    res.msg = "账户或密码错误,登陆失败";
                     return res;
                 }
                 FactoryService.instance.constant.redis.KeyDelete(FactoryService.instance.GetRedisVerificationCode(email));

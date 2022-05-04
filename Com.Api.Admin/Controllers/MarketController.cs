@@ -99,21 +99,21 @@ public class MarketController : ControllerBase
         {
 
             res.code = E_Res_Code.not_less_0;
-            res.message = "值不能小于或等于0";
+            res.msg = "值不能小于或等于0";
             return res;
         }
         if (!this.db.Coin.Any(P => P.coin_id == coin_id_base || P.coin_id == coin_id_quote))
         {
 
             res.code = E_Res_Code.coin_not_found;
-            res.message = "未找到币种";
+            res.msg = "未找到币种";
             return res;
         }
         if (this.db.Market.Any(P => P.market_type == type && P.coin_id_base == coin_id_base && P.coin_id_quote == coin_id_quote))
         {
 
             res.code = E_Res_Code.name_repeat;
-            res.message = "市场已存在";
+            res.msg = "市场已存在";
             return res;
         }
         Coin coin_base = db.Coin.Single(P => P.coin_id == coin_id_base);
@@ -223,7 +223,7 @@ public class MarketController : ControllerBase
         {
 
             res.code = E_Res_Code.not_found_symbol;
-            res.message = "交易对不存在";
+            res.msg = "交易对不存在";
             return res;
         }
         Market obj_market = db.Market.Single(P => P.market == market);

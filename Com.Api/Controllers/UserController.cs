@@ -101,7 +101,7 @@ public class UserController : ControllerBase
 
             res.code = E_Res_Code.apply_fail;
             res.data = false;
-            res.message = "用户被禁用或已经验证过";
+            res.msg = "用户被禁用或已经验证过";
             return res;
         }
         else
@@ -148,7 +148,7 @@ public class UserController : ControllerBase
 
                     res.code = E_Res_Code.apply_fail;
                     res.data = false;
-                    res.message = "用户被禁用或已经验证过";
+                    res.msg = "用户被禁用或已经验证过";
                     return res;
                 }
                 else
@@ -169,7 +169,7 @@ public class UserController : ControllerBase
 
                 res.code = E_Res_Code.verification_error;
                 res.data = false;
-                res.message = "验证码错误";
+                res.msg = "验证码错误";
                 return res;
             }
         }
@@ -192,7 +192,7 @@ public class UserController : ControllerBase
         {
 
             res.code = E_Res_Code.verification_disable;
-            res.message = "用户被禁用或已申请过验证";
+            res.msg = "用户被禁用或已申请过验证";
             return res;
         }
         else
@@ -221,7 +221,7 @@ public class UserController : ControllerBase
 
             res.code = E_Res_Code.apply_fail;
             res.data = false;
-            res.message = "用户被禁用或已经验证过";
+            res.msg = "用户被禁用或已经验证过";
             return res;
         }
         else
@@ -231,7 +231,7 @@ public class UserController : ControllerBase
             {
 
                 res.code = E_Res_Code.verification_error;
-                res.message = "验证码错误";
+                res.msg = "验证码错误";
                 return res;
             }
             else
@@ -267,7 +267,7 @@ public class UserController : ControllerBase
 
             res.code = E_Res_Code.file_not_found;
             res.data = false;
-            res.message = "未找到文件";
+            res.msg = "未找到文件";
             return res;
         }
         ServiceMinio service_minio = new ServiceMinio(config, logger);
@@ -279,7 +279,7 @@ public class UserController : ControllerBase
 
             res.code = E_Res_Code.apply_fail;
             res.data = false;
-            res.message = "用户被禁用或已经验证过";
+            res.msg = "用户被禁用或已经验证过";
             return res;
         }
         else

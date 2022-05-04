@@ -48,7 +48,7 @@ public class VerificationFilters : Attribute, IAuthorizationFilter
         Res<bool> res = new Res<bool>();
 
         res.code = E_Res_Code.signature_error;
-        res.message = "签名错误!";
+        res.msg = "签名错误!";
         res.data = false;
         //参数判断
         string key = "";
@@ -57,7 +57,7 @@ public class VerificationFilters : Attribute, IAuthorizationFilter
         if (!context.HttpContext.Request.Headers.ContainsKey("api_key"))
         {
             res.code = E_Res_Code.not_found_api_key;
-            res.message = "缺少api_key参数!";
+            res.msg = "缺少api_key参数!";
             context.Result = new JsonResult(res);
             return;
         }
@@ -68,7 +68,7 @@ public class VerificationFilters : Attribute, IAuthorizationFilter
         if (!context.HttpContext.Request.Headers.ContainsKey("api_sign"))
         {
             res.code = E_Res_Code.not_found_api_sign;
-            res.message = "缺少api_sign参数!";
+            res.msg = "缺少api_sign参数!";
             context.Result = new JsonResult(res);
             return;
         }
@@ -79,7 +79,7 @@ public class VerificationFilters : Attribute, IAuthorizationFilter
         if (!context.HttpContext.Request.Headers.ContainsKey("api_timestamp"))
         {
             res.code = E_Res_Code.not_found_api_timestamp;
-            res.message = "缺少api_timestamp参数!";
+            res.msg = "缺少api_timestamp参数!";
             context.Result = new JsonResult(res);
             return;
         }
@@ -94,7 +94,7 @@ public class VerificationFilters : Attribute, IAuthorizationFilter
                 if (requestTime.AddHours(apiExpiry) <= DateTimeOffset.UtcNow)
                 {
                     res.code = E_Res_Code.request_overtime;
-                    res.message = "请求超时!";
+                    res.msg = "请求超时!";
                     context.Result = new JsonResult(res);
                     return;
                 }
@@ -102,7 +102,7 @@ public class VerificationFilters : Attribute, IAuthorizationFilter
             else
             {
                 res.code = E_Res_Code.not_found_api_timestamp;
-                res.message = "缺少api_timestamp参数!";
+                res.msg = "缺少api_timestamp参数!";
                 context.Result = new JsonResult(res);
                 return;
             }
@@ -131,7 +131,7 @@ public class VerificationFilters : Attribute, IAuthorizationFilter
         if (userapi == null)
         {
             res.code = E_Res_Code.not_found_api_key;
-            res.message = "api_key错误!";
+            res.msg = "api_key错误!";
             context.Result = new JsonResult(res);
             return;
         }
@@ -139,14 +139,14 @@ public class VerificationFilters : Attribute, IAuthorizationFilter
         if (!string.IsNullOrWhiteSpace(userapi.white_list_ip))
         {
             res.code = E_Res_Code.not_white_ip;
-            res.message = "不是白名单仿问";
+            res.msg = "不是白名单仿问";
             context.Result = new JsonResult(res);
             return;
         }
         else if (userapi.create_time.AddDays(10) < DateTimeOffset.UtcNow)
         {
             res.code = E_Res_Code.not_white_ip;
-            res.message = "不是白名单仿问";
+            res.msg = "不是白名单仿问";
             context.Result = new JsonResult(res);
             return;
         }

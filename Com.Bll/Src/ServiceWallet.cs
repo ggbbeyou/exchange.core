@@ -71,7 +71,7 @@ public class ServiceWallet
         {
 
             res.code = E_Res_Code.amount_cannot_lass_0;
-            res.message = "划转金额不能低于0";
+            res.msg = "划转金额不能低于0";
             return res;
         }
         using (var scope = FactoryService.instance.constant.provider.CreateScope())
@@ -88,14 +88,14 @@ public class ServiceWallet
                         {
 
                             res.code = E_Res_Code.wallet_not_found;
-                            res.message = "钱包不存在";
+                            res.msg = "钱包不存在";
                             return res;
                         }
                         if (wallet_from.available < amount)
                         {
 
                             res.code = E_Res_Code.available_not_enough;
-                            res.message = "可用资产不足";
+                            res.msg = "可用资产不足";
                             return res;
                         }
                         if (wallet_to == null)
@@ -131,7 +131,7 @@ public class ServiceWallet
                         FactoryService.instance.constant.logger.LogError(ex, "Transfer(并发):" + ex.Message);
 
                         res.code = E_Res_Code.db_error;
-                        res.message = "钱包类型之间划转出错(并发)";
+                        res.msg = "钱包类型之间划转出错(并发)";
                         return res;
                     }
                     catch (Exception ex)
@@ -140,7 +140,7 @@ public class ServiceWallet
                         FactoryService.instance.constant.logger.LogError(ex, "FreezeChange:" + ex.Message);
 
                         res.code = E_Res_Code.db_error;
-                        res.message = "钱包类型之间划转出错";
+                        res.msg = "钱包类型之间划转出错";
                         return res;
                     }
                 }

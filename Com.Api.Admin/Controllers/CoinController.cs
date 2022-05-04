@@ -88,7 +88,7 @@ public class CoinController : ControllerBase
 
             res.code = E_Res_Code.file_not_found;
             res.data = false;
-            res.message = "未找到文件";
+            res.msg = "未找到文件";
             return res;
         }
         if (this.db.Coin.Any(P => P.coin_name == coin_name.ToUpper()))
@@ -96,7 +96,7 @@ public class CoinController : ControllerBase
 
             res.code = E_Res_Code.name_repeat;
             res.data = false;
-            res.message = "币名已重复";
+            res.msg = "币名已重复";
             return res;
         }
         if (this.db.Coin.Any(P => P.full_name == full_name))
@@ -104,7 +104,7 @@ public class CoinController : ControllerBase
 
             res.code = E_Res_Code.name_repeat;
             res.data = false;
-            res.message = "全名已重复";
+            res.msg = "全名已重复";
             return res;
         }
         Coin coin = new Coin();
@@ -121,7 +121,7 @@ public class CoinController : ControllerBase
 
             res.code = E_Res_Code.ok;
             res.data = true;
-            res.message = "";
+            res.msg = "";
             return res;
         }
         return res;

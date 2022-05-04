@@ -36,7 +36,7 @@ public class GreeterImpl : ExchangeService.ExchangeServiceBase
         {
 
             res.code = E_Res_Code.fail;
-            res.message = $"grpc 请求参数为空:{request.Json}";
+            res.msg = $"grpc 请求参数为空:{request.Json}";
             FactoryService.instance.constant.logger.LogError($"grpc 请求参数为空:{request.Json}");
             reply.Message = JsonConvert.SerializeObject(res);
             return reply;
@@ -51,7 +51,7 @@ public class GreeterImpl : ExchangeService.ExchangeServiceBase
             {
 
                 res.code = E_Res_Code.fail;
-                res.message = $"服务(失败):获取服务状态,未获取到请求参数:{request.Json}";
+                res.msg = $"服务(失败):获取服务状态,未获取到请求参数:{request.Json}";
                 FactoryService.instance.constant.logger.LogError($"服务(失败):获取服务状态,未获取到请求参数:{request.Json}");
                 reply.Message = JsonConvert.SerializeObject(res);
                 return reply;
@@ -60,21 +60,21 @@ public class GreeterImpl : ExchangeService.ExchangeServiceBase
             {
                 marketInfo = FactoryMatching.instance.ServiceGetStatus(marketInfo);
                 res.data = JsonConvert.SerializeObject(marketInfo);
-                res.message = $"服务(成功):获取服务状态:{marketInfo.market}";
+                res.msg = $"服务(成功):获取服务状态:{marketInfo.market}";
                 FactoryService.instance.constant.logger.LogInformation($"服务(成功):获取服务状态:{marketInfo.market}");
             }
             else if (req.op == E_Op.service_start)
             {
                 marketInfo = FactoryMatching.instance.ServiceStart(marketInfo);
                 res.data = JsonConvert.SerializeObject(marketInfo);
-                res.message = $"服务(成功):启动服务:{marketInfo.market}";
+                res.msg = $"服务(成功):启动服务:{marketInfo.market}";
                 FactoryService.instance.constant.logger.LogInformation($"服务(成功):启动服务:{marketInfo.market}");
             }
             else if (req.op == E_Op.service_stop)
             {
                 marketInfo = FactoryMatching.instance.ServiceStop(marketInfo);
                 res.data = JsonConvert.SerializeObject(marketInfo);
-                res.message = $"服务(成功):关闭服务:{marketInfo.market}";
+                res.msg = $"服务(成功):关闭服务:{marketInfo.market}";
                 FactoryService.instance.constant.logger.LogInformation($"服务(成功):关闭服务:{marketInfo.market}");
             }
         }

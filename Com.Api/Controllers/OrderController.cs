@@ -77,13 +77,13 @@ public class OrderController : ControllerBase
         if (users == null)
         {
             result.code = E_Res_Code.user_not_found;
-            result.message = "未找到该用户";
+            result.msg = "未找到该用户";
             return result;
         }
         if (users.disabled || !users.transaction)
         {
             result.code = E_Res_Code.no_permission;
-            result.message = "用户禁止交易";
+            result.msg = "用户禁止交易";
             return result;
         }
         List<ReqOrder> orders = new List<ReqOrder>()
@@ -119,13 +119,13 @@ public class OrderController : ControllerBase
         if (users == null)
         {
             result.code = E_Res_Code.user_not_found;
-            result.message = "未找到该用户";
+            result.msg = "未找到该用户";
             return result;
         }
         if (users.disabled || !users.transaction)
         {
             result.code = E_Res_Code.no_permission;
-            result.message = "用户禁止交易";
+            result.msg = "用户禁止交易";
             return result;
         }
         return service_order.PlaceOrder(data.symbol, login.user_id, login.user_name, data.orders);
@@ -145,13 +145,13 @@ public class OrderController : ControllerBase
         if (users == null)
         {
             result.code = E_Res_Code.user_not_found;
-            result.message = "未找到该用户";
+            result.msg = "未找到该用户";
             return result;
         }
         if (users.disabled || !users.transaction)
         {
             result.code = E_Res_Code.no_permission;
-            result.message = "用户禁止交易";
+            result.msg = "用户禁止交易";
             return result;
         }
         return this.service_order.CancelOrder(symbol, users.user_id, 2, new List<long>());
@@ -171,13 +171,13 @@ public class OrderController : ControllerBase
         if (users == null)
         {
             result.code = E_Res_Code.user_not_found;
-            result.message = "未找到该用户";
+            result.msg = "未找到该用户";
             return result;
         }
         if (users.disabled || !users.transaction)
         {
             result.code = E_Res_Code.no_permission;
-            result.message = "用户禁止交易";
+            result.msg = "用户禁止交易";
             return result;
         }
         return this.service_order.CancelOrder(model.key, users.user_id, 3, model.data);

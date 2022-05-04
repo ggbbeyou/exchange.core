@@ -122,7 +122,7 @@ public class UserController : ControllerBase
         if (users == null)
         {
             res.code = E_Res_Code.fail;
-            res.message = "用户不存在或已实名认证";
+            res.msg = "用户不存在或已实名认证";
             res.data = false;
             return res;
         }

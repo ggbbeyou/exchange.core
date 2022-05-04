@@ -99,7 +99,7 @@ public class AccountController : ControllerBase
         if (!Regex.IsMatch(email, @"^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+((\.[a-zA-Z0-9_-]{2,3}){1,2})$"))
         {
             res.code = E_Res_Code.email_format_error;
-            res.message = "邮箱格式错误";
+            res.msg = "邮箱格式错误";
             return res;
         }
         string code = common.CreateRandomCode(6);
@@ -110,7 +110,7 @@ public class AccountController : ControllerBase
         if (db.Users.Any(P => P.email.ToLower() == email))
         {
             res.code = E_Res_Code.email_repeat;
-            res.message = "邮箱地址已存在";
+            res.msg = "邮箱地址已存在";
             return res;
         }
         else

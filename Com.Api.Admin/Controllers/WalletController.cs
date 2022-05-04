@@ -112,7 +112,7 @@ public class WalletController : ControllerBase
     /// <summary>
     /// 获取流水(手续费)
     /// </summary>
-    /// <param name="uid">用户id</param>
+    /// <param name="user_name">用户名</param>
     /// <param name="start">开始时间</param>
     /// <param name="end">结束时间</param>
     /// <param name="skip">跳过行数</param>
@@ -120,18 +120,25 @@ public class WalletController : ControllerBase
     /// <returns></returns>
     [HttpGet]
     [Route("GetRunningFee")]
-    public Res<List<ResRunning>> GetRunningFee(long? uid, DateTimeOffset? start, DateTimeOffset? end, int skip, int take)
+    public Res<List<ResRunning>> GetRunningFee(string? user_name, DateTimeOffset? start, DateTimeOffset? end, int skip, int take)
     {
         Res<List<ResRunning>> res = new Res<List<ResRunning>>();
+        Users? users = db.Users.AsNoTracking().SingleOrDefault(P => P.user_name == user_name);
+        if (users == null)
+        {
+            res.code = E_Res_Code.user_not_found;
+            res.msg = "用户不存在";
+            return res;
+        }
         res.code = E_Res_Code.ok;
-        res.data = db.RunningFee.AsNoTracking().Where(P => P.type == E_RunningType.fee).WhereIf(uid != null, P => P.uid_from == uid).WhereIf(start != null, P => P.time >= start).WhereIf(end != null, P => P.time <= end).Skip(skip).Take(take).ToList().ConvertAll(P => (ResRunning)P);
+        res.data = db.RunningFee.AsNoTracking().Where(P => P.type == E_RunningType.fee).WhereIf(users != null, P => P.uid_from == users!.user_id).WhereIf(start != null, P => P.time >= start).WhereIf(end != null, P => P.time <= end).Skip(skip).Take(take).ToList().ConvertAll(P => (ResRunning)P);
         return res;
     }
 
     /// <summary>
     /// 获取流水(币币交易)
     /// </summary>
-    /// <param name="uid">用户id</param>
+    /// <param name="user_name">用户名</param>
     /// <param name="start">开始时间</param>
     /// <param name="end">结束时间</param>
     /// <param name="skip">跳过行数</param>
@@ -139,11 +146,18 @@ public class WalletController : ControllerBase
     /// <returns></returns>
     [HttpGet]
     [Route("GetRunningTrade")]
-    public Res<List<ResRunning>> GetRunningTrade(long? uid, DateTimeOffset? start, DateTimeOffset? end, int skip, int take)
+    public Res<List<ResRunning>> GetRunningTrade(string? user_name, DateTimeOffset? start, DateTimeOffset? end, int skip, int take)
     {
         Res<List<ResRunning>> res = new Res<List<ResRunning>>();
+        Users? users = db.Users.AsNoTracking().SingleOrDefault(P => P.user_name == user_name);
+        if (users == null)
+        {
+            res.code = E_Res_Code.user_not_found;
+            res.msg = "用户不存在";
+            return res;
+        }
         res.code = E_Res_Code.ok;
-        res.data = db.RunningTrade.AsNoTracking().Where(P => P.type == E_RunningType.trade).WhereIf(uid != null, P => P.uid_from == uid).WhereIf(start != null, P => P.time >= start).WhereIf(end != null, P => P.time <= end).Skip(skip).Take(take).ToList().ConvertAll(P => (ResRunning)P);
+        res.data = db.RunningTrade.AsNoTracking().Where(P => P.type == E_RunningType.trade).WhereIf(users != null, P => P.uid_from == users!.user_id).WhereIf(start != null, P => P.time >= start).WhereIf(end != null, P => P.time <= end).Skip(skip).Take(take).ToList().ConvertAll(P => (ResRunning)P);
         return res;
     }
 

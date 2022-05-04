@@ -70,7 +70,7 @@ public class ServiceController : ControllerBase
         {
 
             res.code = E_Res_Code.symbol_not_found;
-            res.message = "交易对不存在";
+            res.msg = "交易对不存在";
             res.data = null;
         }
         else
@@ -90,7 +90,7 @@ public class ServiceController : ControllerBase
             this.db.SaveChanges();
 
             res.code = E_Res_Code.ok;
-            res.message = "操作成功";
+            res.msg = "操作成功";
             res.data = marketInfo.status;
         }
         return res;

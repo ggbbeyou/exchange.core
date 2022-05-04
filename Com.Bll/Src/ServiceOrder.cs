@@ -63,111 +63,111 @@ public class ServiceOrder
         FactoryService.instance.constant.stopwatch.Restart();
 
         res.code = E_Res_Code.fail;
-        res.message = "";
+        res.msg = "";
         res.data = new List<ResOrder>();
         if (orders.Max(P => P.client_id?.Length ?? 0) > 50)
         {
             res.code = E_Res_Code.length_too_long;
-            res.message = "client_id长度不能超过50";
+            res.msg = "client_id长度不能超过50";
             return res;
         }
         if (orders.Any(P => P.type == E_OrderType.limit && (P.price == null || P.price <= 0)))
         {
             res.code = E_Res_Code.limit_price_error;
-            res.message = "price:限价单,交易价不能为低于0";
+            res.msg = "price:限价单,交易价不能为低于0";
             return res;
         }
         if (orders.Any(P => P.type == E_OrderType.limit && (P.amount == null || P.amount <= 0)))
         {
             res.code = E_Res_Code.limit_amount_error;
-            res.message = "amount:限价单,交易量不能低于0";
+            res.msg = "amount:限价单,交易量不能低于0";
             return res;
         }
         if (orders.Any(P => P.type == E_OrderType.market && P.side == E_OrderSide.buy && (P.total == null || P.total <= 0)))
         {
             res.code = E_Res_Code.market_total_error;
-            res.message = "total:市价买单,交易额不能为低于0";
+            res.msg = "total:市价买单,交易额不能为低于0";
             return res;
         }
         if (orders.Any(P => P.type == E_OrderType.market && P.side == E_OrderSide.sell && (P.amount == null || P.amount <= 0)))
         {
             res.code = E_Res_Code.market_amount_error;
-            res.message = "amount:市价卖单,交易量不能为低于0";
+            res.msg = "amount:市价卖单,交易量不能为低于0";
             return res;
         }
         Market? info = this.service_market.GetMarketBySymbol(symbol);
         if (info == null)
         {
             res.code = E_Res_Code.symbol_not_found;
-            res.message = "未找到该交易对";
+            res.msg = "未找到该交易对";
             return res;
         }
         if (info.transaction == false || info.status == false)
         {
             res.code = E_Res_Code.system_disable_place_order;
-            res.message = "该交易对禁止下单(系统设置)";
+            res.msg = "该交易对禁止下单(系统设置)";
             return res;
         }
         if (info.market_type == E_MarketType.spot && orders.Any(P => P.trade_model != E_TradeModel.cash))
         {
             res.code = E_Res_Code.trade_model_error;
-            res.message = "trade_model:现货交易对必须是现货交易模式";
+            res.msg = "trade_model:现货交易对必须是现货交易模式";
             return res;
         }
         if (orders.Any(P => P.type == E_OrderType.limit && Math.Round(P.price ?? 0, info.places_price, MidpointRounding.ToNegativeInfinity) != P.price))
         {
             res.code = E_Res_Code.limit_price_error;
-            res.message = $"price:限价单交易价精度错误(交易价小数位:{info.places_price})";
+            res.msg = $"price:限价单交易价精度错误(交易价小数位:{info.places_price})";
             return res;
         }
         if (orders.Any(P => (P.type == E_OrderType.limit && Math.Round(P.amount ?? 0, info.places_amount, MidpointRounding.ToNegativeInfinity) != P.amount)))
         {
             res.code = E_Res_Code.limit_amount_error;
-            res.message = $"amount:限价单交易量精度错误(交易量小数位:{info.places_amount})";
+            res.msg = $"amount:限价单交易量精度错误(交易量小数位:{info.places_amount})";
             return res;
         }
         if (orders.Any(P => (P.type == E_OrderType.market && P.side == E_OrderSide.buy && Math.Round(P.total ?? 0, info.places_price + info.places_amount, MidpointRounding.ToNegativeInfinity) != P.total)))
         {
             res.code = E_Res_Code.market_total_error;
-            res.message = $"total:市价买单交易额精度错误(交易额小数位:{info.places_price + info.places_amount})";
+            res.msg = $"total:市价买单交易额精度错误(交易额小数位:{info.places_price + info.places_amount})";
             return res;
         }
         if (orders.Any(P => P.type == E_OrderType.limit && P.price * P.amount < info.trade_min))
         {
             res.code = E_Res_Code.market_amount_error;
-            res.message = $"price * mount:限价单交易额不能低于:{info.trade_min})";
+            res.msg = $"price * mount:限价单交易额不能低于:{info.trade_min})";
             return res;
         }
         if (orders.Any(P => P.type == E_OrderType.market && P.side == E_OrderSide.buy && P.total < info.trade_min))
         {
             res.code = E_Res_Code.market_total_error;
-            res.message = $"total:市价买单交易额不能低于:{info.trade_min})";
+            res.msg = $"total:市价买单交易额不能低于:{info.trade_min})";
             return res;
         }
         if (orders.Any(P => P.type == E_OrderType.market && P.side == E_OrderSide.sell && P.amount < info.trade_min_market_sell))
         {
             res.code = E_Res_Code.market_amount_error;
-            res.message = $"amount:市价卖单交易量不能低于:{info.trade_min_market_sell})";
+            res.msg = $"amount:市价卖单交易量不能低于:{info.trade_min_market_sell})";
             return res;
         }
         Users? users = service_user.GetUser(uid);
         if (users == null)
         {
             res.code = E_Res_Code.user_not_found;
-            res.message = "未找到该用户";
+            res.msg = "未找到该用户";
             return res;
         }
         if (users.disabled || !users.transaction)
         {
             res.code = E_Res_Code.user_disable_place_order;
-            res.message = "用户禁止交易";
+            res.msg = "用户禁止交易";
             return res;
         }
         Vip? vip = service_user.GetVip(users.vip);
         if (vip == null)
         {
             res.code = E_Res_Code.vip_not_found;
-            res.message = "未找到该用户的vip等级信息";
+            res.msg = "未找到该用户的vip等级信息";
             return res;
         }
         decimal coin_base = 0;
@@ -243,7 +243,7 @@ public class ServiceOrder
             if (!service_wallet.FreezeChange(wallet_type, uid, info.coin_id_base, coin_base, info.coin_id_quote, coin_quote))
             {
                 res.code = E_Res_Code.available_not_enough;
-                res.message = "基础币种或报价币种余额不足";
+                res.msg = "基础币种或报价币种余额不足";
                 return res;
             }
         }
@@ -252,7 +252,7 @@ public class ServiceOrder
             if (!service_wallet.FreezeChange(wallet_type, uid, info.coin_id_base, coin_base))
             {
                 res.code = E_Res_Code.available_not_enough;
-                res.message = "基础币种余额不足";
+                res.msg = "基础币种余额不足";
                 return res;
             }
         }
@@ -261,7 +261,7 @@ public class ServiceOrder
             if (!service_wallet.FreezeChange(wallet_type, uid, info.coin_id_quote, coin_quote))
             {
                 res.code = E_Res_Code.available_not_enough;
-                res.message = "报价币种余额不足";
+                res.msg = "报价币种余额不足";
                 return res;
             }
         }
@@ -286,7 +286,7 @@ public class ServiceOrder
                 if (!service_wallet.FreezeChange(wallet_type, uid, info.coin_id_base, -coin_base, info.coin_id_quote, -coin_quote))
                 {
                     res.code = E_Res_Code.db_error;
-                    res.message = "挂单失败,并且解除冻结出错,基础币种或报价币种余额不足";
+                    res.msg = "挂单失败,并且解除冻结出错,基础币种或报价币种余额不足";
                     return res;
                 }
             }
@@ -295,7 +295,7 @@ public class ServiceOrder
                 if (!service_wallet.FreezeChange(wallet_type, uid, info.coin_id_base, -coin_base))
                 {
                     res.code = E_Res_Code.db_error;
-                    res.message = "挂单失败,并且解除冻结出错,基础币种余额不足";
+                    res.msg = "挂单失败,并且解除冻结出错,基础币种余额不足";
                     return res;
                 }
             }
@@ -304,12 +304,12 @@ public class ServiceOrder
                 if (!service_wallet.FreezeChange(wallet_type, uid, info.coin_id_quote, -coin_quote))
                 {
                     res.code = E_Res_Code.db_error;
-                    res.message = "挂单失败,并且解除冻结出错,报价币种余额不足";
+                    res.msg = "挂单失败,并且解除冻结出错,报价币种余额不足";
                     return res;
                 }
             }
             res.code = E_Res_Code.db_error;
-            res.message = "挂单失败";
+            res.msg = "挂单失败";
             return res;
         }
         FactoryService.instance.constant.stopwatch.Stop();
@@ -324,7 +324,7 @@ public class ServiceOrder
         FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{info.symbol}:挂单=>插入{call_req.data.Count}条订单到Mq");
 
         res.code = E_Res_Code.ok;
-        res.message = "挂单成功";
+        res.msg = "挂单成功";
         res.data.AddRange(temp_order);
         this.stopwatch.Stop();
         FactoryService.instance.constant.logger.LogTrace($"计算耗时:{this.stopwatch.Elapsed.ToString()};{info.symbol}:挂单=>总耗时.{call_req.data.Count}条订单");
@@ -345,7 +345,7 @@ public class ServiceOrder
 
         res.code = E_Res_Code.fail;
         res.data = false;
-        res.message = null;
+        res.msg = null;
         E_Op op;
         switch (type)
         {
@@ -368,13 +368,13 @@ public class ServiceOrder
         if (info == null)
         {
             res.code = E_Res_Code.symbol_not_found;
-            res.message = "未找到该交易对";
+            res.msg = "未找到该交易对";
             return res;
         }
         if (info.transaction == false || info.status == false)
         {
             res.code = E_Res_Code.system_disable_place_order;
-            res.message = "该交易对禁止下单(系统设置)";
+            res.msg = "该交易对禁止下单(系统设置)";
             return res;
         }
         if (uid > 0)
@@ -383,13 +383,13 @@ public class ServiceOrder
             if (users == null)
             {
                 res.code = E_Res_Code.user_not_found;
-                res.message = "未找到该用户";
+                res.msg = "未找到该用户";
                 return res;
             }
             if (users.disabled || !users.transaction)
             {
                 res.code = E_Res_Code.no_permission;
-                res.message = "用户禁止撤单";
+                res.msg = "用户禁止撤单";
                 return res;
             }
         }

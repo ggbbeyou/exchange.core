@@ -203,7 +203,7 @@ public class Core
                     if (process.running_trade == false && result.running_trade.Count > 0)
                     {
                         FactoryService.instance.constant.stopwatch.Restart();
-                        process.running_fee = service_wallet.AddRunningTrade(result.running_trade);
+                        process.running_trade = service_wallet.AddRunningTrade(result.running_trade);
                         FactoryService.instance.constant.stopwatch.Stop();
                         FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>添加资金流水(交易){result.running_trade.Count}条");
                     }
@@ -218,7 +218,7 @@ public class Core
                 FactoryService.instance.constant.stopwatch.Restart();
                 process.deal = service_deal.AddDeal(deals);
                 FactoryService.instance.constant.stopwatch.Stop();
-                FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>记录:{deals.Count}");
+                FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>成交记录:{deals.Count}");
             }
             if (orders.Count > 0)
             {

@@ -326,7 +326,7 @@ public class TestController : ControllerBase
             Users user = users[FactoryService.instance.constant.random.Next(0, 10)];
             Market market = markets[FactoryService.instance.constant.random.Next(0, 2)];
             List<ReqOrder> reqOrders = new List<ReqOrder>();
-            for (int j = 0; j < 500; j++)
+            for (int j = 0; j < 200; j++)
             {
                 E_OrderSide side = FactoryService.instance.constant.random.Next(0, 2) == 0 ? E_OrderSide.buy : E_OrderSide.sell;
                 E_OrderType type = FactoryService.instance.constant.random.Next(0, 2) == 0 ? E_OrderType.limit : E_OrderType.market;

@@ -124,7 +124,7 @@ public class WalletController : ControllerBase
         Res<List<ResRunning>> res = new Res<List<ResRunning>>();
 
         res.code = E_Res_Code.fail;
-        res.data = db.Running.AsNoTracking().Where(P => P.uid_from == this.login.user_id && P.type == E_RunningType.fee).WhereIf(start != null, P => P.time >= start).WhereIf(end != null, P => P.time <= end).Skip(skip).Take(take).ToList().ConvertAll(P => (ResRunning)P);
+        res.data = db.RunningFee.AsNoTracking().Where(P => P.uid_from == this.login.user_id && P.type == E_RunningType.fee).WhereIf(start != null, P => P.time >= start).WhereIf(end != null, P => P.time <= end).Skip(skip).Take(take).ToList().ConvertAll(P => (ResRunning)P);
         return res;
     }
 

@@ -24,10 +24,15 @@ public class Processing
     /// <value></value>
     public bool asset { get; set; }
     /// <summary>
-    /// 资产流水
+    /// 资产流水(手续费)
     /// </summary>
     /// <value></value>
-    public bool running { get; set; }
+    public bool running_fee { get; set; }
+    /// <summary>
+    /// 资产流水(交易)
+    /// </summary>
+    /// <value></value>
+    public bool running_trade { get; set; }
     /// <summary>
     /// 成交记录添加
     /// </summary>

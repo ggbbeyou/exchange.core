@@ -144,7 +144,7 @@ public class Core
             ReceiveDealOrder(process, deals.orders, deals.deals, deals.cancels);
             this.stopwatch.Stop();
             FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{this.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:撮合后续处理总时间(成交记录数:{deals.deals.Count},成交订单数:{deals.orders.Count},撤单数:{deals.cancels.Count}),处理结果:{JsonConvert.SerializeObject(process)}");
-            if (process.match && process.asset && process.running && process.deal && process.order && process.order_cancel && process.order_complete_thaw && process.push_order && process.push_order_cancel && process.sync_kline && process.push_kline && process.push_deal && process.push_ticker)
+            if (process.match && process.asset && process.running_fee && process.deal && process.order && process.order_cancel && process.order_complete_thaw && process.push_order && process.push_order_cancel && process.sync_kline && process.push_kline && process.push_deal && process.push_ticker)
             {
                 FactoryService.instance.constant.redis.HashDelete(FactoryService.instance.GetRedisProcess(), process.no);
                 return true;
@@ -172,7 +172,7 @@ public class Core
             if (process.asset == false)
             {
                 FactoryService.instance.constant.stopwatch.Restart();
-                (bool result, List<Running> running) result = service_wallet.Transaction(this.model.info, deals);
+                (bool result, List<RunningFee> running_fee, List<RunningTrade> running_trade) result = service_wallet.Transaction(this.model.info, deals);
                 process.asset = result.result;
                 FactoryService.instance.constant.stopwatch.Stop();
                 FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>成交记录{deals.Count}条,实际资产转移(结果)");
@@ -189,16 +189,27 @@ public class Core
                     {
                         process.order = true;
                     }
-                    if (process.running == false && result.running.Count > 0)
+                    if (process.running_fee == false && result.running_fee.Count > 0)
                     {
                         FactoryService.instance.constant.stopwatch.Restart();
-                        process.running = service_wallet.AddRunning(result.running);
+                        process.running_fee = service_wallet.AddRunningFee(result.running_fee);
                         FactoryService.instance.constant.stopwatch.Stop();
-                        FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>添加资金流水{result.running.Count}条");
+                        FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>添加资金流水(手续费){result.running_fee.Count}条");
                     }
                     else
                     {
-                        process.running = true;
+                        process.running_fee = true;
+                    }
+                    if (process.running_trade == false && result.running_trade.Count > 0)
+                    {
+                        FactoryService.instance.constant.stopwatch.Restart();
+                        process.running_fee = service_wallet.AddRunningTrade(result.running_trade);
+                        FactoryService.instance.constant.stopwatch.Stop();
+                        FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>添加资金流水(交易){result.running_trade.Count}条");
+                    }
+                    else
+                    {
+                        process.running_trade = true;
                     }
                 }
             }
@@ -339,7 +350,7 @@ public class Core
         else
         {
             process.asset = true;
-            process.running = true;
+            process.running_fee = true;
             process.deal = true;
             process.order = true;
             process.order_complete_thaw = true;

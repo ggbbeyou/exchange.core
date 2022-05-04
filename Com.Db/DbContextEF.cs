@@ -40,10 +40,15 @@ public class DbContextEF : DbContext
     /// <value></value>
     public DbSet<OrderSell> OrderSell { get; set; } = null!;
     /// <summary>
-    /// 钱包流水
+    /// 钱包流水(手续费流水)
     /// </summary>
     /// <value></value>
-    public DbSet<Running> Running { get; set; } = null!;
+    public DbSet<RunningFee> RunningFee { get; set; } = null!;
+    /// <summary>
+    /// 钱包流水(交易流水)
+    /// </summary>
+    /// <value></value>
+    public DbSet<RunningTrade> RunningTrade { get; set; } = null!;
     /// <summary>
     /// 用户基础信息
     /// </summary>
@@ -73,7 +78,7 @@ public class DbContextEF : DbContext
     {
 
     }
-  
+
     /// <summary>
     /// 
     /// </summary>
@@ -230,7 +235,7 @@ public class DbContextEF : DbContext
             o.Property(P => P.remarks).HasColumnType("nvarchar").HasMaxLength(200).HasComment("备注");
             o.ToTable(nameof(OrderSell));
         });
-        modelBuilder.Entity<Running>(o =>
+        modelBuilder.Entity<RunningFee>(o =>
         {
             o.HasKey(p => p.id);
             o.HasIndex(P => new { P.coin_id, P.uid_from, P.uid_to, P.time });
@@ -251,7 +256,30 @@ public class DbContextEF : DbContext
             o.Property(P => P.operation_uid).IsRequired().HasColumnType("bigint").HasComment("操作人 0:系统");
             o.Property(P => P.time).IsRequired().HasColumnType("datetimeoffset").HasComment("时间");
             o.Property(P => P.remarks).HasColumnType("nvarchar").HasMaxLength(200).HasComment("备注");
-            o.ToTable(nameof(Running));
+            o.ToTable(nameof(RunningFee));
+        });
+        modelBuilder.Entity<RunningTrade>(o =>
+        {
+            o.HasKey(p => p.id);
+            o.HasIndex(P => new { P.coin_id, P.uid_from, P.uid_to, P.time });
+            o.Property(P => P.id).IsRequired().ValueGeneratedNever().HasColumnType("bigint").HasComment("id");
+            o.Property(P => P.relation_id).IsRequired().HasColumnType("bigint").HasComment("关联id");
+            o.Property(P => P.type).IsRequired().HasColumnType("tinyint").HasComment("流水类型");
+            o.Property(P => P.coin_id).IsRequired().HasColumnType("bigint").HasComment("币id");
+            o.Property(P => P.coin_name).HasColumnType("nvarchar").HasMaxLength(20).HasComment("币名称");
+            o.Property(P => P.wallet_from).IsRequired().HasColumnType("bigint").HasComment("来源 钱包id");
+            o.Property(P => P.wallet_to).IsRequired().HasColumnType("bigint").HasComment("目的 钱包id");
+            o.Property(P => P.wallet_type_from).IsRequired().HasColumnType("tinyint").HasComment("来源 钱包类型");
+            o.Property(P => P.wallet_type_to).IsRequired().HasColumnType("tinyint").HasComment("目的 钱包类型");
+            o.Property(P => P.uid_from).IsRequired().HasColumnType("bigint").HasComment("来源 用户id");
+            o.Property(P => P.uid_to).IsRequired().HasColumnType("bigint").HasComment("目的 用户id");
+            o.Property(P => P.user_name_from).IsRequired().HasColumnType("nvarchar").HasMaxLength(50).HasComment("来源 用户名");
+            o.Property(P => P.user_name_to).IsRequired().HasColumnType("nvarchar").HasMaxLength(50).HasComment("目的 用户名");
+            o.Property(P => P.amount).HasColumnType("decimal").HasPrecision(28, 16).HasComment("量");
+            o.Property(P => P.operation_uid).IsRequired().HasColumnType("bigint").HasComment("操作人 0:系统");
+            o.Property(P => P.time).IsRequired().HasColumnType("datetimeoffset").HasComment("时间");
+            o.Property(P => P.remarks).HasColumnType("nvarchar").HasMaxLength(200).HasComment("备注");
+            o.ToTable(nameof(RunningTrade));
         });
         modelBuilder.Entity<Users>(o =>
         {

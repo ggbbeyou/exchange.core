@@ -110,7 +110,7 @@ public class WalletController : ControllerBase
     }
 
     /// <summary>
-    /// 获取手续费
+    /// 获取手续费流水
     /// </summary>
     /// <param name="start">开始时间</param>
     /// <param name="end">结束时间</param>
@@ -119,17 +119,12 @@ public class WalletController : ControllerBase
     /// <returns></returns>
     [HttpGet]
     [Route("GetRunning")]
-    public Res<List<ResRunning>> GetRunning(DateTimeOffset? start, DateTimeOffset? end, int skip, int take)
+    public Res<List<ResRunning>> GetRunningFee(DateTimeOffset? start, DateTimeOffset? end, int skip, int take)
     {
         Res<List<ResRunning>> res = new Res<List<ResRunning>>();
-
-        res.code = E_Res_Code.fail;
-        res.data = db.Running.AsNoTracking().Where(P => P.uid_from == this.login.user_id && P.type == E_RunningType.fee).WhereIf(start != null, P => P.time >= start).WhereIf(end != null, P => P.time <= end).Skip(skip).Take(take).ToList().ConvertAll(P => (ResRunning)P);
+        res.code = E_Res_Code.ok;
+        res.data = db.RunningFee.AsNoTracking().Where(P => P.uid_from == this.login.user_id && P.type == E_RunningType.fee).WhereIf(start != null, P => P.time >= start).WhereIf(end != null, P => P.time <= end).Skip(skip).Take(take).ToList().ConvertAll(P => (ResRunning)P);
         return res;
     }
 
-    // public Res<string> GetRechargeAddress(long wallet_id,)
-    // {
-
-    // }
 }

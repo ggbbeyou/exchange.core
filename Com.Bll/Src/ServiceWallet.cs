@@ -98,7 +98,6 @@ public class ServiceWallet
                         }
                         if (wallet_from.available < amount)
                         {
-
                             res.code = E_Res_Code.available_not_enough;
                             res.msg = "可用资产不足";
                             return res;
@@ -133,7 +132,6 @@ public class ServiceWallet
                     {
                         transaction.Rollback();
                         FactoryService.instance.constant.logger.LogError(ex, "Transfer(并发):" + ex.Message);
-
                         res.code = E_Res_Code.db_error;
                         res.msg = "钱包类型之间划转出错(并发)";
                         return res;
@@ -142,7 +140,6 @@ public class ServiceWallet
                     {
                         transaction.Rollback();
                         FactoryService.instance.constant.logger.LogError(ex, "FreezeChange:" + ex.Message);
-
                         res.code = E_Res_Code.db_error;
                         res.msg = "钱包类型之间划转出错";
                         return res;

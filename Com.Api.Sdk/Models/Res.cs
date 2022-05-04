@@ -16,7 +16,7 @@ public class Res<T>
     /// <value></value>
     //[JsonConverter(typeof(StringEnumConverter))]
     // //[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-    public E_Res_Code code { get; set; }
+    public E_Res_Code code { get; set; } = E_Res_Code.ok;
     /// <summary>
     /// 响应消息
     /// </summary>

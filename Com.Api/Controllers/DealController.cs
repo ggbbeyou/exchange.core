@@ -57,15 +57,15 @@ public class DealController : ControllerBase
     /// <summary>
     /// 当前用户成交记录
     /// </summary>
-    /// <param name="skip">跳过多少行</param>
-    /// <param name="take">获取多少行</param>
     /// <param name="start">开始时间</param>
     /// <param name="end">结束时间</param>
+    /// <param name="skip">跳过多少行</param>
+    /// <param name="take">获取多少行</param>
     /// <returns></returns>
     [HttpGet]
     [Route("GetDealByuid")]
     [ResponseCache(CacheProfileName = "cache_1")]
-    public Res<List<ResDeal>> GetDealByuid(int skip, int take, DateTimeOffset? start = null, DateTimeOffset? end = null)
+    public Res<List<ResDeal>> GetDealByuid(DateTimeOffset? start = null, DateTimeOffset? end = null, int skip = 0, int take = 50)
     {
         return this.service_deal.GetDealByuid(login.user_id, skip, take, start, end);
     }

@@ -39,6 +39,6 @@ public class ResWebsocker<T>
     /// 消息
     /// </summary>
     /// <value></value>
-    public string message { get; set; } = null!;
+    public string msg { get; set; } = null!;
 
 }

@@ -170,7 +170,7 @@ public class WebSocketController : ControllerBase
         catch (System.Exception ex)
         {
             resWebsocker.success = false;
-            resWebsocker.message = $"无法解析请求命令:{str},{ex.Message}";
+            resWebsocker.msg = $"无法解析请求命令:{str},{ex.Message}";
             byte[] b = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(resWebsocker));
             webSocket.SendAsync(new ArraySegment<byte>(b, 0, b.Length), WebSocketMessageType.Text, true, CancellationToken.None);
         }
@@ -188,7 +188,7 @@ public class WebSocketController : ControllerBase
                 resWebsocker.success = false;
                 resWebsocker.channel = item.channel;
                 resWebsocker.data = item.data;
-                resWebsocker.message = "该订阅需要登录权限,请先登录!";
+                resWebsocker.msg = "该订阅需要登录权限,请先登录!";
                 byte[] b = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(resWebsocker));
                 webSocket.SendAsync(new ArraySegment<byte>(b, 0, b.Length), WebSocketMessageType.Text, true, CancellationToken.None);
             }
@@ -212,7 +212,7 @@ public class WebSocketController : ControllerBase
                                 uid = users_api.user_id;
                                 resWebsocker.channel = E_WebsockerChannel.none;
                                 resWebsocker.data = "";
-                                resWebsocker.message = "登录成功!";
+                                resWebsocker.msg = "登录成功!";
                                 byte[] b = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(resWebsocker));
                                 webSocket.SendAsync(new ArraySegment<byte>(b, 0, b.Length), WebSocketMessageType.Text, true, CancellationToken.None);
                                 return;
@@ -226,7 +226,7 @@ public class WebSocketController : ControllerBase
             }
             resWebsocker.success = false;
             resWebsocker.channel = E_WebsockerChannel.none;
-            resWebsocker.message = "签名失败. {api_key:'你的api用户key',timestamp:时间戳(毫秒),sign:'签名'},签名算法 HMACSHA256(secret).ComputeHash(timestamp)";
+            resWebsocker.msg = "签名失败. {api_key:'你的api用户key',timestamp:时间戳(毫秒),sign:'签名'},签名算法 HMACSHA256(secret).ComputeHash(timestamp)";
             byte[] bb = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(resWebsocker));
             webSocket.SendAsync(new ArraySegment<byte>(bb, 0, bb.Length), WebSocketMessageType.Text, true, CancellationToken.None);
             return;
@@ -236,7 +236,7 @@ public class WebSocketController : ControllerBase
             uid = 0;
             resWebsocker.channel = E_WebsockerChannel.none;
             resWebsocker.data = "";
-            resWebsocker.message = "登出成功!";
+            resWebsocker.msg = "登出成功!";
             byte[] b = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(resWebsocker));
             webSocket.SendAsync(new ArraySegment<byte>(b, 0, b.Length), WebSocketMessageType.Text, true, CancellationToken.None);
         }
@@ -268,7 +268,7 @@ public class WebSocketController : ControllerBase
                         }
                         resWebsocker.channel = item.channel;
                         resWebsocker.data = item.data;
-                        resWebsocker.message = "订阅成功";
+                        resWebsocker.msg = "订阅成功";
                         string Json = JsonConvert.SerializeObject(resWebsocker);
                         byte[] bb = Encoding.UTF8.GetBytes(Json);
                         webSocket.SendAsync(new ArraySegment<byte>(bb, 0, bb.Length), WebSocketMessageType.Text, true, CancellationToken.None);
@@ -336,7 +336,7 @@ public class WebSocketController : ControllerBase
                             channel.Remove(key);
                             resWebsocker.channel = item.channel;
                             resWebsocker.data = item.data;
-                            resWebsocker.message = "取消订阅成功";
+                            resWebsocker.msg = "取消订阅成功";
                             string Json = JsonConvert.SerializeObject(resWebsocker);
                             byte[] bb = System.Text.Encoding.UTF8.GetBytes(Json);
                             webSocket.SendAsync(new ArraySegment<byte>(bb, 0, bb.Length), WebSocketMessageType.Text, true, CancellationToken.None);

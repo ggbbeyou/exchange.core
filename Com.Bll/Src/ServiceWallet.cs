@@ -120,7 +120,7 @@ public class ServiceWallet
                         wallet_to.total = wallet_from.available + wallet_from.freeze;
                         db.SaveChanges();
                         transaction.Commit();
-                        PushWallet(new List<Wallet>() { wallet_from, wallet_to });
+                        PushWallet(new List<Wallet>() { wallet_from, wallet_to }, "划转");
 
                         res.code = E_Res_Code.ok;
                         return res;
@@ -193,7 +193,7 @@ public class ServiceWallet
                         wallet.available -= amount;
                         db.SaveChanges();
                         transaction.Commit();
-                        PushWallet(new List<Wallet>() { wallet });
+                        PushWallet(new List<Wallet>() { wallet }, $"{wallet.coin_name}冻结变更");
                         return true;
                     }
                     catch (DbUpdateConcurrencyException ex)
@@ -281,7 +281,7 @@ public class ServiceWallet
                         wallet_quote.available -= amount_quote;
                         db.SaveChanges();
                         transaction.Commit();
-                        PushWallet(new List<Wallet>() { wallet_base, wallet_quote });
+                        PushWallet(new List<Wallet>() { wallet_base, wallet_quote }, $"{wallet_base.coin_name}/{wallet_quote.coin_name}资产冻结变更");
                         return true;
                     }
                     catch (DbUpdateConcurrencyException ex)
@@ -430,7 +430,7 @@ public class ServiceWallet
                         db.Wallet.UpdateRange(wallets_settlement);
                         int savecount = db.SaveChanges();
                         transaction.Commit();
-                        PushWallet(wallets);
+                        PushWallet(wallets, market.symbol + "撮合");
                         return (savecount > 0, runnings_fee, runnings_trade);
                     }
                     catch (DbUpdateConcurrencyException ex)
@@ -618,8 +618,9 @@ public class ServiceWallet
     /// <summary>
     /// 推送变更资金
     /// </summary>
-    /// <param name="wallets"></param>
-    private void PushWallet(List<Wallet> wallets)
+    /// <param name="wallets">钱包</param>
+    /// <param name="name"></param>
+    private void PushWallet(List<Wallet> wallets, string name)
     {
         FactoryService.instance.constant.stopwatch.Restart();
         try
@@ -641,7 +642,7 @@ public class ServiceWallet
             FactoryService.instance.constant.logger.LogError(ex, "PushWallet" + ex.Message);
         }
         FactoryService.instance.constant.stopwatch.Stop();
-        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};:Mq=>推送资金变更");
+        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};:Mq=>推送资金变更({name})");
     }
 
 }

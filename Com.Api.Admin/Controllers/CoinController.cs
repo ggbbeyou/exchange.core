@@ -80,12 +80,10 @@ public class CoinController : ControllerBase
     public async Task<Res<bool>> AddCoin(string coin_name, string full_name, IFormFile icon)
     {
         Res<bool> res = new Res<bool>();
-
         res.code = E_Res_Code.fail;
         res.data = false;
         if (icon == null || icon.Length <= 0)
         {
-
             res.code = E_Res_Code.file_not_found;
             res.data = false;
             res.msg = "未找到文件";
@@ -93,7 +91,6 @@ public class CoinController : ControllerBase
         }
         if (this.db.Coin.Any(P => P.coin_name == coin_name.ToUpper()))
         {
-
             res.code = E_Res_Code.name_repeat;
             res.data = false;
             res.msg = "币名已重复";
@@ -101,7 +98,6 @@ public class CoinController : ControllerBase
         }
         if (this.db.Coin.Any(P => P.full_name == full_name))
         {
-
             res.code = E_Res_Code.name_repeat;
             res.data = false;
             res.msg = "全名已重复";
@@ -138,7 +134,6 @@ public class CoinController : ControllerBase
     public Res<List<Coin>> GetCoin(string? coin_name)
     {
         Res<List<Coin>> res = new Res<List<Coin>>();
-
         res.code = E_Res_Code.ok;
         res.data = db.Coin.WhereIf(coin_name != null, P => P.coin_name == coin_name!.ToUpper()).AsNoTracking().ToList();
         return res;

@@ -92,26 +92,22 @@ public class MarketController : ControllerBase
     public Res<bool> AddMarket(E_MarketType type, long coin_id_base, long coin_id_quote, int places_price, int places_amount, decimal trade_min, decimal trade_min_market_sell, string service_url, string market_email, string market_password, string settlement_email, string settlement_password, float sort, string? tag)
     {
         Res<bool> res = new Res<bool>();
-
         res.code = E_Res_Code.fail;
         res.data = false;
         if (places_price < 0 || places_amount < 0 || trade_min <= 0 || trade_min_market_sell <= 0)
         {
-
             res.code = E_Res_Code.not_less_0;
             res.msg = "值不能小于或等于0";
             return res;
         }
         if (!this.db.Coin.Any(P => P.coin_id == coin_id_base || P.coin_id == coin_id_quote))
         {
-
             res.code = E_Res_Code.coin_not_found;
             res.msg = "未找到币种";
             return res;
         }
         if (this.db.Market.Any(P => P.market_type == type && P.coin_id_base == coin_id_base && P.coin_id_quote == coin_id_quote))
         {
-
             res.code = E_Res_Code.name_repeat;
             res.msg = "市场已存在";
             return res;
@@ -191,7 +187,6 @@ public class MarketController : ControllerBase
         this.db.Market.Add(market);
         if (this.db.SaveChanges() > 0)
         {
-
             res.code = E_Res_Code.ok;
             res.data = true;
             return res;
@@ -217,11 +212,9 @@ public class MarketController : ControllerBase
     public Res<bool> UpdateMarket(long market, bool transaction, int places_price, int places_amount, decimal trade_min, decimal trade_min_market_sell, float sort, string? tag, string service_url)
     {
         Res<bool> res = new Res<bool>();
-
         res.code = E_Res_Code.fail;
         if (!this.db.Market.Any(P => P.market == market))
         {
-
             res.code = E_Res_Code.not_found_symbol;
             res.msg = "交易对不存在";
             return res;
@@ -257,12 +250,9 @@ public class MarketController : ControllerBase
     public Res<List<Market>> GetMarket(string? symbol)
     {
         Res<List<Market>> res = new Res<List<Market>>();
-
         res.code = E_Res_Code.ok;
         res.data = db.Market.WhereIf(symbol != null, P => P.symbol == symbol!.ToUpper()).AsNoTracking().ToList();
         return res;
     }
-
-
 
 }

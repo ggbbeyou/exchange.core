@@ -87,7 +87,6 @@ public class WalletController : ControllerBase
     public Res<List<Wallet>?> GetWallet(E_WalletType wallet_type, string? coin_name)
     {
         Res<List<Wallet>?> res = new Res<List<Wallet>?>();
-
         res.code = E_Res_Code.fail;
         var linq = from coin in db.Coin
                    join wallet in db.Wallet.Where(P => P.user_id == this.login.user_id && P.wallet_type == wallet_type).WhereIf(!string.IsNullOrWhiteSpace(coin_name), P => P.coin_name.Contains(coin_name!))

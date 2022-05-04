@@ -71,7 +71,6 @@ public class HomeController : ControllerBase
     public Res<ResBaseInfo> GetBaseInfo(int site = 1)
     {
         Res<ResBaseInfo> res = new Res<ResBaseInfo>();
-
         res.code = E_Res_Code.ok;
         res.data = new ResBaseInfo()
         {
@@ -94,7 +93,6 @@ public class HomeController : ControllerBase
     public Res<bool> SetTimeZone(int time_zone)
     {
         Res<bool> res = new Res<bool>();
-
         res.code = E_Res_Code.ok;
         HttpContext.Session.SetInt32("time_zone", time_zone);
         return res;

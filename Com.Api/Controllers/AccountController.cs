@@ -92,7 +92,6 @@ public class AccountController : ControllerBase
     public Res<bool> SendEmailCodeByRegister(string email)
     {
         Res<bool> res = new Res<bool>();
-
         res.code = E_Res_Code.fail;
         res.data = false;
         email = email.Trim().ToLower();

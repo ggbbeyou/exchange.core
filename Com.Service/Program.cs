@@ -28,7 +28,7 @@ builder.ConfigureLogging((hostContext, logging) =>
             // #if (DEBUG)
             logging.AddConsole();
             // #endif
-            // logging.AddNLog();
+            logging.AddNLog();
         });
 // ExceptionlessClient.Default.Startup("vRWgU1ub8e197kpI77ut5LTJAPIxPTH2mcwyeTuI");
 

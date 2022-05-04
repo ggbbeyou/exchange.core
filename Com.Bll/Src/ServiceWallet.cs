@@ -46,6 +46,11 @@ public class ServiceWallet
     /// 事务等级
     /// </summary>
     private IsolationLevel isolationLevel = IsolationLevel.RepeatableRead;
+    /// <summary>
+    /// 秒表
+    /// </summary>
+    /// <returns></returns>
+    public Stopwatch stopwatch = new Stopwatch();
 
     /// <summary>
     /// 初始化
@@ -621,7 +626,7 @@ public class ServiceWallet
     /// <param name="remark">备注</param>
     private void PushWallet(List<Wallet> wallets, string remark)
     {
-        FactoryService.instance.constant.stopwatch.Restart();
+        stopwatch.Restart();
         try
         {
             ResWebsocker<List<Wallet>> res = new ResWebsocker<List<Wallet>>();
@@ -640,8 +645,8 @@ public class ServiceWallet
         {
             FactoryService.instance.constant.logger.LogError(ex, "PushWallet" + ex.Message);
         }
-        FactoryService.instance.constant.stopwatch.Stop();
-        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};:Mq=>资金变更,{remark}");
+        stopwatch.Stop();
+        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{stopwatch.Elapsed.ToString()};:Mq=>资金变更,{remark}");
     }
 
 }

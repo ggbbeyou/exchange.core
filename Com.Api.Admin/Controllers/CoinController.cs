@@ -114,7 +114,6 @@ public class CoinController : ControllerBase
         this.db.Coin.Add(coin);
         if (this.db.SaveChanges() > 0)
         {
-
             res.code = E_Res_Code.ok;
             res.data = true;
             res.msg = "";

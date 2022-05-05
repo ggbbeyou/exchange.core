@@ -110,7 +110,7 @@ builder.Services.AddControllers(options =>
     // setupAction.SerializerSettings.ContractResolver = new Newtonsoft.Json.Serialization.DefaultContractResolver();
     // setupAction.SerializerSettings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Objects;
     setupAction.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
-    setupAction.SerializerSettings.Converters.Add(new Com.Api.JsonConverterDecimal());
+    setupAction.SerializerSettings.Converters.Add(new Com.Bll.Util.JsonConverterDecimal());
 #pragma warning disable 
     ServiceProvider build = builder.Services.BuildServiceProvider();
 #pragma warning restore

@@ -15,6 +15,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Newtonsoft.Json;
 using StackExchange;
 using StackExchange.Redis;
+using Com.Bll.Util;
 
 namespace Com.Bll;
 
@@ -380,7 +381,7 @@ public class ServiceKline
                 SortedSetEntry[] entries = new SortedSetEntry[klines.Count()];
                 for (int i = 0; i < klines.Count(); i++)
                 {
-                    entries[i] = new SortedSetEntry(JsonConvert.SerializeObject(klines[i]), klines[i].time_start.ToUnixTimeMilliseconds());
+                    entries[i] = new SortedSetEntry(JsonConvert.SerializeObject(klines[i], new JsonConverterDecimal()), klines[i].time_start.ToUnixTimeMilliseconds());
                 }
                 FactoryService.instance.constant.redis.SortedSetAdd(FactoryService.instance.GetRedisKline(market, cycle), entries);
             }

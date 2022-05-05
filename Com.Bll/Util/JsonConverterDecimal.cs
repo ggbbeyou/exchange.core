@@ -2,7 +2,7 @@
 
 using Newtonsoft.Json;
 
-namespace Com.Api.Admin;
+namespace Com.Bll.Util;
 
 /// <summary>
 /// json 转换器，主要是去掉decimal小数点后面多余的0

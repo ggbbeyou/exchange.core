@@ -472,12 +472,12 @@ public class ServiceKline
                         time_end = now,
                         time = now,
                     };
-                    FactoryService.instance.constant.redis.HashSet(FactoryService.instance.GetRedisKlineing(market), cycle.ToString(), JsonConvert.SerializeObject(kline_new));
+                    FactoryService.instance.constant.redis.HashSet(FactoryService.instance.GetRedisKlineing(market), cycle.ToString(), JsonConvert.SerializeObject(kline_new, new JsonConverterDecimal()));
                 }
             }
             else
             {
-                FactoryService.instance.constant.redis.HashSet(FactoryService.instance.GetRedisKlineing(market), cycle.ToString(), JsonConvert.SerializeObject(kline_new));
+                FactoryService.instance.constant.redis.HashSet(FactoryService.instance.GetRedisKlineing(market), cycle.ToString(), JsonConvert.SerializeObject(kline_new, new JsonConverterDecimal()));
             }
         }
     }
@@ -517,7 +517,7 @@ public class ServiceKline
                     kline_new.time_start = kline_old.time_start;
                 }
             }
-            FactoryService.instance.constant.redis.HashSet(FactoryService.instance.GetRedisKlineing(market), cycle.ToString(), JsonConvert.SerializeObject(kline_new));
+            FactoryService.instance.constant.redis.HashSet(FactoryService.instance.GetRedisKlineing(market), cycle.ToString(), JsonConvert.SerializeObject(kline_new, new JsonConverterDecimal()));
         }
     }
 

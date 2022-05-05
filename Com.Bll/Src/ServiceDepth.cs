@@ -36,9 +36,9 @@ public class ServiceDepth
     public Dictionary<E_WebsockerChannel, ResDepth> ConvertDepth(long market, string symbol, (List<OrderBook> bid, List<OrderBook> ask) orderbook)
     {
         Dictionary<E_WebsockerChannel, ResDepth> depths = new Dictionary<E_WebsockerChannel, ResDepth>();
-        depths.Add(E_WebsockerChannel.books10, new ResDepth());
-        depths.Add(E_WebsockerChannel.books50, new ResDepth());
-        depths.Add(E_WebsockerChannel.books200, new ResDepth());
+        depths.Add(E_WebsockerChannel.books10, new ResDepth() { symbol = symbol, timestamp = DateTimeOffset.UtcNow });
+        depths.Add(E_WebsockerChannel.books50, new ResDepth() { symbol = symbol, timestamp = DateTimeOffset.UtcNow });
+        depths.Add(E_WebsockerChannel.books200, new ResDepth() { symbol = symbol, timestamp = DateTimeOffset.UtcNow });
         decimal total_bid = 0;
         for (int i = 0; i < orderbook.bid.Count; i++)
         {
@@ -97,9 +97,9 @@ public class ServiceDepth
     public Dictionary<E_WebsockerChannel, ResDepth> ConvertDepth(long market, string symbol, (List<(int index, OrderBook orderbook)> bid, List<(int index, OrderBook orderbook)> ask) orderbook)
     {
         Dictionary<E_WebsockerChannel, ResDepth> depths = new Dictionary<E_WebsockerChannel, ResDepth>();
-        depths.Add(E_WebsockerChannel.books10_inc, new ResDepth() { symbol = symbol });
-        depths.Add(E_WebsockerChannel.books50_inc, new ResDepth() { symbol = symbol });
-        depths.Add(E_WebsockerChannel.books200_inc, new ResDepth() { symbol = symbol });
+        depths.Add(E_WebsockerChannel.books10_inc, new ResDepth() { symbol = symbol, timestamp = DateTimeOffset.UtcNow });
+        depths.Add(E_WebsockerChannel.books50_inc, new ResDepth() { symbol = symbol, timestamp = DateTimeOffset.UtcNow });
+        depths.Add(E_WebsockerChannel.books200_inc, new ResDepth() { symbol = symbol, timestamp = DateTimeOffset.UtcNow });
         foreach (var item in orderbook.bid)
         {
             if (item.index <= 10)

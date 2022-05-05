@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using StackExchange.Redis;
 using Com.Api.Sdk.Models;
+using Com.Bll.Util;
 
 namespace Com.Bll;
 
@@ -212,7 +213,7 @@ public class ServiceDeal
                 resWebsocker.op = E_WebsockerOp.subscribe_event;
                 resWebsocker.channel = E_WebsockerChannel.tickers;
                 resWebsocker.data = ticker;
-                FactoryService.instance.constant.redis.HashSet(FactoryService.instance.GetRedisTicker(), ticker.market, JsonConvert.SerializeObject(ticker));
+                FactoryService.instance.constant.redis.HashSet(FactoryService.instance.GetRedisTicker(), ticker.market, JsonConvert.SerializeObject(ticker, new JsonConverterDecimal()));
                 FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.tickers, ticker.market), JsonConvert.SerializeObject(resWebsocker));
             }
         }

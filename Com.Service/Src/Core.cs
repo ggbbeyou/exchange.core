@@ -351,6 +351,7 @@ public class Core
         {
             process.asset = true;
             process.running_fee = true;
+            process.running_trade = true;
             process.deal = true;
             process.order = true;
             process.order_complete_thaw = true;

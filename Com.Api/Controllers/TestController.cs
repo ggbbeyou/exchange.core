@@ -329,7 +329,7 @@ public class TestController : ControllerBase
             for (int j = 0; j < 200; j++)
             {
                 E_OrderSide side = FactoryService.instance.constant.random.Next(0, 2) == 0 ? E_OrderSide.buy : E_OrderSide.sell;
-                E_OrderType type = FactoryService.instance.constant.random.Next(0, 4) == 0 ? E_OrderType.market : E_OrderType.limit;
+                E_OrderType type = FactoryService.instance.constant.random.Next(0, 10) == 0 ? E_OrderType.market : E_OrderType.limit;
                 decimal? price = null;
                 decimal? amount = null;
                 decimal? total = null;

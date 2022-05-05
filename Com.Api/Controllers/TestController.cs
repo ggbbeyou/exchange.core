@@ -130,7 +130,7 @@ public class TestController : ControllerBase
         this.db.Vip.Add(vip0);
         this.db.Vip.Add(vip1);
         this.db.Vip.Add(vip2);
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 100; i++)
         {
             (string public_key, string private_key) key = Encryption.GetRsaKey();
             Users user = new Users()
@@ -323,7 +323,7 @@ public class TestController : ControllerBase
         List<Market> markets = this.db.Market.ToList();
         for (int i = 0; i < count; i++)
         {
-            Users user = users[FactoryService.instance.constant.random.Next(0, 10)];
+            Users user = users[FactoryService.instance.constant.random.Next(0, 100)];
             Market market = markets[FactoryService.instance.constant.random.Next(0, 2)];
             List<ReqOrder> reqOrders = new List<ReqOrder>();
             for (int j = 0; j < 200; j++)

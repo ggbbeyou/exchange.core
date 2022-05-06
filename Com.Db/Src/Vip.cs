@@ -29,13 +29,13 @@ public class Vip
     /// 挂单手续费
     /// </summary>
     /// <value></value>
-    //[JsonConverter(typeof(JsonConverterDecimal))]
+
     public decimal fee_maker { get; set; }
     /// <summary>
     /// 吃单手续费
     /// </summary>
     /// <value></value>
-    //[JsonConverter(typeof(JsonConverterDecimal))]
+
     public decimal fee_taker { get; set; }
 
 }

@@ -28,8 +28,7 @@ public class ResOrder : ReqOrder
     /// 订单状态
     /// </summary>
     /// <value></value>
-    //[JsonConverter(typeof(StringEnumConverter))]
-    //[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter))]
     public E_OrderState state { get; set; }
     /// <summary>
     /// 挂单时间

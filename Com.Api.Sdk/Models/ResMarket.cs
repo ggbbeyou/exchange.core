@@ -36,8 +36,7 @@ public class ResMarket
     /// 市场类型
     /// </summary>
     /// <value></value>
-    //[JsonConverter(typeof(StringEnumConverter))]
-    //[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter))]
     public E_MarketType market_type { get; set; }
     /// <summary>
     /// 是否交易(true:可以交易,false:禁止交易)

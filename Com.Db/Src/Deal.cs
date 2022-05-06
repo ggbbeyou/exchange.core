@@ -29,13 +29,13 @@ public class Deal : ResDeal
     /// </summary>
     /// <value></value>
     //[JsonConverter(typeof(StringEnumConverter))]
-    //[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+
     public E_TradeModel trade_model { get; set; }
     /// <summary>
     /// 成交总额
     /// </summary>
     /// <value></value>
-    //[JsonConverter(typeof(JsonConverterDecimal))]
+
     public decimal total { get; set; }
     /// <summary>
     /// 买单id
@@ -71,48 +71,48 @@ public class Deal : ResDeal
     /// 买单未成交额
     /// </summary>
     /// <value></value>
-    //[JsonConverter(typeof(JsonConverterDecimal))]
+
     public decimal bid_total_unsold { get; set; }
     /// <summary>
     /// 卖单未成交量
     /// </summary>
     /// <value></value>
-    //[JsonConverter(typeof(JsonConverterDecimal))]
+
     public decimal ask_amount_unsold { get; set; }
     /// <summary>
     /// 买单已成交额
     /// </summary>
     /// <value></value>
-    //[JsonConverter(typeof(JsonConverterDecimal))]
+
     public decimal bid_total_done { get; set; }
     /// <summary>
     /// 卖单已成交量
     /// </summary>
     /// <value></value>
-    //[JsonConverter(typeof(JsonConverterDecimal))]
+
     public decimal ask_amount_done { get; set; }
     /// <summary>
     /// 买单挂单手续费
     /// </summary>
     /// <value></value>
-    //[JsonConverter(typeof(JsonConverterDecimal))]
+
     public decimal fee_bid_maker { get; set; }
     /// <summary>
     /// 买单吃单手续费
     /// </summary>
     /// <value></value>
-    //[JsonConverter(typeof(JsonConverterDecimal))]
+
     public decimal fee_bid_taker { get; set; }
     /// <summary>
     /// 卖单挂单手续费
     /// </summary>
     /// <value></value>
-    //[JsonConverter(typeof(JsonConverterDecimal))]
+
     public decimal fee_ask_maker { get; set; }
     /// <summary>
     /// 卖单吃单手续费
     /// </summary>
     /// <value></value>
-    //[JsonConverter(typeof(JsonConverterDecimal))]
+
     public decimal fee_ask_taker { get; set; }
 }

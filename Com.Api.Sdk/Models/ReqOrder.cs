@@ -24,52 +24,52 @@ public class ReqOrder
     /// 交易方向
     /// </summary>
     /// <value></value>
-    //[JsonConverter(typeof(StringEnumConverter))]
-    //[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter))]
+     
     public E_OrderSide side { get; set; }
     /// <summary>
     /// 订单类型
     /// </summary>
     /// <value></value>
-    //[JsonConverter(typeof(StringEnumConverter))]
-    //[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter))]
+     
     public E_OrderType type { get; set; }
     /// <summary>
     /// 交易模式,现货(cash)
     /// </summary>
     /// <value></value>
     //[JsonConverter(typeof(StringEnumConverter))]
-    //[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+     
     public E_TradeModel trade_model { get; set; }
     /// <summary>
     /// 挂单价:限价单(有效),其它无效
     /// </summary>
     /// <value></value>
-    //[JsonConverter(typeof(JsonConverterDecimal))]
+     
     public decimal? price { get; set; }
     /// <summary>
     /// 挂单量:限价单/市场卖价(有效),其它无效
     /// </summary>
     /// <value></value>
-    //[JsonConverter(typeof(JsonConverterDecimal))]
+     
     public decimal? amount { get; set; }
     /// <summary>
     /// 挂单额:市价买单(有效),其它无效
     /// </summary>
     /// <value></value>
-    //[JsonConverter(typeof(JsonConverterDecimal))]
+     
     public decimal? total { get; set; }
     /// <summary>
     /// 触发挂单价格
     /// </summary>
     /// <value></value>   
-    //[JsonConverter(typeof(JsonConverterDecimal))]
+     
     public decimal trigger_hanging_price { get; set; }
     /// <summary>
     /// 触发撤单价格
     /// </summary>
     /// <value></value>
-    //[JsonConverter(typeof(JsonConverterDecimal))]
+     
     public decimal trigger_cancel_price { get; set; }
 
 }

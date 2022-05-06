@@ -43,7 +43,7 @@ public class Users : ResUser
     /// </summary>
     /// <value></value>
     //[JsonConverter(typeof(StringEnumConverter))]
-    //[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+
     public E_UserType user_type { get; set; }
     /// <summary>
     /// 推荐人id
@@ -55,7 +55,7 @@ public class Users : ResUser
     /// </summary>
     /// <value></value>
     [JsonIgnore]
-    public string? google_key { get; set; }   
+    public string? google_key { get; set; }
     /// <summary>
     /// sha公钥
     /// </summary>

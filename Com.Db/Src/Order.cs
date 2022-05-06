@@ -24,43 +24,43 @@ public class Orders : ResOrder
     /// 已成交均价
     /// </summary>
     /// <value></value>
-    //[JsonConverter(typeof(JsonConverterDecimal))]
+
     public decimal deal_price { get; set; }
     /// <summary>
     /// 已成交量
     /// </summary>
     /// <value></value>
-    //[JsonConverter(typeof(JsonConverterDecimal))]
+
     public decimal deal_amount { get; set; }
     /// <summary>
     /// 已成交额
     /// </summary>
     /// <value></value>
-    //[JsonConverter(typeof(JsonConverterDecimal))]
+
     public decimal deal_total { get; set; }
     /// <summary>
     /// 未成交 买:交易额,卖:交易量
     /// </summary>
     /// <value></value>
-    //[JsonConverter(typeof(JsonConverterDecimal))]
+
     public decimal unsold { get; set; }
     /// <summary>
     /// 订单完成解冻金额
     /// </summary>
     /// <value></value>
-    //[JsonConverter(typeof(JsonConverterDecimal))]
+
     public decimal complete_thaw { get; set; }
     /// <summary>
     /// 挂单手续费
     /// </summary>
     /// <value></value>
-    //[JsonConverter(typeof(JsonConverterDecimal))]
+
     public decimal fee_maker { get; set; }
     /// <summary>
     /// 吃单手续费
     /// </summary>
     /// <value></value>
-    //[JsonConverter(typeof(JsonConverterDecimal))]
+
     public decimal fee_taker { get; set; }
 
     /// <summary>

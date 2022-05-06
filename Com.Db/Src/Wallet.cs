@@ -24,7 +24,7 @@ public class Wallet
     /// </summary>
     /// <value></value>
     //[JsonConverter(typeof(StringEnumConverter))]
-    //[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+
     public E_WalletType wallet_type { get; set; }
     /// <summary>
     /// 用户id
@@ -52,21 +52,21 @@ public class Wallet
     /// 总额
     /// </summary>
     /// <value></value>
-    //[JsonConverter(typeof(JsonConverterDecimal))]
+
     [ConcurrencyCheck]
     public decimal total { get; set; }
     /// <summary>
     /// 可用
     /// </summary>
     /// <value></value>
-    //[JsonConverter(typeof(JsonConverterDecimal))]
+
     [ConcurrencyCheck]
     public decimal available { get; set; }
     /// <summary>
     /// 冻结
     /// </summary>
     /// <value></value>
-    //[JsonConverter(typeof(JsonConverterDecimal))]
+
     [ConcurrencyCheck]
     public decimal freeze { get; set; }
     /// <summary>

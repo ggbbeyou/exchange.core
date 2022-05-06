@@ -21,13 +21,12 @@ public class ResKline
     /// </summary>
     /// <value></value>
     [JsonConverter(typeof(StringEnumConverter))]
-    //[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
     public E_KlineType type { get; set; }
     /// <summary>
     /// 成交量
     /// </summary>
     /// <value></value>
-    //[JsonConverter(typeof(JsonConverterDecimal))]
+
     public decimal amount { get; set; }
     /// <summary>
     /// 成交笔数
@@ -38,31 +37,31 @@ public class ResKline
     /// 成交总金额
     /// </summary>
     /// <value></value>
-    //[JsonConverter(typeof(JsonConverterDecimal))]
+
     public decimal total { get; set; }
     /// <summary>
     /// 开盘价
     /// </summary>
     /// <value></value>
-    //[JsonConverter(typeof(JsonConverterDecimal))]
+
     public decimal open { get; set; }
     /// <summary>
     /// 收盘价（当K线为最晚的一根时，是最新成交价）
     /// </summary>
     /// <value></value>
-    //[JsonConverter(typeof(JsonConverterDecimal))]
+
     public decimal close { get; set; }
     /// <summary>
     /// 最低价
     /// </summary>
     /// <value></value>
-    //[JsonConverter(typeof(JsonConverterDecimal))]
+
     public decimal low { get; set; }
     /// <summary>
     /// 最高价
     /// </summary>
     /// <value></value>
-    //[JsonConverter(typeof(JsonConverterDecimal))]
+
     public decimal high { get; set; }
     /// <summary>
     /// K线开始时间

@@ -214,7 +214,7 @@ public class ServiceDeal
                 resWebsocker.channel = E_WebsockerChannel.tickers;
                 resWebsocker.data = ticker;
                 FactoryService.instance.constant.redis.HashSet(FactoryService.instance.GetRedisTicker(), ticker.market, JsonConvert.SerializeObject(ticker, new JsonConverterDecimal()));
-                FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.tickers, ticker.market), JsonConvert.SerializeObject(resWebsocker));
+                FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.tickers, ticker.market), JsonConvert.SerializeObject(resWebsocker, new JsonConverterDecimal()));
             }
         }
         catch (System.Exception ex)

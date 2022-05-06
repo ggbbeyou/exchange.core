@@ -33,6 +33,7 @@ using System.Diagnostics;
 using System.Data;
 using Com.Api.Sdk.Models;
 using Newtonsoft.Json;
+using Com.Bll.Util;
 
 namespace Com.Bll;
 
@@ -635,7 +636,7 @@ public class ServiceWallet
             foreach (var item in wallet_uid)
             {
                 res.data = item.g.ToList();
-                FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.assets, item.user_id), JsonConvert.SerializeObject(res));
+                FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.assets, item.user_id), JsonConvert.SerializeObject(res, new JsonConverterDecimal()));
             }
         }
         catch (System.Exception ex)

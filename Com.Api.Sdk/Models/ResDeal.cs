@@ -31,7 +31,7 @@ public class ResDeal
     /// 成交触发方向(吃单方向)
     /// </summary>
     /// <value></value>
-    //[JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter))]
     //[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
     public E_OrderSide trigger_side { get; set; }
     /// <summary>

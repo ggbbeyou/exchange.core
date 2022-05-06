@@ -281,23 +281,8 @@ public class Core
             Dictionary<E_KlineType, DateTimeOffset> last_kline = new Dictionary<E_KlineType, DateTimeOffset>();
             if (process.sync_kline == false)
             {
-                FactoryService.instance.constant.stopwatch.Restart();               
-                DateTimeOffset end = deals.Max(P => P.time);
-                end = end.AddSeconds(-end.Second).AddMilliseconds(-end.Millisecond);
-                end = end.AddMinutes(1).AddMilliseconds(-1);
-                foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
-                {
-                    Kline? Last_kline = service_kline.GetRedisLastKline(this.model.info.market, cycle);
-                    if (Last_kline == null)
-                    {
-                        last_kline.Add(cycle, FactoryService.instance.system_init);
-                    }
-                    else
-                    {
-                        last_kline.Add(cycle, Last_kline.time_start);
-                    }
-                }
-                this.service_kline.DBtoRedised(this.model.info.market, this.model.info.symbol, end);
+                FactoryService.instance.constant.stopwatch.Restart();
+                this.service_kline.DBtoRedised(this.model.info.market, this.model.info.symbol, deals.Max(P => P.time));
                 this.service_kline.DBtoRedising(this.model.info.market, this.model.info.symbol, deals);
                 process.sync_kline = true;
                 FactoryService.instance.constant.stopwatch.Stop();
@@ -322,20 +307,24 @@ public class Core
             if (process.push_kline == false)
             {
                 FactoryService.instance.constant.stopwatch.Restart();
+                DateTimeOffset start = deals.Min(P => P.time);
+                DateTimeOffset end = deals.Max(P => P.time);
                 HashEntry[] hashes = FactoryService.instance.constant.redis.HashGetAll(FactoryService.instance.GetRedisKlineing(this.model.info.market));
-                process.push_kline = true;
-                foreach (var item in hashes)
+                foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
                 {
-                    res_kline.data.Clear();
-                    E_KlineType klineType = (E_KlineType)Enum.Parse(typeof(E_KlineType), item.Name.ToString());
-                    if (last_kline.ContainsKey(klineType))
+                    List<Kline> klines = service_kline.GetRedisKline(this.model.info.market, cycle, start, end);
+                    RedisValue rv = hashes.FirstOrDefault(P => P.Name == cycle.ToString()).Value;
+                    if (rv.HasValue)
                     {
-                        res_kline.data.AddRange(service_kline.GetRedisKline(this.model.info.market, klineType, last_kline[klineType], null));
+                        Kline? kline = JsonConvert.DeserializeObject<Kline>(rv);
+                        if (kline != null)
+                        {
+                            klines.Add(kline);
+                        }
                     }
-                    res_kline.channel = (E_WebsockerChannel)Enum.Parse(typeof(E_WebsockerChannel), item.Name.ToString());
-                    res_kline.data.Add(JsonConvert.DeserializeObject<Kline>(item.Value)!);
                     process.push_kline = process.push_kline && FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(res_kline.channel, this.model.info.market), JsonConvert.SerializeObject(res_kline));
                 }
+                process.push_kline = true;
                 FactoryService.instance.constant.stopwatch.Stop();
                 FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:Mq,Redis=>推送K线记录");
             }

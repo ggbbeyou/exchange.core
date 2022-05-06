@@ -281,10 +281,10 @@ public class Core
             Dictionary<E_KlineType, DateTimeOffset> last_kline = new Dictionary<E_KlineType, DateTimeOffset>();
             if (process.sync_kline == false)
             {
-                FactoryService.instance.constant.stopwatch.Restart();
-                DateTimeOffset now = DateTimeOffset.UtcNow;
-                now = now.AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond);
-                DateTimeOffset end = now.AddMilliseconds(-1);
+                FactoryService.instance.constant.stopwatch.Restart();               
+                DateTimeOffset end = deals.Max(P => P.time);
+                end = end.AddSeconds(-end.Second).AddMilliseconds(-end.Millisecond);
+                end = end.AddMinutes(1).AddMilliseconds(-1);
                 foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
                 {
                     Kline? Last_kline = service_kline.GetRedisLastKline(this.model.info.market, cycle);

@@ -64,7 +64,7 @@ public class Processing
     /// <value></value>
     public bool push_order_cancel { get; set; }
     /// <summary>
-    /// 推送K线
+    /// 保存K线
     /// </summary>
     /// <value></value>
     public bool sync_kline { get; set; }

@@ -322,6 +322,8 @@ public class Core
                             klines.Add(kline);
                         }
                     }
+                    res_kline.channel = (E_WebsockerChannel)Enum.Parse(typeof(E_WebsockerChannel), cycle.ToString());
+                    res_kline.data = klines;
                     process.push_kline = process.push_kline && FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(res_kline.channel, this.model.info.market), JsonConvert.SerializeObject(res_kline));
                 }
                 process.push_kline = true;

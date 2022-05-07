@@ -345,7 +345,7 @@ public class ServiceKline
     public void DBtoRedised(long market, string symbol, DateTimeOffset end)
     {
         SyncKlines(market, symbol, end);
-        DbSaveRedis(market);
+        DbSaveRedis(market, end);
     }
 
     /// <summary>
@@ -370,12 +370,13 @@ public class ServiceKline
     /// 将DB中的K线数据保存到Redis
     /// </summary>
     /// <param name="market">交易对</param>
-    public void DbSaveRedis(long market)
+    /// <param name="end">结束时间</param>
+    public void DbSaveRedis(long market, DateTimeOffset end)
     {
         foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
         {
             Kline? Last_kline = GetRedisLastKline(market, cycle);
-            List<Kline> klines = this.GetKlines(market, cycle, Last_kline?.time_end ?? FactoryService.instance.system_init, DateTimeOffset.Now);
+            List<Kline> klines = this.GetKlines(market, cycle, Last_kline?.time_end ?? FactoryService.instance.system_init, end);
             if (klines.Count() > 0)
             {
                 SortedSetEntry[] entries = new SortedSetEntry[klines.Count()];

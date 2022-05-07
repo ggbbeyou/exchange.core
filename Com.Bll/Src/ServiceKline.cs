@@ -48,7 +48,7 @@ public class ServiceKline
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
-                return db.Kline.Where(P => P.market == market && P.type == type).OrderByDescending(P => P.time_start).AsNoTracking().FirstOrDefault();
+                return db.Kline.AsNoTracking().Where(P => P.market == market && P.type == type).OrderByDescending(P => P.time_start).FirstOrDefault();
             }
         }
     }
@@ -67,7 +67,7 @@ public class ServiceKline
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
-                return db.Kline.Where(P => P.market == market && P.type == type && P.time_start >= start && P.time_start <= end).OrderBy(P => P.time_start).AsNoTracking().ToList();
+                return db.Kline.AsNoTracking().Where(P => P.market == market && P.type == type && P.time_start >= start && P.time_start <= end).OrderBy(P => P.time_start).ToList();
             }
         }
     }

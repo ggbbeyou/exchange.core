@@ -37,7 +37,7 @@ public class ServiceKline
     }
 
     /// <summary>
-    /// 获取最后一条K线
+    /// db获取最后一条K线
     /// </summary>
     /// <param name="market">交易对</param>
     /// <param name="type">K线类型</param>
@@ -48,7 +48,7 @@ public class ServiceKline
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
-                return db.Kline.AsNoTracking().Where(P => P.market == market && P.type == type).OrderByDescending(P => P.time_start).FirstOrDefault();
+                return db.Kline.AsNoTracking().Where(P => P.market == market && P.type == type).OrderByDescending(P => P.time_start).SingleOrDefault();
             }
         }
     }
@@ -75,11 +75,11 @@ public class ServiceKline
     /// <summary>
     /// 保存K线
     /// </summary>
-    /// <param name="market"></param>
-    /// <param name="klineType"></param>
-    /// <param name="klines"></param>
+    /// <param name="market">交易对</param>
+    /// <param name="type">K线类型</param>
+    /// <param name="klines">K线集合</param>
     /// <returns></returns>
-    public int SaveKline(long market, string symbol, E_KlineType klineType, List<Kline> klines)
+    public int SaveKline(long market, string symbol, E_KlineType type, List<Kline> klines)
     {
         if (klines == null || klines.Count == 0)
         {
@@ -89,7 +89,7 @@ public class ServiceKline
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
-                List<Kline> db_kline = db.Kline.Where(P => P.market == market && P.type == klineType && P.time_start >= klines[0].time_start && P.time_end <= klines[klines.Count - 1].time_end).ToList();
+                List<Kline> db_kline = db.Kline.Where(P => P.market == market && P.type == type && P.time_start >= klines[0].time_start && P.time_end <= klines[klines.Count - 1].time_end).ToList();
                 foreach (var item in klines)
                 {
                     Kline? kline = db_kline.FirstOrDefault(P => P.time_start == item.time_start);
@@ -104,7 +104,7 @@ public class ServiceKline
                     }
                     kline.market = market;
                     kline.symbol = symbol;
-                    kline.type = klineType;
+                    kline.type = type;
                     kline.amount = item.amount;
                     kline.count = item.count;
                     kline.total = item.total;

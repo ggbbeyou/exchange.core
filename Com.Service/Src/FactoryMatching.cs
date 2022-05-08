@@ -119,7 +119,7 @@ public class FactoryMatching
     /// <summary>
     /// 服务:关闭服务
     /// </summary>
-    /// <param name="info">交易基础信息</param>
+    /// <param name="info">交易对基础信息</param>
     public Market ServiceStop(Market info)
     {
         FactoryService.instance.constant.logger.LogInformation($"服务准备关闭:{info.market}");
@@ -144,7 +144,7 @@ public class FactoryMatching
     /// <summary>
     /// 服务:清除所有缓存
     /// </summary>
-    /// <param name="marketInfo"></param>
+    /// <param name="info">交易对基础信息</param>
     /// <returns></returns>
     private bool ServiceClearCache(Market info)
     {

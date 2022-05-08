@@ -585,9 +585,9 @@ public class ServiceKline
     /// <summary>
     /// 交易记录转换成一条K线
     /// </summary>
-    /// <param name="cycle"></param>
-    /// <param name="start"></param>
-    /// <param name="deals"></param>
+    /// <param name="cycle">k线类型</param>
+    /// <param name="start">开始时间</param>
+    /// <param name="deals">交易记录</param>
     /// <returns></returns>
     public Kline? DealToKline(E_KlineType cycle, DateTimeOffset start, List<Deal> deals)
     {
@@ -618,9 +618,9 @@ public class ServiceKline
     }
 
     /// <summary>
-    /// 删除redis数据
+    /// 删除redis kline数据
     /// </summary>
-    /// <param name="market"></param>
+    /// <param name="market">交易对</param>
     public void DeleteRedisKline(long market)
     {
         FactoryService.instance.constant.redis.KeyDelete(FactoryService.instance.GetRedisKlineing(market));

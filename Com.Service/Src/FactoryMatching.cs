@@ -58,7 +58,7 @@ public class FactoryMatching
     /// <summary>
     /// 服务:获取服务状态
     /// </summary>
-    /// <param name="marketInfo"></param>
+    /// <param name="info">交易基础信息</param>
     /// <returns></returns>
     public Market ServiceGetStatus(Market info)
     {
@@ -99,7 +99,7 @@ public class FactoryMatching
             if (!model.mq_consumer.Contains(receive_match_order.consume_tag))
             {
                 model.mq_consumer.Add(receive_match_order.consume_tag);
-            }           
+            }
             (string queue_name, string consume_tag) order_receive = model.mq.OrderReceive();
             if (!model.mq_queues.Contains(order_receive.queue_name))
             {

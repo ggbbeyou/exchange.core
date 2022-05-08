@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using StackExchange.Redis;
 using Com.Api.Sdk.Models;
 using Com.Bll.Models;
+using Com.Bll.Util;
 
 namespace Com.Bll;
 
@@ -152,11 +153,11 @@ public class ServiceDepth
         {
             if (all)
             {
-                FactoryService.instance.constant.redis.HashSet(FactoryService.instance.GetRedisDepth(market), item.Key.ToString(), JsonConvert.SerializeObject(item.Value));
+                FactoryService.instance.constant.redis.HashSet(FactoryService.instance.GetRedisDepth(market), item.Key.ToString(), JsonConvert.SerializeObject(item.Value, new JsonConverterDecimal()));
             }
             resWebsocker.channel = item.Key;
             resWebsocker.data = item.Value;
-            FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(item.Key, market), JsonConvert.SerializeObject(resWebsocker));
+            FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(item.Key, market), JsonConvert.SerializeObject(resWebsocker, new JsonConverterDecimal()));
         }
     }
 

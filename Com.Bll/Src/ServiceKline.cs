@@ -129,7 +129,7 @@ public class ServiceKline
     /// <param name="start">开始时间</param>
     /// <param name="end">结束时间</param>
     /// <returns></returns>
-    public List<Kline>? CalcKlines(long market, E_KlineType type, DateTimeOffset? start, DateTimeOffset? end)
+    public List<Kline>? CalcKlines(long market, string symbol, E_KlineType type, DateTimeOffset? start, DateTimeOffset? end)
     {
         try
         {
@@ -140,7 +140,7 @@ public class ServiceKline
                     switch (type)
                     {
                         case E_KlineType.min1:
-                            return this.service_deal.GetKlinesMin1ByDeal(market, start, end);
+                            return this.service_deal.GetKlinesMin1ByDeal(market, symbol, start, end);
                         case E_KlineType.min5:
                             var sql5 = from kline in db.Kline.Where(P => P.market == market && P.type == E_KlineType.min1).WhereIf(start != null, P => start <= P.time_start).WhereIf(end != null, P => P.time_end <= end)
                                        orderby kline.time_start
@@ -148,6 +148,7 @@ public class ServiceKline
                                        select new Kline
                                        {
                                            market = market,
+                                           symbol = symbol,
                                            amount = g.Sum(P => P.amount),
                                            count = g.Sum(P => P.count),
                                            total = g.Sum(P => P.total),
@@ -168,6 +169,7 @@ public class ServiceKline
                                         select new Kline
                                         {
                                             market = market,
+                                            symbol = symbol,
                                             amount = g.Sum(P => P.amount),
                                             count = g.Sum(P => P.count),
                                             total = g.Sum(P => P.total),
@@ -188,6 +190,7 @@ public class ServiceKline
                                         select new Kline
                                         {
                                             market = market,
+                                            symbol = symbol,
                                             amount = g.Sum(P => P.amount),
                                             count = g.Sum(P => P.count),
                                             total = g.Sum(P => P.total),
@@ -208,6 +211,7 @@ public class ServiceKline
                                            select new Kline
                                            {
                                                market = market,
+                                               symbol = symbol,
                                                amount = g.Sum(P => P.amount),
                                                count = g.Sum(P => P.count),
                                                total = g.Sum(P => P.total),
@@ -228,6 +232,7 @@ public class ServiceKline
                                            select new Kline
                                            {
                                                market = market,
+                                               symbol = symbol,
                                                amount = g.Sum(P => P.amount),
                                                count = g.Sum(P => P.count),
                                                total = g.Sum(P => P.total),
@@ -248,6 +253,7 @@ public class ServiceKline
                                             select new Kline
                                             {
                                                 market = market,
+                                                symbol = symbol,
                                                 amount = g.Sum(P => P.amount),
                                                 count = g.Sum(P => P.count),
                                                 total = g.Sum(P => P.total),
@@ -268,6 +274,7 @@ public class ServiceKline
                                           select new Kline
                                           {
                                               market = market,
+                                              symbol = symbol,
                                               amount = g.Sum(P => P.amount),
                                               count = g.Sum(P => P.count),
                                               total = g.Sum(P => P.total),
@@ -288,6 +295,7 @@ public class ServiceKline
                                            select new Kline
                                            {
                                                market = market,
+                                               symbol = symbol,
                                                amount = g.Sum(P => P.amount),
                                                count = g.Sum(P => P.count),
                                                total = g.Sum(P => P.total),
@@ -308,6 +316,7 @@ public class ServiceKline
                                             select new Kline
                                             {
                                                 market = market,
+                                                symbol = symbol,
                                                 amount = g.Sum(P => P.amount),
                                                 count = g.Sum(P => P.count),
                                                 total = g.Sum(P => P.total),
@@ -359,7 +368,7 @@ public class ServiceKline
         foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
         {
             Kline? last_kline = this.GetLastKline(market, cycle);
-            List<Kline>? kline = this.CalcKlines(market, cycle, last_kline?.time_end ?? FactoryService.instance.system_init, end);
+            List<Kline>? kline = this.CalcKlines(market, symbol, cycle, last_kline?.time_end ?? FactoryService.instance.system_init, end);
             if (kline != null && kline.Count > 0)
             {
                 int count = this.SaveKline(market, symbol, cycle, kline);

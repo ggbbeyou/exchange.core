@@ -71,10 +71,11 @@ public class ServiceDeal
     /// 交易记录转换成一分钟K线
     /// </summary>
     /// <param name="market">交易对</param>
+    /// <param name="symbol">交易对</param>
     /// <param name="start">开始时间</param>
     /// <param name="end">结束时间</param>
     /// <returns></returns>
-    public List<Kline>? GetKlinesMin1ByDeal(long market, DateTimeOffset? start, DateTimeOffset? end)
+    public List<Kline>? GetKlinesMin1ByDeal(long market, string symbol, DateTimeOffset? start, DateTimeOffset? end)
     {
         try
         {
@@ -87,6 +88,7 @@ public class ServiceDeal
                               select new Kline
                               {
                                   market = market,
+                                  symbol = symbol,
                                   amount = g.Sum(P => P.amount),
                                   count = g.Count(),
                                   total = g.Sum(P => P.total),

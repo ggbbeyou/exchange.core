@@ -182,6 +182,8 @@ public class FactoryMatching
     /// <summary>
     /// 服务:预热缓存
     /// </summary>
+    /// <param name="info">交易对基础信息</param>
+    /// <returns></returns>
     private bool ServiceWarmCache(Market info)
     {
         FactoryService.instance.constant.stopwatch.Restart();

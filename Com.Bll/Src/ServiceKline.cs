@@ -345,7 +345,7 @@ public class ServiceKline
     public void DBtoRedised(long market, string symbol, DateTimeOffset end)
     {
         Dictionary<E_KlineType, List<Kline>> klines = SyncKlines(market, symbol, end);
-        DbSaveRedis(market, end);
+        DbSaveRedis(market, klines);
     }
 
     /// <summary>

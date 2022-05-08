@@ -344,7 +344,7 @@ public class ServiceKline
     /// <param name="end">结束时间</param>
     public void DBtoRedised(long market, string symbol, DateTimeOffset end)
     {
-        SyncKlines(market, symbol, end);
+        Dictionary<E_KlineType, List<Kline>> klines = SyncKlines(market, symbol, end);
         DbSaveRedis(market, end);
     }
 
@@ -353,17 +353,20 @@ public class ServiceKline
     /// </summary>
     /// <param name="market">交易对</param>
     /// <param name="end">结束时间</param>
-    public void SyncKlines(long market, string symbol, DateTimeOffset end)
+    public Dictionary<E_KlineType, List<Kline>> SyncKlines(long market, string symbol, DateTimeOffset end)
     {
+        Dictionary<E_KlineType, List<Kline>> klines = new Dictionary<E_KlineType, List<Kline>>();
         foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
         {
             Kline? last_kline = this.GetLastKline(market, cycle);
-            List<Kline>? klines = this.CalcKlines(market, cycle, last_kline?.time_end ?? FactoryService.instance.system_init, end);
-            if (klines != null)
+            List<Kline>? kline = this.CalcKlines(market, cycle, last_kline?.time_end ?? FactoryService.instance.system_init, end);
+            if (kline != null)
             {
-                int count = this.SaveKline(market, symbol, cycle, klines);
+                int count = this.SaveKline(market, symbol, cycle, kline);
+                klines.Add(cycle, kline);
             }
         }
+        return klines;
     }
 
     /// <summary>
@@ -385,6 +388,30 @@ public class ServiceKline
                     entries[i] = new SortedSetEntry(JsonConvert.SerializeObject(klines[i], new JsonConverterDecimal()), klines[i].time_start.ToUnixTimeMilliseconds());
                 }
                 FactoryService.instance.constant.redis.SortedSetAdd(FactoryService.instance.GetRedisKline(market, cycle), entries);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 将DB中的K线数据保存到Redis
+    /// </summary>
+    /// <param name="market">交易对</param>
+    /// <param name="end">结束时间</param>
+    public void DbSaveRedis(long market, Dictionary<E_KlineType, List<Kline>> klines)
+    {
+        foreach (var item in klines)
+        {
+            Kline? Last_kline = GetRedisLastKline(market, item.Key);
+            DateTimeOffset start = Last_kline?.time_end ?? FactoryService.instance.system_init;
+            List<Kline> kline = item.Value.Where(P => P.time_start > start).ToList();
+            if (kline.Count() > 0)
+            {
+                SortedSetEntry[] entries = new SortedSetEntry[kline.Count()];
+                for (int i = 0; i < kline.Count(); i++)
+                {
+                    entries[i] = new SortedSetEntry(JsonConvert.SerializeObject(kline[i], new JsonConverterDecimal()), kline[i].time_start.ToUnixTimeMilliseconds());
+                }
+                FactoryService.instance.constant.redis.SortedSetAdd(FactoryService.instance.GetRedisKline(market, item.Key), entries);
             }
         }
     }

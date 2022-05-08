@@ -22,11 +22,8 @@ public class Kline : ResKline
     /// 交易对
     /// </summary>
     /// <value></value>
-    public long market { get; set; } 
-    /// <summary>
-    /// 更新时间
-    /// </summary>
-    /// <value></value>
-    public DateTimeOffset time { get; set; }
+    [JsonIgnore]
+    public long market { get; set; }
+
 
 }

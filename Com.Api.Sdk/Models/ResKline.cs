@@ -73,5 +73,10 @@ public class ResKline
     /// </summary>
     /// <value></value>
     public DateTimeOffset time_end { get; set; }
+    /// <summary>
+    /// 更新时间
+    /// </summary>
+    /// <value></value>
+    public DateTimeOffset time { get; set; }
 
 }

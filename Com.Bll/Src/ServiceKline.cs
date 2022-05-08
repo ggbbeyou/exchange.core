@@ -360,7 +360,7 @@ public class ServiceKline
         {
             Kline? last_kline = this.GetLastKline(market, cycle);
             List<Kline>? kline = this.CalcKlines(market, cycle, last_kline?.time_end ?? FactoryService.instance.system_init, end);
-            if (kline != null)
+            if (kline != null && kline.Count > 0)
             {
                 int count = this.SaveKline(market, symbol, cycle, kline);
                 klines.Add(cycle, kline);

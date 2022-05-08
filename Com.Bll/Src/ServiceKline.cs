@@ -468,11 +468,10 @@ public class ServiceKline
     /// 缓存预热(未确定K线)
     /// </summary>
     /// <param name="market">交易对</param>
-    public void DBtoRedising(long market, string symbol)
+    public void DBtoRedising(long market, string symbol, DateTimeOffset now)
     {
         foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
         {
-            DateTimeOffset now = DateTimeOffset.UtcNow;
             (DateTimeOffset start, DateTimeOffset end) startend = KlineTime(cycle, now);
             Kline? kline_new = this.service_deal.GetKlinesByDeal(market, cycle, startend.start, null);
             if (kline_new == null)

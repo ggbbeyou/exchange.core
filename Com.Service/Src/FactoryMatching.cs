@@ -171,7 +171,7 @@ public class FactoryMatching
         }
         //交易记录数据从DB同步到Redis 至少保存最近3个月记录
         FactoryService.instance.constant.stopwatch.Restart();
-        long delete = this.deal_service.DeleteDeal(info.market, DateTimeOffset.UtcNow.AddMonths(-2));
+        long delete = this.deal_service.DeleteDeal(info.market, DateTimeOffset.UtcNow.AddDays(-10));
         ServiceDepth.instance.DeleteRedisDepth(info.market);
         kline_service.DeleteRedisKline(info.market);
         FactoryService.instance.constant.stopwatch.Stop();
@@ -186,11 +186,11 @@ public class FactoryMatching
     {
         FactoryService.instance.constant.stopwatch.Restart();
         DateTimeOffset now = DateTimeOffset.UtcNow;
-        now = now.AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond);
-        this.deal_service.DealDbToRedis(info.market, now.AddMonths(-2));
-        DateTimeOffset end = now.AddMilliseconds(-1);
+        DateTimeOffset end = now.AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond);
+        this.deal_service.DealDbToRedis(info.market, end.AddDays(-10));
+        end = end.AddMilliseconds(-1);
         this.kline_service.DBtoRedised(info.market, info.symbol, end);
-        this.kline_service.DBtoRedising(info.market, info.symbol);
+        this.kline_service.DBtoRedising(info.market, info.symbol, now);
         order_service.PushOrderToMqRedis(info.market);
         FactoryService.instance.constant.stopwatch.Stop();
         FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{info.symbol}:redis=>预热缓存");

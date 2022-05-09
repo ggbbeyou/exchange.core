@@ -31,14 +31,9 @@ using System.Text;
 using Com.Bll;
 using Com.Db;
 using Com.Api.Sdk.Enum;
-
-using Com.Service.Match;
 using Com.Service.Models;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using RabbitMQ.Client;
-using RabbitMQ.Client.Events;
 using StackExchange.Redis;
 using Com.Api.Sdk.Models;
 using Com.Bll.Util;

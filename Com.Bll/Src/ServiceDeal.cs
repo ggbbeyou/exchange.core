@@ -83,10 +83,11 @@ public class ServiceDeal
             {
                 using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
                 {
-                    var sql = from deal in db.Deal.Where(P => P.market == market).WhereIf(start != null, P => start < P.time).WhereIf(end != null, P => P.time <= end).OrderBy(P => P.time)
+                    var sql = from deal in db.Deal.Where(P => P.market == market).WhereIf(start != null, P => start <= P.time).WhereIf(end != null, P => P.time <= end).OrderBy(P => P.time)
                               group deal by EF.Functions.DateDiffMinute(FactoryService.instance.system_init, deal.time) into g
                               select new Kline
                               {
+                                  id = FactoryService.instance.constant.worker.NextId(),
                                   market = market,
                                   symbol = symbol,
                                   amount = g.Sum(P => P.amount),

@@ -418,9 +418,13 @@ public class ServiceKline
     {
         foreach (var item in klines)
         {
+            DateTimeOffset start = FactoryService.instance.system_init;
             Kline? Last_kline = GetRedisLastKline(market, item.Key);
-            DateTimeOffset start = Last_kline?.time_end ?? FactoryService.instance.system_init;
-            List<Kline> kline = item.Value.Where(P => P.time_start > start).ToList();
+            if (Last_kline != null)
+            {
+                start = Last_kline.time_end.AddMilliseconds(1);
+            }
+            List<Kline> kline = item.Value.Where(P => P.time_start >= start).ToList();
             if (kline.Count() > 0)
             {
                 SortedSetEntry[] entries = new SortedSetEntry[kline.Count()];
@@ -490,7 +494,7 @@ public class ServiceKline
         foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
         {
             (DateTimeOffset start, DateTimeOffset end) startend = KlineTime(cycle, now);
-            Kline? kline_new = this.service_deal.GetKlinesByDeal(market, cycle, startend.start, null);
+            Kline? kline_new = this.service_deal.GetKlinesByDeal(market, cycle, startend.start, startend.end);
             if (kline_new == null)
             {
                 Deal? last_deal = service_deal.GetRedisLastDeal(market);

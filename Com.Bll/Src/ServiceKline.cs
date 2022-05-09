@@ -62,14 +62,64 @@ public class ServiceKline
         }
     }
 
+    /*
+        /// <summary>
+        /// 保存K线
+        /// </summary>
+        /// <param name="market">交易对</param>
+        /// <param name="type">K线类型</param>
+        /// <param name="klines">K线集合</param>
+        /// <returns></returns>
+        public int SaveKline(long market, string symbol, E_KlineType type, List<Kline> klines)
+        {
+            if (klines == null || klines.Count == 0)
+            {
+                return 0;
+            }
+            using (var scope = FactoryService.instance.constant.provider.CreateScope())
+            {
+                using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
+                {
+                    List<Kline> db_kline = db.Kline.Where(P => P.market == market && P.type == type && P.time_start >= klines[0].time_start && P.time_end <= klines[klines.Count - 1].time_end).ToList();
+                    foreach (var item in klines)
+                    {
+                        Kline? kline = db_kline.FirstOrDefault(P => P.time_start == item.time_start);
+                        if (kline == null)
+                        {
+                            kline = new Kline();
+                            kline.id = FactoryService.instance.constant.worker.NextId();
+                            kline.time_start = item.time_start;
+                            kline.time_end = item.time_end;
+                            kline.time = item.time;
+                            db.Kline.Add(kline);
+                        }
+                        kline.market = market;
+                        kline.symbol = symbol;
+                        kline.type = type;
+                        kline.amount = item.amount;
+                        kline.count = item.count;
+                        kline.total = item.total;
+                        kline.open = item.open;
+                        kline.close = item.close;
+                        kline.low = item.low;
+                        kline.high = item.high;
+                        kline.time_start = item.time_start;
+                        kline.time_end = item.time_end;
+                        kline.time = item.time;
+                    }
+                    db.Kline.AddRange(klines);
+                    return db.SaveChanges();
+                }
+            }
+        }        
+    */
+
     /// <summary>
-    /// 保存K线
+    /// 保存k线记录
     /// </summary>
-    /// <param name="market">交易对</param>
-    /// <param name="type">K线类型</param>
-    /// <param name="klines">K线集合</param>
+    /// <param name="klines">集合</param>
     /// <returns></returns>
-    public int SaveKline(long market, string symbol, E_KlineType type, List<Kline> klines)
+    public int SaveKline(List<Kline> klines)
     {
         if (klines == null || klines.Count == 0)
         {
@@ -79,33 +129,6 @@ public class ServiceKline
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
             {
-                // List<Kline> db_kline = db.Kline.Where(P => P.market == market && P.type == type && P.time_start >= klines[0].time_start && P.time_end <= klines[klines.Count - 1].time_end).ToList();
-                // foreach (var item in klines)
-                // {
-                //     Kline? kline = db_kline.FirstOrDefault(P => P.time_start == item.time_start);
-                //     if (kline == null)
-                //     {
-                //         kline = new Kline();
-                //         kline.id = FactoryService.instance.constant.worker.NextId();
-                //         kline.time_start = item.time_start;
-                //         kline.time_end = item.time_end;
-                //         kline.time = item.time;
-                //         db.Kline.Add(kline);
-                //     }
-                //     kline.market = market;
-                //     kline.symbol = symbol;
-                //     kline.type = type;
-                //     kline.amount = item.amount;
-                //     kline.count = item.count;
-                //     kline.total = item.total;
-                //     kline.open = item.open;
-                //     kline.close = item.close;
-                //     kline.low = item.low;
-                //     kline.high = item.high;
-                //     kline.time_start = item.time_start;
-                //     kline.time_end = item.time_end;
-                //     kline.time = item.time;
-                // }
                 db.Kline.AddRange(klines);
                 return db.SaveChanges();
             }
@@ -378,7 +401,7 @@ public class ServiceKline
             List<Kline>? kline = this.CalcKlines(market, symbol, cycle, start, end);
             if (kline != null && kline.Count > 0)
             {
-                int count = this.SaveKline(market, symbol, cycle, kline);
+                int count = this.SaveKline(kline);
                 klines.Add(cycle, kline);
             }
         }

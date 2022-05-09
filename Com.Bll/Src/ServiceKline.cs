@@ -351,10 +351,11 @@ public class ServiceKline
     /// </summary>
     /// <param name="markets">交易对</param>
     /// <param name="end">结束时间</param>
-    public void DBtoRedised(long market, string symbol, DateTimeOffset end)
+    public Dictionary<E_KlineType, List<Kline>> DBtoRedised(long market, string symbol, DateTimeOffset end)
     {
         Dictionary<E_KlineType, List<Kline>> klines = SyncKlines(market, symbol, end);
         DbSaveRedis(market, klines);
+        return klines;
     }
 
     /// <summary>
@@ -536,8 +537,9 @@ public class ServiceKline
     /// <param name="market"></param>
     /// <param name="symbol"></param>
     /// <param name="deals"></param>
-    public void DBtoRedising(long market, string symbol, List<Deal> deals)
+    public Dictionary<E_KlineType, Kline> DBtoRedising(long market, string symbol, List<Deal> deals)
     {
+        Dictionary<E_KlineType, Kline> klines = new Dictionary<E_KlineType, Kline>();
         DateTimeOffset now = DateTimeOffset.UtcNow;
         foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
         {
@@ -566,7 +568,9 @@ public class ServiceKline
                 }
             }
             FactoryService.instance.constant.redis.HashSet(FactoryService.instance.GetRedisKlineing(market), cycle.ToString(), JsonConvert.SerializeObject(kline_new, new JsonConverterDecimal()));
+            klines.Add(cycle, kline_new);
         }
+        return klines;
     }
 
     #endregion

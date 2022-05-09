@@ -150,7 +150,7 @@ public class Core
             ReceiveDealOrder(process, deals.orders, deals.deals, deals.cancels);
             this.stopwatch.Stop();
             FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{this.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:撮合后续处理总时间(成交记录数:{deals.deals.Count},成交订单数:{deals.orders.Count},撤单数:{deals.cancels.Count}),处理结果:{JsonConvert.SerializeObject(process)}");
-            if (process.match && process.asset && process.running_fee && process.deal && process.order && process.order_cancel && process.order_complete_thaw && process.push_order && process.push_order_cancel && process.sync_kline && process.push_kline && process.push_deal && process.push_ticker)
+            if (process.match && process.asset && process.running_fee && process.deal && process.order && process.order_cancel && process.order_complete_thaw && process.push_order && process.push_order_cancel && process.sync_kline && process.push_deal && process.push_ticker)
             {
                 FactoryService.instance.constant.redis.HashDelete(FactoryService.instance.GetRedisProcess(), process.no);
                 return true;
@@ -287,11 +287,34 @@ public class Core
             if (process.sync_kline == false)
             {
                 FactoryService.instance.constant.stopwatch.Restart();
-                this.service_kline.DBtoRedised(this.model.info.market, this.model.info.symbol, deals.Max(P => P.time));
-                this.service_kline.DBtoRedising(this.model.info.market, this.model.info.symbol, deals);
+                Dictionary<E_KlineType, List<Kline>> klines = this.service_kline.DBtoRedised(this.model.info.market, this.model.info.symbol, deals.Max(P => P.time));
+                Dictionary<E_KlineType, Kline> klineing = this.service_kline.DBtoRedising(this.model.info.market, this.model.info.symbol, deals);
                 process.sync_kline = true;
                 FactoryService.instance.constant.stopwatch.Stop();
-                FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>同步K线记录");
+                FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB,redis=>同步K线记录");
+                FactoryService.instance.constant.stopwatch.Restart();
+                DateTimeOffset start = deals.Min(P => P.time);
+                foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
+                {
+                    List<ResKline> push_kline = new List<ResKline>();
+                    if (klines.ContainsKey(cycle))
+                    {
+                        push_kline = klines[cycle].ConvertAll(P => (ResKline)P);
+                    }
+                    if (klineing.ContainsKey(cycle))
+                    {
+                        push_kline.RemoveAll(P => P.time_start == klineing[cycle].time_start);
+                        push_kline.Add(klineing[cycle]);
+                    }
+                    if (push_kline.Count > 0)
+                    {
+                        res_kline.channel = (E_WebsockerChannel)Enum.Parse(typeof(E_WebsockerChannel), cycle.ToString());
+                        res_kline.data = push_kline;
+                        FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(res_kline.channel, this.model.info.market), JsonConvert.SerializeObject(res_kline));
+                    }
+                }
+                FactoryService.instance.constant.stopwatch.Stop();
+                FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:Mq=>推送K线记录");
             }
             if (process.push_deal == false)
             {
@@ -309,25 +332,7 @@ public class Core
                 FactoryService.instance.constant.stopwatch.Stop();
                 FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:Mq,Redis=>推送交易记录");
             }
-            if (process.push_kline == false)
-            {
-                FactoryService.instance.constant.stopwatch.Restart();
-                DateTimeOffset start = deals.Min(P => P.time);
-                foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
-                {
-                    (DateTimeOffset start, DateTimeOffset end) startend = service_kline.KlineTime(cycle, start);
-                    Res<List<ResKline>?> res = service_market.Klines(this.model.info.symbol, cycle, startend.start, null, 0, 50);
-                    if (res.code == E_Res_Code.ok && res.data != null && res.data.Count > 0)
-                    {
-                        res_kline.channel = (E_WebsockerChannel)Enum.Parse(typeof(E_WebsockerChannel), cycle.ToString());
-                        res_kline.data = res.data;
-                        process.push_kline = process.push_kline && FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(res_kline.channel, this.model.info.market), JsonConvert.SerializeObject(res_kline));
-                    }
-                }
-                process.push_kline = true;
-                FactoryService.instance.constant.stopwatch.Stop();
-                FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:Mq,Redis=>推送K线记录");
-            }
+
             if (process.push_ticker == false)
             {
                 FactoryService.instance.constant.stopwatch.Restart();
@@ -347,7 +352,7 @@ public class Core
             process.order_complete_thaw = true;
             process.push_order = true;
             process.sync_kline = true;
-            process.push_kline = true;
+
             process.push_deal = true;
             process.push_ticker = true;
         }

@@ -64,15 +64,10 @@ public class Processing
     /// <value></value>
     public bool push_order_cancel { get; set; }
     /// <summary>
-    /// 保存K线
+    /// 保存K线并推送K线
     /// </summary>
     /// <value></value>
     public bool sync_kline { get; set; }
-    /// <summary>
-    /// 推送K线
-    /// </summary>
-    /// <value></value>
-    public bool push_kline { get; set; }
     /// <summary>
     /// 推送交易记录
     /// </summary>

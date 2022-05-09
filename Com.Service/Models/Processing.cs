@@ -67,7 +67,7 @@ public class Processing
     /// 保存K线并推送K线
     /// </summary>
     /// <value></value>
-    public bool sync_kline { get; set; }
+    public bool push_kline { get; set; }
     /// <summary>
     /// 推送交易记录
     /// </summary>

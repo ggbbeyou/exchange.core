@@ -150,7 +150,7 @@ public class Core
             ReceiveDealOrder(process, deals.orders, deals.deals, deals.cancels);
             this.stopwatch.Stop();
             FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{this.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:撮合后续处理总时间(成交记录数:{deals.deals.Count},成交订单数:{deals.orders.Count},撤单数:{deals.cancels.Count}),处理结果:{JsonConvert.SerializeObject(process)}");
-            if (process.match && process.asset && process.running_fee && process.deal && process.order && process.order_cancel && process.order_complete_thaw && process.push_order && process.push_order_cancel && process.sync_kline && process.push_deal && process.push_ticker)
+            if (process.match && process.asset && process.running_fee && process.deal && process.order && process.order_cancel && process.order_complete_thaw && process.push_order && process.push_order_cancel && process.push_kline && process.push_deal && process.push_ticker)
             {
                 FactoryService.instance.constant.redis.HashDelete(FactoryService.instance.GetRedisProcess(), process.no);
                 return true;
@@ -284,12 +284,12 @@ public class Core
                 process.push_order = true;
             }
             Dictionary<E_KlineType, DateTimeOffset> last_kline = new Dictionary<E_KlineType, DateTimeOffset>();
-            if (process.sync_kline == false)
+            if (process.push_kline == false)
             {
                 FactoryService.instance.constant.stopwatch.Restart();
                 Dictionary<E_KlineType, List<Kline>> klines = this.service_kline.DBtoRedised(this.model.info.market, this.model.info.symbol, deals.Max(P => P.time));
                 Dictionary<E_KlineType, Kline> klineing = this.service_kline.DBtoRedising(this.model.info.market, this.model.info.symbol, deals);
-                process.sync_kline = true;
+                process.push_kline = true;
                 FactoryService.instance.constant.stopwatch.Stop();
                 FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB,redis=>同步K线记录");
                 FactoryService.instance.constant.stopwatch.Restart();
@@ -351,7 +351,7 @@ public class Core
             process.order = true;
             process.order_complete_thaw = true;
             process.push_order = true;
-            process.sync_kline = true;
+            process.push_kline = true;
 
             process.push_deal = true;
             process.push_ticker = true;

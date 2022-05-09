@@ -168,7 +168,7 @@ public class Core
     /// <param name="cancels">撤单订单</param>
     private void ReceiveDealOrder(Processing process, List<Orders> orders, List<Deal> deals, List<Orders> cancels)
     {
-        FactoryService.instance.constant.logger.LogTrace($"线程Id({model.info.symbol}):{Thread.CurrentThread.ManagedThreadId.ToString()}");
+        FactoryService.instance.constant.logger.LogInformation($"线程Id({model.info.symbol}):{Thread.CurrentThread.ManagedThreadId.ToString()}");
         if (deals.Count > 0)
         {
             if (process.asset == false)

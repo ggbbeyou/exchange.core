@@ -65,7 +65,6 @@ public class ServiceMarket
         List<Market> market = this.GetMarketBySymbol(symbol);
         if (market != null)
         {
-
             res.code = E_Res_Code.ok;
             res.data = new List<ResTicker>();
             foreach (var item in market)
@@ -106,7 +105,6 @@ public class ServiceMarket
             {
                 return res;
             }
-
             res.code = E_Res_Code.ok;
             res.data = JsonConvert.DeserializeObject<ResDepth>(rv);
         }

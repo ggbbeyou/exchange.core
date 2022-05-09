@@ -332,7 +332,6 @@ public class Core
                 FactoryService.instance.constant.stopwatch.Stop();
                 FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:Mq,Redis=>推送交易记录");
             }
-
             if (process.push_ticker == false)
             {
                 FactoryService.instance.constant.stopwatch.Restart();
@@ -352,7 +351,6 @@ public class Core
             process.order_complete_thaw = true;
             process.push_order = true;
             process.push_kline = true;
-
             process.push_deal = true;
             process.push_ticker = true;
         }

@@ -43,24 +43,27 @@ public class ServiceKline
         }
     }
 
-    /// <summary>
-    ///  从数据库获取K线数据
-    /// </summary>
-    /// <param name="market">交易对</param>
-    /// <param name="type">K线类型</param>
-    /// <param name="start">开始时间</param>
-    /// <param name="end">结束时间</param>
-    /// <returns></returns>
-    public List<Kline> GetKlines(long market, E_KlineType type, DateTimeOffset start, DateTimeOffset end)
-    {
-        using (var scope = FactoryService.instance.constant.provider.CreateScope())
+    /*
+        /// <summary>
+        ///  从数据库获取K线数据
+        /// </summary>
+        /// <param name="market">交易对</param>
+        /// <param name="type">K线类型</param>
+        /// <param name="start">开始时间</param>
+        /// <param name="end">结束时间</param>
+        /// <returns></returns>
+        public List<Kline> GetKlines(long market, E_KlineType type, DateTimeOffset start, DateTimeOffset end)
         {
-            using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
+            using (var scope = FactoryService.instance.constant.provider.CreateScope())
             {
-                return db.Kline.AsNoTracking().Where(P => P.market == market && P.type == type && P.time_start >= start && P.time_start <= end).OrderBy(P => P.time_start).ToList();
+                using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)
+                {
+                    return db.Kline.AsNoTracking().Where(P => P.market == market && P.type == type && P.time_start >= start && P.time_start <= end).OrderBy(P => P.time_start).ToList();
+                }
             }
         }
-    }
+
+        */
 
     /*
         /// <summary>
@@ -477,32 +480,34 @@ public class ServiceKline
         return null;
     }
 
-    /// <summary>
-    /// 从redis获取的K线
-    /// </summary>
-    /// <param name="market">交易对</param>
-    /// <param name="klineType">K线类型</param>
-    /// <returns></returns>
-    public List<Kline> GetRedisKline(long market, E_KlineType klineType, DateTimeOffset? start, DateTimeOffset? end)
-    {
-        List<Kline> klines = new List<Kline>();
-        double start1 = double.NegativeInfinity;
-        double stop1 = double.PositiveInfinity;
-        if (start != null)
+    /*
+        /// <summary>
+        /// 从redis获取的K线
+        /// </summary>
+        /// <param name="market">交易对</param>
+        /// <param name="klineType">K线类型</param>
+        /// <returns></returns>
+        public List<Kline> GetRedisKline(long market, E_KlineType klineType, DateTimeOffset? start, DateTimeOffset? end)
         {
-            start1 = start.Value.ToUnixTimeMilliseconds();
+            List<Kline> klines = new List<Kline>();
+            double start1 = double.NegativeInfinity;
+            double stop1 = double.PositiveInfinity;
+            if (start != null)
+            {
+                start1 = start.Value.ToUnixTimeMilliseconds();
+            }
+            if (end != null)
+            {
+                stop1 = end.Value.ToUnixTimeMilliseconds();
+            }
+            RedisValue[] redisvalue = FactoryService.instance.constant.redis.SortedSetRangeByScore(key: FactoryService.instance.GetRedisKline(market, klineType), start: start1, stop: stop1, order: StackExchange.Redis.Order.Ascending);
+            foreach (var item in redisvalue)
+            {
+                klines.Add(JsonConvert.DeserializeObject<Kline>(item)!);
+            }
+            return klines;
         }
-        if (end != null)
-        {
-            stop1 = end.Value.ToUnixTimeMilliseconds();
-        }
-        RedisValue[] redisvalue = FactoryService.instance.constant.redis.SortedSetRangeByScore(key: FactoryService.instance.GetRedisKline(market, klineType), start: start1, stop: stop1, order: StackExchange.Redis.Order.Ascending);
-        foreach (var item in redisvalue)
-        {
-            klines.Add(JsonConvert.DeserializeObject<Kline>(item)!);
-        }
-        return klines;
-    }
+        */
 
     #endregion
 

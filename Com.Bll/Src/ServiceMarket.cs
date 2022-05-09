@@ -134,7 +134,7 @@ public class ServiceMarket
         {
             res.code = E_Res_Code.ok;
             res.data = new List<ResKline>();
-            RedisValue[] rv = FactoryService.instance.constant.redis.SortedSetRangeByScore(key: FactoryService.instance.GetRedisKline(market.market, type), start: start.ToUnixTimeMilliseconds(), stop: stop, exclude: Exclude.Both, skip: skip, take: take, order: StackExchange.Redis.Order.Ascending);
+            RedisValue[] rv = FactoryService.instance.constant.redis.SortedSetRangeByScore(key: FactoryService.instance.GetRedisKline(market.market, type), start: start.ToUnixTimeMilliseconds(), stop: stop, exclude: Exclude.None, skip: skip, take: take, order: StackExchange.Redis.Order.Ascending);
             foreach (var item in rv)
             {
                 if (!item.HasValue)
@@ -152,6 +152,7 @@ public class ServiceMarket
                 ResKline? resKline = JsonConvert.DeserializeObject<ResKline>(FactoryService.instance.constant.redis.HashGet(FactoryService.instance.GetRedisKlineing(market.market), type.ToString()));
                 if (resKline != null)
                 {
+                    res.data.RemoveAll(P => P.time_start == resKline.time_start);
                     res.data.Add(resKline);
                 }
             }
@@ -179,7 +180,7 @@ public class ServiceMarket
         Market? market = this.GetMarketBySymbol(symbol);
         if (market != null)
         {
-            RedisValue[] rv = FactoryService.instance.constant.redis.SortedSetRangeByScore(key: FactoryService.instance.GetRedisDeal(market.market), start: start.ToUnixTimeMilliseconds(), stop: stop, exclude: Exclude.Both, skip: skip, take: take, order: StackExchange.Redis.Order.Ascending);
+            RedisValue[] rv = FactoryService.instance.constant.redis.SortedSetRangeByScore(key: FactoryService.instance.GetRedisDeal(market.market), start: start.ToUnixTimeMilliseconds(), stop: stop, exclude: Exclude.None, skip: skip, take: take, order: StackExchange.Redis.Order.Ascending);
             foreach (var item in rv)
             {
                 if (!item.HasValue)

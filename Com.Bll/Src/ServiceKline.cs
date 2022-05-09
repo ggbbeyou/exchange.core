@@ -133,7 +133,7 @@ public class ServiceKline
                         case E_KlineType.min1:
                             return this.service_deal.GetKlinesMin1ByDeal(market, symbol, start, end);
                         case E_KlineType.min5:
-                            var sql5 = from kline in db.Kline.Where(P => P.market == market && P.type == E_KlineType.min1).WhereIf(start != null, P => start <= P.time_start).WhereIf(end != null, P => P.time_end <= end)
+                            var sql5 = from kline in db.Kline.Where(P => P.market == market && P.type == E_KlineType.min1).WhereIf(start != null, P => start < P.time_start).WhereIf(end != null, P => P.time_end <= end)
                                        orderby kline.time_start
                                        group kline by EF.Functions.DateDiffMinute(FactoryService.instance.system_init, kline.time_start) / 5 into g
                                        select new Kline
@@ -154,7 +154,7 @@ public class ServiceKline
                                        };
                             return sql5.AsNoTracking().ToList();
                         case E_KlineType.min15:
-                            var sql15 = from kline in db.Kline.Where(P => P.market == market && P.type == E_KlineType.min5).WhereIf(start != null, P => start <= P.time_start).WhereIf(end != null, P => P.time_end <= end)
+                            var sql15 = from kline in db.Kline.Where(P => P.market == market && P.type == E_KlineType.min5).WhereIf(start != null, P => start < P.time_start).WhereIf(end != null, P => P.time_end <= end)
                                         orderby kline.time_start
                                         group kline by EF.Functions.DateDiffMinute(FactoryService.instance.system_init, kline.time_start) / 15 into g
                                         select new Kline
@@ -175,7 +175,7 @@ public class ServiceKline
                                         };
                             return sql15.AsNoTracking().ToList();
                         case E_KlineType.min30:
-                            var sql30 = from kline in db.Kline.Where(P => P.market == market && P.type == E_KlineType.min15).WhereIf(start != null, P => start <= P.time_start).WhereIf(end != null, P => P.time_end <= end)
+                            var sql30 = from kline in db.Kline.Where(P => P.market == market && P.type == E_KlineType.min15).WhereIf(start != null, P => start < P.time_start).WhereIf(end != null, P => P.time_end <= end)
                                         orderby kline.time_start
                                         group kline by EF.Functions.DateDiffMinute(FactoryService.instance.system_init, kline.time_start) / 30 into g
                                         select new Kline
@@ -196,7 +196,7 @@ public class ServiceKline
                                         };
                             return sql30.AsNoTracking().ToList();
                         case E_KlineType.hour1:
-                            var sqlhour1 = from kline in db.Kline.Where(P => P.market == market && P.type == E_KlineType.min30).WhereIf(start != null, P => start <= P.time_start).WhereIf(end != null, P => P.time_end <= end)
+                            var sqlhour1 = from kline in db.Kline.Where(P => P.market == market && P.type == E_KlineType.min30).WhereIf(start != null, P => start < P.time_start).WhereIf(end != null, P => P.time_end <= end)
                                            orderby kline.time_start
                                            group kline by EF.Functions.DateDiffHour(FactoryService.instance.system_init, kline.time_start) into g
                                            select new Kline
@@ -217,7 +217,7 @@ public class ServiceKline
                                            };
                             return sqlhour1.AsNoTracking().ToList();
                         case E_KlineType.hour6:
-                            var sqlhour6 = from kline in db.Kline.Where(P => P.market == market && P.type == E_KlineType.hour1).WhereIf(start != null, P => start <= P.time_start).WhereIf(end != null, P => P.time_end <= end)
+                            var sqlhour6 = from kline in db.Kline.Where(P => P.market == market && P.type == E_KlineType.hour1).WhereIf(start != null, P => start < P.time_start).WhereIf(end != null, P => P.time_end <= end)
                                            orderby kline.time_start
                                            group kline by EF.Functions.DateDiffHour(FactoryService.instance.system_init, kline.time_start) / 6 into g
                                            select new Kline
@@ -238,7 +238,7 @@ public class ServiceKline
                                            };
                             return sqlhour6.AsNoTracking().ToList();
                         case E_KlineType.hour12:
-                            var sqlhour12 = from kline in db.Kline.Where(P => P.market == market && P.type == E_KlineType.hour6).WhereIf(start != null, P => start <= P.time_start).WhereIf(end != null, P => P.time_end <= end)
+                            var sqlhour12 = from kline in db.Kline.Where(P => P.market == market && P.type == E_KlineType.hour6).WhereIf(start != null, P => start < P.time_start).WhereIf(end != null, P => P.time_end <= end)
                                             orderby kline.time_start
                                             group kline by EF.Functions.DateDiffHour(FactoryService.instance.system_init, kline.time_start) / 12 into g
                                             select new Kline
@@ -259,7 +259,7 @@ public class ServiceKline
                                             };
                             return sqlhour12.AsNoTracking().ToList();
                         case E_KlineType.day1:
-                            var sqlday1 = from kline in db.Kline.Where(P => P.market == market && P.type == E_KlineType.hour12).WhereIf(start != null, P => start <= P.time_start).WhereIf(end != null, P => P.time_end <= end)
+                            var sqlday1 = from kline in db.Kline.Where(P => P.market == market && P.type == E_KlineType.hour12).WhereIf(start != null, P => start < P.time_start).WhereIf(end != null, P => P.time_end <= end)
                                           orderby kline.time_start
                                           group kline by EF.Functions.DateDiffDay(FactoryService.instance.system_init, kline.time_start) into g
                                           select new Kline
@@ -280,7 +280,7 @@ public class ServiceKline
                                           };
                             return sqlday1.AsNoTracking().ToList();
                         case E_KlineType.week1:
-                            var sqlweek1 = from kline in db.Kline.Where(P => P.market == market && P.type == E_KlineType.day1).WhereIf(start != null, P => start <= P.time_start).WhereIf(end != null, P => P.time_end <= end)
+                            var sqlweek1 = from kline in db.Kline.Where(P => P.market == market && P.type == E_KlineType.day1).WhereIf(start != null, P => start < P.time_start).WhereIf(end != null, P => P.time_end <= end)
                                            orderby kline.time_start
                                            group kline by EF.Functions.DateDiffWeek(FactoryService.instance.system_init, kline.time_start) into g
                                            select new Kline
@@ -301,7 +301,7 @@ public class ServiceKline
                                            };
                             return sqlweek1.AsNoTracking().ToList();
                         case E_KlineType.month1:
-                            var sqlmonth1 = from kline in db.Kline.Where(P => P.market == market && P.type == E_KlineType.day1).WhereIf(start != null, P => start <= P.time_start).WhereIf(end != null, P => P.time_end <= end)
+                            var sqlmonth1 = from kline in db.Kline.Where(P => P.market == market && P.type == E_KlineType.day1).WhereIf(start != null, P => start < P.time_start).WhereIf(end != null, P => P.time_end <= end)
                                             orderby kline.time_start
                                             group kline by EF.Functions.DateDiffMonth(FactoryService.instance.system_init, kline.time_start) into g
                                             select new Kline

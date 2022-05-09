@@ -1,19 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Threading;
-using System.Threading.Tasks;
-using Com.Bll;
 using Com.Db;
 using Com.Api.Sdk.Enum;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using Newtonsoft.Json;
-using StackExchange;
 using StackExchange.Redis;
 using Com.Bll.Util;
 
@@ -380,28 +370,30 @@ public class ServiceKline
         return klines;
     }
 
-    /// <summary>
-    /// 将DB中的K线数据保存到Redis
-    /// </summary>
-    /// <param name="market">交易对</param>
-    /// <param name="end">结束时间</param>
-    public void DbSaveRedis(long market, DateTimeOffset end)
-    {
-        foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
+    /*
+        /// <summary>
+        /// 将DB中的K线数据保存到Redis
+        /// </summary>
+        /// <param name="market">交易对</param>
+        /// <param name="end">结束时间</param>
+        public void DbSaveRedis(long market, DateTimeOffset end)
         {
-            Kline? Last_kline = GetRedisLastKline(market, cycle);
-            List<Kline> klines = this.GetKlines(market, cycle, Last_kline?.time_end ?? FactoryService.instance.system_init, end);
-            if (klines.Count() > 0)
+            foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
             {
-                SortedSetEntry[] entries = new SortedSetEntry[klines.Count()];
-                for (int i = 0; i < klines.Count(); i++)
+                Kline? Last_kline = GetRedisLastKline(market, cycle);
+                List<Kline> klines = this.GetKlines(market, cycle, Last_kline?.time_end ?? FactoryService.instance.system_init, end);
+                if (klines.Count() > 0)
                 {
-                    entries[i] = new SortedSetEntry(JsonConvert.SerializeObject(klines[i], new JsonConverterDecimal()), klines[i].time_start.ToUnixTimeMilliseconds());
+                    SortedSetEntry[] entries = new SortedSetEntry[klines.Count()];
+                    for (int i = 0; i < klines.Count(); i++)
+                    {
+                        entries[i] = new SortedSetEntry(JsonConvert.SerializeObject(klines[i], new JsonConverterDecimal()), klines[i].time_start.ToUnixTimeMilliseconds());
+                    }
+                    FactoryService.instance.constant.redis.SortedSetAdd(FactoryService.instance.GetRedisKline(market, cycle), entries);
                 }
-                FactoryService.instance.constant.redis.SortedSetAdd(FactoryService.instance.GetRedisKline(market, cycle), entries);
             }
         }
-    }
+        */
 
     /// <summary>
     /// 将DB中的K线数据保存到Redis

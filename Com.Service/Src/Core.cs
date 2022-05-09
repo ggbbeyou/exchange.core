@@ -77,6 +77,11 @@ public class Core
     /// <returns></returns>
     private ServiceWallet service_wallet = new ServiceWallet();
     /// <summary>
+    /// 交易对服务
+    /// </summary>
+    /// <returns></returns>
+    private ServiceMarket service_market = new ServiceMarket();
+    /// <summary>
     /// 秒表
     /// </summary>
     /// <returns></returns>
@@ -91,7 +96,7 @@ public class Core
     /// </summary>
     /// <typeparam name="Kline?"></typeparam>
     /// <returns></returns>
-    private ResWebsocker<List<Kline>> res_kline = new ResWebsocker<List<Kline>>();
+    private ResWebsocker<List<ResKline>> res_kline = new ResWebsocker<List<ResKline>>();
     /// <summary>
     /// 临时变量
     /// </summary>
@@ -114,7 +119,7 @@ public class Core
         res_deal.channel = E_WebsockerChannel.trades;
         res_kline.success = true;
         res_kline.op = E_WebsockerOp.subscribe_event;
-        res_kline.data = new List<Kline>();
+        res_kline.data = new List<ResKline>();
     }
 
     /// <summary>
@@ -309,22 +314,15 @@ public class Core
                 FactoryService.instance.constant.stopwatch.Restart();
                 DateTimeOffset start = deals.Min(P => P.time);
                 DateTimeOffset end = deals.Max(P => P.time);
-                HashEntry[] hashes = FactoryService.instance.constant.redis.HashGetAll(FactoryService.instance.GetRedisKlineing(this.model.info.market));
                 foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
                 {
-                    List<Kline> klines = service_kline.GetRedisKline(this.model.info.market, cycle, start, end);
-                    RedisValue rv = hashes.FirstOrDefault(P => P.Name == cycle.ToString()).Value;
-                    if (rv.HasValue)
+                    Res<List<ResKline>?> res = service_market.Klines(this.model.info.symbol, cycle, start, end, 0, 50);
+                    if (res.code == E_Res_Code.ok && res.data != null && res.data.Count > 0)
                     {
-                        Kline? kline = JsonConvert.DeserializeObject<Kline>(rv);
-                        if (kline != null)
-                        {
-                            klines.Add(kline);
-                        }
+                        res_kline.channel = (E_WebsockerChannel)Enum.Parse(typeof(E_WebsockerChannel), cycle.ToString());
+                        res_kline.data = res.data;
+                        process.push_kline = process.push_kline && FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(res_kline.channel, this.model.info.market), JsonConvert.SerializeObject(res_kline));
                     }
-                    res_kline.channel = (E_WebsockerChannel)Enum.Parse(typeof(E_WebsockerChannel), cycle.ToString());
-                    res_kline.data = klines;
-                    process.push_kline = process.push_kline && FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(res_kline.channel, this.model.info.market), JsonConvert.SerializeObject(res_kline));
                 }
                 process.push_kline = true;
                 FactoryService.instance.constant.stopwatch.Stop();

@@ -134,7 +134,6 @@ public class ServiceMarket
         Market? market = this.GetMarketBySymbol(symbol);
         if (market != null)
         {
-
             res.code = E_Res_Code.ok;
             res.data = new List<ResKline>();
             RedisValue[] rv = FactoryService.instance.constant.redis.SortedSetRangeByScore(key: FactoryService.instance.GetRedisKline(market.market, type), start: start.ToUnixTimeMilliseconds(), stop: stop, exclude: Exclude.Both, skip: skip, take: take, order: StackExchange.Redis.Order.Ascending);

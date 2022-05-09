@@ -293,7 +293,6 @@ public class Core
                 FactoryService.instance.constant.stopwatch.Stop();
                 FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB,redis=>同步K线记录");
                 FactoryService.instance.constant.stopwatch.Restart();
-                DateTimeOffset start = deals.Min(P => P.time);
                 foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
                 {
                     List<ResKline> push_kline = new List<ResKline>();

@@ -313,10 +313,10 @@ public class Core
             {
                 FactoryService.instance.constant.stopwatch.Restart();
                 DateTimeOffset start = deals.Min(P => P.time);
-                DateTimeOffset end = deals.Max(P => P.time);
                 foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
                 {
-                    Res<List<ResKline>?> res = service_market.Klines(this.model.info.symbol, cycle, start, end, 0, 50);
+                    (DateTimeOffset start, DateTimeOffset end) startend = service_kline.KlineTime(cycle, start);
+                    Res<List<ResKline>?> res = service_market.Klines(this.model.info.symbol, cycle, startend.start, null, 0, 50);
                     if (res.code == E_Res_Code.ok && res.data != null && res.data.Count > 0)
                     {
                         res_kline.channel = (E_WebsockerChannel)Enum.Parse(typeof(E_WebsockerChannel), cycle.ToString());

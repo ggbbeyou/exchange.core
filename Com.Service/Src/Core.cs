@@ -127,7 +127,7 @@ public class Core
     /// </summary>
     /// <param name="queue_name">列队名称</param>
     /// <param name="consume_tag">消费器标签</param>
-    /// <returns></returns>
+    /// <returns>queue_name:队列名,consume_tag消费者标签</returns>
     public (string queue_name, string consume_tag) ReceiveMatchOrder()
     {
         string queue_name = FactoryService.instance.GetMqOrderDeal(this.model.info.market);

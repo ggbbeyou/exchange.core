@@ -304,7 +304,7 @@ public class Core
                     {
                         res_kline.channel = (E_WebsockerChannel)Enum.Parse(typeof(E_WebsockerChannel), cycle.ToString());
                         res_kline.data = push_kline;
-                        FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(res_kline.channel, this.model.info.market), JsonConvert.SerializeObject(res_kline));
+                        FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(res_kline.channel, this.model.info.market), JsonConvert.SerializeObject(res_kline, new JsonConverterDecimal()));
                     }
                 }
                 FactoryService.instance.constant.stopwatch.Stop();

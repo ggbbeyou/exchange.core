@@ -65,10 +65,10 @@ public class FactoryConstant
     /// mq 连接接口
     /// </summary>
     public readonly IConnection i_commection = null!;
-    /// <summary>
-    /// mq 通道接口
-    /// </summary>
-    public readonly IModel i_model = null!;
+    // /// <summary>
+    // /// mq 通道接口
+    // /// </summary>
+    // public readonly IModel i_model = null!;
 
     /// <summary>
     /// 初始化

@@ -106,7 +106,7 @@ public class FactoryConstant
             if (factory != null)
             {
                 this.i_commection = factory!.CreateConnection();
-                this.i_model = this.i_commection.CreateModel();
+                // this.i_model = this.i_commection.CreateModel();
             }
         }
         catch (Exception ex)
@@ -182,10 +182,11 @@ public class FactoryConstant
     {
         try
         {
-            IBasicProperties props = this.i_model.CreateBasicProperties();
+            IModel i_model = this.i_commection.CreateModel();
+            IBasicProperties props = i_model.CreateBasicProperties();
             props.DeliveryMode = 2;
-            this.i_model.QueueDeclare(queue: queue_name, durable: true, exclusive: false, autoDelete: false, arguments: null);
-            this.i_model.BasicPublish(exchange: "", routingKey: queue_name, basicProperties: props, body: body);
+            i_model.QueueDeclare(queue: queue_name, durable: true, exclusive: false, autoDelete: false, arguments: null);
+            i_model.BasicPublish(exchange: "", routingKey: queue_name, basicProperties: props, body: body);
         }
         catch (System.Exception ex)
         {
@@ -203,20 +204,21 @@ public class FactoryConstant
     /// <returns>队列标记</returns>
     public string MqReceive(string queue_name, Func<byte[], bool> func)
     {
-        this.i_model.QueueDeclare(queue: queue_name, durable: true, exclusive: false, autoDelete: false, arguments: null);
-        EventingBasicConsumer consumer = new EventingBasicConsumer(this.i_model);
+        IModel i_model = this.i_commection.CreateModel();
+        i_model.QueueDeclare(queue: queue_name, durable: true, exclusive: false, autoDelete: false, arguments: null);
+        EventingBasicConsumer consumer = new EventingBasicConsumer(i_model);
         consumer.Received += (model, ea) =>
         {
             if (func(ea.Body.ToArray()))
             {
-                this.i_model.BasicAck(deliveryTag: ea.DeliveryTag, multiple: true);
+                i_model.BasicAck(deliveryTag: ea.DeliveryTag, multiple: true);
             }
             else
             {
-                this.i_model.BasicNack(deliveryTag: ea.DeliveryTag, multiple: true, requeue: true);
+                i_model.BasicNack(deliveryTag: ea.DeliveryTag, multiple: true, requeue: true);
             }
         };
-        return this.i_model.BasicConsume(queue: queue_name, autoAck: false, consumer: consumer);
+        return i_model.BasicConsume(queue: queue_name, autoAck: false, consumer: consumer);
     }
 
     /// <summary>
@@ -228,10 +230,11 @@ public class FactoryConstant
     {
         try
         {
-            this.i_model.QueueDeclare(queue: queue_name, durable: true, exclusive: false, autoDelete: false, arguments: null);
-            var properties = this.i_model.CreateBasicProperties();
+            IModel i_model = this.i_commection.CreateModel();
+            i_model.QueueDeclare(queue: queue_name, durable: true, exclusive: false, autoDelete: false, arguments: null);
+            var properties = i_model.CreateBasicProperties();
             properties.Persistent = true;
-            this.i_model.BasicPublish(exchange: "", routingKey: queue_name, basicProperties: properties, body: body);
+            i_model.BasicPublish(exchange: "", routingKey: queue_name, basicProperties: properties, body: body);
         }
         catch (System.Exception ex)
         {
@@ -249,21 +252,22 @@ public class FactoryConstant
     /// <returns></returns>
     public string MqWorker(string queue_name, Func<byte[], bool> func)
     {
-        this.i_model.QueueDeclare(queue: queue_name, durable: true, exclusive: false, autoDelete: false, arguments: null);
-        this.i_model.BasicQos(prefetchSize: 0, prefetchCount: 1, global: false);
-        EventingBasicConsumer consumer = new EventingBasicConsumer(this.i_model);
+        IModel i_model = this.i_commection.CreateModel();
+        i_model.QueueDeclare(queue: queue_name, durable: true, exclusive: false, autoDelete: false, arguments: null);
+        i_model.BasicQos(prefetchSize: 0, prefetchCount: 1, global: false);
+        EventingBasicConsumer consumer = new EventingBasicConsumer(i_model);
         consumer.Received += (model, ea) =>
         {
             if (func(ea.Body.ToArray()))
             {
-                this.i_model.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
+                i_model.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
             }
             else
             {
-                this.i_model.BasicNack(deliveryTag: ea.DeliveryTag, multiple: false, requeue: true);
+                i_model.BasicNack(deliveryTag: ea.DeliveryTag, multiple: false, requeue: true);
             }
         };
-        return this.i_model.BasicConsume(queue: queue_name, autoAck: false, consumer: consumer);
+        return i_model.BasicConsume(queue: queue_name, autoAck: false, consumer: consumer);
     }
 
     /// <summary>
@@ -275,9 +279,10 @@ public class FactoryConstant
     {
         try
         {
-            this.i_model.ExchangeDeclare(exchange: exchange, type: ExchangeType.Fanout);
+            IModel i_model = this.i_commection.CreateModel();
+            i_model.ExchangeDeclare(exchange: exchange, type: ExchangeType.Fanout);
             var body = Encoding.UTF8.GetBytes(message);
-            this.i_model.BasicPublish(exchange: exchange, routingKey: "", basicProperties: null, body);
+            i_model.BasicPublish(exchange: exchange, routingKey: "", basicProperties: null, body);
         }
         catch (System.Exception ex)
         {
@@ -294,15 +299,16 @@ public class FactoryConstant
     /// <param name="action"></param>
     public string MqSubscribe(string exchange, Action<byte[]> action)
     {
-        this.i_model.ExchangeDeclare(exchange: exchange, type: ExchangeType.Fanout);
-        string queueName = this.i_model.QueueDeclare().QueueName;
-        this.i_model.QueueBind(queue: queueName, exchange: exchange, routingKey: "");
-        EventingBasicConsumer consumer = new EventingBasicConsumer(this.i_model);
+        IModel i_model = this.i_commection.CreateModel();
+        i_model.ExchangeDeclare(exchange: exchange, type: ExchangeType.Fanout);
+        string queueName = i_model.QueueDeclare().QueueName;
+        i_model.QueueBind(queue: queueName, exchange: exchange, routingKey: "");
+        EventingBasicConsumer consumer = new EventingBasicConsumer(i_model);
         consumer.Received += (model, ea) =>
         {
             action(ea.Body.ToArray());
         };
-        return this.i_model.BasicConsume(queue: queueName, autoAck: true, consumer: consumer);
+        return i_model.BasicConsume(queue: queueName, autoAck: true, consumer: consumer);
     }
 
     /// <summary>
@@ -313,7 +319,8 @@ public class FactoryConstant
     {
         try
         {
-            this.i_model.BasicCancel(consumerTag);
+            IModel i_model = this.i_commection.CreateModel();
+            i_model.BasicCancel(consumerTag);
         }
         catch (System.Exception ex)
         {
@@ -329,7 +336,8 @@ public class FactoryConstant
     {
         try
         {
-            this.i_model.QueuePurge(consumerTag);
+            IModel i_model = this.i_commection.CreateModel();
+            i_model.QueuePurge(consumerTag);
         }
         catch (System.Exception ex)
         {

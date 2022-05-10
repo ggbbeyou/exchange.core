@@ -5,6 +5,7 @@ using Com.Db;
 using Com.Service.Match;
 using Com.Service.Models;
 using Microsoft.Extensions.Logging;
+using RabbitMQ.Client;
 
 namespace Com.Service;
 
@@ -159,7 +160,8 @@ public class FactoryMatching
             string queue_name = FactoryService.instance.GetMqOrderPlace(info.market);
             if (!mm.mq_queues.Contains(queue_name))
             {
-                FactoryService.instance.constant.i_model.QueueDeclare(queue: queue_name, durable: true, exclusive: false, autoDelete: false, arguments: null);
+                IModel i_model = FactoryService.instance.constant.i_commection.CreateModel();
+                i_model.QueueDeclare(queue: queue_name, durable: true, exclusive: false, autoDelete: false, arguments: null);
                 mm.mq_queues.Add(queue_name);
             }
             foreach (var item in mm.mq_queues)

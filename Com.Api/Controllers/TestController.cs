@@ -396,7 +396,7 @@ public class TestController : ControllerBase
                 };
                 reqOrders.Add(order);
             }
-            Res<List<ResOrder>> aaa = order_service.PlaceOrder(market.symbol, user.user_id, user.user_name, reqOrders);
+            Res<List<ResOrder>> aaa = order_service.PlaceOrder(market.symbol, user.user_id, user.user_name,Request.GetIp(), reqOrders);
             // res.data.AddRange(aaa.data);
         }
         return res;

@@ -90,7 +90,7 @@ public class ApiOrderController : ControllerBase
                     client_id = client_id
                 }
             };
-            return service_order.PlaceOrder(symbol, user_api.users.user_id, user_api.users.user_name, orders);
+            return service_order.PlaceOrder(symbol, user_api.users.user_id, user_api.users.user_name,Request.GetIp(), orders);
         };
     }
 
@@ -113,7 +113,7 @@ public class ApiOrderController : ControllerBase
         }
         else
         {
-            return service_order.PlaceOrder(data.symbol, user_api.users.user_id, user_api.users.user_name, data.orders);
+            return service_order.PlaceOrder(data.symbol, user_api.users.user_id, user_api.users.user_name,Request.GetIp(), data.orders);
         }
     }
 

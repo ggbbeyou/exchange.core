@@ -56,7 +56,7 @@ public class ServiceOrder
     /// <param name="user_name">用户名</param>
     /// <param name="order">订单列表</param>
     /// <returns></returns>
-    public Res<List<ResOrder>> PlaceOrder(string symbol, long uid, string user_name, List<ReqOrder> orders)
+    public Res<List<ResOrder>> PlaceOrder(string symbol, long uid, string user_name,string ip, List<ReqOrder> orders)
     {
         Res<List<ResOrder>> res = new Res<List<ResOrder>>();
         this.stopwatch.Restart();

@@ -313,7 +313,7 @@ public class ServiceOrder
             return res;
         }
         FactoryService.instance.constant.stopwatch.Stop();
-        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{info.symbol}:挂单=>插入{dbcount}条订单到DB");
+        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{info.symbol}:挂单({ip})=>插入{dbcount}条订单到DB");
         FactoryService.instance.constant.stopwatch.Restart();
         ReqCall<List<Orders>> call_req = new ReqCall<List<Orders>>();
         call_req.op = E_Op.place;

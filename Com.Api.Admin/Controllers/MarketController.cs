@@ -57,11 +57,11 @@ public class MarketController : ControllerBase
     private ServiceUser service_user = new ServiceUser();
 
     /// <summary>
-    /// 
+    /// 初始化
     /// </summary>
-    /// <param name="db"></param>
-    /// <param name="config"></param>
-    /// <param name="logger"></param>
+    /// <param name="db">db上下文</param>
+    /// <param name="config">配置接口</param>
+    /// <param name="logger">日志接口</param>
     public MarketController(DbContextEF db, IConfiguration config, ILogger<MarketController> logger)
     {
         this.logger = logger;
@@ -246,7 +246,6 @@ public class MarketController : ControllerBase
     /// <returns></returns>
     [HttpGet]
     [Route("GetMarket")]
-
     public Res<List<Market>> GetMarket(string? symbol)
     {
         Res<List<Market>> res = new Res<List<Market>>();

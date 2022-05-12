@@ -15,7 +15,6 @@ public class Res<T>
     /// </summary>
     /// <value></value>
     [JsonConverter(typeof(StringEnumConverter))]
-    //  
     public E_Res_Code code { get; set; } = E_Res_Code.ok;
     /// <summary>
     /// 响应消息

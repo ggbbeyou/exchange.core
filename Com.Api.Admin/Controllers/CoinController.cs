@@ -130,7 +130,6 @@ public class CoinController : ControllerBase
     /// <returns></returns>
     [HttpGet]
     [Route("GetCoin")]
-
     public Res<List<Coin>> GetCoin(string? coin_name)
     {
         Res<List<Coin>> res = new Res<List<Coin>>();

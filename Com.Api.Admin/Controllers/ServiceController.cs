@@ -46,9 +46,9 @@ public class ServiceController : ControllerBase
     private ServiceUser service_user = new ServiceUser();
 
     /// <summary>
-    /// 
+    /// 初始化
     /// </summary>
-    /// <param name="db"></param>
+    /// <param name="db">db上下文</param>
     public ServiceController(DbContextEF db)
     {
         this.db = db;

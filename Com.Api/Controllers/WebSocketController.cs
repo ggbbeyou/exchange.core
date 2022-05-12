@@ -57,7 +57,7 @@ using Com.Bll.Util;
 namespace Com.Api.Controllers;
 
 /// <summary>
-/// 
+/// websocket推送
 /// </summary>
 [Route("[controller]")]
 [AllowAnonymous]
@@ -150,10 +150,10 @@ public class WebSocketController : ControllerBase
     /// <summary>
     /// 订阅消息
     /// </summary>
-    /// <param name="webSocket"></param>
-    /// <param name="str"></param>
-    /// <param name="channel"></param>
-    /// <param name="uid"></param>
+    /// <param name="webSocket">websocket对象</param>
+    /// <param name="str">接收到的字符串</param>
+    /// <param name="channel">频道</param>
+    /// <param name="uid">用户id</param>
     private void Subscribe(WebSocket webSocket, string str, Dictionary<string, string> channel, ref long uid)
     {
         if (str.ToLower() == "ping")
@@ -291,7 +291,7 @@ public class WebSocketController : ControllerBase
                             ResDepth? depth = JsonConvert.DeserializeObject<ResDepth>(rv);
                             if (depth != null)
                             {
-                                ResWebsocker<ResDepth> depth_res = new ResWebsocker<ResDepth>();                                
+                                ResWebsocker<ResDepth> depth_res = new ResWebsocker<ResDepth>();
                                 depth_res.op = E_WebsockerOp.subscribe_event;
                                 depth_res.channel = item.channel;
                                 depth_res.data = depth;

@@ -187,14 +187,12 @@ public class UserController : ControllerBase
         res.data = service_common.CreateGoogle2FA(FactoryService.instance.constant.config["Jwt:Issuer"], this.login.user_id);
         if (string.IsNullOrWhiteSpace(res.data))
         {
-
             res.code = E_Res_Code.verification_disable;
             res.msg = "用户被禁用或已申请过验证";
             return res;
         }
         else
         {
-
             res.code = E_Res_Code.ok;
             return res;
         }
@@ -319,7 +317,6 @@ public class UserController : ControllerBase
         db.UsersApi.Add(api);
         if (db.SaveChanges() > 0)
         {
-
             res.code = E_Res_Code.ok;
             res.data = new KeyValuePair<string, string>(api.api_key, api.api_secret);
             return res;
@@ -353,7 +350,6 @@ public class UserController : ControllerBase
             db.UsersApi.Update(api);
             if (db.SaveChanges() > 0)
             {
-
                 res.code = E_Res_Code.ok;
                 res.data = true;
                 return res;

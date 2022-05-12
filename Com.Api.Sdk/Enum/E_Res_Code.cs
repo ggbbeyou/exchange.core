@@ -27,7 +27,11 @@ public enum E_Res_Code
     /// <summary>
     /// 数据库操作出错
     /// </summary>
-    error_db,
+    db_error,
+    /// <summary>
+    /// 网络错误
+    /// </summary>
+    network_error,
     /// <summary>
     /// 无权限
     /// </summary>

@@ -133,7 +133,7 @@ public class ServiceWallet
                     {
                         transaction.Rollback();
                         FactoryService.instance.constant.logger.LogError(ex, "Transfer(并发):" + ex.Message);
-                        res.code = E_Res_Code.error_db;
+                        res.code = E_Res_Code.db_error;
                         res.msg = "钱包类型之间划转出错(并发)";
                         return res;
                     }
@@ -141,7 +141,7 @@ public class ServiceWallet
                     {
                         transaction.Rollback();
                         FactoryService.instance.constant.logger.LogError(ex, "FreezeChange:" + ex.Message);
-                        res.code = E_Res_Code.error_db;
+                        res.code = E_Res_Code.db_error;
                         res.msg = "钱包类型之间划转出错";
                         return res;
                     }

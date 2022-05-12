@@ -41,6 +41,7 @@ public class CoinController : ControllerBase
     /// <summary>
     /// 登录信息
     /// </summary>
+    /// <value></value>
     private (long no, long user_id, string user_name, E_App app, string public_key) login
     {
         get
@@ -56,11 +57,11 @@ public class CoinController : ControllerBase
     private ServiceUser service_user = new ServiceUser();
 
     /// <summary>
-    /// 
+    /// 初始化
     /// </summary>
-    /// <param name="db"></param>
-    /// <param name="config"></param>
-    /// <param name="logger"></param>
+    /// <param name="db">db上下文</param>
+    /// <param name="config">配置接口</param>
+    /// <param name="logger">日志接口</param>
     public CoinController(DbContextEF db, IConfiguration config, ILogger<CoinController> logger)
     {
         this.logger = logger;

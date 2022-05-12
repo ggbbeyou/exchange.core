@@ -62,19 +62,19 @@ public class ServiceController : ControllerBase
     /// <returns></returns>
     [HttpPost]
     [Route("Manage")]
-    public async Task<Res<bool?>> Manage(long market, int status)
+    public async Task<Res<bool>> Manage(long market, int status)
     {
-        Res<bool?> res = new Res<bool?>();
+        Res<bool> res = new Res<bool>();
         Market? marketInfo = this.db.Market.FirstOrDefault(P => P.market == market);
         if (marketInfo == null)
         {
-
             res.code = E_Res_Code.symbol_not_found;
             res.msg = "交易对不存在";
-            res.data = null;
+            res.data = false;
         }
         else
         {
+            bool? rsult = null;
             if (status == 0)
             {
                 marketInfo.status = await FactoryAdmin.instance.ServiceGetStatus(marketInfo) ?? marketInfo.status;
@@ -87,11 +87,23 @@ public class ServiceController : ControllerBase
             {
                 marketInfo.status = await FactoryAdmin.instance.ServiceStop(marketInfo) ?? marketInfo.status;
             }
+            if (rsult == null)
+            {
+                res.code = E_Res_Code.network_error;
+                res.data = false;
+                return res;
+            }
+            if (rsult == true)
+            {
+                marketInfo.status = true;
+                res.code = E_Res_Code.ok;
+            }
+            else if (rsult == false)
+            {
+                marketInfo.status = false;
+                res.code = E_Res_Code.fail;
+            }
             this.db.SaveChanges();
-
-            res.code = E_Res_Code.ok;
-            res.msg = "操作成功";
-            res.data = marketInfo.status;
         }
         return res;
     }

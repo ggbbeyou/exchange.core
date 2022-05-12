@@ -97,7 +97,7 @@ public class AccountController : ControllerBase
         email = email.Trim().ToLower();
         if (!Regex.IsMatch(email, @"^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+((\.[a-zA-Z0-9_-]{2,3}){1,2})$"))
         {
-            res.code = E_Res_Code.email_format_error;
+            res.code = E_Res_Code.email_irregularity;
             res.msg = "邮箱格式错误";
             return res;
         }

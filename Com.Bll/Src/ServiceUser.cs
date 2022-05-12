@@ -126,7 +126,7 @@ public class ServiceUser
         res.data = false;
         if (!Regex.IsMatch(email, @"^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+((\.[a-zA-Z0-9_-]{2,3}){1,2})$"))
         {
-            res.code = E_Res_Code.email_format_error;
+            res.code = E_Res_Code.email_irregularity;
             res.msg = "邮箱格式错误";
             return res;
         }
@@ -137,7 +137,7 @@ public class ServiceUser
                             .{6,20}                         #至少6个字符,最多20个字符
                             ", RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace))
         {
-            res.code = E_Res_Code.password_format_error;
+            res.code = E_Res_Code.password_irregularity;
             res.msg = "密码必须包含数字、小写字母或大写字母、特殊符号,长度6-20位";
             return res;
         }

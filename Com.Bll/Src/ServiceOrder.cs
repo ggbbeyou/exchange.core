@@ -56,7 +56,7 @@ public class ServiceOrder
     /// <param name="user_name">用户名</param>
     /// <param name="order">订单列表</param>
     /// <returns></returns>
-    public Res<List<ResOrder>> PlaceOrder(string symbol, long uid, string user_name,string ip, List<ReqOrder> orders)
+    public Res<List<ResOrder>> PlaceOrder(string symbol, long uid, string user_name, string ip, List<ReqOrder> orders)
     {
         Res<List<ResOrder>> res = new Res<List<ResOrder>>();
         this.stopwatch.Restart();
@@ -285,7 +285,7 @@ public class ServiceOrder
             {
                 if (!service_wallet.FreezeChange(wallet_type, uid, info.coin_id_base, -coin_base, info.coin_id_quote, -coin_quote))
                 {
-                    res.code = E_Res_Code.db_error;
+                    res.code = E_Res_Code.error_db;
                     res.msg = "挂单失败,并且解除冻结出错,基础币种或报价币种余额不足";
                     return res;
                 }
@@ -294,7 +294,7 @@ public class ServiceOrder
             {
                 if (!service_wallet.FreezeChange(wallet_type, uid, info.coin_id_base, -coin_base))
                 {
-                    res.code = E_Res_Code.db_error;
+                    res.code = E_Res_Code.error_db;
                     res.msg = "挂单失败,并且解除冻结出错,基础币种余额不足";
                     return res;
                 }
@@ -303,12 +303,12 @@ public class ServiceOrder
             {
                 if (!service_wallet.FreezeChange(wallet_type, uid, info.coin_id_quote, -coin_quote))
                 {
-                    res.code = E_Res_Code.db_error;
+                    res.code = E_Res_Code.error_db;
                     res.msg = "挂单失败,并且解除冻结出错,报价币种余额不足";
                     return res;
                 }
             }
-            res.code = E_Res_Code.db_error;
+            res.code = E_Res_Code.error_db;
             res.msg = "挂单失败";
             return res;
         }
@@ -388,7 +388,7 @@ public class ServiceOrder
             }
             if (users.disabled || !users.transaction)
             {
-                res.code = E_Res_Code.no_permission;
+                res.code = E_Res_Code.permission_no;
                 res.msg = "用户禁止撤单";
                 return res;
             }

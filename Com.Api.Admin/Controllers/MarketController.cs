@@ -96,7 +96,7 @@ public class MarketController : ControllerBase
         res.data = false;
         if (places_price < 0 || places_amount < 0 || trade_min <= 0 || trade_min_market_sell <= 0)
         {
-            res.code = E_Res_Code.not_less_0;
+            res.code = E_Res_Code.cannot_less_0;
             res.msg = "值不能小于或等于0";
             return res;
         }
@@ -215,7 +215,7 @@ public class MarketController : ControllerBase
         res.code = E_Res_Code.fail;
         if (!this.db.Market.Any(P => P.market == market))
         {
-            res.code = E_Res_Code.not_found_symbol;
+            res.code = E_Res_Code.symbol_not_found;
             res.msg = "交易对不存在";
             return res;
         }

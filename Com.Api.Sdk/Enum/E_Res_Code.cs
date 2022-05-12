@@ -15,32 +15,27 @@ public enum E_Res_Code
     /// <summary>
     /// 未定义
     /// </summary>
-    unknown = 0,
+    unknown,
     /// <summary>
     /// 成功
     /// </summary>
-    ok = 1000,
+    ok,
     /// <summary>
     /// 失败
     /// </summary>
-    fail = 1001,
+    fail,
     /// <summary>
     /// 数据库操作出错
     /// </summary>
-    db_error,
-    /// <summary>
-    /// 服务操作出错
-    /// </summary>
-    service_error,
+    error_db,
     /// <summary>
     /// 无权限
     /// </summary>
-    no_permission = 1002,
-
+    permission_no,
     /// <summary>
     /// 未找到交易对
     /// </summary>
-    symbol_not_found = 1004,
+    symbol_not_found,
     /// <summary>
     /// 字段长度过长
     /// </summary>
@@ -52,15 +47,15 @@ public enum E_Res_Code
     /// <summary>
     /// 未找到api_key参数
     /// </summary>
-    not_found_api_key,
+    api_key_not_found,
     /// <summary>
     /// 未找到api_sign参数
     /// </summary>
-    not_found_api_sign,
+    api_sign_not_found,
     /// <summary>
     /// 未找到api_timestamp参数
     /// </summary>
-    not_found_api_timestamp,
+    api_timestamp_not_found,
     /// <summary>
     /// 签名错误
     /// </summary>
@@ -68,7 +63,7 @@ public enum E_Res_Code
     /// <summary>
     /// 不是白名单用户
     /// </summary>
-    not_white_ip,
+    white_ip_not,
     /// <summary>
     /// 未找到文件
     /// </summary>
@@ -80,7 +75,7 @@ public enum E_Res_Code
     /// <summary>
     /// 密码不合规则
     /// </summary>
-    password_format_error,
+    password_irregularity,
     /// <summary>
     /// 验证码错误
     /// </summary>
@@ -96,10 +91,9 @@ public enum E_Res_Code
     /// <summary>
     /// 不能小于0
     /// </summary>
-    not_less_0,
+    cannot_less_0,
+
     //////用户相关错误码/////////////////////////////////////////////////////////////////////
-
-
 
     /// <summary>
     /// 未找到该用户
@@ -120,7 +114,7 @@ public enum E_Res_Code
     /// <summary>
     /// Email地址不合规则
     /// </summary>
-    email_format_error,
+    email_irregularity,
     /// <summary>
     /// 登录账号或密码错误
     /// </summary>
@@ -131,10 +125,7 @@ public enum E_Res_Code
     user_disable,
 
     //////订单相关错误码/////////////////////////////////////////////////////////////////////
-    /// <summary>
-    /// 交易对不存在
-    /// </summary>
-    not_found_symbol,
+
     /// <summary>
     /// 系统禁止挂单
     /// </summary>
@@ -144,14 +135,6 @@ public enum E_Res_Code
     /// </summary>
     user_disable_place_order,
     /// <summary>
-    /// 成交价格不能低于0
-    /// </summary>
-    trans_price_cannot_lower_0,
-    /// <summary>
-    /// 成交价格不能低于0
-    /// </summary>
-    amount_cannot_lower_0,
-    /// <summary>
     /// 限价单交易价错误
     /// </summary>
     limit_price_error,
@@ -159,7 +142,6 @@ public enum E_Res_Code
     /// 限价单交易量错误
     /// </summary>
     limit_amount_error,
-
     /// <summary>
     /// 市价单交易额错误
     /// </summary>
@@ -169,10 +151,9 @@ public enum E_Res_Code
     /// </summary>
     market_amount_error,
     /// <summary>
-    /// 交易模式
+    /// 交易模式错误
     /// </summary>
     trade_model_error,
-
 
     //////资金相关错误码/////////////////////////////////////////////////////////////////////
 
@@ -185,18 +166,12 @@ public enum E_Res_Code
     /// </summary>
     coin_not_found,
     /// <summary>
-    /// 资金不能低于0
+    /// 量不能低于0
     /// </summary>
-    amount_cannot_lass_0,
-
+    volume_cannot_lass_0,
     /// <summary>
     /// 资金不足
     /// </summary>
     available_not_enough,
-
-
-
-
-
 
 }

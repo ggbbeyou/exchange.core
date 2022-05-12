@@ -82,7 +82,7 @@ public class OrderController : ControllerBase
         }
         if (users.disabled || !users.transaction)
         {
-            result.code = E_Res_Code.no_permission;
+            result.code = E_Res_Code.permission_no;
             result.msg = "用户禁止交易";
             return result;
         }
@@ -102,7 +102,7 @@ public class OrderController : ControllerBase
                 client_id = client_id
             }
         };
-        return service_order.PlaceOrder(symbol, users.user_id, users.user_name,Request.GetIp(), orders);
+        return service_order.PlaceOrder(symbol, users.user_id, users.user_name, Request.GetIp(), orders);
     }
 
     /// <summary>
@@ -124,11 +124,11 @@ public class OrderController : ControllerBase
         }
         if (users.disabled || !users.transaction)
         {
-            result.code = E_Res_Code.no_permission;
+            result.code = E_Res_Code.permission_no;
             result.msg = "用户禁止交易";
             return result;
         }
-        return service_order.PlaceOrder(data.symbol, login.user_id, login.user_name,Request.GetIp(), data.orders);
+        return service_order.PlaceOrder(data.symbol, login.user_id, login.user_name, Request.GetIp(), data.orders);
     }
 
     /// <summary>
@@ -150,7 +150,7 @@ public class OrderController : ControllerBase
         }
         if (users.disabled || !users.transaction)
         {
-            result.code = E_Res_Code.no_permission;
+            result.code = E_Res_Code.permission_no;
             result.msg = "用户禁止交易";
             return result;
         }
@@ -176,7 +176,7 @@ public class OrderController : ControllerBase
         }
         if (users.disabled || !users.transaction)
         {
-            result.code = E_Res_Code.no_permission;
+            result.code = E_Res_Code.permission_no;
             result.msg = "用户禁止交易";
             return result;
         }

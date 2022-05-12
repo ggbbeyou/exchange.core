@@ -56,7 +56,7 @@ public class VerificationFilters : Attribute, IAuthorizationFilter
         string timestamp = "";
         if (!context.HttpContext.Request.Headers.ContainsKey("api_key"))
         {
-            res.code = E_Res_Code.not_found_api_key;
+            res.code = E_Res_Code.api_key_not_found;
             res.msg = "缺少api_key参数!";
             context.Result = new JsonResult(res);
             return;
@@ -67,7 +67,7 @@ public class VerificationFilters : Attribute, IAuthorizationFilter
         }
         if (!context.HttpContext.Request.Headers.ContainsKey("api_sign"))
         {
-            res.code = E_Res_Code.not_found_api_sign;
+            res.code = E_Res_Code.api_sign_not_found;
             res.msg = "缺少api_sign参数!";
             context.Result = new JsonResult(res);
             return;
@@ -78,7 +78,7 @@ public class VerificationFilters : Attribute, IAuthorizationFilter
         }
         if (!context.HttpContext.Request.Headers.ContainsKey("api_timestamp"))
         {
-            res.code = E_Res_Code.not_found_api_timestamp;
+            res.code = E_Res_Code.api_timestamp_not_found;
             res.msg = "缺少api_timestamp参数!";
             context.Result = new JsonResult(res);
             return;
@@ -101,7 +101,7 @@ public class VerificationFilters : Attribute, IAuthorizationFilter
             }
             else
             {
-                res.code = E_Res_Code.not_found_api_timestamp;
+                res.code = E_Res_Code.api_timestamp_not_found;
                 res.msg = "缺少api_timestamp参数!";
                 context.Result = new JsonResult(res);
                 return;
@@ -130,7 +130,7 @@ public class VerificationFilters : Attribute, IAuthorizationFilter
         }
         if (userapi == null)
         {
-            res.code = E_Res_Code.not_found_api_key;
+            res.code = E_Res_Code.api_key_not_found;
             res.msg = "api_key错误!";
             context.Result = new JsonResult(res);
             return;
@@ -138,14 +138,14 @@ public class VerificationFilters : Attribute, IAuthorizationFilter
         //判断白名单ip
         if (!string.IsNullOrWhiteSpace(userapi.white_list_ip))
         {
-            res.code = E_Res_Code.not_white_ip;
+            res.code = E_Res_Code.white_ip_not;
             res.msg = "不是白名单仿问";
             context.Result = new JsonResult(res);
             return;
         }
         else if (userapi.create_time.AddDays(10) < DateTimeOffset.UtcNow)
         {
-            res.code = E_Res_Code.not_white_ip;
+            res.code = E_Res_Code.white_ip_not;
             res.msg = "不是白名单仿问";
             context.Result = new JsonResult(res);
             return;

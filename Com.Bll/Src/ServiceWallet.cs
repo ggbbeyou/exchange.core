@@ -76,7 +76,7 @@ public class ServiceWallet
         if (amount <= 0)
         {
 
-            res.code = E_Res_Code.amount_cannot_lass_0;
+            res.code = E_Res_Code.volume_cannot_lass_0;
             res.msg = "划转金额不能低于0";
             return res;
         }
@@ -133,7 +133,7 @@ public class ServiceWallet
                     {
                         transaction.Rollback();
                         FactoryService.instance.constant.logger.LogError(ex, "Transfer(并发):" + ex.Message);
-                        res.code = E_Res_Code.db_error;
+                        res.code = E_Res_Code.error_db;
                         res.msg = "钱包类型之间划转出错(并发)";
                         return res;
                     }
@@ -141,7 +141,7 @@ public class ServiceWallet
                     {
                         transaction.Rollback();
                         FactoryService.instance.constant.logger.LogError(ex, "FreezeChange:" + ex.Message);
-                        res.code = E_Res_Code.db_error;
+                        res.code = E_Res_Code.error_db;
                         res.msg = "钱包类型之间划转出错";
                         return res;
                     }

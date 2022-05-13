@@ -82,7 +82,8 @@ public class Api
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="base_url"></param>
+    /// <param name="base_url">域名</param>
+    /// <param name="logger">日志接口</param>
     public Api(string base_url, ILogger logger)
     {
         this.logger = logger ?? NullLogger.Instance;

@@ -1,5 +1,8 @@
 using System;
-
+using System.Net;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using Newtonsoft.Json;
 
 namespace Com.Api.Sdk;
 
@@ -65,5 +68,61 @@ public class Api
     //     }
     //     return default(AjaxResult<T>);
     // }
+
+    /// <summary>
+    /// 日志接口
+    /// </summary>
+    public readonly ILogger logger;
+    /// <summary>
+    /// 
+    /// </summary>
+    private readonly HttpClient client;
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="base_url"></param>
+    public Api(string base_url, ILogger logger)
+    {
+        this.logger = logger ?? NullLogger.Instance;
+        this.client = new HttpClient();
+        this.client.BaseAddress = new Uri(base_url);
+    }
+
+    private void AddHeader(string key, string value)
+    {
+        this.client.DefaultRequestHeaders.Add(key, value);
+    }
+
+    public async Task Get(string url)
+    {
+        HttpResponseMessage response = await client.GetAsync(url,);
+        response.EnsureSuccessStatusCode();
+        string responseBody = await response.Content.ReadAsStringAsync();
+        // Above three lines can be replaced with new helper method below
+        // string responseBody = await client.GetStringAsync(uri);
+    }
+
+    private async Task<string?> Post(string url, object obj)
+    {
+        try
+        {
+            HttpContent content = new StringContent(JsonConvert.SerializeObject(obj));
+            HttpResponseMessage response = await client.PostAsync(url, content);
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                return await response.Content.ReadAsStringAsync();
+            }
+            else
+            {
+                return null;
+            }
+        }
+        catch (System.Exception ex)
+        {
+            this.logger.LogError(ex, $"url:{url},input:{JsonConvert.SerializeObject(obj)}");
+            return null;
+        }
+    }
 
 }

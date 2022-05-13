@@ -1,5 +1,6 @@
 using System;
 using System.Net;
+using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Newtonsoft.Json;
@@ -89,21 +90,70 @@ public class Api
         this.client.BaseAddress = new Uri(base_url);
     }
 
-    private void AddHeader(string key, string value)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="key"></param>
+    /// <param name="value"></param>
+    public void AddHeader(string key, string value)
     {
         this.client.DefaultRequestHeaders.Add(key, value);
     }
 
-    public async Task Get(string url)
+    /// <summary>
+    /// 返回登录token
+    /// </summary>
+    /// <param name="api_key"></param>
+    /// <param name="api_secret"></param>
+    /// <returns></returns>
+    public string GetLoginToken(string api_key, string api_secret)
     {
-        HttpResponseMessage response = await client.GetAsync(url,);
-        response.EnsureSuccessStatusCode();
-        string responseBody = await response.Content.ReadAsStringAsync();
-        // Above three lines can be replaced with new helper method below
-        // string responseBody = await client.GetStringAsync(uri);
+        return "";
     }
 
-    private async Task<string?> Post(string url, object obj)
+    /// <summary>
+    /// HttpGet请求
+    /// </summary>
+    /// <param name="url">请求地址</param>
+    /// <param name="input">请求参数</param>
+    /// <returns></returns>
+    private async Task<string?> Get(string url, Dictionary<string, string> input)
+    {
+        try
+        {
+            if (input != null && input.Count > 0)
+            {
+                StringBuilder sb = new StringBuilder("?");
+                foreach (var item in input)
+                {
+                    sb.Append($"{item.Key}={item.Value}&");
+                }
+                url += sb.ToString().TrimEnd('&');
+            }
+            HttpResponseMessage response = await client.GetAsync(url);
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                return await response.Content.ReadAsStringAsync();
+            }
+            else
+            {
+                return null;
+            }
+        }
+        catch (System.Exception ex)
+        {
+            this.logger.LogError(ex, $"url:{url},input:{JsonConvert.SerializeObject(input)}");
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// HttpPost请求
+    /// </summary>
+    /// <param name="url">请求地址</param>
+    /// <param name="input">请求参数</param>
+    /// <returns></returns>
+    private async Task<string?> Post(string url, object input)
     {
         try
         {
@@ -120,7 +170,7 @@ public class Api
         }
         catch (System.Exception ex)
         {
-            this.logger.LogError(ex, $"url:{url},input:{JsonConvert.SerializeObject(obj)}");
+            this.logger.LogError(ex, $"url:{url},input:{JsonConvert.SerializeObject(input)}");
             return null;
         }
     }

@@ -157,7 +157,7 @@ public class Api
     {
         try
         {
-            HttpContent content = new StringContent(JsonConvert.SerializeObject(obj));
+            HttpContent content = new StringContent(JsonConvert.SerializeObject(input));
             HttpResponseMessage response = await client.PostAsync(url, content);
             if (response.StatusCode == HttpStatusCode.OK)
             {

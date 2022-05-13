@@ -19,12 +19,12 @@ public class MainService : BackgroundService
     public FactoryConstant constant = null!;
 
     /// <summary>
-    /// 
+    /// 初始化
     /// </summary>
-    /// <param name="configuration"></param>
-    /// <param name="environment"></param>
-    /// <param name="provider"></param>
-    /// <param name="logger"></param>
+    /// <param name="provider">服务驱动</param>
+    /// <param name="configuration">配置接口</param>
+    /// <param name="environment">环境接口</param>
+    /// <param name="logger">日志接口</param>
     public MainService(IServiceProvider provider, IConfiguration configuration, IHostEnvironment environment, ILogger<MainService> logger)
     {
         this.constant = new FactoryConstant(provider, configuration, environment, logger);

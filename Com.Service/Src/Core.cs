@@ -469,7 +469,7 @@ public class Core
     }
 
     /// <summary>
-    /// 处理进程 订单取消
+    /// 处理进程 订单取消推送
     /// </summary>
     /// <param name="process">处理进程</param>
     /// <param name="cancels">取消订单</param>

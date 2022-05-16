@@ -65,10 +65,10 @@ public class FactoryConstant
     /// mq 连接接口
     /// </summary>
     public readonly IConnection i_commection = null!;
-    // /// <summary>
-    // /// mq 通道接口
-    // /// </summary>
-    // public readonly IModel i_model = null!;
+    /// <summary>
+    /// mq 通道接口
+    /// </summary>
+    public readonly IModel i_model = null!;
 
     /// <summary>
     /// 初始化
@@ -106,7 +106,7 @@ public class FactoryConstant
             if (factory != null)
             {
                 this.i_commection = factory!.CreateConnection();
-                // this.i_model = this.i_commection.CreateModel();
+                this.i_model = this.i_commection.CreateModel();
             }
         }
         catch (Exception ex)
@@ -172,7 +172,6 @@ public class FactoryConstant
         }
     }
 
-
     /// <summary>
     /// MQ 简单的队列 发送消息
     /// </summary>
@@ -182,7 +181,6 @@ public class FactoryConstant
     {
         try
         {
-            IModel i_model = this.i_commection.CreateModel();
             IBasicProperties props = i_model.CreateBasicProperties();
             props.DeliveryMode = 2;
             i_model.QueueDeclare(queue: queue_name, durable: true, exclusive: false, autoDelete: false, arguments: null);
@@ -202,9 +200,8 @@ public class FactoryConstant
     /// <param name="queue_name"></param>
     /// <param name="func"></param>
     /// <returns>队列标记</returns>
-    public string MqReceive(string queue_name, Func<byte[], bool> func)
+    public string MqReceive(IModel i_model, string queue_name, Func<byte[], bool> func)
     {
-        IModel i_model = this.i_commection.CreateModel();
         i_model.QueueDeclare(queue: queue_name, durable: true, exclusive: false, autoDelete: false, arguments: null);
         EventingBasicConsumer consumer = new EventingBasicConsumer(i_model);
         consumer.Received += (model, ea) =>
@@ -226,11 +223,10 @@ public class FactoryConstant
     /// </summary>
     /// <param name="queue_name"></param>
     /// <param name="body"></param>
-    public bool MqTask(string queue_name, byte[] body)
+    public bool MqTask(IModel i_model, string queue_name, byte[] body)
     {
         try
         {
-            IModel i_model = this.i_commection.CreateModel();
             i_model.QueueDeclare(queue: queue_name, durable: true, exclusive: false, autoDelete: false, arguments: null);
             var properties = i_model.CreateBasicProperties();
             properties.Persistent = true;
@@ -250,9 +246,8 @@ public class FactoryConstant
     /// <param name="queue_name"></param>
     /// <param name="func"></param>
     /// <returns></returns>
-    public string MqWorker(string queue_name, Func<byte[], bool> func)
+    public string MqWorker(IModel i_model, string queue_name, Func<byte[], bool> func)
     {
-        IModel i_model = this.i_commection.CreateModel();
         i_model.QueueDeclare(queue: queue_name, durable: true, exclusive: false, autoDelete: false, arguments: null);
         i_model.BasicQos(prefetchSize: 0, prefetchCount: 1, global: false);
         EventingBasicConsumer consumer = new EventingBasicConsumer(i_model);
@@ -279,7 +274,6 @@ public class FactoryConstant
     {
         try
         {
-            IModel i_model = this.i_commection.CreateModel();
             i_model.ExchangeDeclare(exchange: exchange, type: ExchangeType.Fanout);
             var body = Encoding.UTF8.GetBytes(message);
             i_model.BasicPublish(exchange: exchange, routingKey: "", basicProperties: null, body);
@@ -299,7 +293,6 @@ public class FactoryConstant
     /// <param name="action"></param>
     public string MqSubscribe(string exchange, Action<byte[]> action)
     {
-        IModel i_model = this.i_commection.CreateModel();
         i_model.ExchangeDeclare(exchange: exchange, type: ExchangeType.Fanout);
         string queueName = i_model.QueueDeclare().QueueName;
         i_model.QueueBind(queue: queueName, exchange: exchange, routingKey: "");
@@ -319,7 +312,6 @@ public class FactoryConstant
     {
         try
         {
-            IModel i_model = this.i_commection.CreateModel();
             i_model.BasicCancel(consumerTag);
         }
         catch (System.Exception ex)
@@ -336,7 +328,6 @@ public class FactoryConstant
     {
         try
         {
-            IModel i_model = this.i_commection.CreateModel();
             i_model.QueuePurge(consumerTag);
         }
         catch (System.Exception ex)

@@ -126,7 +126,7 @@ public class Core
     public (string queue_name, string consume_tag) ReceiveMatchOrder()
     {
         string queue_name = FactoryService.instance.GetMqOrderDeal(this.model.info.market);
-        string consume_tag = FactoryService.instance.constant.MqWorker(queue_name, (b) =>
+        string consume_tag = FactoryService.instance.constant.MqWorker(this.model.i_model, queue_name, (b) =>
         {
             string json = Encoding.UTF8.GetString(b);
             (long no, List<Orders> orders, List<Deal> deals, List<Orders> cancels) deals = JsonConvert.DeserializeObject<(long no, List<Orders> orders, List<Deal> deals, List<Orders> cancels)>(json);

@@ -433,7 +433,7 @@ public class ServiceOrder
     }
 
     /// <summary>
-    /// DB未完成挂单重要推送到mq和redis
+    /// DB未完成挂单重复推送到mq和redis
     /// </summary>
     /// <param name="market"></param>
     /// <returns></returns>

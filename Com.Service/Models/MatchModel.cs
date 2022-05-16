@@ -5,6 +5,8 @@ using Com.Api.Sdk.Enum;
 using Com.Service.Match;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
+using RabbitMQ.Client;
+using Com.Bll;
 
 namespace Com.Service.Models;
 
@@ -60,6 +62,11 @@ public class MatchModel
     /// <returns></returns>
     public Stopwatch stopwatch = new Stopwatch();
     /// <summary>
+    /// mq 通道接口
+    /// </summary>
+    public readonly IModel i_model = null!;
+
+    /// <summary>
     /// 初始化
     /// </summary>
     /// <param name="info"></param>
@@ -67,5 +74,6 @@ public class MatchModel
     {
         this.info = info;
         this.eventId = new EventId(1, info.symbol);
+        this.i_model = FactoryService.instance.constant.i_commection.CreateModel();
     }
 }

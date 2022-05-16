@@ -171,170 +171,12 @@ public class Core
         FactoryService.instance.constant.logger.LogInformation($"线程Id({model.info.symbol}):{Thread.CurrentThread.ManagedThreadId.ToString()}");
         if (deals.Count > 0)
         {
-            if (process.asset == false)
-            {
-                FactoryService.instance.constant.stopwatch.Restart();
-                (bool result, List<RunningFee> running_fee, List<RunningTrade> running_trade) result = service_wallet.Transaction(this.model.info, deals);
-                process.asset = result.result;
-                FactoryService.instance.constant.stopwatch.Stop();
-                FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>成交记录{deals.Count}条,实际资产转移(结果)");
-                if (result.result)
-                {
-                    if (process.order == false && orders.Count > 0)
-                    {
-                        FactoryService.instance.constant.stopwatch.Restart();
-                        process.order = service_order.UpdateOrder(orders);
-                        FactoryService.instance.constant.stopwatch.Stop();
-                        FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>更新{orders.Count}条订单记录");
-                    }
-                    else
-                    {
-                        process.order = true;
-                    }
-                    if (process.running_fee == false && result.running_fee.Count > 0)
-                    {
-                        FactoryService.instance.constant.stopwatch.Restart();
-                        process.running_fee = service_wallet.AddRunningFee(result.running_fee);
-                        FactoryService.instance.constant.stopwatch.Stop();
-                        FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>添加资金流水(手续费){result.running_fee.Count}条");
-                    }
-                    else
-                    {
-                        process.running_fee = true;
-                    }
-                    if (process.running_trade == false && result.running_trade.Count > 0)
-                    {
-                        FactoryService.instance.constant.stopwatch.Restart();
-                        process.running_trade = service_wallet.AddRunningTrade(result.running_trade);
-                        FactoryService.instance.constant.stopwatch.Stop();
-                        FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>添加资金流水(交易){result.running_trade.Count}条");
-                    }
-                    else
-                    {
-                        process.running_trade = true;
-                    }
-                }
-            }
-            if (process.deal == false)
-            {
-                FactoryService.instance.constant.stopwatch.Restart();
-                process.deal = service_deal.AddDeal(deals);
-                FactoryService.instance.constant.stopwatch.Stop();
-                FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>成交记录:{deals.Count}");
-            }
-            if (orders.Count > 0)
-            {
-                if (process.order_complete_thaw == false)
-                {
-                    process.order_complete_thaw = true;
-                    FactoryService.instance.constant.stopwatch.Restart();
-                    E_WalletType wallet_type = E_WalletType.main;
-                    if (this.model.info.market_type == E_MarketType.spot)
-                    {
-                        wallet_type = E_WalletType.spot;
-                    }
-                    List<Orders> order_buy = orders.Where(P => P.state == E_OrderState.completed && P.unsold > 0 && P.side == E_OrderSide.buy).ToList();
-                    var order_buy_uid = from o in order_buy
-                                        group o by o.uid into g
-                                        select new { uid = g.Key, unsold = g.Sum(P => P.unsold), order = g.ToList() };
-                    foreach (var item in order_buy_uid)
-                    {
-                        if (service_wallet.FreezeChange(wallet_type, item.uid, this.model.info.coin_id_quote, -item.unsold))
-                        {
-                            item.order.ForEach(P => { P.complete_thaw = P.unsold; P.unsold = 0; });
-                        }
-                    }
-                    process.order_complete_thaw = process.order_complete_thaw && service_order.UpdateOrder(order_buy);
-                    List<Orders> order_sell = orders.Where(P => P.state == E_OrderState.completed && P.unsold > 0 && P.side == E_OrderSide.sell).ToList();
-                    var order_sell_uid = from o in order_sell
-                                         group o by o.uid into g
-                                         select new { uid = g.Key, unsold = g.Sum(P => P.unsold), order = g.ToList() };
-                    foreach (var item in order_sell_uid)
-                    {
-                        if (service_wallet.FreezeChange(wallet_type, item.uid, this.model.info.coin_id_base, -item.unsold))
-                        {
-                            item.order.ForEach(P => { P.complete_thaw = P.unsold; P.unsold = 0; });
-                        }
-                    }
-                    process.order_complete_thaw = process.order_complete_thaw && service_order.UpdateOrder(order_sell);
-                    FactoryService.instance.constant.stopwatch.Stop();
-                    FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>更新订单记录(完成解冻多余资金)");
-                }
-                if (process.push_order == false)
-                {
-                    FactoryService.instance.constant.stopwatch.Restart();
-                    var uid_order = orders.GroupBy(P => P.uid).ToList();
-                    process.push_order = true;
-                    foreach (var item in uid_order)
-                    {
-                        res_order.data = item.ToList();
-                        process.push_order = process.push_order && FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.orders, item.Key), JsonConvert.SerializeObject(res_order, new JsonConverterDecimal()));
-                    }
-                    FactoryService.instance.constant.stopwatch.Stop();
-                    FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:Mq=>推送订单更新");
-                }
-            }
-            else
-            {
-                process.order_complete_thaw = true;
-                process.push_order = true;
-            }
-            Dictionary<E_KlineType, DateTimeOffset> last_kline = new Dictionary<E_KlineType, DateTimeOffset>();
-            if (process.push_kline == false)
-            {
-                FactoryService.instance.constant.stopwatch.Restart();
-                Dictionary<E_KlineType, List<Kline>> klines = this.service_kline.DBtoRedised(this.model.info.market, this.model.info.symbol, deals.Max(P => P.time));
-                Dictionary<E_KlineType, Kline> klineing = this.service_kline.DBtoRedising(this.model.info.market, this.model.info.symbol, deals);
-                process.push_kline = true;
-                FactoryService.instance.constant.stopwatch.Stop();
-                FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB,redis=>同步K线记录");
-                FactoryService.instance.constant.stopwatch.Restart();
-                foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
-                {
-                    List<ResKline> push_kline = new List<ResKline>();
-                    if (klines.ContainsKey(cycle))
-                    {
-                        push_kline = klines[cycle].ConvertAll(P => (ResKline)P);
-                    }
-                    if (klineing.ContainsKey(cycle))
-                    {
-                        push_kline.RemoveAll(P => P.time_start == klineing[cycle].time_start);
-                        push_kline.Add(klineing[cycle]);
-                    }
-                    if (push_kline.Count > 0)
-                    {
-                        res_kline.channel = (E_WebsockerChannel)Enum.Parse(typeof(E_WebsockerChannel), cycle.ToString());
-                        res_kline.data = push_kline;
-                        FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(res_kline.channel, this.model.info.market), JsonConvert.SerializeObject(res_kline, new JsonConverterDecimal()));
-                    }
-                }
-                FactoryService.instance.constant.stopwatch.Stop();
-                FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:Mq=>推送K线记录");
-            }
-            if (process.push_deal == false)
-            {
-                FactoryService.instance.constant.stopwatch.Restart();
-                SortedSetEntry[] entries = new SortedSetEntry[deals.Count()];
-                res_deal.data = new List<ResDeal>();
-                for (int i = 0; i < deals.Count(); i++)
-                {
-                    ResDeal resdeal = service_deal.Convert(deals[i]);
-                    entries[i] = new SortedSetEntry(JsonConvert.SerializeObject(resdeal), resdeal.time.ToUnixTimeMilliseconds());
-                    res_deal.data.Add(resdeal);
-                }
-                FactoryService.instance.constant.redis.SortedSetAdd(FactoryService.instance.GetRedisDeal(this.model.info.market), entries);
-                process.push_deal = FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.trades, this.model.info.market), JsonConvert.SerializeObject(res_deal, new JsonConverterDecimal()));
-                FactoryService.instance.constant.stopwatch.Stop();
-                FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:Mq,Redis=>推送交易记录");
-            }
-            if (process.push_ticker == false)
-            {
-                FactoryService.instance.constant.stopwatch.Restart();
-                ResTicker? ticker = service_deal.Get24HoursTicker(this.model.info.market);
-                process.push_ticker = service_deal.PushTicker(ticker);
-                FactoryService.instance.constant.stopwatch.Stop();
-                FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:Mq,Redis=>推送聚合行情");
-            }
+            Process_Asset(process, orders, deals);
+            Process_Deal_Db(process, deals);
+            Process_Order(process, orders);
+            Process_Kline(process, deals);
+            Process_Deal(process, deals);
+            Process_Ticker(process);
         }
         else
         {
@@ -351,15 +193,105 @@ public class Core
         }
         if (cancels.Count > 0)
         {
-            if (process.order_cancel == false)
+            Process_Cancel(process, cancels);
+            Process_Order_Cancel(process, cancels);
+        }
+        else
+        {
+            process.order_cancel = true;
+            process.push_order_cancel = true;
+        }
+    }
+
+    /// <summary>
+    /// 处理进程 资产
+    /// </summary>
+    /// <param name="process">处理进程</param>
+    /// <param name="orders">影响订单</param>
+    /// <param name="deals">成交记录</param>
+    private void Process_Asset(Processing process, List<Orders> orders, List<Deal> deals)
+    {
+        if (process.asset == false)
+        {
+            FactoryService.instance.constant.stopwatch.Restart();
+            (bool result, List<RunningFee> running_fee, List<RunningTrade> running_trade) result = service_wallet.Transaction(this.model.info, deals);
+            process.asset = result.result;
+            FactoryService.instance.constant.stopwatch.Stop();
+            FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>成交记录{deals.Count}条,实际资产转移(结果)");
+            if (result.result)
             {
+                if (process.order == false && orders.Count > 0)
+                {
+                    FactoryService.instance.constant.stopwatch.Restart();
+                    process.order = service_order.UpdateOrder(orders);
+                    FactoryService.instance.constant.stopwatch.Stop();
+                    FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>更新{orders.Count}条订单记录");
+                }
+                else
+                {
+                    process.order = true;
+                }
+                if (process.running_fee == false && result.running_fee.Count > 0)
+                {
+                    FactoryService.instance.constant.stopwatch.Restart();
+                    process.running_fee = service_wallet.AddRunningFee(result.running_fee);
+                    FactoryService.instance.constant.stopwatch.Stop();
+                    FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>添加资金流水(手续费){result.running_fee.Count}条");
+                }
+                else
+                {
+                    process.running_fee = true;
+                }
+                if (process.running_trade == false && result.running_trade.Count > 0)
+                {
+                    FactoryService.instance.constant.stopwatch.Restart();
+                    process.running_trade = service_wallet.AddRunningTrade(result.running_trade);
+                    FactoryService.instance.constant.stopwatch.Stop();
+                    FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>添加资金流水(交易){result.running_trade.Count}条");
+                }
+                else
+                {
+                    process.running_trade = true;
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// 处理进程 交易记录
+    /// </summary>
+    /// <param name="process">处理进程</param>
+    /// <param name="deals">deals</param>
+    private void Process_Deal_Db(Processing process, List<Deal> deals)
+    {
+        if (process.deal == false)
+        {
+            FactoryService.instance.constant.stopwatch.Restart();
+            process.deal = service_deal.AddDeal(deals);
+            FactoryService.instance.constant.stopwatch.Stop();
+            FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>成交记录:{deals.Count}");
+        }
+    }
+
+    /// <summary>
+    /// 处理进程 订单
+    /// </summary>
+    /// <param name="process">处理进程</param>
+    /// <param name="orders">影响订单</param>
+    private void Process_Order(Processing process, List<Orders> orders)
+    {
+        if (orders.Count > 0)
+        {
+            if (process.order_complete_thaw == false)
+            {
+                process.order_complete_thaw = true;
                 FactoryService.instance.constant.stopwatch.Restart();
                 E_WalletType wallet_type = E_WalletType.main;
                 if (this.model.info.market_type == E_MarketType.spot)
                 {
                     wallet_type = E_WalletType.spot;
                 }
-                List<Orders> order_buy = cancels.Where(P => P.state == E_OrderState.cancel && P.unsold > 0 && P.side == E_OrderSide.buy).ToList();
+                List<Orders> order_buy = orders.Where(P => P.state == E_OrderState.completed && P.unsold > 0 && P.side == E_OrderSide.buy).ToList();
                 var order_buy_uid = from o in order_buy
                                     group o by o.uid into g
                                     select new { uid = g.Key, unsold = g.Sum(P => P.unsold), order = g.ToList() };
@@ -370,7 +302,8 @@ public class Core
                         item.order.ForEach(P => { P.complete_thaw = P.unsold; P.unsold = 0; });
                     }
                 }
-                List<Orders> order_sell = cancels.Where(P => P.state == E_OrderState.cancel && P.unsold > 0 && P.side == E_OrderSide.sell).ToList();
+                process.order_complete_thaw = process.order_complete_thaw && service_order.UpdateOrder(order_buy);
+                List<Orders> order_sell = orders.Where(P => P.state == E_OrderState.completed && P.unsold > 0 && P.side == E_OrderSide.sell).ToList();
                 var order_sell_uid = from o in order_sell
                                      group o by o.uid into g
                                      select new { uid = g.Key, unsold = g.Sum(P => P.unsold), order = g.ToList() };
@@ -381,27 +314,174 @@ public class Core
                         item.order.ForEach(P => { P.complete_thaw = P.unsold; P.unsold = 0; });
                     }
                 }
-                process.order_cancel = service_order.UpdateOrder(cancels);
+                process.order_complete_thaw = process.order_complete_thaw && service_order.UpdateOrder(order_sell);
                 FactoryService.instance.constant.stopwatch.Stop();
-                FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>撤单{cancels.Count}条订单记录");
+                FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>更新订单记录(完成解冻多余资金)");
             }
-            if (process.push_order_cancel == false)
+            if (process.push_order == false)
             {
-                var uid_order = cancels.GroupBy(P => P.uid).ToList();
-                process.push_order_cancel = true;
+                FactoryService.instance.constant.stopwatch.Restart();
+                var uid_order = orders.GroupBy(P => P.uid).ToList();
+                process.push_order = true;
                 foreach (var item in uid_order)
                 {
                     res_order.data = item.ToList();
-                    process.push_order_cancel = process.push_order_cancel && FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.orders, item.Key), JsonConvert.SerializeObject(item.ToList(), new JsonConverterDecimal()));
+                    process.push_order = process.push_order && FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.orders, item.Key), JsonConvert.SerializeObject(res_order, new JsonConverterDecimal()));
                 }
                 FactoryService.instance.constant.stopwatch.Stop();
-                FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:Mq=>推送撤单订单");
+                FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:Mq=>推送订单更新");
             }
         }
         else
         {
-            process.order_cancel = true;
+            process.order_complete_thaw = true;
+            process.push_order = true;
+        }
+    }
+
+    /// <summary>
+    /// 处理进程 K线
+    /// </summary>
+    /// <param name="process">处理进程</param>
+    /// <param name="deals">deals</param>
+    private void Process_Kline(Processing process, List<Deal> deals)
+    {
+        Dictionary<E_KlineType, DateTimeOffset> last_kline = new Dictionary<E_KlineType, DateTimeOffset>();
+        if (process.push_kline == false)
+        {
+            FactoryService.instance.constant.stopwatch.Restart();
+            Dictionary<E_KlineType, List<Kline>> klines = this.service_kline.DBtoRedised(this.model.info.market, this.model.info.symbol, deals.Max(P => P.time));
+            Dictionary<E_KlineType, Kline> klineing = this.service_kline.DBtoRedising(this.model.info.market, this.model.info.symbol, deals);
+            process.push_kline = true;
+            FactoryService.instance.constant.stopwatch.Stop();
+            FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB,redis=>同步K线记录");
+            FactoryService.instance.constant.stopwatch.Restart();
+            foreach (E_KlineType cycle in System.Enum.GetValues(typeof(E_KlineType)))
+            {
+                List<ResKline> push_kline = new List<ResKline>();
+                if (klines.ContainsKey(cycle))
+                {
+                    push_kline = klines[cycle].ConvertAll(P => (ResKline)P);
+                }
+                if (klineing.ContainsKey(cycle))
+                {
+                    push_kline.RemoveAll(P => P.time_start == klineing[cycle].time_start);
+                    push_kline.Add(klineing[cycle]);
+                }
+                if (push_kline.Count > 0)
+                {
+                    res_kline.channel = (E_WebsockerChannel)Enum.Parse(typeof(E_WebsockerChannel), cycle.ToString());
+                    res_kline.data = push_kline;
+                    FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(res_kline.channel, this.model.info.market), JsonConvert.SerializeObject(res_kline, new JsonConverterDecimal()));
+                }
+            }
+            FactoryService.instance.constant.stopwatch.Stop();
+            FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:Mq=>推送K线记录");
+        }
+    }
+
+    /// <summary>
+    /// 处理进程 成交记录
+    /// </summary>
+    /// <param name="process">处理进程</param>
+    /// <param name="deals">deals</param>
+    private void Process_Deal(Processing process, List<Deal> deals)
+    {
+        if (process.push_deal == false)
+        {
+            FactoryService.instance.constant.stopwatch.Restart();
+            SortedSetEntry[] entries = new SortedSetEntry[deals.Count()];
+            res_deal.data = new List<ResDeal>();
+            for (int i = 0; i < deals.Count(); i++)
+            {
+                ResDeal resdeal = service_deal.Convert(deals[i]);
+                entries[i] = new SortedSetEntry(JsonConvert.SerializeObject(resdeal), resdeal.time.ToUnixTimeMilliseconds());
+                res_deal.data.Add(resdeal);
+            }
+            FactoryService.instance.constant.redis.SortedSetAdd(FactoryService.instance.GetRedisDeal(this.model.info.market), entries);
+            process.push_deal = FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.trades, this.model.info.market), JsonConvert.SerializeObject(res_deal, new JsonConverterDecimal()));
+            FactoryService.instance.constant.stopwatch.Stop();
+            FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:Mq,Redis=>推送交易记录");
+        }
+    }
+
+    /// <summary>
+    /// 处理进程 聚合行情
+    /// </summary>
+    /// <param name="process">处理进程</param>
+    private void Process_Ticker(Processing process)
+    {
+        if (process.push_ticker == false)
+        {
+            FactoryService.instance.constant.stopwatch.Restart();
+            ResTicker? ticker = service_deal.Get24HoursTicker(this.model.info.market);
+            process.push_ticker = service_deal.PushTicker(ticker);
+            FactoryService.instance.constant.stopwatch.Stop();
+            FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:Mq,Redis=>推送聚合行情");
+        }
+    }
+
+    /// <summary>
+    /// 处理进程 订单取消
+    /// </summary>
+    /// <param name="process">处理进程</param>
+    /// <param name="cancels">取消订单</param>
+    private void Process_Cancel(Processing process, List<Orders> cancels)
+    {
+        if (process.order_cancel == false)
+        {
+            FactoryService.instance.constant.stopwatch.Restart();
+            E_WalletType wallet_type = E_WalletType.main;
+            if (this.model.info.market_type == E_MarketType.spot)
+            {
+                wallet_type = E_WalletType.spot;
+            }
+            List<Orders> order_buy = cancels.Where(P => P.state == E_OrderState.cancel && P.unsold > 0 && P.side == E_OrderSide.buy).ToList();
+            var order_buy_uid = from o in order_buy
+                                group o by o.uid into g
+                                select new { uid = g.Key, unsold = g.Sum(P => P.unsold), order = g.ToList() };
+            foreach (var item in order_buy_uid)
+            {
+                if (service_wallet.FreezeChange(wallet_type, item.uid, this.model.info.coin_id_quote, -item.unsold))
+                {
+                    item.order.ForEach(P => { P.complete_thaw = P.unsold; P.unsold = 0; });
+                }
+            }
+            List<Orders> order_sell = cancels.Where(P => P.state == E_OrderState.cancel && P.unsold > 0 && P.side == E_OrderSide.sell).ToList();
+            var order_sell_uid = from o in order_sell
+                                 group o by o.uid into g
+                                 select new { uid = g.Key, unsold = g.Sum(P => P.unsold), order = g.ToList() };
+            foreach (var item in order_sell_uid)
+            {
+                if (service_wallet.FreezeChange(wallet_type, item.uid, this.model.info.coin_id_base, -item.unsold))
+                {
+                    item.order.ForEach(P => { P.complete_thaw = P.unsold; P.unsold = 0; });
+                }
+            }
+            process.order_cancel = service_order.UpdateOrder(cancels);
+            FactoryService.instance.constant.stopwatch.Stop();
+            FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>撤单{cancels.Count}条订单记录");
+        }
+    }
+
+    /// <summary>
+    /// 处理进程 订单取消
+    /// </summary>
+    /// <param name="process">处理进程</param>
+    /// <param name="cancels">取消订单</param>
+    private void Process_Order_Cancel(Processing process, List<Orders> cancels)
+    {
+        if (process.push_order_cancel == false)
+        {
+            var uid_order = cancels.GroupBy(P => P.uid).ToList();
             process.push_order_cancel = true;
+            foreach (var item in uid_order)
+            {
+                res_order.data = item.ToList();
+                process.push_order_cancel = process.push_order_cancel && FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.orders, item.Key), JsonConvert.SerializeObject(item.ToList(), new JsonConverterDecimal()));
+            }
+            FactoryService.instance.constant.stopwatch.Stop();
+            FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:Mq=>推送撤单订单");
         }
     }
 

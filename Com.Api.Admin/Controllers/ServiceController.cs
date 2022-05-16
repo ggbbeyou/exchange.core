@@ -77,15 +77,15 @@ public class ServiceController : ControllerBase
             bool? rsult = null;
             if (status == 0)
             {
-                marketInfo.status = await FactoryAdmin.instance.ServiceGetStatus(marketInfo) ?? marketInfo.status;
+                rsult = await FactoryAdmin.instance.ServiceGetStatus(marketInfo) ?? marketInfo.status;
             }
             else if (status == 1)
             {
-                marketInfo.status = await FactoryAdmin.instance.ServiceStart(marketInfo) ?? marketInfo.status;
+                rsult = await FactoryAdmin.instance.ServiceStart(marketInfo) ?? marketInfo.status;
             }
             else if (status == 2)
             {
-                marketInfo.status = await FactoryAdmin.instance.ServiceStop(marketInfo) ?? marketInfo.status;
+                rsult = await FactoryAdmin.instance.ServiceStop(marketInfo) ?? marketInfo.status;
             }
             if (rsult == null)
             {

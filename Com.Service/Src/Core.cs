@@ -172,11 +172,11 @@ public class Core
         if (deals.Count > 0)
         {
             Process_Asset(process, orders, deals);
-            Process_Deal_Db(process, deals);
+            Process_Deal(process, deals);
             Process_Order(process, orders);
             Process_Kline(process, deals);
-            Process_Deal(process, deals);
-            Process_Ticker(process);
+            Process_Deal_Push(process, deals);
+            Process_Ticker_Push(process);
         }
         else
         {
@@ -194,7 +194,7 @@ public class Core
         if (cancels.Count > 0)
         {
             Process_Cancel(process, cancels);
-            Process_Order_Cancel(process, cancels);
+            Process_Cancel_Push(process, cancels);
         }
         else
         {
@@ -262,7 +262,7 @@ public class Core
     /// </summary>
     /// <param name="process">处理进程</param>
     /// <param name="deals">deals</param>
-    private void Process_Deal_Db(Processing process, List<Deal> deals)
+    private void Process_Deal(Processing process, List<Deal> deals)
     {
         if (process.deal == false)
         {
@@ -385,7 +385,7 @@ public class Core
     /// </summary>
     /// <param name="process">处理进程</param>
     /// <param name="deals">deals</param>
-    private void Process_Deal(Processing process, List<Deal> deals)
+    private void Process_Deal_Push(Processing process, List<Deal> deals)
     {
         if (process.push_deal == false)
         {
@@ -409,7 +409,7 @@ public class Core
     /// 处理进程 聚合行情
     /// </summary>
     /// <param name="process">处理进程</param>
-    private void Process_Ticker(Processing process)
+    private void Process_Ticker_Push(Processing process)
     {
         if (process.push_ticker == false)
         {
@@ -469,7 +469,7 @@ public class Core
     /// </summary>
     /// <param name="process">处理进程</param>
     /// <param name="cancels">取消订单</param>
-    private void Process_Order_Cancel(Processing process, List<Orders> cancels)
+    private void Process_Cancel_Push(Processing process, List<Orders> cancels)
     {
         if (process.push_order_cancel == false)
         {

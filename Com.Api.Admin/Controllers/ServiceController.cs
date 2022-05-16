@@ -93,15 +93,11 @@ public class ServiceController : ControllerBase
                 res.data = false;
                 return res;
             }
-            if (rsult == true)
+            else
             {
-                marketInfo.status = true;
                 res.code = E_Res_Code.ok;
-            }
-            else if (rsult == false)
-            {
-                marketInfo.status = false;
-                res.code = E_Res_Code.fail;
+                res.data = rsult.Value;
+                marketInfo.status = rsult.Value;
             }
             this.db.SaveChanges();
         }

@@ -142,7 +142,7 @@ public class MQ
         {
             Processing process = new Processing() { no = FactoryService.instance.constant.worker.NextId(), match = true };
             FactoryService.instance.constant.redis.HashSet(FactoryService.instance.GetRedisProcess(), process.no, JsonConvert.SerializeObject(process));
-            FactoryService.instance.constant.MqTask(this.model.i_model, FactoryService.instance.GetMqOrderDeal(this.model.info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject((process.no, orders, deal, cancel))));
+            FactoryService.instance.constant.MqTask(FactoryService.instance.GetMqOrderDeal(this.model.info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject((process.no, orders, deal, cancel))));
         }
         if (deal.Count() > 0 || cancel.Count > 0)
         {

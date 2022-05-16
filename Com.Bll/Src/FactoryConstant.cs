@@ -223,7 +223,7 @@ public class FactoryConstant
     /// </summary>
     /// <param name="queue_name"></param>
     /// <param name="body"></param>
-    public bool MqTask(IModel i_model, string queue_name, byte[] body)
+    public bool MqTask(string queue_name, byte[] body)
     {
         try
         {

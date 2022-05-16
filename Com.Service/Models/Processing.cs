@@ -52,7 +52,12 @@ public class Processing
     /// 订单完成或撤单解冻多余资金
     /// </summary>
     /// <value></value>
-    public bool order_complete_thaw { get; set; }
+    public bool order_complete_thaw_buy { get; set; }
+    /// <summary>
+    /// 订单完成或撤单解冻多余资金
+    /// </summary>
+    /// <value></value>
+    public bool order_complete_thaw_sell { get; set; }
     /// <summary>
     /// 推送订单更新
     /// </summary>

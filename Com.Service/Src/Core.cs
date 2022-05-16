@@ -145,7 +145,7 @@ public class Core
             ReceiveDealOrder(process, deals.orders, deals.deals, deals.cancels);
             this.stopwatch.Stop();
             FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{this.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:撮合后续处理总时间(成交记录数:{deals.deals.Count},成交订单数:{deals.orders.Count},撤单数:{deals.cancels.Count}),处理结果:{JsonConvert.SerializeObject(process)}");
-            if (process.match && process.asset && process.running_fee && process.deal && process.order && process.order_cancel && process.order_complete_thaw && process.push_order && process.push_order_cancel && process.push_kline && process.push_deal && process.push_ticker)
+            if (process.match && process.asset && process.running_fee && process.deal && process.order && process.order_cancel && process.order_complete_thaw_buy && process.order_complete_thaw_sell && process.push_order && process.push_order_cancel && process.push_kline && process.push_deal && process.push_ticker)
             {
                 FactoryService.instance.constant.redis.HashDelete(FactoryService.instance.GetRedisProcess(), process.no);
                 return true;
@@ -185,7 +185,8 @@ public class Core
             process.running_trade = true;
             process.deal = true;
             process.order = true;
-            process.order_complete_thaw = true;
+            process.order_complete_thaw_buy = true;
+            process.order_complete_thaw_sell = true;
             process.push_order = true;
             process.push_kline = true;
             process.push_deal = true;
@@ -282,15 +283,14 @@ public class Core
     {
         if (orders.Count > 0)
         {
-            if (process.order_complete_thaw == false)
+            E_WalletType wallet_type = E_WalletType.main;
+            if (this.model.info.market_type == E_MarketType.spot)
             {
-                process.order_complete_thaw = true;
+                wallet_type = E_WalletType.spot;
+            }
+            if (process.order_complete_thaw_buy == false)
+            {
                 FactoryService.instance.constant.stopwatch.Restart();
-                E_WalletType wallet_type = E_WalletType.main;
-                if (this.model.info.market_type == E_MarketType.spot)
-                {
-                    wallet_type = E_WalletType.spot;
-                }
                 List<Orders> order_buy = orders.Where(P => P.state == E_OrderState.completed && P.unsold > 0 && P.side == E_OrderSide.buy).ToList();
                 var order_buy_uid = from o in order_buy
                                     group o by o.uid into g
@@ -302,7 +302,10 @@ public class Core
                         item.order.ForEach(P => { P.complete_thaw = P.unsold; P.unsold = 0; });
                     }
                 }
-                process.order_complete_thaw = process.order_complete_thaw && service_order.UpdateOrder(order_buy);
+                process.order_complete_thaw_buy = service_order.UpdateOrder(order_buy);
+            }
+            if (process.order_complete_thaw_sell == false)
+            {
                 List<Orders> order_sell = orders.Where(P => P.state == E_OrderState.completed && P.unsold > 0 && P.side == E_OrderSide.sell).ToList();
                 var order_sell_uid = from o in order_sell
                                      group o by o.uid into g
@@ -314,7 +317,7 @@ public class Core
                         item.order.ForEach(P => { P.complete_thaw = P.unsold; P.unsold = 0; });
                     }
                 }
-                process.order_complete_thaw = process.order_complete_thaw && service_order.UpdateOrder(order_sell);
+                process.order_complete_thaw_sell = service_order.UpdateOrder(order_sell);
                 FactoryService.instance.constant.stopwatch.Stop();
                 FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB=>更新订单记录(完成解冻多余资金)");
             }
@@ -334,7 +337,8 @@ public class Core
         }
         else
         {
-            process.order_complete_thaw = true;
+            process.order_complete_thaw_buy = true;
+            process.order_complete_thaw_sell = true;
             process.push_order = true;
         }
     }
@@ -352,7 +356,6 @@ public class Core
             FactoryService.instance.constant.stopwatch.Restart();
             Dictionary<E_KlineType, List<Kline>> klines = this.service_kline.DBtoRedised(this.model.info.market, this.model.info.symbol, deals.Max(P => P.time));
             Dictionary<E_KlineType, Kline> klineing = this.service_kline.DBtoRedising(this.model.info.market, this.model.info.symbol, deals);
-            process.push_kline = true;
             FactoryService.instance.constant.stopwatch.Stop();
             FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:DB,redis=>同步K线记录");
             FactoryService.instance.constant.stopwatch.Restart();
@@ -375,6 +378,7 @@ public class Core
                     FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(res_kline.channel, this.model.info.market), JsonConvert.SerializeObject(res_kline, new JsonConverterDecimal()));
                 }
             }
+            process.push_kline = true;
             FactoryService.instance.constant.stopwatch.Stop();
             FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:Mq=>推送K线记录");
         }

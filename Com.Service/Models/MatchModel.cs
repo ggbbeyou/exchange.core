@@ -4,6 +4,7 @@ using Com.Db;
 using Com.Api.Sdk.Enum;
 using Com.Service.Match;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics;
 
 namespace Com.Service.Models;
 
@@ -53,6 +54,11 @@ public class MatchModel
     /// <typeparam name="string"></typeparam>
     /// <returns></returns>
     public HashSet<string> mq_consumer = new HashSet<string>();
+    /// <summary>
+    /// 秒表
+    /// </summary>
+    /// <returns></returns>
+    public Stopwatch stopwatch = new Stopwatch();
     /// <summary>
     /// 初始化
     /// </summary>

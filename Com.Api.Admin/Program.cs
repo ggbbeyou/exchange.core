@@ -16,9 +16,15 @@ builder.Services.AddCors(options =>
 });
 builder.Services.AddDbContextPool<DbContextEF>(options =>
 {
-    options.UseLoggerFactory(LoggerFactory.Create(builder => { builder.AddConsole(); }));
-    options.EnableSensitiveDataLogging();
-    DbContextOptions options1 = options.UseSqlServer(builder.Configuration.GetConnectionString("Mssql")).Options;
+    // options.UseLoggerFactory(LoggerFactory.Create(builder => { builder.AddConsole(); }));
+    // options.EnableSensitiveDataLogging();
+    DbContextOptions options1 = options.UseSqlServer(builder.Configuration.GetConnectionString("Mssql"), builder =>
+    {
+        builder.EnableRetryOnFailure(
+            maxRetryCount: 5,
+            maxRetryDelay: TimeSpan.FromSeconds(30),
+            errorNumbersToAdd: new int[] { 2 });
+    }).Options;
 });
 builder.Services.AddStackExchangeRedisCache(options =>
 {

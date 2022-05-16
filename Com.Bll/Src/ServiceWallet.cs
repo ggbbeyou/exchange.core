@@ -644,7 +644,7 @@ public class ServiceWallet
             FactoryService.instance.constant.logger.LogError(ex, "PushWallet" + ex.Message);
         }
         stopwatch.Stop();
-        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{stopwatch.Elapsed.ToString()};:Mq=>资金变更,{remark}");
+        FactoryService.instance.constant.logger.LogTrace($"计算耗时:{stopwatch.Elapsed.ToString()};:Mq=>资金变更推送,{remark}");
     }
 
 }

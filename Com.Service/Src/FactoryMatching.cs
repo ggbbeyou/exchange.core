@@ -161,9 +161,9 @@ public class FactoryMatching
             string queue_name = FactoryService.instance.GetMqOrderPlace(info.market);
             // if (!mm.mq_queues.Contains(queue_name))
             // {
-                IModel i_model = FactoryService.instance.constant.i_commection.CreateModel();
-                i_model.QueueDeclare(queue: queue_name, durable: true, exclusive: false, autoDelete: false, arguments: null);
-                // mm.mq_queues.Add(queue_name);
+            // IModel i_model = FactoryService.instance.constant.i_commection.CreateModel();
+            mm.mq_helper.i_model.QueueDeclare(queue: queue_name, durable: true, exclusive: false, autoDelete: false, arguments: null);
+            // mm.mq_queues.Add(queue_name);
             // }
             // foreach (var item in mm.mq_queues)
             // {

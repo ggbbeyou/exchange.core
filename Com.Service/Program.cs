@@ -19,10 +19,10 @@ builder.ConfigureServices((hostContext, services) =>
                 // options.EnableSensitiveDataLogging();
                 DbContextOptions options1 = options.UseSqlServer(hostContext.Configuration.GetConnectionString("Mssql"), builder =>
                 {
-                    builder.EnableRetryOnFailure(
-                        maxRetryCount: 5,
-                        maxRetryDelay: TimeSpan.FromSeconds(30),
-                        errorNumbersToAdd: new int[] { 2 });
+                    // builder.EnableRetryOnFailure(
+                    //     maxRetryCount: 5,
+                    //     maxRetryDelay: TimeSpan.FromSeconds(30),
+                    //     errorNumbersToAdd: new int[] { 2 });
                 }).Options;
 
             });

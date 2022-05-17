@@ -45,18 +45,18 @@ public class MatchModel
     /// </summary>
     /// <value></value>
     public Core core { get; set; } = null!;
-    /// <summary>
-    /// mq 队列名称
-    /// </summary>
-    /// <typeparam name="string"></typeparam>
-    /// <returns></returns>
-    public HashSet<string> mq_queues = new HashSet<string>();
-    /// <summary>
-    /// mq 消费者事件标示
-    /// </summary>
-    /// <typeparam name="string"></typeparam>
-    /// <returns></returns>
-    public HashSet<string> mq_consumer = new HashSet<string>();
+    // /// <summary>
+    // /// mq 队列名称
+    // /// </summary>
+    // /// <typeparam name="string"></typeparam>
+    // /// <returns></returns>
+    // public HashSet<string> mq_queues = new HashSet<string>();
+    // /// <summary>
+    // /// mq 消费者事件标示
+    // /// </summary>
+    // /// <typeparam name="string"></typeparam>
+    // /// <returns></returns>
+    // public HashSet<string> mq_consumer = new HashSet<string>();
     /// <summary>
     /// 秒表
     /// </summary>

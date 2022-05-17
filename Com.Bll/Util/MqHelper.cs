@@ -39,6 +39,15 @@ public class MqHelper
     }
 
     /// <summary>
+    /// 初始化
+    /// </summary>
+    /// <param name="i_commection">mq连接对象</param>
+    public MqHelper(IConnection i_commection)
+    {
+        this.i_model = i_commection.CreateModel();
+    }
+
+    /// <summary>
     /// MQ 简单的队列 发送消息
     /// </summary>
     /// <param name="queue_name"></param>

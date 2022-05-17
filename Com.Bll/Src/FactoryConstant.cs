@@ -111,9 +111,13 @@ public class FactoryConstant
             this.connectionFactory = config.GetSection("RabbitMQ").Get<ConnectionFactory>();
             if (this.connectionFactory != null)
             {
-                this.i_commection = this.connectionFactory.CreateConnection();
+                // this.i_commection = this.connectionFactory.CreateConnection();
                 // this.i_model = this.i_commection.CreateModel();
                 mq_helper = new MqHelper(this.connectionFactory);
+            }
+            else
+            {
+                this.logger.LogError($"mq服务器地址没有找到");
             }
         }
         catch (Exception ex)

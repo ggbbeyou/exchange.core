@@ -75,6 +75,6 @@ public class MatchModel
     {
         this.info = info;
         this.eventId = new EventId(1, info.symbol);
-        this.mq_helper = new MqHelper(FactoryService.instance.constant.connection_factory);
+        this.mq_helper = new MqHelper(FactoryService.instance.constant.connection_factory.CreateConnection());
     }
 }

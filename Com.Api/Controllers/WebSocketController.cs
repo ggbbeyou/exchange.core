@@ -95,7 +95,14 @@ public class WebSocketController : ControllerBase
     /// </summary>
     public WebSocketController()
     {
-        this.mq_helper = new MqHelper(FactoryService.instance.constant.connection_factory);
+        try
+        {
+            this.mq_helper = new MqHelper(FactoryService.instance.constant.connection_factory.CreateConnection());
+        }
+        catch (RabbitMQ.Client.Exceptions.BrokerUnreachableException ex)
+        {
+            this.mq_helper = new MqHelper(FactoryService.instance.constant.connection_factory);
+        }
     }
 
     /// <summary>

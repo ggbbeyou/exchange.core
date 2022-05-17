@@ -125,8 +125,7 @@ public class Core
     /// <returns>queue_name:队列名,consume_tag消费者标签</returns>
     public (string queue_name, string consume_tag) ReceiveMatchOrder()
     {
-        string queue_name = FactoryService.instance.GetMqOrderDeal(this.model.info.market);
-        string consume_tag = FactoryService.instance.constant.MqWorker(this.model.i_model, queue_name, (b) =>
+        return this.model.mq_helper.MqWorker(FactoryService.instance.GetMqOrderDeal(this.model.info.market), (b) =>
         {
             string json = Encoding.UTF8.GetString(b);
             (long no, List<Orders> orders, List<Deal> deals, List<Orders> cancels) deals = JsonConvert.DeserializeObject<(long no, List<Orders> orders, List<Deal> deals, List<Orders> cancels)>(json);
@@ -156,7 +155,6 @@ public class Core
                 return false;
             }
         });
-        return (queue_name, consume_tag);
     }
 
     /// <summary>

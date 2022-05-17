@@ -64,8 +64,7 @@ public class MQ
     /// <returns>队列标识</returns>
     public (string queue_name, string consume_tag) OrderReceive()
     {
-        string queue_name = FactoryService.instance.GetMqOrderPlace(this.model.info.market);
-        string consume_tag = FactoryService.instance.constant.MqReceive(this.model.i_model, queue_name, (e) =>
+        return this.model.mq_helper.MqReceive(FactoryService.instance.GetMqOrderPlace(this.model.info.market), (e) =>
         {
             string json = Encoding.UTF8.GetString(e);
             ReqCall<object>? reqCall = JsonConvert.DeserializeObject<ReqCall<object>>(json);
@@ -130,7 +129,6 @@ public class MQ
             }
             return true;
         });
-        return (queue_name, consume_tag);
     }
 
     /// <summary>

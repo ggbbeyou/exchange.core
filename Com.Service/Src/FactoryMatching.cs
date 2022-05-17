@@ -170,6 +170,7 @@ public class FactoryMatching
             //     FactoryService.instance.constant.MqDeletePurge(item);
             // }
             mm.mq_helper.MqDeletePurge();
+            mm.mq_helper.MqDelete();
             // mm.mq_queues.Clear();
             mm.mq.DepthChange(new List<Orders>(), new List<Deal>(), mm.match_core.CancelOrder());
         }

@@ -133,6 +133,7 @@ public class WebSocketController : ControllerBase
                             // }
                             this.mq_helper.MqDeleteConsumer();
                             this.mq_helper.MqDeletePurge();
+                            this.mq_helper.MqDelete();
                             this.mq_helper.Close();
                             channel.Clear();
                             break;
@@ -153,6 +154,7 @@ public class WebSocketController : ControllerBase
                 // }
                 this.mq_helper.MqDeleteConsumer();
                 this.mq_helper.MqDeletePurge();
+                this.mq_helper.MqDelete();
                 this.mq_helper.Close();
                 channel.Clear();
                 await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);

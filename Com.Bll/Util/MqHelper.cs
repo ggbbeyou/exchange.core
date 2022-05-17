@@ -244,6 +244,41 @@ public class MqHelper
     }
 
     /// <summary>
+    /// 删除队列
+    /// </summary>
+    /// <param name="queueName"></param>
+    public void MqDelete()
+    {
+        try
+        {
+            foreach (var item in mq_queues)
+            {
+                i_model.QueueDelete(item);
+            }
+        }
+        catch (System.Exception ex)
+        {
+            FactoryService.instance.constant.logger.LogError(ex, "清除mq队列失败");
+        }
+    }
+
+    /// <summary>
+    /// 删除队列
+    /// </summary>
+    /// <param name="queueName"></param>
+    public void MqDelete(string queueName)
+    {
+        try
+        {
+            i_model.QueueDelete(queueName);
+        }
+        catch (System.Exception ex)
+        {
+            FactoryService.instance.constant.logger.LogError(ex, "清除mq队列失败");
+        }
+    }
+
+    /// <summary>
     /// 删除消费者
     /// </summary>
     public void MqDeleteConsumer()

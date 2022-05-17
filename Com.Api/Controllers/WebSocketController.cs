@@ -95,7 +95,7 @@ public class WebSocketController : ControllerBase
     /// </summary>
     public WebSocketController()
     {
-        this.mq_helper = new MqHelper(FactoryService.instance.constant.i_commection);
+        this.mq_helper = new MqHelper(FactoryService.instance.constant.connection_factory);
     }
 
     /// <summary>

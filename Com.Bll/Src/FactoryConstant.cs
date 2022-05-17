@@ -66,6 +66,7 @@ public class FactoryConstant
     /// mq 连接接口
     /// </summary>
     public readonly IConnection i_commection = null!;
+    public readonly ConnectionFactory connectionFactory = null!;
     // /// <summary>
     // /// mq 通道接口
     // /// </summary>
@@ -107,12 +108,12 @@ public class FactoryConstant
         }
         try
         {
-            ConnectionFactory? factory = config.GetSection("RabbitMQ").Get<ConnectionFactory>();
-            if (factory != null)
+            this.connectionFactory = config.GetSection("RabbitMQ").Get<ConnectionFactory>();
+            if (this.connectionFactory != null)
             {
-                this.i_commection = factory!.CreateConnection();
+                this.i_commection = this.connectionFactory.CreateConnection();
                 // this.i_model = this.i_commection.CreateModel();
-                mq_helper = new MqHelper(this.i_commection);
+                mq_helper = new MqHelper(this.connectionFactory);
             }
         }
         catch (Exception ex)

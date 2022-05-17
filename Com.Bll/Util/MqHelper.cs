@@ -255,7 +255,7 @@ public class MqHelper
         }
         catch (System.Exception ex)
         {
-            FactoryService.instance.constant.logger.LogError(ex, "清除mq队列失败");
+            FactoryService.instance.constant.logger.LogError(ex, "删除mq队列失败");
         }
     }
 
@@ -274,7 +274,7 @@ public class MqHelper
         }
         catch (System.Exception ex)
         {
-            FactoryService.instance.constant.logger.LogError(ex, "清除mq队列失败");
+            FactoryService.instance.constant.logger.LogError(ex, "删除mq队列失败");
         }
     }
 

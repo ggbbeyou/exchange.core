@@ -66,10 +66,10 @@ public class FactoryConstant
     /// mq 连接接口
     /// </summary>
     public readonly IConnection i_commection = null!;
-    /// <summary>
-    /// mq 通道接口
-    /// </summary>
-    public readonly IModel i_model = null!;
+    // /// <summary>
+    // /// mq 通道接口
+    // /// </summary>
+    // public readonly IModel i_model = null!;
     /// <summary>
     /// mq
     /// </summary>
@@ -111,7 +111,7 @@ public class FactoryConstant
             if (factory != null)
             {
                 this.i_commection = factory!.CreateConnection();
-                this.i_model = this.i_commection.CreateModel();
+                // this.i_model = this.i_commection.CreateModel();
                 mq_helper = new MqHelper(this.i_commection);
             }
         }

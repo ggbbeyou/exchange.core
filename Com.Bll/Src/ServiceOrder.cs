@@ -319,7 +319,7 @@ public class ServiceOrder
         call_req.op = E_Op.place;
         call_req.market = info.market;
         call_req.data = temp_order;
-        FactoryService.instance.constant.MqSend(FactoryService.instance.GetMqOrderPlace(info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(call_req)));
+        FactoryService.instance.constant.mq_helper.MqSend(FactoryService.instance.GetMqOrderPlace(info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(call_req)));
         FactoryService.instance.constant.stopwatch.Stop();
         FactoryService.instance.constant.logger.LogTrace($"计算耗时:{FactoryService.instance.constant.stopwatch.Elapsed.ToString()};{info.symbol}:挂单=>插入{call_req.data.Count}条订单到Mq");
 
@@ -397,7 +397,7 @@ public class ServiceOrder
         req.op = op;
         req.market = info.market;
         req.data = (uid, order);
-        res.data = FactoryService.instance.constant.MqSend(FactoryService.instance.GetMqOrderPlace(info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(req)));
+        res.data = FactoryService.instance.constant.mq_helper.MqSend(FactoryService.instance.GetMqOrderPlace(info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(req)));
         if (res.data)
         {
             res.code = E_Res_Code.ok;
@@ -446,7 +446,7 @@ public class ServiceOrder
             call_req.op = E_Op.place;
             call_req.market = market;
             call_req.data = orders;
-            FactoryService.instance.constant.MqSend(FactoryService.instance.GetMqOrderPlace(market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(call_req)));
+            FactoryService.instance.constant.mq_helper.MqSend(FactoryService.instance.GetMqOrderPlace(market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(call_req)));
         }
         return true;
     }

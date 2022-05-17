@@ -327,7 +327,7 @@ public class Core
                 foreach (var item in uid_order)
                 {
                     res_order.data = item.ToList();
-                    process.push_order = process.push_order && FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.orders, item.Key), JsonConvert.SerializeObject(res_order, new JsonConverterDecimal()));
+                    process.push_order = process.push_order && FactoryService.instance.constant.mq_helper.MqPublish(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.orders, item.Key), JsonConvert.SerializeObject(res_order, new JsonConverterDecimal()));
                 }
                 this.model.stopwatch.Stop();
                 FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{this.model.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:Mq=>推送订单更新");
@@ -373,7 +373,7 @@ public class Core
                 {
                     res_kline.channel = (E_WebsockerChannel)Enum.Parse(typeof(E_WebsockerChannel), cycle.ToString());
                     res_kline.data = push_kline;
-                    FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(res_kline.channel, this.model.info.market), JsonConvert.SerializeObject(res_kline, new JsonConverterDecimal()));
+                    FactoryService.instance.constant.mq_helper.MqPublish(FactoryService.instance.GetMqSubscribe(res_kline.channel, this.model.info.market), JsonConvert.SerializeObject(res_kline, new JsonConverterDecimal()));
                 }
             }
             process.push_kline = true;
@@ -401,7 +401,7 @@ public class Core
                 res_deal.data.Add(resdeal);
             }
             FactoryService.instance.constant.redis.SortedSetAdd(FactoryService.instance.GetRedisDeal(this.model.info.market), entries);
-            process.push_deal = FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.trades, this.model.info.market), JsonConvert.SerializeObject(res_deal, new JsonConverterDecimal()));
+            process.push_deal = FactoryService.instance.constant.mq_helper.MqPublish(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.trades, this.model.info.market), JsonConvert.SerializeObject(res_deal, new JsonConverterDecimal()));
             this.model.stopwatch.Stop();
             FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{this.model.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:Mq,Redis=>推送交易记录");
         }
@@ -480,7 +480,7 @@ public class Core
             foreach (var item in uid_order)
             {
                 res_order.data = item.ToList();
-                process.push_order_cancel = process.push_order_cancel && FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.orders, item.Key), JsonConvert.SerializeObject(item.ToList(), new JsonConverterDecimal()));
+                process.push_order_cancel = process.push_order_cancel && FactoryService.instance.constant.mq_helper.MqPublish(FactoryService.instance.GetMqSubscribe(E_WebsockerChannel.orders, item.Key), JsonConvert.SerializeObject(item.ToList(), new JsonConverterDecimal()));
             }
             this.model.stopwatch.Stop();
             FactoryService.instance.constant.logger.LogTrace(this.model.eventId, $"计算耗时:{this.model.stopwatch.Elapsed.ToString()};{this.model.eventId.Name}:Mq=>推送撤单订单");

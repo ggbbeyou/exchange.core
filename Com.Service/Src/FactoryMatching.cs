@@ -152,10 +152,11 @@ public class FactoryMatching
         if (this.service.ContainsKey(info.market))
         {
             MatchModel mm = this.service[info.market];
-            foreach (var item in mm.mq_consumer)
-            {
-                FactoryService.instance.constant.MqDeleteConsumer(item);
-            }
+            mm.mq_helper.MqDeleteConsumer();
+            // foreach (var item in mm.mq_consumer)
+            // {
+            //     mm.mq_helper.MqDeleteConsumer(item);
+            // }
             mm.mq_consumer.Clear();
             string queue_name = FactoryService.instance.GetMqOrderPlace(info.market);
             if (!mm.mq_queues.Contains(queue_name))
@@ -164,10 +165,11 @@ public class FactoryMatching
                 i_model.QueueDeclare(queue: queue_name, durable: true, exclusive: false, autoDelete: false, arguments: null);
                 mm.mq_queues.Add(queue_name);
             }
-            foreach (var item in mm.mq_queues)
-            {
-                FactoryService.instance.constant.MqDeletePurge(item);
-            }
+            // foreach (var item in mm.mq_queues)
+            // {
+            //     FactoryService.instance.constant.MqDeletePurge(item);
+            // }
+            mm.mq_helper.MqDeletePurge();
             mm.mq_queues.Clear();
             mm.mq.DepthChange(new List<Orders>(), new List<Deal>(), mm.match_core.CancelOrder());
         }

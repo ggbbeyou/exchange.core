@@ -157,7 +157,7 @@ public class ServiceDepth
             }
             resWebsocker.channel = item.Key;
             resWebsocker.data = item.Value;
-            FactoryService.instance.constant.MqPublish(FactoryService.instance.GetMqSubscribe(item.Key, market), JsonConvert.SerializeObject(resWebsocker, new JsonConverterDecimal()));
+            FactoryService.instance.constant.mq_helper.MqPublish(FactoryService.instance.GetMqSubscribe(item.Key, market), JsonConvert.SerializeObject(resWebsocker, new JsonConverterDecimal()));
         }
     }
 

@@ -700,7 +700,7 @@ public class MatchCore
             call_req.op = E_Op.place;
             call_req.market = this.model.info.market;
             call_req.data = trigger_order;
-            FactoryService.instance.constant.MqSend(FactoryService.instance.GetMqOrderPlace(this.model.info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(call_req)));
+            this.model.mq_helper.MqSend(FactoryService.instance.GetMqOrderPlace(this.model.info.market), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(call_req)));
         }
         return price;
     }

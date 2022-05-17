@@ -158,7 +158,7 @@ public class FactoryMatching
             //     mm.mq_helper.MqDeleteConsumer(item);
             // }
             // mm.mq_consumer.Clear();
-            string queue_name = FactoryService.instance.GetMqOrderPlace(info.market);
+            // string queue_name = FactoryService.instance.GetMqOrderPlace(info.market);
             // if (!mm.mq_queues.Contains(queue_name))
             // {
             // IModel i_model = FactoryService.instance.constant.i_commection.CreateModel();

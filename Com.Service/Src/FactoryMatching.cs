@@ -97,19 +97,19 @@ public class FactoryMatching
             ServiceWarmCache(info);
             model.run = true;
             (string queue_name, string consume_tag) receive_match_order = model.core.ReceiveMatchOrder();
-            if (!model.mq_consumer.Contains(receive_match_order.consume_tag))
-            {
-                model.mq_consumer.Add(receive_match_order.consume_tag);
-            }
-            (string queue_name, string consume_tag) order_receive = model.mq.OrderReceive();
-            if (!model.mq_queues.Contains(order_receive.queue_name))
-            {
-                model.mq_queues.Add(order_receive.queue_name);
-            }
-            if (!model.mq_consumer.Contains(order_receive.consume_tag))
-            {
-                model.mq_consumer.Add(order_receive.consume_tag);
-            }
+            // if (!model.mq_consumer.Contains(receive_match_order.consume_tag))
+            // {
+            //     model.mq_consumer.Add(receive_match_order.consume_tag);
+            // }
+            // (string queue_name, string consume_tag) order_receive = model.mq.OrderReceive();
+            // if (!model.mq_queues.Contains(order_receive.queue_name))
+            // {
+            //     model.mq_queues.Add(order_receive.queue_name);
+            // }
+            // if (!model.mq_consumer.Contains(order_receive.consume_tag))
+            // {
+            //     model.mq_consumer.Add(order_receive.consume_tag);
+            // }
         }
         info.status = model.run;
         this.mutex.ReleaseMutex();
@@ -157,20 +157,20 @@ public class FactoryMatching
             // {
             //     mm.mq_helper.MqDeleteConsumer(item);
             // }
-            mm.mq_consumer.Clear();
+            // mm.mq_consumer.Clear();
             string queue_name = FactoryService.instance.GetMqOrderPlace(info.market);
-            if (!mm.mq_queues.Contains(queue_name))
-            {
+            // if (!mm.mq_queues.Contains(queue_name))
+            // {
                 IModel i_model = FactoryService.instance.constant.i_commection.CreateModel();
                 i_model.QueueDeclare(queue: queue_name, durable: true, exclusive: false, autoDelete: false, arguments: null);
-                mm.mq_queues.Add(queue_name);
-            }
+                // mm.mq_queues.Add(queue_name);
+            // }
             // foreach (var item in mm.mq_queues)
             // {
             //     FactoryService.instance.constant.MqDeletePurge(item);
             // }
             mm.mq_helper.MqDeletePurge();
-            mm.mq_queues.Clear();
+            // mm.mq_queues.Clear();
             mm.mq.DepthChange(new List<Orders>(), new List<Deal>(), mm.match_core.CancelOrder());
         }
         //交易记录数据从DB同步到Redis 至少保存最近3个月记录

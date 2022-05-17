@@ -33,7 +33,7 @@ builder.Services.AddDbContextPool<DbContextEF>(options =>
         //     maxRetryCount: 5,
         //     maxRetryDelay: TimeSpan.FromSeconds(30),
         //     errorNumbersToAdd: new int[] { 2 });
-        builder.EnableRetryOnFailure();
+        // builder.EnableRetryOnFailure();
     }).Options;
 });
 builder.Services.AddStackExchangeRedisCache(options =>

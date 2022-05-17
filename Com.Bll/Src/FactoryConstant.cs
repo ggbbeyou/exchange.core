@@ -1,6 +1,7 @@
 
 using System.Diagnostics;
 using System.Text;
+using Com.Bll.Util;
 using Com.Db;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -69,6 +70,10 @@ public class FactoryConstant
     /// mq 通道接口
     /// </summary>
     public readonly IModel i_model = null!;
+    /// <summary>
+    /// mq
+    /// </summary>
+    public readonly MqHelper mq_helper = null!;
 
     /// <summary>
     /// 初始化
@@ -107,6 +112,7 @@ public class FactoryConstant
             {
                 this.i_commection = factory!.CreateConnection();
                 this.i_model = this.i_commection.CreateModel();
+                mq_helper = new MqHelper(this.i_commection);
             }
         }
         catch (Exception ex)

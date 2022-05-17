@@ -85,13 +85,17 @@ public class WebSocketController : ControllerBase
     /// </summary>
     /// <returns></returns>
     private ServiceUser service_user = new ServiceUser();
+    /// <summary>
+    /// mq
+    /// </summary>
+    public readonly MqHelper mq_helper = null!;
 
     /// <summary>
     /// 
     /// </summary>
     public WebSocketController()
     {
-
+        this.mq_helper = new MqHelper(FactoryService.instance.constant.i_commection);
     }
 
     /// <summary>
@@ -107,7 +111,7 @@ public class WebSocketController : ControllerBase
             try
             {
                 WebSocket webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
-                Dictionary<string, string> channel = new Dictionary<string, string>();
+                Dictionary<string, (string, string)> channel = new Dictionary<string, (string, string)>();
                 await new TaskFactory().StartNew(async () =>
                 {
                     while (true)
@@ -115,10 +119,13 @@ public class WebSocketController : ControllerBase
                         await Task.Delay(1000 * 60 * 5);
                         if (webSocket.State == WebSocketState.Closed)
                         {
-                            foreach (var item in channel)
-                            {
-                                FactoryService.instance.constant.MqDeleteConsumer(item.Value);
-                            }
+                            // foreach (var item in channel)
+                            // {
+                            //     this.mq_helper.MqDeleteConsumer(item.Value);
+                            // }
+                            this.mq_helper.MqDeleteConsumer();
+                            this.mq_helper.MqDeletePurge();
+                            this.mq_helper.Close();
                             channel.Clear();
                             break;
                         }
@@ -132,10 +139,13 @@ public class WebSocketController : ControllerBase
                     Subscribe(webSocket, System.Text.Encoding.UTF8.GetString(buffer, 0, result.Count), channel, ref uid);
                     result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
                 }
-                foreach (var item in channel)
-                {
-                    FactoryService.instance.constant.MqDeleteConsumer(item.Value);
-                }
+                // foreach (var item in channel)
+                // {
+                //     this.mq_helper.MqDeleteConsumer(item.Value);
+                // }
+                this.mq_helper.MqDeleteConsumer();
+                this.mq_helper.MqDeletePurge();
+                this.mq_helper.Close();
                 channel.Clear();
                 await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
             }
@@ -154,7 +164,7 @@ public class WebSocketController : ControllerBase
     /// <param name="str">接收到的字符串</param>
     /// <param name="channel">频道</param>
     /// <param name="uid">用户id</param>
-    private void Subscribe(WebSocket webSocket, string str, Dictionary<string, string> channel, ref long uid)
+    private void Subscribe(WebSocket webSocket, string str, Dictionary<string, (string queueName, string consume_tag)> channel, ref long uid)
     {
         if (str.ToLower() == "ping")
         {
@@ -299,11 +309,11 @@ public class WebSocketController : ControllerBase
                                 webSocket.SendAsync(new ArraySegment<byte>(bb1, 0, bb1.Length), WebSocketMessageType.Text, true, CancellationToken.None);
                             }
                         }
-                        string ConsumerTags = FactoryService.instance.constant.MqSubscribe(key, async (b) =>
+                        (string queue_name, string ConsumerTags) subscribe = this.mq_helper.MqSubscribe(key, async (b) =>
                         {
                             await webSocket.SendAsync(new ArraySegment<byte>(b, 0, b.Length), WebSocketMessageType.Text, true, CancellationToken.None);
                         });
-                        channel.Add(key, ConsumerTags);
+                        channel.Add(key, (subscribe.queue_name, subscribe.ConsumerTags));
                     }
                 }
             }
@@ -332,7 +342,8 @@ public class WebSocketController : ControllerBase
                         }
                         if (channel.ContainsKey(key))
                         {
-                            FactoryService.instance.constant.MqDeleteConsumer(channel[key]);
+                            this.mq_helper.MqDeleteConsumer(channel[key].consume_tag);
+                            this.mq_helper.MqDeletePurge(channel[key].queueName);
                             channel.Remove(key);
                             resWebsocker.channel = item.channel;
                             resWebsocker.data = item.data;

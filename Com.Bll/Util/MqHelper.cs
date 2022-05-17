@@ -266,4 +266,12 @@ public class MqHelper
         }
     }
 
+    /// <summary>
+    /// 关闭
+    /// </summary>
+    public void Close()
+    {
+        i_model.Close();
+    }
+
 }

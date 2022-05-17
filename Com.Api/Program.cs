@@ -29,10 +29,11 @@ builder.Services.AddDbContextPool<DbContextEF>(options =>
     // options.EnableSensitiveDataLogging();
     DbContextOptions options1 = options.UseSqlServer(builder.Configuration.GetConnectionString("Mssql"), builder =>
     {
-        builder.EnableRetryOnFailure(
-            maxRetryCount: 5,
-            maxRetryDelay: TimeSpan.FromSeconds(30),
-            errorNumbersToAdd: new int[] { 2 });
+        // builder.EnableRetryOnFailure(
+        //     maxRetryCount: 5,
+        //     maxRetryDelay: TimeSpan.FromSeconds(30),
+        //     errorNumbersToAdd: new int[] { 2 });
+        builder.EnableRetryOnFailure();
     }).Options;
 });
 builder.Services.AddStackExchangeRedisCache(options =>

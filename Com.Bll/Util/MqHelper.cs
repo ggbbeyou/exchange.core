@@ -219,6 +219,21 @@ public class MqHelper
     }
 
     /// <summary>
+    /// 请除队列
+    /// </summary>
+    public void MqDeletePurge(string queueName)
+    {
+        try
+        {
+            i_model.QueuePurge(queueName);
+        }
+        catch (System.Exception ex)
+        {
+            FactoryService.instance.constant.logger.LogError(ex, "清除mq队列失败");
+        }
+    }
+
+    /// <summary>
     /// 删除消费者
     /// </summary>
     public void MqDeleteConsumer()
@@ -229,6 +244,21 @@ public class MqHelper
             {
                 i_model.BasicCancel(item);
             }
+        }
+        catch (System.Exception ex)
+        {
+            FactoryService.instance.constant.logger.LogError(ex, "删除mq消费者失败");
+        }
+    }
+
+    /// <summary>
+    /// 删除消费者
+    /// </summary>
+    public void MqDeleteConsumer(string consume_tag)
+    {
+        try
+        {
+            i_model.BasicCancel(consume_tag);
         }
         catch (System.Exception ex)
         {

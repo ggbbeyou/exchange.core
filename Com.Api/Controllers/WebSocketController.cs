@@ -102,6 +102,7 @@ public class WebSocketController : ControllerBase
         catch (RabbitMQ.Client.Exceptions.BrokerUnreachableException ex)
         {
             this.mq_helper = new MqHelper(FactoryService.instance.constant.connection_factory);
+            FactoryService.instance.constant.logger.LogInformation(ex, $"mq创建通道报错,使用mq连接重新创建通道");
         }
     }
 

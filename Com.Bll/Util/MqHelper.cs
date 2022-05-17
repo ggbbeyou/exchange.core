@@ -247,14 +247,11 @@ public class MqHelper
     /// 删除队列
     /// </summary>
     /// <param name="queueName"></param>
-    public void MqDelete()
+    public void MqDelete(string queueName)
     {
         try
         {
-            foreach (var item in mq_queues)
-            {
-                i_model.QueueDelete(item);
-            }
+            i_model.QueueDelete(queueName);
         }
         catch (System.Exception ex)
         {
@@ -266,11 +263,14 @@ public class MqHelper
     /// 删除队列
     /// </summary>
     /// <param name="queueName"></param>
-    public void MqDelete(string queueName)
+    public void MqDelete()
     {
         try
         {
-            i_model.QueueDelete(queueName);
+            foreach (var item in mq_queues)
+            {
+                i_model.QueueDelete(item);
+            }
         }
         catch (System.Exception ex)
         {

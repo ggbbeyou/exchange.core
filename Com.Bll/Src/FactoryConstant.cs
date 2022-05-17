@@ -177,169 +177,169 @@ public class FactoryConstant
             this.logger.LogError(ex, "redis分布试锁错误");
         }
     }
-
-    /// <summary>
-    /// MQ 简单的队列 发送消息
-    /// </summary>
-    /// <param name="queue_name"></param>
-    /// <param name="body"></param>
-    public bool MqSend(string queue_name, byte[] body)
-    {
-        try
+    /*
+        /// <summary>
+        /// MQ 简单的队列 发送消息
+        /// </summary>
+        /// <param name="queue_name"></param>
+        /// <param name="body"></param>
+        public bool MqSend(string queue_name, byte[] body)
         {
-            IBasicProperties props = i_model.CreateBasicProperties();
-            props.DeliveryMode = 2;
-            i_model.QueueDeclare(queue: queue_name, durable: true, exclusive: false, autoDelete: false, arguments: null);
-            i_model.BasicPublish(exchange: "", routingKey: queue_name, basicProperties: props, body: body);
-        }
-        catch (System.Exception ex)
-        {
-            FactoryService.instance.constant.logger.LogError(ex, "MQ 简单的队列 发送消息");
-            return false;
-        }
-        return true;
-    }
-
-    /// <summary>
-    /// MQ 简单的队列 接收消息
-    /// </summary>
-    /// <param name="queue_name"></param>
-    /// <param name="func"></param>
-    /// <returns>队列标记</returns>
-    public string MqReceive(IModel i_model, string queue_name, Func<byte[], bool> func)
-    {
-        i_model.QueueDeclare(queue: queue_name, durable: true, exclusive: false, autoDelete: false, arguments: null);
-        EventingBasicConsumer consumer = new EventingBasicConsumer(i_model);
-        consumer.Received += (model, ea) =>
-        {
-            if (func(ea.Body.ToArray()))
+            try
             {
-                i_model.BasicAck(deliveryTag: ea.DeliveryTag, multiple: true);
+                IBasicProperties props = i_model.CreateBasicProperties();
+                props.DeliveryMode = 2;
+                i_model.QueueDeclare(queue: queue_name, durable: true, exclusive: false, autoDelete: false, arguments: null);
+                i_model.BasicPublish(exchange: "", routingKey: queue_name, basicProperties: props, body: body);
             }
-            else
+            catch (System.Exception ex)
             {
-                i_model.BasicNack(deliveryTag: ea.DeliveryTag, multiple: true, requeue: true);
+                FactoryService.instance.constant.logger.LogError(ex, "MQ 简单的队列 发送消息");
+                return false;
             }
-        };
-        return i_model.BasicConsume(queue: queue_name, autoAck: false, consumer: consumer);
-    }
+            return true;
+        }
 
-    /// <summary>
-    /// MQ 发布工作任务
-    /// </summary>
-    /// <param name="queue_name"></param>
-    /// <param name="body"></param>
-    public bool MqTask(string queue_name, byte[] body)
-    {
-        try
+        /// <summary>
+        /// MQ 简单的队列 接收消息
+        /// </summary>
+        /// <param name="queue_name"></param>
+        /// <param name="func"></param>
+        /// <returns>队列标记</returns>
+        public string MqReceive(IModel i_model, string queue_name, Func<byte[], bool> func)
         {
             i_model.QueueDeclare(queue: queue_name, durable: true, exclusive: false, autoDelete: false, arguments: null);
-            var properties = i_model.CreateBasicProperties();
-            properties.Persistent = true;
-            i_model.BasicPublish(exchange: "", routingKey: queue_name, basicProperties: properties, body: body);
-        }
-        catch (System.Exception ex)
-        {
-            FactoryService.instance.constant.logger.LogError(ex, "MQ 发布工作任务");
-            return false;
-        }
-        return true;
-    }
-
-    /// <summary>
-    /// MQ 处理工作任务
-    /// </summary>
-    /// <param name="queue_name"></param>
-    /// <param name="func"></param>
-    /// <returns></returns>
-    public string MqWorker(IModel i_model, string queue_name, Func<byte[], bool> func)
-    {
-        i_model.QueueDeclare(queue: queue_name, durable: true, exclusive: false, autoDelete: false, arguments: null);
-        i_model.BasicQos(prefetchSize: 0, prefetchCount: 1, global: false);
-        EventingBasicConsumer consumer = new EventingBasicConsumer(i_model);
-        consumer.Received += (model, ea) =>
-        {
-            if (func(ea.Body.ToArray()))
+            EventingBasicConsumer consumer = new EventingBasicConsumer(i_model);
+            consumer.Received += (model, ea) =>
             {
-                i_model.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
-            }
-            else
-            {
-                i_model.BasicNack(deliveryTag: ea.DeliveryTag, multiple: false, requeue: true);
-            }
-        };
-        return i_model.BasicConsume(queue: queue_name, autoAck: false, consumer: consumer);
-    }
+                if (func(ea.Body.ToArray()))
+                {
+                    i_model.BasicAck(deliveryTag: ea.DeliveryTag, multiple: true);
+                }
+                else
+                {
+                    i_model.BasicNack(deliveryTag: ea.DeliveryTag, multiple: true, requeue: true);
+                }
+            };
+            return i_model.BasicConsume(queue: queue_name, autoAck: false, consumer: consumer);
+        }
 
-    /// <summary>
-    /// MQ 发布消息
-    /// </summary>
-    /// <param name="exchange"></param>
-    /// <param name="message"></param>
-    public bool MqPublish(string exchange, string message)
-    {
-        try
+        /// <summary>
+        /// MQ 发布工作任务
+        /// </summary>
+        /// <param name="queue_name"></param>
+        /// <param name="body"></param>
+        public bool MqTask(string queue_name, byte[] body)
+        {
+            try
+            {
+                i_model.QueueDeclare(queue: queue_name, durable: true, exclusive: false, autoDelete: false, arguments: null);
+                var properties = i_model.CreateBasicProperties();
+                properties.Persistent = true;
+                i_model.BasicPublish(exchange: "", routingKey: queue_name, basicProperties: properties, body: body);
+            }
+            catch (System.Exception ex)
+            {
+                FactoryService.instance.constant.logger.LogError(ex, "MQ 发布工作任务");
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// MQ 处理工作任务
+        /// </summary>
+        /// <param name="queue_name"></param>
+        /// <param name="func"></param>
+        /// <returns></returns>
+        public string MqWorker(IModel i_model, string queue_name, Func<byte[], bool> func)
+        {
+            i_model.QueueDeclare(queue: queue_name, durable: true, exclusive: false, autoDelete: false, arguments: null);
+            i_model.BasicQos(prefetchSize: 0, prefetchCount: 1, global: false);
+            EventingBasicConsumer consumer = new EventingBasicConsumer(i_model);
+            consumer.Received += (model, ea) =>
+            {
+                if (func(ea.Body.ToArray()))
+                {
+                    i_model.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
+                }
+                else
+                {
+                    i_model.BasicNack(deliveryTag: ea.DeliveryTag, multiple: false, requeue: true);
+                }
+            };
+            return i_model.BasicConsume(queue: queue_name, autoAck: false, consumer: consumer);
+        }
+
+        /// <summary>
+        /// MQ 发布消息
+        /// </summary>
+        /// <param name="exchange"></param>
+        /// <param name="message"></param>
+        public bool MqPublish(string exchange, string message)
+        {
+            try
+            {
+                i_model.ExchangeDeclare(exchange: exchange, type: ExchangeType.Fanout);
+                var body = Encoding.UTF8.GetBytes(message);
+                i_model.BasicPublish(exchange: exchange, routingKey: "", basicProperties: null, body);
+            }
+            catch (System.Exception ex)
+            {
+                FactoryService.instance.constant.logger.LogError(ex, "MQ发布消息错误");
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// MQ 订阅消息
+        /// </summary>
+        /// <param name="exchange"></param>
+        /// <param name="action"></param>
+        public string MqSubscribe(string exchange, Action<byte[]> action)
         {
             i_model.ExchangeDeclare(exchange: exchange, type: ExchangeType.Fanout);
-            var body = Encoding.UTF8.GetBytes(message);
-            i_model.BasicPublish(exchange: exchange, routingKey: "", basicProperties: null, body);
+            string queueName = i_model.QueueDeclare().QueueName;
+            i_model.QueueBind(queue: queueName, exchange: exchange, routingKey: "");
+            EventingBasicConsumer consumer = new EventingBasicConsumer(i_model);
+            consumer.Received += (model, ea) =>
+            {
+                action(ea.Body.ToArray());
+            };
+            return i_model.BasicConsume(queue: queueName, autoAck: true, consumer: consumer);
         }
-        catch (System.Exception ex)
-        {
-            FactoryService.instance.constant.logger.LogError(ex, "MQ发布消息错误");
-            return false;
-        }
-        return true;
-    }
 
-    /// <summary>
-    /// MQ 订阅消息
-    /// </summary>
-    /// <param name="exchange"></param>
-    /// <param name="action"></param>
-    public string MqSubscribe(string exchange, Action<byte[]> action)
-    {
-        i_model.ExchangeDeclare(exchange: exchange, type: ExchangeType.Fanout);
-        string queueName = i_model.QueueDeclare().QueueName;
-        i_model.QueueBind(queue: queueName, exchange: exchange, routingKey: "");
-        EventingBasicConsumer consumer = new EventingBasicConsumer(i_model);
-        consumer.Received += (model, ea) =>
+        /// <summary>
+        /// 删除消费者
+        /// </summary>
+        /// <param name="consumerTag">消费者标示</param>
+        public void MqDeleteConsumer(string consumerTag)
         {
-            action(ea.Body.ToArray());
-        };
-        return i_model.BasicConsume(queue: queueName, autoAck: true, consumer: consumer);
-    }
+            try
+            {
+                i_model.BasicCancel(consumerTag);
+            }
+            catch (System.Exception ex)
+            {
+                FactoryService.instance.constant.logger.LogError(ex, "删除mq消费者失败");
+            }
+        }
 
-    /// <summary>
-    /// 删除消费者
-    /// </summary>
-    /// <param name="consumerTag">消费者标示</param>
-    public void MqDeleteConsumer(string consumerTag)
-    {
-        try
+        /// <summary>
+        /// 请除队列
+        /// </summary>
+        /// <param name="consumerTag"></param>
+        public void MqDeletePurge(string consumerTag)
         {
-            i_model.BasicCancel(consumerTag);
+            try
+            {
+                i_model.QueuePurge(consumerTag);
+            }
+            catch (System.Exception ex)
+            {
+                FactoryService.instance.constant.logger.LogError(ex, "清除mq队列失败");
+            }
         }
-        catch (System.Exception ex)
-        {
-            FactoryService.instance.constant.logger.LogError(ex, "删除mq消费者失败");
-        }
-    }
-
-    /// <summary>
-    /// 请除队列
-    /// </summary>
-    /// <param name="consumerTag"></param>
-    public void MqDeletePurge(string consumerTag)
-    {
-        try
-        {
-            i_model.QueuePurge(consumerTag);
-        }
-        catch (System.Exception ex)
-        {
-            FactoryService.instance.constant.logger.LogError(ex, "清除mq队列失败");
-        }
-    }
-
+    */
 }

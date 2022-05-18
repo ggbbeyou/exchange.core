@@ -101,7 +101,7 @@ public class FactoryMatching
             // {
             //     model.mq_consumer.Add(receive_match_order.consume_tag);
             // }
-            // (string queue_name, string consume_tag) order_receive = model.mq.OrderReceive();
+            (string queue_name, string consume_tag) order_receive = model.mq.OrderReceive();
             // if (!model.mq_queues.Contains(order_receive.queue_name))
             // {
             //     model.mq_queues.Add(order_receive.queue_name);

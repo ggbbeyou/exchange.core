@@ -80,7 +80,7 @@ public class FactoryMatching
     /// <param name="info">交易基础信息</param>
     public Market ServiceStart(Market info)
     {
-        FactoryService.instance.constant.logger.LogInformation($"服务准备启动:{info.market}");
+        FactoryService.instance.constant.logger.LogInformation($"服务准备启动:{info.symbol}");
         this.mutex.WaitOne();
         if (!this.service.ContainsKey(info.market))
         {
@@ -113,7 +113,7 @@ public class FactoryMatching
         }
         info.status = model.run;
         this.mutex.ReleaseMutex();
-        FactoryService.instance.constant.logger.LogInformation(model.eventId, $"服务启动成功:{info.market}");
+        FactoryService.instance.constant.logger.LogInformation(model.eventId, $"服务启动成功:{info.symbol}");
         return info;
     }
 
@@ -123,7 +123,7 @@ public class FactoryMatching
     /// <param name="info">交易对基础信息</param>
     public Market ServiceStop(Market info)
     {
-        FactoryService.instance.constant.logger.LogInformation($"服务准备关闭:{info.market}");
+        FactoryService.instance.constant.logger.LogInformation($"服务准备关闭:{info.symbol}");
         this.mutex.WaitOne();
         if (this.service.ContainsKey(info.market))
         {
@@ -139,7 +139,7 @@ public class FactoryMatching
             info.status = false;
         }
         this.mutex.ReleaseMutex();
-        FactoryService.instance.constant.logger.LogInformation($"服务关闭成功:{info.market}");
+        FactoryService.instance.constant.logger.LogInformation($"服务关闭成功:{info.symbol}");
         return info;
     }
 

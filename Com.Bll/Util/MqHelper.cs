@@ -31,7 +31,7 @@ public class MqHelper
     /// <summary>
     /// 初始化
     /// </summary>
-    /// <param name="i_commection">mq连接接口</param>
+    /// <param name="connectionFactory">mq连接接口</param>
     public MqHelper(ConnectionFactory connectionFactory)
     {
         IConnection i_commection = connectionFactory.CreateConnection();

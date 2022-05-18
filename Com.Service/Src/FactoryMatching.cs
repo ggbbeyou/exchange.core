@@ -132,6 +132,7 @@ public class FactoryMatching
             ServiceClearCache(info);
             this.service.Remove(info.market);
             info.status = false;
+            // mm.mq_helper.Close();
         }
         else
         {

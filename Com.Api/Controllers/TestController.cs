@@ -75,37 +75,6 @@ public class TestController : ControllerBase
     [Route("Init")]
     public int Init()
     {
-        List<Coin> coins = new List<Coin>();
-        Coin usdt = new Coin()
-        {
-            coin_id = FactoryService.instance.constant.worker.NextId(),
-            coin_name = "USDT",
-            full_name = "USDT",
-            icon = "https://www.baidu.com/img/bd_logo1.png",
-            contract = "",
-        };
-        Coin btc = new Coin()
-        {
-            coin_id = FactoryService.instance.constant.worker.NextId(),
-            coin_name = "BTC",
-            full_name = "BTC",
-            icon = "https://www.baidu.com/img/bd_logo1.png",
-            contract = "",
-        };
-        Coin eth = new Coin()
-        {
-            coin_id = FactoryService.instance.constant.worker.NextId(),
-            coin_name = "ETH",
-            full_name = "ETH",
-            icon = "https://www.baidu.com/img/bd_logo1.png",
-            contract = "",
-        };
-        this.db.Coin.Add(usdt);
-        this.db.Coin.Add(btc);
-        this.db.Coin.Add(eth);
-        coins.Add(usdt);
-        coins.Add(btc);
-        coins.Add(eth);
         Vip vip0 = new Vip()
         {
             id = FactoryService.instance.constant.worker.NextId(),
@@ -130,6 +99,36 @@ public class TestController : ControllerBase
         this.db.Vip.Add(vip0);
         this.db.Vip.Add(vip1);
         this.db.Vip.Add(vip2);
+
+        List<Coin> coins = new List<Coin>();
+        var a = delegate (string name)
+        {
+            Coin usdt = new Coin()
+            {
+                coin_id = FactoryService.instance.constant.worker.NextId(),
+                coin_name = name,
+                full_name = name,
+                icon = "https://www.baidu.com/img/bd_logo1.png",
+                contract = "",
+            };
+            this.db.Coin.Add(usdt);
+            coins.Add(usdt);
+        };
+        a("USDT");
+        a("BTC");
+        a("ETH");
+        a("EOS");
+        a("BCH");
+        a("BNB");
+        a("TRX");
+        a("RSR");
+        a("LTC");
+        a("ETC");
+        a("FIL");
+        a("REN");
+        a("KNC");
+        a("ZRX");
+        a("REP");
         for (int i = 0; i < 100; i++)
         {
             (string public_key, string private_key) key = Encryption.GetRsaKey();
@@ -162,90 +161,54 @@ public class TestController : ControllerBase
 
             };
             this.db.UsersApi.Add(api);
-            Wallet wallet_usdt = new Wallet()
+            foreach (var item in coins)
             {
-                wallet_id = FactoryService.instance.constant.worker.NextId(),
-                wallet_type = E_WalletType.spot,
-                user_id = user.user_id,
-                user_name = user.user_name,
-                coin_id = usdt.coin_id,
-                coin_name = usdt.coin_name,
-                total = 5_000_000_000,
-                available = 5_000_000_000,
-                freeze = 0,
-            };
-            Wallet wallet_btc = new Wallet()
-            {
-                wallet_id = FactoryService.instance.constant.worker.NextId(),
-                wallet_type = E_WalletType.spot,
-                user_id = user.user_id,
-                user_name = user.user_name,
-                coin_id = btc.coin_id,
-                coin_name = btc.coin_name,
-                total = 10_000_000,
-                available = 10_000_000,
-                freeze = 0,
-            };
-            Wallet wallet_eth = new Wallet()
-            {
-                wallet_id = FactoryService.instance.constant.worker.NextId(),
-                wallet_type = E_WalletType.spot,
-                user_id = user.user_id,
-                user_name = user.user_name,
-                coin_id = eth.coin_id,
-                coin_name = eth.coin_name,
-                total = 50_000_000,
-                available = 50_000_000,
-                freeze = 0,
-            };
-            this.db.Wallet.Add(wallet_usdt);
-            this.db.Wallet.Add(wallet_btc);
-            this.db.Wallet.Add(wallet_eth);
+                Wallet wallet_usdt = new Wallet()
+                {
+                    wallet_id = FactoryService.instance.constant.worker.NextId(),
+                    wallet_type = E_WalletType.spot,
+                    user_id = user.user_id,
+                    user_name = user.user_name,
+                    coin_id = item.coin_id,
+                    coin_name = item.coin_name,
+                    total = 5_000_000_000,
+                    available = 5_000_000_000,
+                    freeze = 0,
+                };
+                this.db.Wallet.Add(wallet_usdt);
+            }
         }
-        (string public_key, string private_key) key_btc_user = Encryption.GetRsaKey();
-        Users settlement_btc_usdt = new Users()
+
+        var b = delegate (string aa, string bb)
         {
-            user_id = FactoryService.instance.constant.worker.NextId(),
-            user_name = "settlement_btc/usdt",
-            password = Encryption.SHA256Encrypt("123456"),
-            user_type = E_UserType.settlement,
-            disabled = false,
-            transaction = true,
-            withdrawal = false,
-            phone = null,
-            email = "settlement_btc/usdt@126.com",
-            vip = vip1.id,
-            public_key = key_btc_user.public_key,
-            private_key = key_btc_user.private_key,
-        };
-        this.db.Users.Add(settlement_btc_usdt);
-        (string public_key, string private_key) key_eth_user = Encryption.GetRsaKey();
-        Users settlement_eth_usdt = new Users()
-        {
-            user_id = FactoryService.instance.constant.worker.NextId(),
-            user_name = "settlement_eth/usdt",
-            password = Encryption.SHA256Encrypt("123456"),
-            user_type = E_UserType.settlement,
-            disabled = false,
-            transaction = true,
-            withdrawal = false,
-            phone = null,
-            email = "settlement_eth/usdt@126.com",
-            vip = vip1.id,
-            public_key = key_eth_user.public_key,
-            private_key = key_eth_user.private_key,
-        };
-        this.db.Users.Add(settlement_eth_usdt);
-        foreach (var item in coins)
-        {
+            Coin aaa = coins.FirstOrDefault(P => P.coin_name == aa)!;
+            Coin bbb = coins.FirstOrDefault(P => P.coin_name == bb)!;
+            (string public_key, string private_key) key_btc_user = Encryption.GetRsaKey();
+            Users settlement_btc_usdt = new Users()
+            {
+                user_id = FactoryService.instance.constant.worker.NextId(),
+                user_name = $"settlement_{aa}/{bb}",
+                password = Encryption.SHA256Encrypt("123456"),
+                user_type = E_UserType.settlement,
+                disabled = false,
+                transaction = true,
+                withdrawal = false,
+                phone = null,
+                email = $"settlement_{aa}/{bb}@126.com",
+                vip = vip1.id,
+                public_key = key_btc_user.public_key,
+                private_key = key_btc_user.private_key,
+            };
+            this.db.Users.Add(settlement_btc_usdt);
+
             this.db.Wallet.Add(new Wallet()
             {
                 wallet_id = FactoryService.instance.constant.worker.NextId(),
                 wallet_type = E_WalletType.main,
                 user_id = settlement_btc_usdt.user_id,
                 user_name = settlement_btc_usdt.user_name,
-                coin_id = item.coin_id,
-                coin_name = item.coin_name,
+                coin_id = aaa.coin_id,
+                coin_name = aaa.coin_name,
                 total = 0,
                 available = 0,
                 freeze = 0,
@@ -254,55 +217,50 @@ public class TestController : ControllerBase
             {
                 wallet_id = FactoryService.instance.constant.worker.NextId(),
                 wallet_type = E_WalletType.main,
-                user_id = settlement_eth_usdt.user_id,
-                user_name = settlement_eth_usdt.user_name,
-                coin_id = item.coin_id,
-                coin_name = item.coin_name,
+                user_id = settlement_btc_usdt.user_id,
+                user_name = settlement_btc_usdt.user_name,
+                coin_id = bbb.coin_id,
+                coin_name = bbb.coin_name,
                 total = 0,
                 available = 0,
                 freeze = 0,
             });
-        }
-        Market btcusdt = new Market()
-        {
-            market = FactoryService.instance.constant.worker.NextId(),
-            symbol = "BTC/USDT",
-            coin_id_base = btc.coin_id,
-            coin_name_base = btc.coin_name,
-            coin_id_quote = usdt.coin_id,
-            coin_name_quote = usdt.coin_name,
-            market_type = E_MarketType.spot,
-            places_price = 2,
-            places_amount = 6,
-            trade_min = 10,
-            trade_min_market_sell = 0.0002m,
-            market_uid = 0,
-            status = false,
-            transaction = true,
-            settlement_uid = settlement_btc_usdt.user_id,
-            service_url = "http://43.138.142.228:8000",
+            Market btcusdt = new Market()
+            {
+                market = FactoryService.instance.constant.worker.NextId(),
+                symbol = $"{aa}/{bb}",
+                coin_id_base = aaa.coin_id,
+                coin_name_base = aaa.coin_name,
+                coin_id_quote = bbb.coin_id,
+                coin_name_quote = bbb.coin_name,
+                market_type = E_MarketType.spot,
+                places_price = 2,
+                places_amount = 6,
+                trade_min = 10,
+                trade_min_market_sell = 0.0002m,
+                market_uid = 0,
+                status = false,
+                transaction = true,
+                settlement_uid = settlement_btc_usdt.user_id,
+                service_url = "http://43.138.142.228:8000",
+            };
+            this.db.Market.Add(btcusdt);
         };
-        Market ethusdt = new Market()
-        {
-            market = FactoryService.instance.constant.worker.NextId(),
-            symbol = "ETH/USDT",
-            coin_id_base = eth.coin_id,
-            coin_name_base = eth.coin_name,
-            coin_id_quote = usdt.coin_id,
-            coin_name_quote = usdt.coin_name,
-            market_type = E_MarketType.spot,
-            places_price = 2,
-            places_amount = 4,
-            trade_min = 10,
-            trade_min_market_sell = 0.002m,
-            market_uid = 0,
-            status = false,
-            transaction = true,
-            settlement_uid = settlement_eth_usdt.user_id,
-            service_url = "http://43.138.142.228:8000",
-        };
-        this.db.Market.Add(btcusdt);
-        this.db.Market.Add(ethusdt);
+        b("BTC", "USDT");
+        b("ETH", "USDT");
+        b("EOS", "USDT");
+        b("BCH", "USDT");
+        b("BNB", "USDT");
+        b("TRX", "USDT");
+        b("RSR", "USDT");
+        b("LTC", "USDT");
+        b("ETC", "USDT");
+        b("FIL", "USDT");
+        b("REN", "USDT");
+        b("KNC", "USDT");
+        b("ETH", "BTC");
+        b("ZRX", "USDT");
+        b("REP", "USDT");
         return this.db.SaveChanges();
     }
 
@@ -324,7 +282,7 @@ public class TestController : ControllerBase
         for (int i = 0; i < count; i++)
         {
             Users user = users[FactoryService.instance.constant.random.Next(0, 100)];
-            Market market = markets[FactoryService.instance.constant.random.Next(0, 2)];
+            Market market = markets[FactoryService.instance.constant.random.Next(0, 15)];
             List<ReqOrder> reqOrders = new List<ReqOrder>();
             for (int j = 0; j < 200; j++)
             {
@@ -396,7 +354,7 @@ public class TestController : ControllerBase
                 };
                 reqOrders.Add(order);
             }
-            Res<List<ResOrder>> aaa = order_service.PlaceOrder(market.symbol, user.user_id, user.user_name,Request.GetIp(), reqOrders);
+            Res<List<ResOrder>> aaa = order_service.PlaceOrder(market.symbol, user.user_id, user.user_name, Request.GetIp(), reqOrders);
             // res.data.AddRange(aaa.data);
         }
         return res;

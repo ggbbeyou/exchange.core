@@ -208,7 +208,7 @@ public class MongoHelper
     /// </summary>
     /// <param name="collName">集合名称</param>
     /// <returns>要查询的对象</returns>
-    public IQueryable<T> GetQueryable<T>(string collName)
+    public IQueryable<T>? GetQueryable<T>(string collName)
     {
         try
         {

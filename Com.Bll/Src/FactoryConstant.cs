@@ -15,6 +15,8 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using Snowflake.Core;
 using StackExchange.Redis;
+using MongoDB.Bson;
+using MongoDB.Driver;
 
 namespace Com.Bll;
 
@@ -142,6 +144,51 @@ public class FactoryConstant
         catch (Exception ex)
         {
             this.logger.LogError(ex, $"mssql服务器连接不上");
+        }
+        try
+        {
+            string? mongodbConnection = config.GetConnectionString("MongoDb");
+            if (!string.IsNullOrWhiteSpace(mongodbConnection))
+            {
+                MongoClient client = new MongoClient(mongodbConnection);
+                IMongoDatabase db = client.GetDatabase("exchange");
+                IMongoCollection<Kline> collection = db.GetCollection<Kline>(nameof(Kline));
+                List<Kline> orders = new List<Kline>();
+                for (int i = 0; i < 10; i++)
+                {
+                    orders.Add(new Kline()
+                    {
+                        id = i,
+                        market = i,
+                        symbol = "symbol",
+                        amount = i,
+                        count = i,
+                        total = i,
+                        open = i,
+                        close = i,
+                        low = i,
+                        high = i,
+                        type = Api.Sdk.Enum.E_KlineType.day1,
+                        time_start = DateTimeOffset.UtcNow,
+                        time_end = DateTimeOffset.UtcNow,
+                        time = DateTimeOffset.UtcNow,
+                    });
+                }
+
+                collection.InsertManyAsync(orders);
+                var list = collection.Find(P => P.id != 0).ToList();
+
+                foreach (var person in list)
+                {
+                    Console.WriteLine(person);
+                }
+            }
+
+            // MongoServer server = MongoDB.Driver.mongocl.Create(strconn);
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogError(ex, $"MongoDb服务器连接不上");
         }
     }
 

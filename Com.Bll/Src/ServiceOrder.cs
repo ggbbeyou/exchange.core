@@ -433,6 +433,17 @@ public class ServiceOrder
     }
 
     /// <summary>
+    /// 更新订单
+    /// </summary>
+    /// <param name="data"></param>
+    public bool UpdateOrder1(List<Orders> data)
+    {
+
+        
+        return false;
+    }
+
+    /// <summary>
     /// DB未完成挂单重复推送到mq和redis
     /// </summary>
     /// <param name="market"></param>

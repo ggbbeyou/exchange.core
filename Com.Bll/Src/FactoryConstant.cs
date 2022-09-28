@@ -61,6 +61,10 @@ public class FactoryConstant
     /// </summary>
     public readonly IDatabase redis = null!;
     /// <summary>
+    /// MongoDb数据库
+    /// </summary>//
+    public readonly IMongoDatabase mongodb = null!;
+    /// <summary>
     /// mq 连接工厂
     /// </summary>
     public readonly ConnectionFactory connection_factory = null!;
@@ -151,37 +155,37 @@ public class FactoryConstant
             if (!string.IsNullOrWhiteSpace(mongodbConnection))
             {
                 MongoClient client = new MongoClient(mongodbConnection);
-                IMongoDatabase db = client.GetDatabase("exchange");
-                IMongoCollection<Kline> collection = db.GetCollection<Kline>(nameof(Kline));
-                List<Kline> orders = new List<Kline>();
-                for (int i = 0; i < 10; i++)
-                {
-                    orders.Add(new Kline()
-                    {
-                        id = i,
-                        market = i,
-                        symbol = "symbol",
-                        amount = i,
-                        count = i,
-                        total = i,
-                        open = i,
-                        close = i,
-                        low = i,
-                        high = i,
-                        type = Api.Sdk.Enum.E_KlineType.day1,
-                        time_start = DateTimeOffset.UtcNow,
-                        time_end = DateTimeOffset.UtcNow,
-                        time = DateTimeOffset.UtcNow,
-                    });
-                }
+                this.mongodb = client.GetDatabase(new MongoUrlBuilder(mongodbConnection).DatabaseName);
+                // IMongoCollection<Kline> collection = db.GetCollection<Kline>(nameof(Kline));
+                // List<Kline> orders = new List<Kline>();
+                // for (int i = 0; i < 10; i++)
+                // {
+                //     orders.Add(new Kline()
+                //     {
+                //         id = i,
+                //         market = i,
+                //         symbol = "symbol",
+                //         amount = i,
+                //         count = i,
+                //         total = i,
+                //         open = i,
+                //         close = i,
+                //         low = i,
+                //         high = i,
+                //         type = Api.Sdk.Enum.E_KlineType.day1,
+                //         time_start = DateTimeOffset.UtcNow,
+                //         time_end = DateTimeOffset.UtcNow,
+                //         time = DateTimeOffset.UtcNow,
+                //     });
+                // }
 
-                collection.InsertManyAsync(orders);
-                var list = collection.Find(P => P.id != 0).ToList();
+                // collection.InsertManyAsync(orders);
+                // var list = collection.Find(P => P.id != 0).ToList();
 
-                foreach (var person in list)
-                {
-                    Console.WriteLine(person);
-                }
+                // foreach (var person in list)
+                // {
+                //     Console.WriteLine(person);
+                // }
             }
 
             // MongoServer server = MongoDB.Driver.mongocl.Create(strconn);

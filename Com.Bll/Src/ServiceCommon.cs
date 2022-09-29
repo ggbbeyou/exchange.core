@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.IdentityModel.Tokens;
+using StackExchange.Redis;
 
 namespace Com.Bll;
 
@@ -24,7 +25,7 @@ public class ServiceCommon
     /// 日志接口
     /// </summary>
     private readonly ILogger logger;
-  
+
     /// <summary>
     /// 初始化
     /// </summary>
@@ -158,6 +159,43 @@ public class ServiceCommon
     public bool SendPhone(string phone, string content)
     {
         return true;
+    }
+
+    /// <summary>
+    /// 上分布式锁
+    /// </summary>
+    /// <param name="key">redis键</param>
+    /// <param name="value">redis值</param>
+    /// <param name="timeout">超时(毫秒)</param>
+    /// <param name="action">方法</param>
+    public void Look(IDatabase redis, string key, string value, long timeout = 5000, Action action = null!)
+    {
+        if (action == null)
+        {
+            return;
+        }
+        try
+        {
+            if (redis.StringSet(key, value, TimeSpan.FromMilliseconds(timeout), When.NotExists))
+            {
+                try
+                {
+                    action();
+                }
+                catch (Exception ex)
+                {
+                    this.logger.LogError(ex, "redis分布试锁错误(业务)");
+                }
+                finally
+                {
+                    redis.KeyDelete(key);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogError(ex, "redis分布试锁错误");
+        }
     }
 
 }

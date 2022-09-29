@@ -65,7 +65,7 @@ public class MatchModel
     /// <summary>
     /// mq
     /// </summary>
-    public readonly MqHelper mq_helper = null!;
+    public readonly HelperMq mq_helper = null!;
 
     /// <summary>
     /// 初始化
@@ -75,6 +75,6 @@ public class MatchModel
     {
         this.info = info;
         this.eventId = new EventId(1, info.symbol);
-        this.mq_helper = new MqHelper(FactoryService.instance.constant.connection_factory.CreateConnection());
+        this.mq_helper = new HelperMq(FactoryService.instance.constant.connection_factory.CreateConnection());
     }
 }

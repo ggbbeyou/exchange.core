@@ -88,7 +88,7 @@ public class WebSocketController : ControllerBase
     /// <summary>
     /// mq
     /// </summary>
-    public readonly MqHelper mq_helper = null!;
+    public readonly HelperMq mq_helper = null!;
 
     /// <summary>
     /// 
@@ -97,11 +97,11 @@ public class WebSocketController : ControllerBase
     {
         try
         {
-            this.mq_helper = new MqHelper(FactoryService.instance.constant.connection_factory.CreateConnection());
+            this.mq_helper = new HelperMq(FactoryService.instance.constant.connection_factory.CreateConnection());
         }
         catch (RabbitMQ.Client.Exceptions.BrokerUnreachableException ex)
         {
-            this.mq_helper = new MqHelper(FactoryService.instance.constant.connection_factory);
+            this.mq_helper = new HelperMq(FactoryService.instance.constant.connection_factory);
             FactoryService.instance.constant.logger.LogInformation(ex, $"mq创建通道报错,使用mq连接重新创建通道");
         }
     }

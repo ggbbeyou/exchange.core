@@ -9,7 +9,7 @@ namespace Com.Bll.Util;
 /// <summary>
 /// mq帮助类
 /// </summary>
-public class MqHelper
+public class HelperMq
 {
     /// <summary>
     /// mq 通道接口
@@ -32,7 +32,7 @@ public class MqHelper
     /// 初始化
     /// </summary>
     /// <param name="connectionFactory">mq连接接口</param>
-    public MqHelper(ConnectionFactory connectionFactory)
+    public HelperMq(ConnectionFactory connectionFactory)
     {
         IConnection i_commection = connectionFactory.CreateConnection();
         this.i_model = i_commection.CreateModel();
@@ -42,7 +42,7 @@ public class MqHelper
     /// 初始化
     /// </summary>
     /// <param name="i_commection">mq连接对象</param>
-    public MqHelper(IConnection i_commection)
+    public HelperMq(IConnection i_commection)
     {
         this.i_model = i_commection.CreateModel();
     }

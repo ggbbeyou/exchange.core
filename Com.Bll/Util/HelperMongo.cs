@@ -12,7 +12,7 @@ namespace Com.Bll.Util;
 /// <summary>
 /// MongoDb帮助类
 /// </summary>
-public class MongoHelper
+public class HelperMongo
 {
     private readonly IMongoDatabase _db = null!;
     private readonly ILogger logger;
@@ -26,7 +26,7 @@ public class MongoHelper
     /// 构造函数
     /// </summary>
     /// <param name="conStrMdb">连接字符串</param>
-    public MongoHelper(string conStrMdb, ILogger? logger)
+    public HelperMongo(string conStrMdb, ILogger? logger)
     {
         this.logger = logger ?? NullLogger.Instance;
         this._dataBase = GetDb(conStrMdb);
@@ -36,7 +36,7 @@ public class MongoHelper
     /// 构造函数
     /// </summary>
     /// <param name="_dataBase">接口</param>
-    public MongoHelper(IMongoDatabase _dataBase, ILogger? logger)
+    public HelperMongo(IMongoDatabase _dataBase, ILogger? logger)
     {
         this.logger = logger ?? NullLogger.Instance;
         this._dataBase = _dataBase;

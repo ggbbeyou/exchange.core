@@ -68,11 +68,11 @@ public class FactoryConstant
     /// mq 连接工厂
     /// </summary>
     public readonly ConnectionFactory connection_factory = null!;
-   
+
     /// <summary>
     /// mq
     /// </summary>
-    public readonly MqHelper mq_helper = null!;
+    public readonly HelperMq mq_helper = null!;
 
     /// <summary>
     /// 初始化
@@ -89,7 +89,7 @@ public class FactoryConstant
         this.logger = logger ?? NullLogger.Instance;
 
 
-        
+
         try
         {
             string? redisConnection = config.GetConnectionString("Redis");
@@ -114,7 +114,7 @@ public class FactoryConstant
             {
                 // this.i_commection = this.connection_factory.CreateConnection();
                 // this.i_model = this.i_commection.CreateModel();
-                mq_helper = new MqHelper(this.connection_factory);
+                mq_helper = new HelperMq(this.connection_factory);
             }
             else
             {
@@ -151,8 +151,8 @@ public class FactoryConstant
             if (!string.IsNullOrWhiteSpace(mongodbConnection))
             {
                 MongoClient client = new MongoClient(mongodbConnection);
-                this.mongodb = client.GetDatabase(new MongoUrlBuilder(mongodbConnection).DatabaseName);              
-            }        
+                this.mongodb = client.GetDatabase(new MongoUrlBuilder(mongodbConnection).DatabaseName);
+            }
         }
         catch (Exception ex)
         {

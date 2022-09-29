@@ -7,7 +7,7 @@ using NPOI.XSSF.UserModel;
 
 namespace Com.Bll.Util;
 
-public class ExcelHelper
+public class HelperExcel
 {
 
     /// <summary>

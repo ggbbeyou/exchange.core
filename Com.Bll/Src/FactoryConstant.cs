@@ -68,14 +68,7 @@ public class FactoryConstant
     /// mq 连接工厂
     /// </summary>
     public readonly ConnectionFactory connection_factory = null!;
-    // /// <summary>
-    // /// mq 连接接口
-    // /// </summary>
-    // public readonly IConnection i_commection = null!;
-    // /// <summary>
-    // /// mq 通道接口
-    // /// </summary>
-    // public readonly IModel i_model = null!;
+   
     /// <summary>
     /// mq
     /// </summary>
@@ -94,6 +87,9 @@ public class FactoryConstant
         this.config = config;
         this.environment = environment;
         this.logger = logger ?? NullLogger.Instance;
+
+
+        
         try
         {
             string? redisConnection = config.GetConnectionString("Redis");

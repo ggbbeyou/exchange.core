@@ -1,4 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
+using System.IO.Compression;
 using System.Security.Claims;
 using System.Text;
 using Com.Api.Sdk.Enum;
@@ -20,20 +21,10 @@ namespace Com.Bll;
 public class ServiceCommon
 {
     /// <summary>
-    /// 公共类
-    /// </summary>
-    /// <returns></returns>
-    private Common common = new Common();
-    /// <summary>
     /// 日志接口
     /// </summary>
     private readonly ILogger logger;
-    /// <summary>
-    /// 用户服务
-    /// </summary>
-    /// <returns></returns>
-    // private ServiceUser service_user = new ServiceUser();
-
+  
     /// <summary>
     /// 初始化
     /// </summary>
@@ -41,6 +32,55 @@ public class ServiceCommon
     {
         this.logger = logger ?? NullLogger.Instance;
     }
+
+    /// <summary>
+    /// 生成验证码
+    /// </summary>
+    /// <param name="n">位数</param>
+    /// <returns>验证码字符串</returns>
+    public string CreateRandomCode(int n)
+    {
+        //产生验证码的字符集(去除I 1 l L，O 0等易混字符)
+        string charSet = "2,3,4,5,6,8,9,A,B,C,D,E,F,G,H,J,K,M,N,P,R,S,U,W,X,Y";
+        string[] CharArray = charSet.Split(',');
+        string randomCode = "";
+        int temp = -1;
+        Random rand = new Random();
+        for (int i = 0; i < n; i++)
+        {
+            if (temp != -1)
+            {
+                rand = new Random(i * temp * ((int)DateTime.Now.Ticks));
+            }
+            int t = rand.Next(CharArray.Length - 1);
+            if (temp == t)
+            {
+                return CreateRandomCode(n);
+            }
+            temp = t;
+            randomCode += CharArray[t];
+        }
+        return randomCode;
+    }
+
+    /// <summary>
+    /// 压缩字符
+    /// </summary>
+    /// <param name="json"></param>
+    /// <returns></returns>
+    public byte[] Compression(string json)
+    {
+        byte[] bytes = Encoding.UTF8.GetBytes(json);
+        using (var compressedStream = new MemoryStream())
+        using (var zipStream = new GZipStream(compressedStream, CompressionMode.Compress))
+        {
+            zipStream.Write(bytes, 0, bytes.Length);
+            zipStream.Close();
+            bytes = compressedStream.ToArray();
+            return bytes;
+        }
+    }
+
 
     /// <summary>
     /// 校验验证码
@@ -67,7 +107,7 @@ public class ServiceCommon
     public string? CreateGoogle2FA(string issuer, long user_id)
     {
         TwoFactorAuthenticator tfa = new TwoFactorAuthenticator();
-        string tempKey = common.CreateRandomCode(40);
+        string tempKey = CreateRandomCode(40);
         using (var scope = FactoryService.instance.constant.provider.CreateScope())
         {
             using (DbContextEF db = scope.ServiceProvider.GetService<DbContextEF>()!)

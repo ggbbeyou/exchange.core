@@ -40,25 +40,7 @@ public class Common
     {
         this.logger = logger ?? NullLogger.Instance;
     }
-
-    /// <summary>
-    /// 压缩字符
-    /// </summary>
-    /// <param name="json"></param>
-    /// <returns></returns>
-    public byte[] Compression(string json)
-    {
-        byte[] bytes = Encoding.UTF8.GetBytes(json);
-        using (var compressedStream = new MemoryStream())
-        using (var zipStream = new GZipStream(compressedStream, CompressionMode.Compress))
-        {
-            zipStream.Write(bytes, 0, bytes.Length);
-            zipStream.Close();
-            bytes = compressedStream.ToArray();
-            return bytes;
-        }
-    }
-
+    
     /// <summary>
     /// 生成验证码
     /// </summary>

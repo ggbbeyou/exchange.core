@@ -21,7 +21,19 @@ public class JsonConverterDecimal : JsonConverter<decimal>
     /// <returns></returns>
     public override decimal ReadJson(JsonReader reader, Type objectType, decimal existingValue, bool hasExistingValue, JsonSerializer serializer)
     {
-        return existingValue;
+        if (reader.Value == null)
+        {
+            return 0;
+        }
+        if (reader.ValueType == typeof(string))
+        {
+            if (Decimal.TryParse(reader.Value.ToString(), out var result))
+            {
+                return result;
+            }
+            return default(Decimal);
+        }
+        return Convert.ToDecimal(reader.Value);
     }
 
     /// <summary>
@@ -32,7 +44,14 @@ public class JsonConverterDecimal : JsonConverter<decimal>
     /// <param name="serializer"></param>
     public override void WriteJson(JsonWriter writer, decimal value, JsonSerializer serializer)
     {
-        double input = Convert.ToDouble(value);
-        writer.WriteValue((decimal)input);
+        if (value == 0)
+        {
+            writer.WriteValue(0);
+        }
+        else
+        {
+            string input = value.ToString().TrimEnd('0').TrimEnd('.');
+            writer.WriteValue(Convert.ToDecimal(input));
+        }
     }
 }

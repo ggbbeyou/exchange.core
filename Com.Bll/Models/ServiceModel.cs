@@ -39,14 +39,14 @@ public class ServiceModel
     /// </summary>
     public readonly ServiceOrder service_order;
     /// <summary>
-    /// 
+    /// Service:用户
     /// </summary>
     public readonly ServiceUser service_user;
     /// <summary>
-    /// 
+    /// Service:计账钱包
     /// </summary>
     public readonly ServiceWallet service_wallet;
-    
+
     /// <summary>
     /// 初始化
     /// </summary>
@@ -61,6 +61,6 @@ public class ServiceModel
         this.service_market = new ServiceMarket(this.logger);
         this.service_order = new ServiceOrder(this.logger);
         this.service_user = new ServiceUser(this.logger);
-        this.service_wallet=new ServiceWallet(this.logger);
+        this.service_wallet = new ServiceWallet(this.logger);
     }
 }

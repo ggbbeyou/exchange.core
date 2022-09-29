@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using StackExchange.Redis;
 using Com.Api.Sdk.Models;
 using Com.Bll.Util;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Com.Bll;
 
@@ -21,12 +22,17 @@ public class ServiceDeal
     /// </summary>
     /// <returns></returns>
     private ServiceMarket service_market = new ServiceMarket();
+    /// <summary>
+    /// 日志接口
+    /// </summary>
+    private readonly ILogger logger;
 
     /// <summary>
     /// 初始化
     /// </summary>
-    public ServiceDeal()
+    public ServiceDeal(ILogger? logger = null)
     {
+        this.logger = logger ?? NullLogger.Instance;
     }
 
     /// <summary>

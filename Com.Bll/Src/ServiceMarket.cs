@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Com.Api.Sdk.Models;
 using StackExchange.Redis;
 using Newtonsoft.Json;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Com.Bll;
 
@@ -16,10 +17,16 @@ namespace Com.Bll;
 public class ServiceMarket
 {
     /// <summary>
+    /// 日志接口
+    /// </summary>
+    private readonly ILogger logger;
+
+    /// <summary>
     /// 初始化
     /// </summary>
-    public ServiceMarket()
+    public ServiceMarket(ILogger? logger = null)
     {
+        this.logger = logger ?? NullLogger.Instance;
     }
 
     /// <summary>

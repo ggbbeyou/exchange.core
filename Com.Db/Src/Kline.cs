@@ -1,6 +1,8 @@
 using System;
 using Com.Api.Sdk.Enum;
 using Com.Api.Sdk.Models;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -12,6 +14,13 @@ namespace Com.Db;
 /// </summary>
 public class Kline : ResKline
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <value></value>
+    [JsonIgnore]
+    [BsonElement("_id")]
+    public ObjectId _id { get; set; }
     /// <summary>
     /// 主键
     /// </summary>

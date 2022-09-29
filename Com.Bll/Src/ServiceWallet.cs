@@ -34,6 +34,7 @@ using System.Data;
 using Com.Api.Sdk.Models;
 using Newtonsoft.Json;
 using Com.Bll.Util;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Com.Bll;
 
@@ -42,7 +43,10 @@ namespace Com.Bll;
 /// </summary>
 public class ServiceWallet
 {
-
+    /// <summary>
+    /// 日志接口
+    /// </summary>
+    private readonly ILogger logger;
     /// <summary>
     /// 事务等级
     /// </summary>
@@ -56,9 +60,9 @@ public class ServiceWallet
     /// <summary>
     /// 初始化
     /// </summary>
-    public ServiceWallet()
+    public ServiceWallet(ILogger? logger = null)
     {
-
+        this.logger = logger ?? NullLogger.Instance;
     }
 
     /// <summary>

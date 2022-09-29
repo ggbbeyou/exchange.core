@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Linq.Expressions;
 using Com.Api.Sdk.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Com.Bll;
 
@@ -20,6 +21,11 @@ namespace Com.Bll;
 /// </summary>
 public class ServiceOrder
 {
+
+    /// <summary>
+    /// 日志接口
+    /// </summary>
+    private readonly ILogger logger;
     /// <summary>
     /// 秒表
     /// </summary>
@@ -44,8 +50,9 @@ public class ServiceOrder
     /// <summary>
     /// 初始化
     /// </summary>
-    public ServiceOrder()
+    public ServiceOrder(ILogger? logger = null)
     {
+        this.logger = logger ?? NullLogger.Instance;
     }
 
     /// <summary>
@@ -439,7 +446,7 @@ public class ServiceOrder
     public bool UpdateOrder1(List<Orders> data)
     {
 
-        
+
         return false;
     }
 

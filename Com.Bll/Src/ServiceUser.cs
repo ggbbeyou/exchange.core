@@ -9,6 +9,8 @@ using Com.Db;
 using Google_Authenticator_netcore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 
@@ -28,12 +30,17 @@ public class ServiceUser
     /// service:公共服务
     /// </summary>
     private ServiceCommon service_common = new ServiceCommon();
+    /// <summary>
+    /// 日志接口
+    /// </summary>
+    private readonly ILogger logger;
 
     /// <summary>
     /// 初始化
     /// </summary>
-    public ServiceUser()
+    public ServiceUser(ILogger? logger = null)
     {
+        this.logger = logger ?? NullLogger.Instance;
     }
 
     /// <summary>

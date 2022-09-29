@@ -7,6 +7,8 @@ using StackExchange.Redis;
 using Com.Api.Sdk.Models;
 using Com.Bll.Models;
 using Com.Bll.Util;
+using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Logging;
 
 namespace Com.Bll;
 
@@ -20,12 +22,17 @@ public class ServiceDepth
     /// </summary>
     /// <returns></returns>
     public static readonly ServiceDepth instance = new ServiceDepth();
+    /// <summary>
+    /// 日志接口
+    /// </summary>
+    private readonly ILogger logger;
 
     /// <summary>
     /// 初始化
     /// </summary>
-    private ServiceDepth()
+    public ServiceDepth(ILogger? logger = null)
     {
+        this.logger = logger ?? NullLogger.Instance;
     }
 
     /// <summary>

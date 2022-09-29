@@ -8,6 +8,8 @@ using Com.Db;
 using Google_Authenticator_netcore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Com.Bll;
@@ -23,6 +25,10 @@ public class ServiceCommon
     /// <returns></returns>
     private Common common = new Common();
     /// <summary>
+    /// 日志接口
+    /// </summary>
+    private readonly ILogger logger;
+    /// <summary>
     /// 用户服务
     /// </summary>
     /// <returns></returns>
@@ -31,8 +37,9 @@ public class ServiceCommon
     /// <summary>
     /// 初始化
     /// </summary>
-    public ServiceCommon()
+    public ServiceCommon(ILogger? logger = null)
     {
+        this.logger = logger ?? NullLogger.Instance;
     }
 
     /// <summary>
